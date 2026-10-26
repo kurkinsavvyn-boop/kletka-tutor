@@ -297,6 +297,66 @@ details.done>summary{cursor:pointer;color:var(--ink-3);font-size:13.5px;padding:
 details.done>summary:hover{background:var(--ink-soft)}
 details.done .topic{opacity:.7}
 
+/* Оформление листов */
+.art{display:block}
+.sheet{position:relative}
+.deco{position:absolute;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.sheet-in{position:relative;z-index:1}
+.fr{position:absolute;inset:2.4cqw;border-radius:3cqw}
+.lv1 .fr,.lv2 .fr{border:1.3cqw solid var(--p1)}
+.fr-dashed .fr{border-style:dashed}
+.fr-double .fr{border-style:double;border-width:1.8cqw}
+.fr-dots .fr{border-style:dotted;border-color:var(--p2)}
+.fr-stripes .fr{border-color:transparent;border-image:repeating-linear-gradient(45deg,var(--p1) 0 1.4cqw,var(--p2) 1.4cqw 2.8cqw) 1}
+.lv2 .fr{border-width:.7cqw}
+.lv2.fr-double .fr{border-width:1.1cqw}
+.lv3 .fr{border:.3cqw solid var(--p1);border-image:none}
+.lv1 .sheet-in,.lv2 .sheet-in{padding:9cqw}
+.lv3 .sheet-in{padding:7cqw 8cqw}
+.deco-stk{position:absolute;width:9cqw;height:9cqw}
+.lv2 .deco-stk{width:7cqw;height:7cqw}
+.hero{display:flex;gap:3cqw;align-items:center}
+.hero-art .art{width:24cqw;height:24cqw}
+.hero-r{display:flex;flex-direction:column;gap:2cqw;min-width:0}
+.bubble{position:relative;background:var(--p3);border:.4cqw solid var(--p1);border-radius:3cqw;padding:1.6cqw 2.4cqw;font-size:2.6cqw;line-height:1.35}
+.bubble::before{content:"";position:absolute;left:-2.6cqw;top:42%;border:1.3cqw solid transparent;border-right-color:var(--p1)}
+.band{display:flex;align-items:center;justify-content:space-between;gap:3cqw;background:var(--p3);border-radius:3cqw;padding:2cqw 3cqw;border-left:1.4cqw solid var(--p1)}
+.band .sh-sub{margin-top:1cqw}
+.band-art .art{width:15cqw;height:15cqw}
+.lv1 .sh-title,.lv2 .sh-title,.lv3 .sh-title{color:var(--p1)}
+.lv3 .tico{width:5.4cqw;height:5.4cqw;display:inline-block;vertical-align:-1cqw;margin-right:1cqw}
+.gico{width:4.6cqw;height:4.6cqw;display:inline-block;vertical-align:middle;margin-right:1cqw}
+.lv1 .grp b,.lv2 .grp b,.lv3 .grp b{color:var(--p1)}
+.lv1 .grp,.lv2 .grp{border-bottom-color:var(--p2)}
+.lv1 .it .n,.lv2 .it .n{background:var(--p1);color:#fff;border-radius:50%;width:4.4cqw;height:4.4cqw;display:inline-grid;place-items:center;font-weight:700;font-size:2.1cqw;flex:none}
+.lv3 .it .n{color:var(--p1);font-weight:700}
+.lv1 .box,.lv2 .box{border-color:var(--p1)}
+.lv1 .sh-items,.lv2 .sh-items,.lv3 .sh-items{font-size:3.1cqw;gap:3cqw 3cqw}
+.lv1 .sh-items .box,.lv2 .sh-items .box{min-width:6cqw;height:4.8cqw}
+.lv1 .it,.lv2 .it{gap:1cqw}
+.selfcheck{grid-column:1/-1;display:flex;align-items:center;gap:3cqw;font-weight:600;font-size:3cqw;border-top:.3cqw dashed var(--p1);padding-top:2cqw;margin-top:2cqw}
+.selfcheck .art{width:7cqw;height:7cqw}
+.bw .art [fill]:not(.k):not([fill="none"]){fill:#fff}
+.bw .art [stroke]:not([stroke="none"]){stroke:#2b2638}
+.design .drow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.design select{flex:1;min-width:0;padding:8px 10px;border:1px solid var(--line);border-radius:9px;background:var(--card);color:var(--ink);font:inherit;font-size:14px}
+.bwl{display:flex;gap:6px;align-items:center;font-size:14px}
+.dseg button{padding:7px 11px;font-size:14px;min-width:0}
+.dprev{display:flex;align-items:center;gap:10px;border:1.5px solid var(--line);background:var(--card);border-radius:12px;padding:6px 10px;text-align:left}
+.dprev:hover{border-color:var(--ink)}
+.dprev .art{width:44px;height:44px}
+.dprev span{display:flex;flex-direction:column}
+.dprev small{color:var(--ink-2);font-size:12.5px}
+.gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
+.gcard{border:1.5px solid var(--line);background:var(--card);border-radius:14px;padding:12px;display:flex;flex-direction:column;align-items:center;gap:8px}
+.gcard:hover{border-color:var(--ink)}
+.gcard.on{border:2px solid var(--pen);background:var(--pen-soft)}
+.gchars{display:flex;justify-content:center;gap:4px}
+.gchars .art{width:76px;height:76px}
+.gchars.many .art{width:48px;height:48px}
+.gstk{display:flex;gap:6px}
+.gstk .art{width:26px;height:26px}
+
 /* Виды листа */
 .seg.tpl{gap:4px}
 .seg.tpl button{padding:7px 11px;font-size:14px;min-width:0}
@@ -958,6 +1018,262 @@ Object.assign(FORMS,{
     return{...O(`Сколько ${name} у фигуры «${k}»? □`,SOLID_N[k][w]),svg:solidSVG(k)}}
 });
 
+
+/* ---------- оформление листов: персонажи и наклейки в одном стиле ----------
+   Все рисунки — векторные, нарисованы кодом: плоские цвета, толстый тёмный контур, круглые формы.
+   Тёмные детали помечены классом k: в чёрно-белом режиме заливки становятся белыми, а контур и k остаются. */
+const INK='#2b2638';
+const gg=b=>`<g stroke="${INK}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">${b}</g>`;
+const eye=(x,y,r=3)=>`<circle cx="${x}" cy="${y}" r="${r}" fill="${INK}" class="k" stroke="none"/><circle cx="${x+r*.35}" cy="${y-r*.35}" r="${r*.33}" fill="#fff" stroke="none"/>`;
+const eyes=(a,b,y,r)=>eye(a,y,r)+eye(b,y,r);
+const bigEye=(x,y,rx,ry)=>`<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" fill="#fff"/>`+eye(x+rx*.15,y+ry*.2,Math.min(rx,ry)*.55);
+const smile=(x,y,w=8)=>`<path d="M${x-w/2} ${y} Q${x} ${y+w*.6} ${x+w/2} ${y}" fill="none"/>`;
+const cheek=(x,y)=>`<ellipse cx="${x}" cy="${y}" rx="4" ry="2.4" fill="#ff9aa8" stroke="none" opacity=".75"/>`;
+const cheeks=(a,b,y)=>cheek(a,y)+cheek(b,y);
+const tri=(p,f)=>`<path d="M${p}Z" fill="${f}"/>`;
+
+const CHARS={
+  /* по мотивам мультфильмов */
+  bear:()=>gg(`<ellipse cx="50" cy="78" rx="24" ry="19" fill="#b8752f"/><ellipse cx="34" cy="70" rx="7" ry="10" fill="#b8752f"/>
+    <circle cx="31" cy="21" r="8" fill="#b8752f"/><circle cx="69" cy="21" r="8" fill="#b8752f"/>
+    <circle cx="50" cy="41" r="23" fill="#c98a45"/><ellipse cx="50" cy="51" rx="12" ry="9" fill="#e7b57a"/>
+    <ellipse cx="50" cy="46" rx="6.5" ry="4.5" fill="${INK}" class="k"/>${smile(50,54,9)}
+    <path d="M64 66 h20 v16 q0 8 -10 8 q-10 0 -10 -8z" fill="#f4b63c"/><path d="M62 66 h24"/><path d="M70 66 q2 6 0 9" fill="none" stroke="#e08a1e"/>
+    <ellipse cx="66" cy="72" rx="6" ry="8" fill="#b8752f"/>`)+eyes(41,59,35,3),
+  piglet:()=>gg(`<ellipse cx="50" cy="78" rx="16" ry="17" fill="#f7a9b9"/><path d="M28 22 L36 40 L24 42Z" fill="#f7a9b9"/><path d="M72 22 L64 40 L76 42Z" fill="#f7a9b9"/>
+    <ellipse cx="50" cy="46" rx="20" ry="19" fill="#ffc0cc"/><ellipse cx="50" cy="52" rx="8" ry="6" fill="#f58ea4"/>
+    <circle cx="47" cy="52" r="1.3" fill="${INK}" class="k" stroke="none"/><circle cx="53" cy="52" r="1.3" fill="${INK}" class="k" stroke="none"/>${smile(50,60,7)}`)+eyes(42,58,41,2.6),
+  catBow:()=>gg(`<path d="M30 22 L37 40 L24 40Z" fill="#f0a34a"/><path d="M70 22 L63 40 L76 40Z" fill="#f0a34a"/>
+    <path d="M30 70 q0 -10 20 -10 q20 0 20 10 v22 h-40z" fill="#8fb7e3"/>
+    <ellipse cx="50" cy="44" rx="24" ry="20" fill="#f0a34a"/><ellipse cx="50" cy="52" rx="12" ry="8" fill="#fff4e3"/>
+    <path d="M47 48 h6 l-3 3z" fill="#e66b7c"/><path d="M50 51 v3 M50 54 q-4 3 -7 0 M50 54 q4 3 7 0" fill="none"/>
+    <path d="M37 50 l-12 -2 M37 53 l-12 2 M63 50 l12 -2 M63 53 l12 2" fill="none" stroke-width="2"/>
+    <path d="M36 66 L50 70 L36 75Z M64 66 L50 70 L64 75Z" fill="#d93a3a"/><circle cx="50" cy="70" r="3.5" fill="#b52828"/>`)+eyes(42,58,41,2.8),
+  mouse:()=>gg(`<path d="M68 82 q14 2 16 -10" fill="none"/><ellipse cx="50" cy="78" rx="15" ry="14" fill="#a9a9b5"/>
+    <circle cx="31" cy="30" r="13" fill="#a9a9b5"/><circle cx="69" cy="30" r="13" fill="#a9a9b5"/><circle cx="31" cy="30" r="7" fill="#f3b6c2" stroke="none"/><circle cx="69" cy="30" r="7" fill="#f3b6c2" stroke="none"/>
+    <ellipse cx="50" cy="50" rx="18" ry="17" fill="#bdbdc8"/><circle cx="50" cy="58" r="3" fill="#e66b7c"/>${smile(50,61,6)}`)+eyes(43,57,48,2.6),
+  funtik:()=>gg(`<ellipse cx="46" cy="78" rx="18" ry="17" fill="#f6a1b3"/><path d="M26 32 L32 46 L20 46Z" fill="#f6a1b3"/><path d="M66 32 L60 46 L72 46Z" fill="#f6a1b3"/>
+    <ellipse cx="46" cy="52" rx="20" ry="18" fill="#ffbccb"/><ellipse cx="46" cy="58" rx="8" ry="6" fill="#f58ea4"/>
+    <circle cx="43" cy="58" r="1.3" fill="${INK}" class="k" stroke="none"/><circle cx="49" cy="58" r="1.3" fill="${INK}" class="k" stroke="none"/>
+    <path d="M28 34 q18 -14 36 0 l-2 4 h-32z" fill="#3e6fb8"/><path d="M30 36 h32" stroke="#e8c13a" stroke-width="3"/>`)+eyes(38,54,47,2.6)+gg(smile(46,65,7)),
+  mokus:()=>gg(`<path d="M28 70 q0 -12 22 -12 q22 0 22 12 v22 h-44z" fill="#4a6fa5"/><ellipse cx="50" cy="44" rx="18" ry="19" fill="#f2c9a3"/>
+    <rect x="34" y="8" width="32" height="20" rx="2" fill="#3b3b4a"/><path d="M26 28 h48" stroke-width="4"/><rect x="34" y="21" width="32" height="5" fill="#c94141" stroke="none"/>
+    <circle cx="50" cy="48" r="5" fill="#e66b5c"/><path d="M34 54 q8 8 16 0 q8 8 16 0 q-2 8 -16 6 q-14 2 -16 -6z" fill="#e0e0e6"/>`)+eyes(43,57,40,2.4),
+  cheburashka:()=>gg(`<circle cx="22" cy="34" r="19" fill="#a0673a"/><circle cx="78" cy="34" r="19" fill="#a0673a"/><circle cx="22" cy="34" r="12" fill="#e8b98c" stroke="none"/><circle cx="78" cy="34" r="12" fill="#e8b98c" stroke="none"/>
+    <ellipse cx="50" cy="80" rx="18" ry="15" fill="#a0673a"/><ellipse cx="50" cy="82" rx="10" ry="9" fill="#e8b98c" stroke="none"/>
+    <circle cx="50" cy="46" r="20" fill="#a0673a"/><ellipse cx="50" cy="52" rx="14" ry="12" fill="#f1cfa8"/>
+    <ellipse cx="50" cy="49" rx="4" ry="3" fill="${INK}" class="k"/>${smile(50,55,8)}`)+gg(bigEye(42,41,6,7)+bigEye(58,41,6,7)),
+  gena:()=>gg(`<path d="M24 76 q0 -12 22 -12 q22 0 22 12 v18 h-44z" fill="#c63b3b"/><path d="M40 64 l6 8 l6 -8" fill="#fff"/>
+    <rect x="8" y="70" width="14" height="20" rx="2" fill="#d9534f"/><path d="M11 74 v12 M15 74 v12 M19 74 v12" stroke-width="1.6"/>
+    <path d="M22 48 q0 -16 18 -16 h26 q26 0 26 12 q0 12 -18 14 h-44 q-8 0 -8 -10z" fill="#5fae4f"/>
+    <path d="M30 56 q30 4 58 -6" fill="none"/><path d="M50 56 l2 3 l2 -3 M60 55 l2 3 l2 -3 M70 53 l2 3 l2 -3" fill="#fff" stroke-width="1.4"/>
+    <circle cx="86" cy="40" r="1.6" fill="${INK}" class="k" stroke="none"/><circle cx="81" cy="40" r="1.6" fill="${INK}" class="k" stroke="none"/>
+    <circle cx="38" cy="30" r="8" fill="#5fae4f"/><circle cx="54" cy="30" r="8" fill="#5fae4f"/>
+    <path d="M18 22 q4 -14 22 -14 q14 0 18 12 l4 4 h-46z" fill="#6b4a2f"/><path d="M14 24 h50" stroke-width="3.5"/><path d="M22 20 h36" stroke="#3b2a1c" stroke-width="2.5"/>`)+eyes(39,55,31,2.6),
+  wolf:()=>gg(`<path d="M28 74 q0 -10 22 -10 q22 0 22 10 v20 h-44z" fill="#3f6eb5"/><path d="M34 70 h32 M34 78 h32 M34 86 h32" stroke="#fff" stroke-width="3"/>
+    <path d="M28 18 L36 38 L22 36Z" fill="#8a8f9c"/><path d="M72 18 L64 38 L78 36Z" fill="#8a8f9c"/>
+    <path d="M28 46 q0 -20 22 -20 q22 0 22 20 q0 8 -6 10 l14 6 q-4 6 -16 4 q-6 6 -14 6 q-14 0 -20 -12z" fill="#9aa0ad"/>
+    <path d="M38 30 l4 -10 l4 8 l4 -10 l4 10 l4 -8 l2 10z" fill="#5f6370"/><ellipse cx="80" cy="62" rx="4" ry="3" fill="${INK}" class="k"/>
+    <path d="M56 68 q8 2 16 -2" fill="none"/><path d="M60 68 l2 3 l2 -3 M66 67 l2 3 l2 -3" fill="#fff" stroke-width="1.5"/>`)+eyes(42,56,42,2.6),
+  hare:()=>gg(`<ellipse cx="38" cy="20" rx="7" ry="20" fill="#eef0f5" transform="rotate(-10 38 20)"/><ellipse cx="62" cy="20" rx="7" ry="20" fill="#eef0f5" transform="rotate(10 62 20)"/>
+    <ellipse cx="38" cy="22" rx="3" ry="13" fill="#f6b8c6" stroke="none" transform="rotate(-10 38 22)"/><ellipse cx="62" cy="22" rx="3" ry="13" fill="#f6b8c6" stroke="none" transform="rotate(10 62 22)"/>
+    <path d="M32 74 q0 -10 18 -10 q18 0 18 10 v20 h-36z" fill="#e8504a"/>
+    <ellipse cx="50" cy="50" rx="18" ry="17" fill="#f4f5f9"/><ellipse cx="50" cy="57" rx="4" ry="3" fill="#f58ea4"/>
+    <path d="M47 61 h6 v5 h-6z" fill="#fff" stroke-width="1.6"/>`)+eyes(43,57,47,2.7)+cheeks(38,62,55),
+  matroskin:()=>gg(`<path d="M30 20 L38 40 L24 40Z" fill="#9b9ea8"/><path d="M70 20 L62 40 L76 40Z" fill="#9b9ea8"/>
+    <path d="M30 70 q0 -10 20 -10 q20 0 20 10 v22 h-40z" fill="#9b9ea8"/><path d="M40 62 h20 v30 h-20z" fill="#fff"/><path d="M40 70 h20 M40 78 h20 M40 86 h20" stroke="#3a6fb8" stroke-width="3"/>
+    <ellipse cx="50" cy="44" rx="23" ry="20" fill="#a7aab4"/><path d="M38 28 l3 8 M50 25 v9 M62 28 l-3 8" stroke-width="3.5"/>
+    <ellipse cx="50" cy="52" rx="12" ry="8" fill="#fff"/><path d="M47 48 h6 l-3 3z" fill="#e66b7c"/>${smile(50,53,9)}
+    <path d="M37 50 l-12 -2 M37 53 l-12 2 M63 50 l12 -2 M63 53 l12 2" fill="none" stroke-width="2"/>`)+eyes(42,58,41,2.8),
+  sharik:()=>gg(`<ellipse cx="26" cy="44" rx="9" ry="16" fill="#2b2638" class="k"/><ellipse cx="74" cy="44" rx="9" ry="16" fill="#f6f2ea"/>
+    <ellipse cx="50" cy="80" rx="18" ry="15" fill="#f6f2ea"/><circle cx="50" cy="46" r="22" fill="#f6f2ea"/>
+    <ellipse cx="41" cy="40" rx="8" ry="9" fill="#2b2638" class="k"/><ellipse cx="50" cy="54" rx="10" ry="7" fill="#fff"/>
+    <ellipse cx="50" cy="50" rx="5" ry="3.5" fill="${INK}" class="k"/><path d="M44 57 q6 5 12 0" fill="none"/><path d="M48 59 q2 8 4 0" fill="#e85a6b"/>`)+eye(42,41,2.6)+eye(58,41,2.6),
+  carlson:()=>gg(`<path d="M50 6 v12" stroke-width="3"/><ellipse cx="38" cy="6" rx="12" ry="3.5" fill="#bfc4cf"/><ellipse cx="62" cy="6" rx="12" ry="3.5" fill="#bfc4cf"/>
+    <ellipse cx="50" cy="74" rx="24" ry="20" fill="#3f86c9"/><path d="M30 82 h40 v10 h-40z" fill="#3f86c9"/><path d="M34 84 v8 M42 84 v8 M50 84 v8 M58 84 v8 M66 84 v8" stroke="#d94a3a" stroke-width="3"/>
+    <circle cx="50" cy="40" r="20" fill="#f6c9a0"/><path d="M30 34 q0 -18 20 -18 q20 0 20 18 q-6 -6 -10 -4 q-4 -6 -10 -2 q-6 -4 -10 2 q-6 -2 -10 4z" fill="#e0662f"/>
+    <circle cx="50" cy="45" r="4" fill="#ef9a7a"/>${smile(50,51,12)}`)+eyes(42,58,38,2.6)+cheeks(37,63,47),
+  umka:()=>gg(`<ellipse cx="50" cy="78" rx="24" ry="17" fill="#f3f7fb"/><circle cx="31" cy="26" r="8" fill="#f3f7fb"/><circle cx="69" cy="26" r="8" fill="#f3f7fb"/>
+    <circle cx="50" cy="45" r="22" fill="#fbfdff"/><ellipse cx="50" cy="54" rx="11" ry="8" fill="#e6eef8"/><ellipse cx="50" cy="50" rx="5.5" ry="4" fill="${INK}" class="k"/>${smile(50,57,8)}`)+eyes(41,59,40,3)+cheeks(36,64,50),
+  lion:()=>gg(`<circle cx="50" cy="44" r="30" fill="#e0822f"/><ellipse cx="50" cy="82" rx="18" ry="13" fill="#f2b04a"/>
+    <circle cx="50" cy="46" r="21" fill="#f6bd55"/><circle cx="33" cy="28" r="6" fill="#f6bd55"/><circle cx="67" cy="28" r="6" fill="#f6bd55"/>
+    <ellipse cx="50" cy="54" rx="10" ry="7" fill="#fde0a6"/><path d="M46 50 h8 l-4 4z" fill="#a8542a"/>${smile(50,57,8)}`)+eyes(42,58,42,2.8),
+  turtle:()=>gg(`<ellipse cx="22" cy="62" rx="10" ry="8" fill="#8cc66a"/><ellipse cx="30" cy="80" rx="6" ry="5" fill="#8cc66a"/><ellipse cx="70" cy="80" rx="6" ry="5" fill="#8cc66a"/>
+    <path d="M28 74 q0 -34 32 -34 q26 0 26 34z" fill="#4f9a4c"/><path d="M40 56 l10 -6 l12 6 v12 l-12 6 l-10 -6z M62 56 l10 2 l4 10" fill="none" stroke-width="2.5"/>
+    <path d="M26 74 h62" />`)+eye(20,59,2.4)+gg(smile(18,66,5)),
+  /* супергерои по мотивам */
+  ironHero:()=>gg(`<path d="M28 72 q0 -10 22 -10 q22 0 22 10 v22 h-44z" fill="#c8302c"/><circle cx="50" cy="76" r="6" fill="#bfefff"/>
+    <path d="M28 30 q0 -22 22 -22 q22 0 22 22 v18 q0 14 -22 16 q-22 -2 -22 -16z" fill="#c8302c"/>
+    <path d="M34 34 q16 -6 32 0 v14 q-2 10 -16 12 q-14 -2 -16 -12z" fill="#f2c443"/>
+    <path d="M38 38 h9 v3 h-9z M53 38 h9 v3 h-9z" fill="#bfefff"/><path d="M44 52 h12" stroke-width="2.5"/>`),
+  spiderHero:()=>gg(`<path d="M28 72 q0 -10 22 -10 q22 0 22 10 v22 h-44z" fill="#2f5fb8"/><path d="M38 64 h24 v12 q-12 6 -24 0z" fill="#d23a3a"/>
+    <ellipse cx="50" cy="38" rx="24" ry="27" fill="#d23a3a"/>
+    <path d="M50 11 v54 M26 38 h48 M33 19 l34 38 M67 19 l-34 38" stroke="#7d1f1f" stroke-width="1.4" fill="none"/>
+    <path d="M30 36 q4 -12 16 -6 q-2 12 -14 10z" fill="#fff" stroke-width="3"/><path d="M70 36 q-4 -12 -16 -6 q2 12 14 10z" fill="#fff" stroke-width="3"/>`),
+  thunderHero:()=>gg(`<path d="M22 68 q10 -12 28 -10 q18 -2 28 10 l6 26 h-68z" fill="#c63b3b"/><path d="M32 70 q0 -8 18 -8 q18 0 18 8 v24 h-36z" fill="#59606f"/>
+    <circle cx="44" cy="76" r="3" fill="#c9ced8"/><circle cx="56" cy="76" r="3" fill="#c9ced8"/>
+    <path d="M28 42 q-2 22 6 26 h32 q8 -4 6 -26z" fill="#f3c64b"/><circle cx="50" cy="42" r="18" fill="#f5cfa6"/>
+    <path d="M30 34 q20 -20 40 0 v-4 q-20 -18 -40 0z" fill="#c9ced8"/><path d="M28 30 q-10 -6 -12 -14 q8 4 14 8z M72 30 q10 -6 12 -14 q-8 4 -14 8z" fill="#e8ecf2"/>
+    ${smile(50,50,9)}<rect x="74" y="56" width="16" height="11" rx="2" fill="#9aa1ae"/><path d="M82 67 v20" stroke-width="4"/>`)+eyes(43,57,41,2.4),
+  sorcerer:()=>gg(`<path d="M18 92 q4 -32 32 -32 q28 0 32 32z" fill="#c8302c"/><path d="M36 62 q14 6 28 0 v30 h-28z" fill="#3c5aa6"/>
+    <circle cx="50" cy="40" r="18" fill="#f2c9a3"/><path d="M32 38 q0 -20 18 -20 q18 0 18 20 q-4 -10 -18 -10 q-14 0 -18 10z" fill="#3b2f2a"/>
+    <path d="M34 30 q2 -4 6 -4 M66 30 q-2 -4 -6 -4" stroke="#d7d7de" stroke-width="3"/><path d="M44 50 q6 10 12 0 v6 q-6 6 -12 0z" fill="#3b2f2a"/>
+    <circle cx="82" cy="34" r="12" fill="none" stroke="#f2a93b" stroke-width="3"/><circle cx="82" cy="34" r="7" fill="none" stroke="#f2a93b" stroke-width="2"/>`)+eyes(43,57,40,2.3),
+  /* свои сюжеты */
+  astronaut:()=>gg(`<path d="M28 72 q0 -10 22 -10 q22 0 22 10 v22 h-44z" fill="#e8ecf2"/><rect x="42" y="72" width="16" height="10" rx="2" fill="#5aa0e8"/>
+    <circle cx="50" cy="40" r="26" fill="#e8ecf2"/><ellipse cx="50" cy="42" rx="17" ry="14" fill="#3b4d7a"/><path d="M40 36 q4 -4 8 -2" stroke="#9fd0ff" stroke-width="3" fill="none"/>
+    <circle cx="50" cy="12" r="3" fill="#e8504a"/><path d="M50 14 v2"/>`),
+  robot:()=>gg(`<path d="M50 8 v10"/><circle cx="50" cy="7" r="4" fill="#e8504a"/><rect x="26" y="18" width="48" height="36" rx="8" fill="#9fb3c8"/>
+    <circle cx="40" cy="34" r="7" fill="#fff"/><circle cx="60" cy="34" r="7" fill="#fff"/><circle cx="40" cy="34" r="3.2" fill="${INK}" class="k" stroke="none"/><circle cx="60" cy="34" r="3.2" fill="${INK}" class="k" stroke="none"/>
+    <rect x="40" y="44" width="20" height="5" rx="2" fill="#f2c443"/><rect x="30" y="58" width="40" height="34" rx="6" fill="#7f94ad"/>
+    <circle cx="44" cy="72" r="4" fill="#5ad19a"/><circle cx="56" cy="72" r="4" fill="#f2a93b"/><path d="M22 64 l-8 12 M78 64 l8 12" stroke-width="4"/>`),
+  trex:()=>gg(`<path d="M24 92 q0 -26 20 -40 q-10 -4 -10 -18 q0 -18 22 -18 q24 0 24 18 q0 14 -14 16 q10 8 10 22 q0 10 -6 20z" fill="#6cc06a"/>
+    <path d="M24 92 q-10 -4 -14 -16 q8 6 16 6" fill="#6cc06a"/><path d="M46 22 l4 -8 l4 8 l4 -8 l4 8" fill="#4f9a4c"/>
+    <path d="M60 30 h18" fill="none"/><path d="M64 30 l2 4 l2 -4 M70 30 l2 4 l2 -4" fill="#fff" stroke-width="1.5"/><path d="M58 52 l8 4 M56 58 l8 4" stroke-width="3.5"/>
+    <ellipse cx="54" cy="70" rx="8" ry="10" fill="#bfe6a8" stroke="none"/>`)+eye(52,26,3),
+  stego:()=>gg(`<path d="M20 50 l8 -14 l8 10 l8 -16 l8 14 l8 -14 l6 16z" fill="#f2a93b"/>
+    <path d="M12 74 q0 -26 38 -26 q30 0 36 18 q4 12 -6 12 h-60 q-8 0 -8 -4z" fill="#7cc4d8"/><circle cx="82" cy="62" r="11" fill="#7cc4d8"/>
+    <path d="M26 78 v12 M40 78 v12 M58 78 v12 M72 78 v12" stroke-width="5"/>`)+eye(84,59,2.6)+gg(smile(86,66,5)),
+  pirate:()=>gg(`<path d="M28 72 q0 -10 22 -10 q22 0 22 10 v22 h-44z" fill="#2f5fb8"/><path d="M34 66 h32 M34 76 h32 M34 86 h32" stroke="#fff" stroke-width="3"/>
+    <circle cx="50" cy="42" r="20" fill="#f2c9a3"/><path d="M24 30 q26 -26 52 0 q-26 -6 -52 0z" fill="#2b2638" class="k"/><path d="M26 30 h48" stroke-width="3.5"/>
+    <circle cx="50" cy="22" r="4" fill="#fff" stroke-width="1.5"/><path d="M34 34 l32 8" stroke-width="2"/><ellipse cx="58" cy="40" rx="5" ry="4.5" fill="#2b2638" class="k"/>${smile(50,51,10)}`)+eye(42,40,2.5),
+  parrot:()=>gg(`<path d="M44 84 l-6 12 h12z" fill="#2f7fd8"/><ellipse cx="50" cy="62" rx="18" ry="24" fill="#e8504a"/><path d="M36 56 q-10 18 4 30 q4 -14 -4 -30z" fill="#f2c443"/>
+    <circle cx="52" cy="34" r="16" fill="#e8504a"/><circle cx="56" cy="32" r="7" fill="#fff"/>
+    <path d="M64 34 q12 2 8 14 q-6 -2 -8 -8z" fill="#f2c443"/>`)+eye(57,32,3),
+  knight:()=>gg(`<path d="M28 72 q0 -10 22 -10 q22 0 22 10 v22 h-44z" fill="#9aa1ae"/><path d="M50 62 v32 M28 76 h44" stroke="#d93a3a" stroke-width="5"/>
+    <path d="M30 26 q0 -18 20 -18 q20 0 20 18 v24 q0 10 -20 10 q-20 0 -20 -10z" fill="#c9ced8"/><path d="M36 36 h28 v6 h-28z" fill="${INK}" class="k"/>
+    <path d="M50 8 q14 -8 22 4 q-12 -2 -22 2z" fill="#d93a3a"/><path d="M44 48 v6 M50 48 v6 M56 48 v6" stroke-width="2"/>`),
+  dragon:()=>gg(`<path d="M30 46 q-20 -14 -26 -4 q12 2 14 14z" fill="#9b6ad8"/><path d="M70 46 q20 -14 26 -4 q-12 2 -14 14z" fill="#9b6ad8"/>
+    <ellipse cx="50" cy="74" rx="22" ry="19" fill="#5fb87a"/><ellipse cx="50" cy="78" rx="12" ry="12" fill="#cdecb8" stroke="none"/>
+    <path d="M38 22 l-4 -12 l10 8z M62 22 l4 -12 l-10 8z" fill="#f2c443"/><ellipse cx="50" cy="40" rx="22" ry="19" fill="#5fb87a"/>
+    <ellipse cx="50" cy="50" rx="12" ry="7" fill="#7fcf8f"/><circle cx="45" cy="49" r="1.4" fill="${INK}" class="k" stroke="none"/><circle cx="55" cy="49" r="1.4" fill="${INK}" class="k" stroke="none"/>${smile(50,53,8)}`)+eyes(41,59,36,3),
+  fairy:()=>gg(`<ellipse cx="28" cy="52" rx="14" ry="20" fill="#bfe6ff" opacity=".9"/><ellipse cx="72" cy="52" rx="14" ry="20" fill="#bfe6ff" opacity=".9"/>
+    <path d="M36 92 l6 -28 h16 l6 28z" fill="#f28ab8"/><circle cx="50" cy="42" r="17" fill="#f5d2b0"/>
+    <path d="M32 42 q0 -22 18 -22 q18 0 18 22 q-4 -14 -18 -12 q-14 -2 -18 12z" fill="#f2c443"/><path d="M42 22 l8 -8 l8 8" fill="#f2a93b"/>
+    ${smile(50,50,8)}<path d="M72 74 l12 -16" stroke-width="2.5"/><path d="M84 52 l2 4 l4 1 l-3 3 l1 4 l-4 -2 l-4 2 l1 -4 l-3 -3 l4 -1z" fill="#f2c443" stroke-width="1.5"/>`)+eyes(44,56,41,2.3)+cheeks(40,60,47),
+  unicorn:()=>gg(`<path d="M30 56 q0 -6 8 -12 l26 -6 q16 2 18 18 q0 10 -10 10 h-30 v24 h-10 v-24 q-2 -4 -2 -10z" fill="#fbf7ff"/>
+    <path d="M70 32 l6 -24 l2 26z" fill="#f2c443"/><path d="M50 40 q-8 -10 -2 -24 q6 8 12 6 q-4 10 4 18z" fill="#f28ab8"/><path d="M44 46 q-10 -6 -12 4 q6 0 12 -4z" fill="#8fd0f5"/>
+    <path d="M40 66 v26 M64 66 v26" stroke-width="6"/>`)+eye(72,42,2.8)+cheek(76,52),
+  fish:()=>gg(`<path d="M18 50 l-12 -14 v28z" fill="#f2a93b"/><ellipse cx="50" cy="50" rx="34" ry="24" fill="#f6b24a"/>
+    <path d="M42 30 q8 20 0 40 M56 28 q8 22 0 44" stroke="#e08a1e" fill="none"/><path d="M44 26 q10 -14 22 -2" fill="#f2a93b"/>`)+eye(70,44,4)+gg(smile(74,58,8)),
+  octopus:()=>gg(`<path d="M24 60 q-4 22 -14 28 M36 66 q-2 16 -8 26 M50 68 v26 M64 66 q2 16 8 26 M76 60 q4 22 14 28" stroke="#a46ad8" stroke-width="7" fill="none"/>
+    <path d="M18 56 q0 -46 32 -46 q32 0 32 46 q-32 14 -64 0z" fill="#b57ce6"/><circle cx="34" cy="26" r="4" fill="#d6b4f5" stroke="none"/>`)+gg(bigEye(40,40,7,8)+bigEye(60,40,7,8))+gg(smile(50,52,10))+cheeks(30,70,50),
+  footballer:()=>gg(`<path d="M28 72 q0 -10 22 -10 q22 0 22 10 v22 h-44z" fill="#e8504a"/><text x="50" y="86" text-anchor="middle" font-size="14" font-weight="700" fill="#fff" stroke="none" font-family="Arial">10</text>
+    <circle cx="50" cy="40" r="20" fill="#f2c9a3"/><path d="M30 38 q0 -20 20 -20 q20 0 20 20 q-6 -10 -20 -10 q-14 0 -20 10z" fill="#6b4a2f"/>${smile(50,48,10)}
+    <circle cx="82" cy="82" r="11" fill="#fff"/><path d="M82 74 l6 4 l-2 7 h-8 l-2 -7z" fill="${INK}" class="k" stroke-width="1"/>`)+eyes(43,57,38,2.4)+cheeks(38,62,45),
+  racecar:()=>gg(`<path d="M8 64 q4 -16 22 -18 l12 -12 h22 l14 12 q14 2 16 18 v8 h-86z" fill="#e8504a"/><path d="M44 36 h18 l10 10 h-34z" fill="#bfe6ff"/>
+    <rect x="44" y="52" width="16" height="12" rx="2" fill="#fff"/><text x="52" y="62" text-anchor="middle" font-size="10" font-weight="700" fill="${INK}" stroke="none" font-family="Arial">7</text>
+    <circle cx="26" cy="74" r="10" fill="${INK}" class="k"/><circle cx="74" cy="74" r="10" fill="${INK}" class="k"/><circle cx="26" cy="74" r="4" fill="#c9ced8"/><circle cx="74" cy="74" r="4" fill="#c9ced8"/>`),
+  fox:()=>gg(`<path d="M70 86 q24 -4 20 -30 q-10 8 -18 12z" fill="#e8762f"/><path d="M84 66 q4 -8 6 -10 q0 10 -8 16z" fill="#fff" stroke="none"/>
+    <ellipse cx="50" cy="78" rx="18" ry="15" fill="#e8762f"/><path d="M26 18 L36 40 L22 42Z M74 18 L64 40 L78 42Z" fill="#e8762f"/>
+    <path d="M24 44 q0 -18 26 -18 q26 0 26 18 q-6 18 -26 22 q-20 -4 -26 -22z" fill="#f08a3c"/><path d="M36 52 q14 14 28 0 q-14 18 -28 0z" fill="#fff"/>
+    <ellipse cx="50" cy="58" rx="4" ry="3" fill="${INK}" class="k"/>`)+eyes(41,59,44,2.8),
+  hedgehog:()=>gg(`<path d="M18 70 l-6 -10 l10 -2 l-4 -12 l12 2 l0 -12 l10 6 l4 -12 l8 10 l8 -10 l4 12 l10 -6 l0 12 l12 -2 l-4 12 l10 2 l-6 10z" fill="#7a5a44"/>
+    <ellipse cx="50" cy="72" rx="28" ry="18" fill="#d9b48a"/><circle cx="50" cy="84" r="3" fill="${INK}" class="k"/>${smile(50,88,8)}
+    <path d="M70 44 q8 -10 18 -4 q-6 10 -18 4z" fill="#e8504a"/><circle cx="80" cy="40" r="1.5" fill="#fff" stroke="none"/>`)+eyes(41,59,70,2.7)+cheeks(35,65,78),
+  snowman:()=>gg(`<circle cx="50" cy="76" r="20" fill="#fff"/><circle cx="50" cy="42" r="16" fill="#fff"/><path d="M36 30 h28 v-4 h-6 v-16 h-16 v16 h-6z" fill="#2b2638" class="k"/>
+    <path d="M50 46 l14 4 l-14 2z" fill="#f2862f"/><path d="M34 58 q16 8 32 0 v6 q-16 6 -32 0z" fill="#e8504a"/><path d="M62 62 l6 12 h-6z" fill="#e8504a"/>
+    <circle cx="50" cy="72" r="2.5" fill="${INK}" class="k" stroke="none"/><circle cx="50" cy="82" r="2.5" fill="${INK}" class="k" stroke="none"/><path d="M30 70 l-14 -10 M70 70 l14 -10" stroke-width="2.5"/>`)+eyes(44,56,38,2.4)+cheeks(40,60,48)
+};
+
+const FACES=[`<g stroke="${INK}" stroke-width="2.2" fill="none"><circle cx="20" cy="20" r="16" fill="#fff"/><circle cx="14" cy="16" r="1.8" fill="${INK}" class="k"/><circle cx="26" cy="16" r="1.8" fill="${INK}" class="k"/><path d="M12 24 q8 8 16 0"/></g>`,
+  `<g stroke="${INK}" stroke-width="2.2" fill="none"><circle cx="20" cy="20" r="16" fill="#fff"/><circle cx="14" cy="16" r="1.8" fill="${INK}" class="k"/><circle cx="26" cy="16" r="1.8" fill="${INK}" class="k"/><path d="M13 26 h14"/></g>`,
+  `<g stroke="${INK}" stroke-width="2.2" fill="none"><circle cx="20" cy="20" r="16" fill="#fff"/><circle cx="14" cy="16" r="1.8" fill="${INK}" class="k"/><circle cx="26" cy="16" r="1.8" fill="${INK}" class="k"/><path d="M12 29 q8 -8 16 0"/></g>`];
+/* наклейки: маленькие значки в том же стиле, рисуются в квадрате 40×40 */
+const star5=(cx,cy,R,r,f)=>{let d='';for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,rr=i%2?r:R;d+=(i?'L':'M')+(cx+rr*Math.cos(a)).toFixed(1)+' '+(cy+rr*Math.sin(a)).toFixed(1)}return `<path d="${d}Z" fill="${f}"/>`};
+const sg=b=>`<g stroke="${INK}" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">${b}</g>`;
+const STK={
+  star:()=>sg(star5(20,21,16,7,'#f6c443')),
+  heart:()=>sg(`<path d="M20 34 q-16 -10 -14 -20 q2 -8 10 -6 q4 2 4 6 q0 -4 4 -6 q8 -2 10 6 q2 10 -14 20z" fill="#f2678a"/>`),
+  honey:()=>sg(`<path d="M8 14 h24 v14 q0 8 -12 8 q-12 0 -12 -8z" fill="#f4b63c"/><path d="M6 14 h28"/><path d="M14 14 q2 6 0 9" stroke="#e08a1e" fill="none"/>`),
+  balloon:()=>sg(`<ellipse cx="20" cy="15" rx="11" ry="13" fill="#e8504a"/><path d="M20 28 l-2 3 h4z" fill="#e8504a"/><path d="M20 31 q-4 4 0 8" fill="none" stroke-width="1.6"/>`),
+  bee:()=>sg(`<ellipse cx="14" cy="13" rx="6" ry="5" fill="#dff3ff"/><ellipse cx="26" cy="13" rx="6" ry="5" fill="#dff3ff"/><ellipse cx="20" cy="24" rx="12" ry="9" fill="#f6c443"/><path d="M16 16 v16 M24 16 v16" stroke-width="3"/>`),
+  cheese:()=>sg(`<path d="M6 28 l26 -14 v14z" fill="#f6c443"/><path d="M6 28 v6 h26 v-6z" fill="#f2b33d"/><circle cx="22" cy="24" r="2" fill="#e0a12a" stroke="none"/>`),
+  bow:()=>sg(`<path d="M20 20 L6 12 v16z M20 20 L34 12 v16z" fill="#d93a3a"/><circle cx="20" cy="20" r="4" fill="#b52828"/>`),
+  flower:()=>sg(`<circle cx="20" cy="10" r="6" fill="#f28ab8"/><circle cx="30" cy="18" r="6" fill="#f28ab8"/><circle cx="26" cy="30" r="6" fill="#f28ab8"/><circle cx="14" cy="30" r="6" fill="#f28ab8"/><circle cx="10" cy="18" r="6" fill="#f28ab8"/><circle cx="20" cy="21" r="5" fill="#f6c443"/>`),
+  umbrella:()=>sg(`<path d="M4 20 q16 -18 32 0 q-4 -4 -8 0 q-4 -4 -8 0 q-4 -4 -8 0 q-4 -4 -8 0z" fill="#7a5ad8"/><path d="M20 20 v12 q0 4 -4 4" fill="none"/>`),
+  candy:()=>sg(`<path d="M8 20 l-6 -6 v12z M32 20 l6 -6 v12z" fill="#f28ab8"/><circle cx="20" cy="20" r="10" fill="#f6c443"/><path d="M14 14 q6 6 12 12" stroke="#e8504a" stroke-width="2.5" fill="none"/>`),
+  orange:()=>sg(`<circle cx="20" cy="22" r="13" fill="#f39a2f"/><path d="M20 9 q4 -6 10 -4 q-4 6 -10 4z" fill="#5fae4f"/>`),
+  accordion:()=>sg(`<rect x="4" y="12" width="10" height="18" rx="2" fill="#d9534f"/><rect x="26" y="12" width="10" height="18" rx="2" fill="#d9534f"/><path d="M14 12 l3 18 l3 -18 l3 18 l3 -18" fill="#f6c443"/>`),
+  house:()=>sg(`<path d="M6 20 l14 -12 l14 12z" fill="#e8504a"/><rect x="9" y="20" width="22" height="14" fill="#f6d9a8"/><rect x="17" y="25" width="6" height="9" fill="#a0673a"/>`),
+  carrot:()=>sg(`<path d="M10 30 l18 -18 q4 4 0 8 z" fill="#f2862f"/><path d="M26 12 l6 -6 M28 14 l8 -2 M26 10 l2 -8" stroke="#5fae4f" stroke-width="3"/>`),
+  note:()=>sg(`<path d="M14 30 v-20 l16 -4 v20" fill="none" stroke-width="3"/><ellipse cx="11" cy="30" rx="5" ry="4" fill="${INK}" class="k"/><ellipse cx="27" cy="26" rx="5" ry="4" fill="${INK}" class="k"/>`),
+  milk:()=>sg(`<path d="M14 6 h12 v6 l4 6 v16 h-20 v-16 l4 -6z" fill="#fff"/><path d="M10 22 h20 v6 h-20z" fill="#3f86c9" stroke="none"/>`),
+  bone:()=>sg(`<path d="M10 14 a4 4 0 1 1 4 -4 l12 12 a4 4 0 1 1 4 4 a4 4 0 1 1 -4 4 l-12 -12 a4 4 0 1 1 -4 -4z" fill="#f6f2ea"/>`),
+  sun:()=>sg(`<circle cx="20" cy="20" r="9" fill="#f6c443"/><path d="M20 3 v5 M20 32 v5 M3 20 h5 M32 20 h5 M8 8 l3 3 M29 29 l3 3 M8 32 l3 -3 M29 11 l3 -3" stroke="#f2a93b" stroke-width="3"/>`),
+  jam:()=>sg(`<rect x="10" y="12" width="20" height="22" rx="4" fill="#d93a5a"/><rect x="8" y="7" width="24" height="7" rx="2" fill="#f2f2f2"/><path d="M14 20 h12" stroke="#fff" stroke-width="2"/>`),
+  propeller:()=>sg(`<ellipse cx="11" cy="20" rx="9" ry="3.5" fill="#bfc4cf"/><ellipse cx="29" cy="20" rx="9" ry="3.5" fill="#bfc4cf"/><circle cx="20" cy="20" r="4" fill="#e8504a"/>`),
+  cloud:()=>sg(`<path d="M8 28 q-6 0 -4 -8 q2 -6 8 -4 q2 -8 10 -6 q8 0 8 8 q8 0 6 8 q-2 4 -8 2z" fill="#eaf4ff"/>`),
+  cake:()=>sg(`<rect x="8" y="18" width="24" height="16" rx="2" fill="#f6d9a8"/><path d="M8 18 q4 6 8 0 q4 6 8 0 q4 6 8 0 v-2 h-24z" fill="#f28ab8"/><path d="M20 8 v8" stroke-width="2.5"/><path d="M20 4 q3 3 0 5 q-3 -2 0 -5z" fill="#f2a93b"/>`),
+  snowflake:()=>sg(`<path d="M20 4 v32 M6 12 l28 16 M6 28 l28 -16 M16 6 l4 4 l4 -4 M16 34 l4 -4 l4 4" stroke="#5aa0e8" stroke-width="2.6" fill="none"/>`),
+  fishS:()=>sg(`<path d="M8 20 l-6 -6 v12z" fill="#5aa0e8"/><ellipse cx="22" cy="20" rx="14" ry="9" fill="#7fc0f0"/><circle cx="30" cy="18" r="1.8" fill="${INK}" class="k" stroke="none"/>`),
+  moon:()=>sg(`<path d="M24 4 q-14 4 -14 16 q0 12 14 16 q-18 4 -20 -16 q2 -20 20 -16z" fill="#f6d36b"/>`),
+  palm:()=>sg(`<path d="M20 36 q2 -14 0 -22" fill="none" stroke="#a0673a" stroke-width="4"/><path d="M20 14 q-10 -8 -16 0 q8 -2 16 0 q-4 -10 -14 -10 q10 2 14 10 q4 -10 14 -10 q-10 2 -14 10 q8 -2 16 0 q-6 -8 -16 0z" fill="#5fae4f"/>`),
+  lightning:()=>sg(`<path d="M24 2 l-14 20 h8 l-4 16 l16 -22 h-8z" fill="#f6c443"/>`),
+  shield:()=>sg(`<path d="M20 4 l14 5 v10 q0 12 -14 18 q-14 -6 -14 -18 v-10z" fill="#3f86c9"/><path d="M20 10 v22 M10 18 h20" stroke="#fff" stroke-width="3"/>`),
+  rocket:()=>sg(`<path d="M20 2 q10 8 8 24 h-16 q-2 -16 8 -24z" fill="#e8ecf2"/><circle cx="20" cy="14" r="3.5" fill="#5aa0e8"/><path d="M12 22 l-6 8 h6z M28 22 l6 8 h-6z" fill="#e8504a"/><path d="M16 26 q4 10 8 0z" fill="#f2a93b"/>`),
+  planet:()=>sg(`<circle cx="20" cy="20" r="10" fill="#b57ce6"/><ellipse cx="20" cy="22" rx="18" ry="5" fill="none" stroke="#f6c443" stroke-width="2.6"/>`),
+  egg:()=>sg(`<ellipse cx="20" cy="22" rx="11" ry="14" fill="#f6f2ea"/><circle cx="16" cy="18" r="2.5" fill="#7cc4a0" stroke="none"/><circle cx="24" cy="26" r="2" fill="#7cc4a0" stroke="none"/>`),
+  leaf:()=>sg(`<path d="M6 34 q0 -26 28 -28 q-2 28 -28 28z" fill="#6cc06a"/><path d="M6 34 l20 -20" fill="none"/>`),
+  chest:()=>sg(`<rect x="6" y="16" width="28" height="18" rx="2" fill="#a0673a"/><path d="M6 16 q14 -12 28 0z" fill="#b8752f"/><rect x="17" y="18" width="6" height="7" fill="#f6c443"/>`),
+  anchor:()=>sg(`<circle cx="20" cy="8" r="4" fill="none"/><path d="M20 12 v22 M12 18 h16 M6 24 q2 12 14 12 q12 0 14 -12" fill="none" stroke-width="3"/>`),
+  coin:()=>sg(`<circle cx="20" cy="20" r="13" fill="#f6c443"/><circle cx="20" cy="20" r="8" fill="none" stroke="#e0a12a" stroke-width="2"/>`),
+  castle:()=>sg(`<path d="M6 34 v-22 h6 v4 h4 v-4 h8 v4 h4 v-4 h6 v22z" fill="#c9ced8"/><path d="M17 34 v-8 q3 -4 6 0 v8z" fill="#7a5a44"/><path d="M20 12 v-8 l6 2 l-6 2" fill="#e8504a"/>`),
+  crown:()=>sg(`<path d="M6 30 l-2 -18 l9 8 l7 -12 l7 12 l9 -8 l-2 18z" fill="#f6c443"/><circle cx="20" cy="24" r="2.5" fill="#e8504a" stroke="none"/>`),
+  flag:()=>sg(`<path d="M10 36 v-32" stroke-width="3"/><path d="M10 6 h20 l-5 6 l5 6 h-20z" fill="#e8504a"/>`),
+  rainbow:()=>sg(`<path d="M4 30 a16 16 0 0 1 32 0" fill="none" stroke="#e8504a" stroke-width="4"/><path d="M9 30 a11 11 0 0 1 22 0" fill="none" stroke="#f6c443" stroke-width="4"/><path d="M14 30 a6 6 0 0 1 12 0" fill="none" stroke="#5aa0e8" stroke-width="4"/>`),
+  wand:()=>sg(`<path d="M8 34 l16 -16" stroke-width="3"/>`+star5(27,13,10,4.5,'#f6c443')),
+  shell:()=>sg(`<path d="M20 34 l-14 -16 q14 -16 28 0z" fill="#f6c0a8"/><path d="M20 34 v-28 M20 34 l-8 -24 M20 34 l8 -24" fill="none" stroke-width="1.8"/>`),
+  bubble:()=>sg(`<circle cx="14" cy="24" r="9" fill="#dff3ff"/><circle cx="28" cy="12" r="6" fill="#dff3ff"/><circle cx="11" cy="21" r="2" fill="#fff" stroke="none"/>`),
+  starfish:()=>sg(star5(20,21,17,8,'#f2862f')),
+  ball:()=>sg(`<circle cx="20" cy="20" r="15" fill="#fff"/><path d="M20 12 l7 5 l-3 8 h-8 l-3 -8z" fill="${INK}" class="k" stroke-width="1"/>`),
+  trophy:()=>sg(`<path d="M10 6 h20 v8 q0 10 -10 10 q-10 0 -10 -10z" fill="#f6c443"/><path d="M10 9 h-5 q0 8 7 8 M30 9 h5 q0 8 -7 8" fill="none"/><path d="M16 30 h8 v-6 h-8z M12 34 h16 v-4 h-16z" fill="#e0a12a"/>`),
+  checkflag:()=>sg(`<path d="M8 36 v-32" stroke-width="3"/><rect x="8" y="4" width="24" height="16" fill="#fff"/><path d="M8 4 h6 v4 h-6z M20 4 h6 v4 h-6z M14 8 h6 v4 h-6z M26 8 h6 v4 h-6z M8 12 h6 v4 h-6z M20 12 h6 v4 h-6z M14 16 h6 v4 h-6z M26 16 h6 v4 h-6z" fill="${INK}" class="k" stroke="none"/>`),
+  wheel:()=>sg(`<circle cx="20" cy="20" r="14" fill="${INK}" class="k"/><circle cx="20" cy="20" r="6" fill="#c9ced8"/>`),
+  mushroom:()=>sg(`<path d="M4 20 q16 -22 32 0z" fill="#e8504a"/><rect x="14" y="20" width="12" height="14" rx="4" fill="#f6f2ea"/><circle cx="14" cy="13" r="2.5" fill="#fff" stroke="none"/><circle cx="25" cy="11" r="2.5" fill="#fff" stroke="none"/>`),
+  acorn:()=>sg(`<ellipse cx="20" cy="25" rx="9" ry="11" fill="#c98a45"/><path d="M8 18 q12 -12 24 0z" fill="#7a5a44"/><path d="M20 8 v-4" stroke-width="3"/>`),
+  tree:()=>sg(`<path d="M20 2 l12 16 h-6 l8 10 h-28 l8 -10 h-6z" fill="#4f9a4c"/><rect x="17" y="28" width="6" height="8" fill="#a0673a"/>`),
+  gift:()=>sg(`<rect x="6" y="16" width="28" height="18" rx="2" fill="#e8504a"/><rect x="4" y="12" width="32" height="6" rx="2" fill="#f28ab8"/><path d="M20 12 v22" stroke="#f6c443" stroke-width="4"/><path d="M20 12 q-10 -10 -10 0 M20 12 q10 -10 10 0" fill="none"/>`)
+};
+
+/* 20 сюжетов: персонажи и наклейки */
+const THEMES=[
+  {id:'honey',n:'Медвежонок с мёдом',chars:['bear','piglet'],stk:['honey','balloon','bee','flower']},
+  {id:'leopold',n:'Кот в бабочке и мышата',chars:['catBow','mouse'],stk:['cheese','bow','heart','flower']},
+  {id:'funtik',n:'Поросёнок в шляпе',chars:['funtik','mokus'],stk:['umbrella','balloon','candy','star']},
+  {id:'cheb',n:'Ушастик и крокодил',chars:['cheburashka','gena'],stk:['orange','accordion','house','star']},
+  {id:'pogodi',n:'Волк и Заяц',chars:['wolf','hare'],stk:['carrot','note','star','sun']},
+  {id:'prosto',n:'Кот в полоску и пёс',chars:['matroskin','sharik'],stk:['milk','bone','house','sun']},
+  {id:'carlson',n:'Малыш с пропеллером',chars:['carlson'],stk:['jam','propeller','cloud','cake']},
+  {id:'umka',n:'Белый медвежонок',chars:['umka'],stk:['snowflake','fishS','moon','star']},
+  {id:'lion',n:'Львёнок и черепаха',chars:['lion','turtle'],stk:['sun','palm','flower','note']},
+  {id:'heroes',n:'Супергерои',chars:['ironHero','spiderHero','thunderHero','sorcerer'],stk:['lightning','shield','star','rocket']},
+  {id:'space',n:'Космос',chars:['astronaut','robot'],stk:['rocket','planet','star','moon']},
+  {id:'dino',n:'Динозавры',chars:['trex','stego'],stk:['egg','leaf','palm','star']},
+  {id:'pirates',n:'Пираты',chars:['pirate','parrot'],stk:['chest','anchor','palm','coin']},
+  {id:'knight',n:'Рыцарь и дракон',chars:['knight','dragon'],stk:['castle','crown','shield','flag']},
+  {id:'fairy',n:'Феи и единорог',chars:['fairy','unicorn'],stk:['rainbow','wand','heart','star']},
+  {id:'sea',n:'Подводный мир',chars:['fish','octopus'],stk:['shell','bubble','anchor','starfish']},
+  {id:'football',n:'Футбол',chars:['footballer'],stk:['ball','trophy','flag','star']},
+  {id:'race',n:'Гонки',chars:['racecar'],stk:['checkflag','wheel','trophy','star']},
+  {id:'forest',n:'Лес и звери',chars:['fox','hedgehog'],stk:['mushroom','acorn','leaf','tree']},
+  {id:'winter',n:'Зима и праздники',chars:['snowman'],stk:['snowflake','gift','tree','star']}
+];
+const PALETTES=[
+  ['#F4A73B','#E8573F','#FFF4DC','#3A86C8'],['#2BB39A','#F2B23E','#E6F7F2','#E8573F'],['#D9467A','#8E5BD9','#FCE8F1','#E8A93B'],['#2E7FD8','#20AFB8','#E5F1FD','#F59E3C'],
+  ['#4A9B4F','#C98A2E','#EBF6E8','#D9534F'],['#7A5AF8','#E8609E','#F0ECFF','#25A897'],['#F0699A','#3BA9D6','#FFF0F5','#E8A520'],['#E8573F','#E8A520','#FFEDE6','#3D5A98']];
+const FRAMES=['solid','dashed','double','dots','stripes'];
+const LEVELS=[['1','Сказка'],['2','Яркий'],['3','Спокойный'],['4','Строгий']];
+const charSVG=(id,cls)=>`<svg class="art ${cls||''}" viewBox="0 0 100 100" aria-hidden="true">${CHARS[id]()}</svg>`;
+const stkSVG=(id,cls,style)=>`<svg class="art stk ${cls||''}" viewBox="0 0 40 40" aria-hidden="true"${style?` style="${style}"`:''}>${STK[id]()}</svg>`;
+/* оформление листа выбирается по номеру варианта: одинаковое на бумаге и на экране */
+function resolveDesign(st,seed){
+  const d=(st&&st.design)||{lv:2,theme:'random',bw:false};
+  const r=rng(seed*7919+13);
+  const theme=d.theme&&d.theme!=='random'?THEMES.find(t=>t.id===d.theme)||THEMES[0]:THEMES[Math.floor(r()*THEMES.length)];
+  return{lv:+d.lv||2,bw:!!d.bw,theme,pal:PALETTES[Math.floor(r()*PALETTES.length)],frame:FRAMES[Math.floor(r()*FRAMES.length)],char:pick(r,theme.chars),seed};
+}
+
 function formItem(p,r){for(let k=0;k<200;k++){const it=FORMS[pick(r,p.forms)](r,p);if(it)return it}return{...E(2,'+',3),fail:true}}
 
 /* ---------- программа ---------- */
@@ -1447,37 +1763,58 @@ function instr(it){
 }
 /* лист раскладывается на части: шапка, задания (по одному куску на задание) и подвал;
    на экране части идут одной лентой, на печати раскладываются по страницам A4 */
-function sheetParts(items,{topic,level,seed,studentName,answers}){
+function sheetParts(items,{topic,level,seed,studentName,answers,design}){
+  const D=design&&!answers&&design.lv<4?design:null;
   const kind=items[0]&&items[0].type;
   const ownLen=Math.max(0,...items.filter(x=>x.type==='own').map(x=>x.q.length+(x.svg?40:0)));
   const mixed=new Set(items.map(x=>x.type)).size>1||items.some(x=>x.src);
-  const cols=mixed?'c2':kind==='word'?'c1':kind==='ch'?'c2':kind==='col'?'c4':kind==='expr'?'c2':kind==='own'?(ownLen>40?'c1':ownLen>16?'c2':'c3'):'c3';
+  /* сколько колонок помещается: по длине самого длинного задания */
+  const lenOf=x=>x.type==='eq'?String(fmt(x.a)).length+String(fmt(x.b)).length+String(fmt(x.res)).length+7:x.type==='cmp'?String(x.left).length+String(x.right).length+4:x.type==='expr'?x.q.length+6:x.type==='own'?x.q.length+(x.svg?40:0):0;
+  const maxLen=Math.max(0,...items.map(lenOf));
+  const tight=true;
+  /* на «Строгом» шрифт крупнее, поэтому три колонки только для коротких примеров */
+  const fit=c=>maxLen>(tight?28:34)?'c1':maxLen>(D?13:11)&&c==='c3'?'c2':c;
+  const cols=mixed?fit('c2'):kind==='word'?'c1':kind==='ch'?'c2':kind==='col'?(Math.max(...items.map(x=>String(fmt(x.ans)).length))>(tight?4:6)?'c3':'c4'):fit(kind==='expr'?'c2':kind==='own'?(ownLen>40?'c1':ownLen>16?'c2':'c3'):'c3');
   const title=answers?'Ответы':topic.t;
   const lvl=topic.sheet||topic.review?esc(topic.L[0].n):LV[level].toLowerCase()+' уровень';
   const newGroup=(it,i)=>{if(i===0)return true;const pr=items[i-1];return it.blk!=null?pr.blk!==it.blk:(pr.src!==it.src||pr.type!==it.type)};
-  const head=`<div class="sh-head"><div class="fld">Имя: <b>${esc(studentName||'')}</b></div><div class="fld">Дата: </div>
-    <div class="fld">${gradeWord(topic.grade)} · ${lvl}</div><div class="fld">Вариант <b class="num">${seed}</b></div></div>
-    <div><div class="sh-title">${answers?'<span class="key-stamp">Ключ</span> ':''}${esc(title)}</div></div>
-    <div class="sh-sub">${answers?esc(topic.t):esc(topic.L[level].n)+'. '+(mixed?'Лист из нескольких частей, у каждой своё указание.':esc(instr(items[0])))}</div>`;
-  const mini=`<div class="sh-mini"><b>${esc(studentName||'')}</b><span>${answers?'Ключ · ':''}${esc(topic.t)} · продолжение</span></div>`;
+  const subText=answers?esc(topic.t):esc(topic.L[level].n)+'. '+(mixed?'Лист из нескольких частей, у каждой своё указание.':esc(instr(items[0])));
+  const fields=`<div class="sh-head"><div class="fld">Имя: <b>${esc(studentName||'')}</b></div><div class="fld">Дата: </div>
+    <div class="fld">${gradeWord(topic.grade)} · ${lvl}</div><div class="fld">Вариант <b class="num">${seed}</b></div></div>`;
+  const titleH=`<div class="sh-title">${answers?'<span class="key-stamp">Ключ</span> ':''}${D&&D.lv===3?stkSVG(D.theme.stk[0],'tico'):''}${esc(title)}</div>`;
+  const head=!D?`${fields}<div>${titleH}</div><div class="sh-sub">${subText}</div>`
+    :D.lv===1?`${fields}<div class="hero"><div class="hero-art">${charSVG(D.char)}</div><div class="hero-r">${titleH}<div class="bubble">${subText}</div></div></div>`
+    :D.lv===2?`<div class="band"><div class="band-t">${titleH}<div class="sh-sub">${subText}</div></div><div class="band-art">${charSVG(D.char)}</div></div>${fields}`
+    :`${fields}<div>${titleH}</div><div class="sh-sub">${subText}</div>`;
+  const mini=`<div class="sh-mini">${D&&D.lv<=2?stkSVG(D.theme.stk[1],'gico'):''}<b>${esc(studentName||'')}</b><span>${answers?'Ключ · ':''}${esc(topic.t)} · продолжение</span></div>`;
   /* заголовок части держится вместе со своим первым заданием */
   const pieces=items.map((it,i)=>{
     const tt=TOPICS[it.src]?TOPICS[it.src].t:'';
-    const grp=mixed&&newGroup(it,i)?`<div class="grp"><b>${esc(it.lbl?it.lbl+' · '+tt:tt)}</b> ${esc(instr(it))}</div>`:'';
+    const gi=D&&D.lv<=2?stkSVG(D.theme.stk[(it.blk||0)%D.theme.stk.length],'gico'):'';
+    const grp=mixed&&newGroup(it,i)?`<div class="grp">${gi}<b>${esc(it.lbl?it.lbl+' · '+tt:tt)}</b> ${esc(instr(it))}</div>`:'';
     return grp+`<div class="it${it.type==='own'?' own':''}${it.type==='word'?' word':''}${it.type==='grid'?' grid':''}${it.type==='ch'||it.svg?' pic':''}"><span class="n">${i+1}</span>${itemHTML(it,answers)}</div>`});
-  return{head,mini,cols,pieces,footL:esc(topic.section),footR:`Проверить онлайн: код варианта ${seed}`};
+  if(D&&D.lv===1)pieces.push(`<div class="selfcheck"><span>Как я справился?</span>${FACES.map(f=>`<svg class="art" viewBox="0 0 40 40" aria-hidden="true">${f}</svg>`).join('')}</div>`);
+  const cls=D?`lv${D.lv} fr-${D.frame}${D.bw?' bw':''}`:'';
+  const pal=D?(D.bw?['#555','#999','#f2f2f2','#777']:D.pal):null;
+  const style=D?`--p1:${pal[0]};--p2:${pal[1]};--p3:${pal[2]};--p4:${pal[3]}`:'';
+  const deco=k=>{if(!D)return'';const r=rng(D.seed*31+k*7+1);let h='<div class="fr"></div>';
+    if(D.lv<=2){const slots=D.lv===1?[[6,3.5,9],[94,3.5,9],[6,97,9],[94,97,9],[3.6,36,6],[96.4,52,6],[3.6,70,6],[96.4,84,6]]:[[94,3.5,7],[6,97,7],[94,97,7]];
+      h+=shuffle(r,slots).slice(0,D.lv===1?5:2).map(([x,y,z])=>stkSVG(pick(r,D.theme.stk),'deco-stk',`left:${x}%;top:${y}%;width:${z}cqw;height:${z}cqw;transform:translate(-50%,-50%) rotate(${ri(r,-18,18)}deg)`)).join('')}
+    return `<div class="deco" aria-hidden="true">${h}</div>`};
+  return{head,mini,cols,pieces,cls,style,deco,footL:esc(topic.section),footR:`Проверить онлайн: код варианта ${seed}`};
 }
 function sheetHTML(items,o){
   const s=sheetParts(items,o);
-  return `<div class="sheet${o.answers?' ans':''}"><div class="sheet-in">${s.head}
+  return `<div class="sheet${o.answers?' ans':''} ${s.cls}" style="${s.style}">${s.deco(0)}<div class="sheet-in">${s.head}
     <div class="sh-items ${s.cols}">${s.pieces.join('')}</div>
     <div class="sh-foot"><span>${s.footL}</span><span>${s.footR}</span></div></div></div>`;
 }
 /* раскладка по страницам A4: задания добавляются по одному, пока страница не переполнится */
 function paginate(host,items,o){
   const s=sheetParts(items,o);host.innerHTML='';
-  const newPage=first=>{const d=document.createElement('div');d.className='sheet page'+(o.answers?' ans':'');
-    d.innerHTML=`<div class="sheet-in">${first?s.head:s.mini}<div class="sh-items ${s.cols}"></div><div class="sh-foot"><span>${s.footL}</span><span class="pg"></span></div></div>`;
+  let pn=0;
+  const newPage=first=>{const d=document.createElement('div');d.className='sheet page'+(o.answers?' ans':'')+' '+s.cls;d.setAttribute('style',s.style);
+    d.innerHTML=`${s.deco(pn++)}<div class="sheet-in">${first?s.head:s.mini}<div class="sh-items ${s.cols}"></div><div class="sh-foot"><span>${s.footL}</span><span class="pg"></span></div></div>`;
     host.appendChild(d);return d};
   let page=newPage(true);
   const over=pg=>{const inner=pg.querySelector('.sheet-in');return inner.scrollHeight>pg.clientHeight+1};
@@ -1515,6 +1852,7 @@ function crumbs(){
   if(V.topicId&&['topic','print'].includes(V.screen)){parts.push('›');parts.push(V.screen==='topic'?`<span class="cur">${esc(TOPICS[V.topicId].t)}</span>`:`<button data-go="topic">${esc(TOPICS[V.topicId].t)}</button>`)}
   if(V.screen==='print'){parts.push('›');parts.push('<span class="cur">Печать</span>')}
   if(V.screen==='builder'){parts.push('›');parts.push('<span class="cur">Своя тема</span>')}
+  if(V.screen==='gallery'){parts.push('›');parts.push('<span class="cur">Сюжеты оформления</span>')}
   if(V.screen==='works'){parts.push('›');parts.push('<span class="cur">Работы и домашки</span>')}
   if(V.screen==='work'){parts.push('›');parts.push('<button data-go="works">Работы и домашки</button>');parts.push('›');parts.push(`<span class="cur">${esc(V.code||'')}</span>`)}
   if(['player','done'].includes(V.screen)){parts.length=0;parts.push('<span class="cur">Экран ученика</span>')}
@@ -1528,7 +1866,7 @@ function crumbs(){
 
 function render(){
   crumbs();
-  ({students:viewStudents,student:viewStudent,topic:viewTopic,print:viewPrint,player:viewPlayer,done:viewDone,builder:viewBuilder,works:viewWorks,work:viewWork,
+  ({students:viewStudents,student:viewStudent,topic:viewTopic,print:viewPrint,player:viewPlayer,done:viewDone,builder:viewBuilder,works:viewWorks,work:viewWork,gallery:viewGallery,
     badlink:()=>{app.innerHTML='<div class="player"><div class="panel finish"><h1 style="font-size:22px">Ссылка не открывается</h1><p style="margin:0">Похоже, она скопирована не целиком. Попроси репетитора прислать её ещё раз.</p></div></div>'}})[V.screen]();
 }
 
@@ -1836,7 +2174,7 @@ function viewTopic(){
     ${V.subName&&tpl==='train'?`<p class="subchip">Подтема: <b>${esc(V.subName)}</b> <button class="btn small quiet" id="subx">Показать всю тему</button></p>`:''}
     <p>${m.pct!=null?`Усвоение ${m.pct}%${m.low?' (мало данных)':''} — ${mNote(m)}. `:'Тему ещё не решали. '}${fixed?'Лист уже собран.':'Уровень подобран по прошлым результатам, лист уже собран.'}</p></div></div>
     <div class="topic-grid">
-      <div class="levels">${tplSeg}
+      <div class="levels">${tplSeg}${designBox(st,V.seed)}
         ${tpl==='own'?'':(tpl==='train'?'':'<span class="label">Уровень темы</span>')+lv}
         ${blocksHTML}
         <div class="actions"><button class="btn primary" id="link">Ссылка ученику</button><button class="btn" id="print">Печать</button></div>
@@ -1849,15 +2187,16 @@ function viewTopic(){
           ${t.custom&&!fixed?`<button class="btn small ${V.confirmDel?'pen':'quiet'}" id="del">${V.confirmDel?'Нажмите ещё раз, чтобы удалить':'Удалить тему'}</button>`:''}</div>
       </div>
       <div class="sheet-wrap"><div class="sheet-bar"><span class="label">Так лист выглядит на экране</span><span class="hint" id="pg-hint"></span></div>
-        ${sheetHTML(items,{topic:shown,level:shownLv,seed:V.seed,studentName:st.name})}</div>
+        ${sheetHTML(items,{topic:shown,level:shownLv,seed:V.seed,studentName:st.name,design:resolveDesign(st,V.seed)})}</div>
     </div>`;
   const $=id=>document.getElementById(id);
   /* считаем страницы печати в невидимом черновике той же ширины */
   const countPages=()=>{if(V.screen!=='topic'||!$('pg-hint'))return;const tmp=document.createElement('div');tmp.className='pg-measure';document.body.appendChild(tmp);
-    const n=paginate(tmp,items,{topic:shown,level:shownLv,seed:V.seed,studentName:st.name});tmp.remove();
+    const n=paginate(tmp,items,{topic:shown,level:shownLv,seed:V.seed,studentName:st.name,design:resolveDesign(st,V.seed)});tmp.remove();
     $('pg-hint').textContent=`при печати: ${pagesWord(n)} и ключ`};
   countPages();if(document.fonts&&document.fonts.ready)document.fonts.ready.then(countPages);
   app.querySelectorAll('.lvl').forEach(b=>b.onclick=()=>go({level:+b.dataset.l,seed:newSeed(),over:null,subName:null}));
+  bindDesign(st);
   if($('subx'))$('subx').onclick=()=>go({over:null,subName:null,seed:newSeed()});
   if($('tpl'))$('tpl').querySelectorAll('button').forEach(b=>b.onclick=()=>{const k=b.dataset.k;
     if(k==='own'&&tpl!=='own')V.blocks=(tpl==='train'?tplBlocks('lesson',st,t,V.level):blocks).map(x=>({...x}));
@@ -1889,9 +2228,28 @@ function viewTopic(){
     if(!(hi>lo&&lo>=0&&c>=4&&c<=24))return;V.over={lo,hi,count:c};V.seed=newSeed();render()};
 }
 
+/* ---------- настройка оформления: запоминается в карточке ученика ---------- */
+const designOf=st=>st.design||(st.design={lv:2,theme:'random',bw:false});
+function designBox(st,seed){const d=designOf(st),R=resolveDesign(st,seed);
+  return `<div class="field design"><span class="label">Оформление листа</span>
+    <div class="seg dseg" id="dlv">${LEVELS.map(([k,l])=>`<button type="button" data-lv="${k}" class="${String(d.lv)===k?'on':''}">${l}</button>`).join('')}</div>
+    ${+d.lv<4?`<div class="drow"><select id="dth" aria-label="Сюжет"><option value="random"${d.theme==='random'?' selected':''}>Случайный сюжет</option>${THEMES.map(t=>`<option value="${t.id}"${d.theme===t.id?' selected':''}>${esc(t.n)}</option>`).join('')}</select>
+      <label class="bwl"><input type="checkbox" id="dbw"${d.bw?' checked':''}> Ч/Б</label></div>
+      <button type="button" class="dprev" id="dgal">${charSVG(R.char,'mini')}<span><b>${esc(R.theme.n)}</b><small>все 20 сюжетов →</small></span></button>`:'<span class="hint">Без украшений, как раньше.</span>'}</div>`}
+function bindDesign(st){const d=designOf(st);const $=id=>document.getElementById(id);
+  document.querySelectorAll('#dlv button').forEach(b=>b.onclick=()=>{d.lv=+b.dataset.lv;save();render()});
+  if($('dth'))$('dth').onchange=e=>{d.theme=e.target.value;save();render()};
+  if($('dbw'))$('dbw').onchange=e=>{d.bw=e.target.checked;save();render()};
+  if($('dgal'))$('dgal').onclick=()=>go({screen:'gallery'})}
+function viewGallery(){const st=student(V.studentId),d=designOf(st);
+  app.innerHTML=`<div class="head"><div><h1>Сюжеты оформления</h1><p>Выберите сюжет для листов ${esc(st.name)} или оставьте случайный: тогда каждый новый лист в новом сюжете.</p></div>
+    <button class="btn ${d.theme==='random'?'primary':''}" data-th="random">Случайный сюжет</button></div>
+    <div class="gal">${THEMES.map(t=>`<button class="gcard${d.theme===t.id?' on':''}" data-th="${t.id}"><span class="gchars${t.chars.length>2?' many':''}">${t.chars.map(c=>charSVG(c)).join('')}</span>
+      <b>${esc(t.n)}</b><span class="gstk">${t.stk.map(k=>stkSVG(k)).join('')}</span></button>`).join('')}</div>`;
+  app.querySelectorAll('[data-th]').forEach(b=>b.onclick=()=>{d.theme=b.dataset.th;if(+d.lv===4)d.lv=2;save();history.back()})}
 function viewPrint(){
   const st=student(V.studentId);const t=TOPICS[V.topicId];const items=generate(curParams(),V.seed);
-  const o={topic:t,level:V.level,seed:V.seed,studentName:st.name};
+  const o={topic:t,level:V.level,seed:V.seed,studentName:st.name,design:resolveDesign(st,V.seed)};
   app.innerHTML=`<div class="head"><div><h1>Печать</h1><p>${esc(t.t)} · ${t.sheet||t.review?esc(t.L[0].n):LV[V.level].toLowerCase()+' уровень'} · вариант ${V.seed}</p></div>
     <button class="btn" id="back">← К теме</button></div>
     <div class="note">В рабочей версии здесь будет кнопка «Скачать PDF». Если задания не помещаются на один лист A4, они переносятся на следующий, задание не разрывается.</div>
