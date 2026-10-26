@@ -367,6 +367,14 @@ details.done .topic{opacity:.7}
 .band{display:flex;align-items:center;justify-content:space-between;gap:3cqw;background:var(--p3);border-radius:3cqw;padding:2cqw 3cqw;border-left:1.4cqw solid var(--p1)}
 .band .sh-sub{margin-top:1cqw}
 .band-art .art{width:15cqw;height:15cqw}
+img.art.pic{object-fit:contain;display:block}
+.hero-art img.art.pic{width:24cqw;height:30cqw}
+.band-art img.art.pic{height:19cqw;width:15cqw}
+.sh-items>.scene2{grid-column:1/-1;display:flex;justify-content:flex-end;align-items:flex-start;gap:var(--c);height:calc(var(--c) * 8)}
+.scene2 img.art.pic{height:100%;width:auto}
+.scene2 .say{margin-top:calc(var(--c) * 2);height:calc(var(--c) * 2);line-height:calc(var(--c) * 2);padding:0 var(--c);font-size:calc(var(--c) * .9);font-weight:800;color:var(--p1);background:#fff;border:.35cqw solid var(--p1);border-radius:var(--c);position:relative}
+.scene2 .say::after{content:"";position:absolute;right:calc(var(--c) * -1.1);top:calc(var(--c) * .55);border:calc(var(--c) * .5) solid transparent;border-left-color:var(--p1)}
+.bw img.art.pic{filter:grayscale(1)}
 .lv1 .sh-title,.lv2 .sh-title,.lv3 .sh-title{color:var(--p1)}
 .lv3 .tico{width:5.4cqw;height:5.4cqw;display:inline-block;vertical-align:-1cqw;margin-right:1cqw}
 .gico{width:4.6cqw;height:4.6cqw;display:inline-block;vertical-align:middle;margin-right:1cqw}
@@ -1292,7 +1300,8 @@ const THEMES=[
   {id:'funtik',n:'Поросёнок в шляпе',chars:['funtik','mokus'],stk:['umbrella','balloon','candy','star']},
   {id:'cheb',n:'Ушастик и крокодил',chars:['cheburashka','gena'],stk:['orange','accordion','house','star']},
   {id:'pogodi',n:'Волк и Заяц',chars:['wolf','hare'],stk:['carrot','note','star','sun']},
-  {id:'prosto',n:'Кот в полоску и пёс',chars:['matroskin','sharik'],stk:['milk','bone','house','sun']},
+  {id:'prosto',n:'Простоквашино',chars:['matroskin','sharik'],stk:['milk','bone','house','sun'],
+   img:{top:'art/prost-top.webp',bot:'art/prost-bot.webp',char:'art/prost-char.webp',say:'Кто там?'}},
   {id:'carlson',n:'Малыш с пропеллером',chars:['carlson'],stk:['jam','propeller','cloud','cake']},
   {id:'umka',n:'Белый медвежонок',chars:['umka'],stk:['snowflake','fishS','moon','star']},
   {id:'lion',n:'Львёнок и черепаха',chars:['lion','turtle'],stk:['sun','palm','flower','note']},
@@ -1314,6 +1323,8 @@ const PALETTES=[
 const FRAMES=['solid','dashed','double','dots','stripes'];
 const LEVELS=[['1','Сказка'],['2','Яркий'],['3','Спокойный'],['4','Строгий']];
 const charSVG=(id,cls)=>`<svg class="art ${cls||''}" viewBox="0 0 100 100" aria-hidden="true">${CHARS[id]()}</svg>`;
+/* рисованные картинки темы: сверху персонаж смотрит вправо, снизу влево */
+const artImg=(src,cls)=>`<img class="art pic ${cls||''}" src="${src}" alt="" aria-hidden="true">`;
 const stkSVG=(id,cls,style)=>`<svg class="art stk ${cls||''}" viewBox="0 0 40 40" aria-hidden="true"${style?` style="${style}"`:''}>${STK[id]()}</svg>`;
 /* оформление листа выбирается по номеру варианта: одинаковое на бумаге и на экране */
 function resolveDesign(st,seed){
@@ -1910,8 +1921,8 @@ function sheetParts(items,{topic,level,seed,studentName,answers,design}){
     <div class="fld">${gradeWord(topic.grade)} · ${lvl}</div><div class="fld">Вариант <b class="num">${seed}</b></div></div>`;
   const titleH=`<div class="sh-title">${answers?'<span class="key-stamp">Ключ</span> ':''}${D&&D.lv===3?stkSVG(D.theme.stk[0],'tico'):''}${esc(title)}</div>`;
   const head=!D?`${fields}<div>${titleH}</div><div class="sh-sub">${subText}</div>`
-    :D.lv===1?`${fields}<div class="hero"><div class="hero-art">${charSVG(D.char)}</div><div class="hero-r">${titleH}<div class="bubble">${subText}</div></div></div>`
-    :D.lv===2?`<div class="band"><div class="band-t">${titleH}<div class="sh-sub">${subText}</div></div><div class="band-art">${charSVG(D.char)}</div></div>${fields}`
+    :D.lv===1?`${fields}<div class="hero"><div class="hero-art">${D.theme.img?artImg(D.theme.img.top):charSVG(D.char)}</div><div class="hero-r">${titleH}<div class="bubble">${subText}</div></div></div>`
+    :D.lv===2?`<div class="band"><div class="band-t">${titleH}<div class="sh-sub">${subText}</div></div><div class="band-art">${D.theme.img?artImg(D.theme.img.char):charSVG(D.char)}</div></div>${fields}`
     :`${fields}<div>${titleH}</div><div class="sh-sub">${subText}</div>`;
   const mini=`<div class="sh-mini">${D&&D.lv<=2?stkSVG(D.theme.stk[1],'gico'):''}<b>${esc(studentName||'')}</b><span>${answers?'Ключ · ':''}${esc(topic.t)} · продолжение</span></div>`;
   /* заголовок части держится вместе со своим первым заданием */
@@ -1921,6 +1932,7 @@ function sheetParts(items,{topic,level,seed,studentName,answers,design}){
     const grp=mixed&&newGroup(it,i)?`<div class="grp">${gi}<b>${esc(it.lbl?it.lbl+' · '+tt:tt)}</b> ${esc(instr(it))}</div>`:'';
     if(cellable(it))return grp+`<div class="it ci">${cellItemHTML(it,i,answers)}</div>`;
     return grp+richItemHTML(it,i,answers)});
+  if(D&&D.lv===1&&D.theme.img)pieces.push(`<div class="scene2"><span class="say">${esc(D.theme.img.say||'')}</span>${artImg(D.theme.img.bot)}</div>`);
   if(D&&D.lv===1)pieces.push(`<div class="selfcheck"><span>Как я справился?</span>${FACES.map(f=>`<svg class="art" viewBox="0 0 40 40" aria-hidden="true">${f}</svg>`).join('')}</div>`);
   const cls=D?`lv${D.lv} fr-${D.frame}${D.bw?' bw':''}`:'';
   const pal=D?(D.bw?['#555','#999','#f2f2f2','#777']:D.pal):null;
