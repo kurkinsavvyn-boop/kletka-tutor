@@ -29,8 +29,22 @@ for f in sorted(os.listdir(src)):
   name=f[:-4];im=Image.open(os.path.join(src,f)).convert('RGBA');W,H=im.size
   sm=im.getchannel('A').resize((W//K,H//K)).point(lambda v:255 if v>24 else 0).filter(ImageFilter.MaxFilter(3))
   w,h=sm.size;p=sm.load()
-  s1,h1=seam(p,w,h,int(h*.2),int(h*.5))
-  s2,h2=seam(p,w,h,int(h*.5),int(h*.82))
+  # перебираем полосы для швов: все три части не пустые, меньше всего задетых пикселей, части примерно равны
+  best=None
+  for a0,a1 in [(.15,.4),(.2,.5),(.25,.45),(.3,.55)]:
+    sa,ha=seam(p,w,h,int(h*a0),int(h*a1))
+    for b0,b1 in [(.5,.75),(.55,.8),(.6,.85),(.45,.7)]:
+      if b0<=a0+.1:continue
+      sb,hb=seam(p,w,h,int(h*b0),int(h*b1))
+      cnt=[0,0,0]
+      for x in range(w):
+        for y in range(h):
+          if p[x,y]:cnt[0 if y<sa[x] else 1 if y<sb[x] else 2]+=1
+      if min(cnt)<0.08*sum(cnt):continue
+      score=(ha+hb)*50+ (max(cnt)-min(cnt))/sum(cnt)*100
+      if best is None or score<best[0]:best=(score,sa,ha,sb,hb)
+  if best is None:best=(0,)+seam(p,w,h,int(h*.2),int(h*.5))+seam(p,w,h,int(h*.5),int(h*.82))
+  _,s1,h1,s2,h2=best
   # фигура, которую задел шов, целиком уходит в ту часть, где её больше
   k2=2;m=im.getchannel('A').resize((W//k2,H//k2)).point(lambda v:255 if v>24 else 0);mw,mh=m.size;mp=m.load()
   lab=[[0]*mw for _ in range(mh)];cnt={};n=0
@@ -43,14 +57,15 @@ for f in sorted(os.listdir(src)):
           cx,cy=st.pop();c[side(cx,cy*k2)]+=1
           for nx,ny in((cx+1,cy),(cx-1,cy),(cx,cy+1),(cx,cy-1)):
             if 0<=nx<mw and 0<=ny<mh and mp[nx,ny] and not lab[ny][nx]:lab[ny][nx]=n;st.append((nx,ny))
-        cnt[n]=c.index(max(c))
+        # переносим целиком, только если шов отрезал небольшой кусок (до 25%); две касающиеся фигуры остаются разрезанными по шву
+        cnt[n]=c.index(max(c)) if max(c)>=0.75*sum(c) else None
   parts=[Image.new('RGBA',(W,H),(0,0,0,0)) for _ in range(3)];pp=[q.load() for q in parts];s=im.load()
   for x in range(W):
     a,b=s1[min(x//K,w-1)]*K,s2[min(x//K,w-1)]*K
     for y in range(H):
       if s[x,y][3]:
         L=lab[min(y//k2,mh-1)][min(x//k2,mw-1)]
-        pp[cnt[L] if L else (0 if y<a else 1 if y<b else 2)][x,y]=s[x,y]
+        pp[cnt[L] if L and cnt[L] is not None else (0 if y<a else 1 if y<b else 2)][x,y]=s[x,y]
   info=[]
   for key,part in zip(['top','mid','bot'],parts):
     bb=part.getbbox()

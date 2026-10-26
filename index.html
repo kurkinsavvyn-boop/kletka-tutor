@@ -300,7 +300,7 @@ details.done .topic{opacity:.7}
 /* Клетки тетради */
 .sh-items{--c:2.8cqw;display:grid;column-gap:calc(var(--c) * 2);row-gap:var(--c);padding:var(--c) !important;background-size:var(--c) var(--c) !important;background-position:0 0 !important;align-items:start}
 .sh-items>*{margin:0 !important}
-.sh-items>.span,.sh-items>.grp,.sh-items>.selfcheck,.sh-items>.word{grid-column:1/-1}
+.sh-items>.span,.sh-items>.grp,.sh-items>.word{grid-column:1/-1}
 .sheet .sh-items .it.ci{display:flex;gap:0;align-items:flex-start;white-space:nowrap;font-size:inherit;padding:0}
 .c{width:var(--c);height:var(--c);display:inline-flex;align-items:center;justify-content:center;font-size:calc(var(--c) * .8);line-height:1;font-variant-numeric:tabular-nums;flex:none;position:relative}
 .crow,.cl{display:flex}
@@ -332,13 +332,14 @@ details.done .topic{opacity:.7}
 .ob{height:var(--c);line-height:var(--c);font-size:calc(var(--c) * .58);padding:0 calc(var(--c) * .35);box-shadow:inset 0 0 0 .25cqw #8a94ab;border-radius:calc(var(--c) * .5);white-space:nowrap}
 .ans .ob.on{box-shadow:inset 0 0 0 .35cqw var(--sheet-pen);color:var(--sheet-pen);font-weight:700}
 .rb > .fig,.rb > .gfig{width:auto;max-width:40cqw}
+.rb > .gfig.on{max-width:none;overflow:visible}
+.gfig.on .gf rect{fill:var(--p2,#9fb3d9);fill-opacity:.18}
+.gfig.on .ge line{stroke-width:.9}
 .rb > .fig.wide{max-width:60cqw}
 .rb > .pair{display:flex;align-items:center;gap:var(--c)}
 .rb > .pair .fig{height:100%;width:auto;max-width:none}
 .sh-items>.grp{font-size:calc(var(--c) * .58);line-height:var(--c);border:0 !important;padding:0 !important;color:#4e5870}
 .sh-items>.grp .gico{width:var(--c);height:var(--c);vertical-align:top;margin:0 calc(var(--c) * .2) 0 0}
-.sh-items>.selfcheck{border:0 !important;padding:0 !important;line-height:calc(var(--c) * 2);height:calc(var(--c) * 2);font-size:calc(var(--c) * .62);gap:var(--c)}
-.sh-items>.selfcheck .art{width:calc(var(--c) * 1.6);height:calc(var(--c) * 1.6);margin-top:calc(var(--c) * .2)}
 .sheet .sh-head{display:grid;grid-template-columns:1fr auto;column-gap:calc(var(--c) * 2);row-gap:0;padding:var(--c) !important;background-size:var(--c) var(--c);--c:2.8cqw}
 .sheet .sh-head .fld{height:var(--c);line-height:var(--c);font-size:calc(var(--c) * .55);padding:0;border:0;min-width:0}
 .sheet .sh-mini{--c:2.8cqw;padding:0 var(--c) !important;height:calc(var(--c) * 2);line-height:calc(var(--c) * 2);background-size:var(--c) var(--c);font-size:calc(var(--c) * .55);border-bottom-width:.15cqw}
@@ -369,7 +370,7 @@ details.done .topic{opacity:.7}
 .tB img.art.pic{position:absolute;right:0;top:50%;transform:translateY(-50%);max-height:100%;max-width:100%;width:auto;height:auto}
 .tB img.art.pic.say{position:absolute;left:0;top:0;transform:none;height:calc(var(--c) * 3);max-width:40%}
 .sheet .sh-items,.sgrid{display:flex !important;flex-wrap:wrap;column-gap:calc(var(--c) * 2);row-gap:var(--c);align-items:flex-start;align-content:flex-start}
-.sh-items>.span,.sh-items>.grp,.sh-items>.selfcheck,.sh-items>.word,.sh-items>.scene2,.sgrid>.span,.sgrid>.grp,.sgrid>.word{flex:0 0 100%;width:100%}
+.sh-items>.span,.sh-items>.grp,.sh-items>.word,.sh-items>.scene2,.sgrid>.span,.sgrid>.grp,.sgrid>.word{flex:0 0 100%;width:100%}
 .sh-items>.it,.sgrid>.it{flex:none}
 .sgrid>*{margin:0 !important}
 .sgrid>.span,.sgrid>.grp,.sgrid>.word{grid-column:1/-1}
@@ -426,8 +427,6 @@ img.art.pic{object-fit:contain;display:block}
 .box,.circ,.col .r{background:transparent}
 .lv1 .sh-items .box,.lv2 .sh-items .box{min-width:6cqw;height:4.8cqw}
 .lv1 .it,.lv2 .it{gap:1cqw}
-.selfcheck{grid-column:1/-1;display:flex;align-items:center;gap:3cqw;font-weight:600;font-size:3cqw;border-top:.3cqw dashed var(--p1);padding-top:2cqw;margin-top:2cqw}
-.selfcheck .art{width:7cqw;height:7cqw}
 .bw .art [fill]:not(.k):not([fill="none"]){fill:#fff}
 .bw .art [stroke]:not([stroke="none"]){stroke:#2b2638}
 .design .drow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
@@ -838,7 +837,7 @@ function gridItem(p,r){
   const ask=p.ask==='PS'?pick(r,['P','S']):p.ask;
   return{type:'grid',cells:[...cells],w,h,ask,ans:ask==='P'?per:cells.size};
 }
-function gridSVG(it){
+function gridSVG(it,onCells){
   const W=it.w+2,H=it.h+2,s=10,set=new Set(it.cells);let g='';
   for(let x=0;x<=W;x++)g+=`<line x1="${x*s}" y1="0" x2="${x*s}" y2="${H*s}"/>`;
   for(let y=0;y<=H;y++)g+=`<line x1="0" y1="${y*s}" x2="${W*s}" y2="${y*s}"/>`;
@@ -848,6 +847,8 @@ function gridSVG(it){
     if(!set.has(x+','+(y+1)))e+=`<line x1="${X}" y1="${Y+s}" x2="${X+s}" y2="${Y+s}"/>`;
     if(!set.has((x-1)+','+y))e+=`<line x1="${X}" y1="${Y}" x2="${X}" y2="${Y+s}"/>`;
     if(!set.has((x+1)+','+y))e+=`<line x1="${X+s}" y1="${Y}" x2="${X+s}" y2="${Y+s}"/>`}
+  /* на листе одна клетка фигуры — ровно одна клетка тетради, своей сетки у фигуры нет */
+  if(onCells)return `<svg class="gfig on" viewBox="0 0 ${W*s} ${H*s}" style="width:calc(var(--c) * ${W});height:calc(var(--c) * ${H})" role="img" aria-label="Фигура из ${it.cells.length} клеток"><g class="gf">${f}</g><g class="ge">${e}</g></svg>`;
   return `<svg class="gfig" viewBox="-1 -1 ${W*s+2} ${H*s+2}" role="img" aria-label="Фигура из ${it.cells.length} клеток"><g class="gl">${g}</g><g class="gf">${f}</g><g class="ge">${e}</g></svg>`;
 }
 const gridUnit=it=>it.ask==='P'?'см':'кв. см';
@@ -1270,9 +1271,6 @@ const CHARS={
     <circle cx="50" cy="72" r="2.5" fill="${INK}" class="k" stroke="none"/><circle cx="50" cy="82" r="2.5" fill="${INK}" class="k" stroke="none"/><path d="M30 70 l-14 -10 M70 70 l14 -10" stroke-width="2.5"/>`)+eyes(44,56,38,2.4)+cheeks(40,60,48)
 };
 
-const FACES=[`<g stroke="${INK}" stroke-width="2.2" fill="none"><circle cx="20" cy="20" r="16" fill="#fff"/><circle cx="14" cy="16" r="1.8" fill="${INK}" class="k"/><circle cx="26" cy="16" r="1.8" fill="${INK}" class="k"/><path d="M12 24 q8 8 16 0"/></g>`,
-  `<g stroke="${INK}" stroke-width="2.2" fill="none"><circle cx="20" cy="20" r="16" fill="#fff"/><circle cx="14" cy="16" r="1.8" fill="${INK}" class="k"/><circle cx="26" cy="16" r="1.8" fill="${INK}" class="k"/><path d="M13 26 h14"/></g>`,
-  `<g stroke="${INK}" stroke-width="2.2" fill="none"><circle cx="20" cy="20" r="16" fill="#fff"/><circle cx="14" cy="16" r="1.8" fill="${INK}" class="k"/><circle cx="26" cy="16" r="1.8" fill="${INK}" class="k"/><path d="M12 29 q8 -8 16 0"/></g>`];
 /* наклейки: маленькие значки в том же стиле, рисуются в квадрате 40×40 */
 const star5=(cx,cy,R,r,f)=>{let d='';for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,rr=i%2?r:R;d+=(i?'L':'M')+(cx+rr*Math.cos(a)).toFixed(1)+' '+(cy+rr*Math.sin(a)).toFixed(1)}return `<path d="${d}Z" fill="${f}"/>`};
 const sg=b=>`<g stroke="${INK}" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">${b}</g>`;
@@ -1332,26 +1330,29 @@ const STK={
 
 /* 20 сюжетов: персонажи и наклейки */
 const THEMES=[
-  {id:'honey',n:'Винни-Пух',art:['pooh-1','pooh-2','pooh-3'],chars:['bear','piglet'],stk:['honey','balloon','bee','flower']},
-  {id:'leopold',n:'Кот Леопольд',art:['leopold-1','leopold-2','leopold-3'],chars:['catBow','mouse'],stk:['cheese','bow','heart','flower']},
-  {id:'funtik',n:'Поросёнок Фунтик',art:['funtik-1','funtik-2','funtik-3'],chars:['funtik','mokus'],stk:['umbrella','balloon','candy','star']},
-  {id:'cheb',n:'Чебурашка',art:['cheburashka-1','cheburashka-2','cheburashka-3'],chars:['cheburashka','gena'],stk:['orange','accordion','house','star']},
-  {id:'pogodi',n:'Ну, погоди!',art:['pogodi-1','pogodi-2','pogodi-3'],chars:['wolf','hare'],stk:['carrot','note','star','sun']},
-  {id:'prosto',n:'Простоквашино',art:['prostokvashino-1','prostokvashino-2','prostokvashino-3'],chars:['matroskin','sharik'],stk:['milk','bone','house','sun']},
-  {id:'carlson',n:'Малыш и Карлсон',art:['carlson-1','carlson-2','carlson-3'],chars:['carlson'],stk:['jam','propeller','cloud','cake']},
-  {id:'umka',n:'Умка',art:['umka-1','umka-2'],chars:['umka'],stk:['snowflake','fishS','moon','star']},
-  {id:'lion',n:'Львёнок и Черепаха',art:['lion-1','lion-2','lion-3'],chars:['lion','turtle'],stk:['sun','palm','flower','note']},
+  {id:'honey',n:'Винни-Пух',art:'pooh',chars:['bear','piglet'],stk:['honey','balloon','bee','flower']},
+  {id:'leopold',n:'Кот Леопольд',art:'leopold',chars:['catBow','mouse'],stk:['cheese','bow','heart','flower']},
+  {id:'funtik',n:'Поросёнок Фунтик',art:'funtik',chars:['funtik','mokus'],stk:['umbrella','balloon','candy','star']},
+  {id:'cheb',n:'Чебурашка',art:'cheburashka',chars:['cheburashka','gena'],stk:['orange','accordion','house','star']},
+  {id:'pogodi',n:'Ну, погоди!',art:'pogodi',chars:['wolf','hare'],stk:['carrot','note','star','sun']},
+  {id:'prosto',n:'Простоквашино',art:'prostokvashino',chars:['matroskin','sharik'],stk:['milk','bone','house','sun']},
+  {id:'carlson',n:'Малыш и Карлсон',art:'carlson',chars:['carlson'],stk:['jam','propeller','cloud','cake']},
+  {id:'umka',n:'Умка',art:'umka',chars:['umka'],stk:['snowflake','fishS','moon','star']},
+  {id:'lion',n:'Львёнок и Черепаха',art:'lion',chars:['lion','turtle'],stk:['sun','palm','flower','note']},
+  {id:'hedgehog',n:'Ёжик в тумане',art:'hedgehog',chars:['hedgehog'],stk:['star','moon','leaf','mushroom']},
+  {id:'bremen',n:'Бременские музыканты',art:'bremen',chars:['fox'],stk:['note','star','crown','heart']},
+  {id:'gav',n:'Котёнок по имени Гав',art:'gav',chars:['matroskin'],stk:['cloud','umbrella','house','star']},
   {id:'heroes',n:'Супергерои',chars:['ironHero','spiderHero','thunderHero','sorcerer'],stk:['lightning','shield','star','rocket']},
-  {id:'space',n:'Космос',chars:['astronaut','robot'],stk:['rocket','planet','star','moon']},
-  {id:'dino',n:'Динозавры',chars:['trex','stego'],stk:['egg','leaf','palm','star']},
-  {id:'pirates',n:'Пираты',chars:['pirate','parrot'],stk:['chest','anchor','palm','coin']},
-  {id:'knight',n:'Рыцарь и дракон',chars:['knight','dragon'],stk:['castle','crown','shield','flag']},
-  {id:'fairy',n:'Феи и единорог',chars:['fairy','unicorn'],stk:['rainbow','wand','heart','star']},
-  {id:'sea',n:'Подводный мир',chars:['fish','octopus'],stk:['shell','bubble','anchor','starfish']},
-  {id:'football',n:'Футбол',chars:['footballer'],stk:['ball','trophy','flag','star']},
-  {id:'race',n:'Гонки',chars:['racecar'],stk:['checkflag','wheel','trophy','star']},
-  {id:'forest',n:'Лес и звери',chars:['fox','hedgehog'],stk:['mushroom','acorn','leaf','tree']},
-  {id:'winter',n:'Зима и праздники',chars:['snowman'],stk:['snowflake','gift','tree','star']}
+  {id:'space',n:'Космос',art:'space',chars:['astronaut','robot'],stk:['rocket','planet','star','moon']},
+  {id:'dino',n:'Динозавры',art:'dino',chars:['trex','stego'],stk:['egg','leaf','palm','star']},
+  {id:'pirates',n:'Пираты',art:'pirates',chars:['pirate','parrot'],stk:['chest','anchor','palm','coin']},
+  {id:'knight',n:'Рыцарь и дракон',art:'knight',chars:['knight','dragon'],stk:['castle','crown','shield','flag']},
+  {id:'fairy',n:'Феи и единорог',art:'fairy',chars:['fairy','unicorn'],stk:['rainbow','wand','heart','star']},
+  {id:'sea',n:'Подводный мир',art:'sea',chars:['fish','octopus'],stk:['shell','bubble','anchor','starfish']},
+  {id:'football',n:'Футбол',art:'football',chars:['footballer'],stk:['ball','trophy','flag','star']},
+  {id:'race',n:'Гонки',art:'race',chars:['racecar'],stk:['checkflag','wheel','trophy','star']},
+  {id:'forest',n:'Лес и звери',art:'forest',chars:['fox','hedgehog'],stk:['mushroom','acorn','leaf','tree']},
+  {id:'winter',n:'Зима и праздники',art:'winter',chars:['snowman'],stk:['snowflake','gift','tree','star']}
 ];
 const PALETTES=[
   ['#F4A73B','#E8573F','#FFF4DC','#3A86C8'],['#2BB39A','#F2B23E','#E6F7F2','#E8573F'],['#D9467A','#8E5BD9','#FCE8F1','#E8A93B'],['#2E7FD8','#20AFB8','#E5F1FD','#F59E3C'],
@@ -1361,9 +1362,10 @@ const LEVELS=[['1','Сказка'],['2','Яркий'],['3','Спокойный']
 /* рисованные сюжеты: у темы до трёх наборов, набор выбирается по номеру варианта.
    top — сверху слева (смотрит вправо), bot — снизу справа (смотрит влево), char — самостоятельная картинка для «Яркого» */
 /* пропорции картинок (ширина / высота), чтобы заранее знать их высоту на листе */
-const ART_AR={"carlson-1-mid":1.724,"carlson-1-top":2.044,"carlson-2-mid":1.524,"carlson-2-top":2.032,"carlson-3-mid":1.608,"carlson-3-top":1.675,"cheburashka-1-mid":2.43,"cheburashka-1-top":1.379,"cheburashka-2-mid":2.468,"cheburashka-2-top":1.811,"cheburashka-3-mid":1.476,"cheburashka-3-top":1.85,"funtik-1-mid":1.455,"funtik-1-top":1.745,"funtik-2-mid":1.47,"funtik-2-top":2.231,"funtik-3-mid":1.699,"funtik-3-top":1.502,"leopold-1-mid":1.907,"leopold-1-top":2.086,"leopold-2-mid":2.379,"leopold-2-top":1.639,"leopold-3-mid":1.636,"leopold-3-top":2.487,"lion-1-mid":1.891,"lion-1-top":1.796,"lion-2-mid":1.754,"lion-2-top":2.237,"lion-3-mid":2.263,"lion-3-top":2.032,"pogodi-1-mid":1.747,"pogodi-1-top":1.737,"pogodi-2-mid":1.963,"pogodi-2-top":1.946,"pogodi-3-mid":2.233,"pogodi-3-top":1.675,"pooh-1-mid":2.437,"pooh-1-top":1.468,"pooh-2-mid":1.855,"pooh-2-top":1.902,"pooh-3-mid":1.99,"pooh-3-top":2.088,"prostokvashino-1-mid":0.851,"prostokvashino-1-top":0.726,"prostokvashino-2-mid":1.351,"prostokvashino-2-top":2.032,"prostokvashino-3-mid":1.942,"prostokvashino-3-top":1.474,"umka-1-mid":1.23,"umka-1-top":1.741,"umka-2-mid":1.898,"umka-2-top":1.852};
+const ART_AR={"bremen-1-mid":2.386,"bremen-1-top":2.048,"bremen-2-mid":2.444,"bremen-2-top":1.822,"bremen-3-mid":2.659,"bremen-3-top":1.878,"carlson-1-mid":1.724,"carlson-1-top":2.044,"carlson-2-mid":1.524,"carlson-2-top":2.032,"carlson-3-mid":1.608,"carlson-3-top":1.675,"cheburashka-1-mid":2.43,"cheburashka-1-top":1.379,"cheburashka-2-mid":2.468,"cheburashka-2-top":1.811,"cheburashka-3-mid":1.476,"cheburashka-3-top":1.85,"dino-1-mid":1.882,"dino-1-top":2.033,"dino-2-mid":1.767,"dino-2-top":2.224,"dino-3-mid":2.031,"dino-3-top":1.741,"fairy-1-mid":1.828,"fairy-1-top":2.43,"fairy-2-mid":1.793,"fairy-2-top":1.853,"fairy-3-mid":1.853,"fairy-3-top":1.855,"football-1-mid":1.938,"football-1-top":1.946,"football-2-mid":1.718,"football-2-top":1.595,"football-3-mid":1.599,"football-3-top":2.019,"forest-1-mid":1.924,"forest-1-top":2.379,"forest-2-mid":1.503,"forest-2-top":1.747,"forest-3-mid":1.803,"forest-3-top":1.757,"funtik-1-mid":1.455,"funtik-1-top":1.745,"funtik-2-mid":1.47,"funtik-2-top":2.231,"funtik-3-mid":1.699,"funtik-3-top":1.502,"gav-1-mid":2.016,"gav-1-top":1.947,"gav-2-mid":1.845,"gav-2-top":2.213,"hedgehog-2-mid":2.028,"hedgehog-2-top":1.957,"hedgehog-3-mid":1.874,"hedgehog-3-top":1.979,"knight-1-mid":2.048,"knight-1-top":1.635,"knight-2-mid":1.456,"knight-2-top":2.218,"knight-3-mid":1.847,"knight-3-top":1.786,"leopold-1-mid":1.907,"leopold-1-top":2.086,"leopold-2-mid":2.379,"leopold-2-top":1.639,"leopold-3-mid":1.636,"leopold-3-top":2.487,"lion-1-mid":1.891,"lion-1-top":1.796,"lion-2-mid":1.754,"lion-2-top":2.237,"lion-3-mid":2.263,"lion-3-top":2.032,"pirates-1-mid":2.137,"pirates-1-top":1.873,"pirates-2-mid":1.903,"pirates-2-top":1.726,"pirates-3-mid":1.638,"pirates-3-top":1.802,"pogodi-1-mid":1.747,"pogodi-1-top":1.737,"pogodi-2-mid":1.963,"pogodi-2-top":1.946,"pogodi-3-mid":2.233,"pogodi-3-top":1.675,"pooh-1-mid":2.437,"pooh-1-top":1.468,"pooh-2-mid":1.855,"pooh-2-top":1.902,"pooh-3-mid":1.99,"pooh-3-top":2.088,"prostokvashino-1-mid":0.851,"prostokvashino-1-top":0.726,"prostokvashino-2-mid":1.351,"prostokvashino-2-top":2.032,"prostokvashino-3-mid":1.942,"prostokvashino-3-top":1.474,"race-1-mid":2.212,"race-1-top":1.998,"race-2-mid":1.813,"race-2-top":1.675,"race-3-mid":1.578,"race-3-top":1.985,"sea-1-mid":1.471,"sea-1-top":2.333,"sea-2-mid":1.434,"sea-2-top":2.13,"sea-3-mid":1.77,"sea-3-top":1.673,"space-1-mid":1.209,"space-1-top":1.946,"space-2-mid":1.734,"space-2-top":1.881,"space-3-mid":2.094,"space-3-top":1.773,"umka-1-mid":1.23,"umka-1-top":1.741,"umka-2-mid":1.898,"umka-2-top":1.852,"umka-3-mid":1.58,"umka-3-top":1.527,"winter-1-mid":1.68,"winter-1-top":1.878,"winter-2-mid":1.56,"winter-2-top":1.959,"winter-3-mid":2.241,"winter-3-top":2.103};
 const ART_SAY={'prostokvashino-1':'art/prostokvashino-1-say.webp'};
-const artSet=(t,k)=>{if(!t.art||!t.art.length)return null;const a=t.art[((k%t.art.length)+t.art.length)%t.art.length];
+const artList=t=>t.art?Object.keys(ART_AR).filter(k=>k.startsWith(t.art+'-')&&/^[a-z]+-\d+-top$/.test(k)).map(k=>k.slice(0,-4)).sort():[];
+const artSet=(t,k)=>{const L=artList(t);if(!L.length)return null;const a=L[((k%L.length)+L.length)%L.length];
   return{id:a,arTop:ART_AR[a+'-top']||0.8,arBot:ART_AR[a+'-mid']||1,top:`art/${a}-top.webp`,bot:`art/${a}-mid.webp`,char:`art/${a}-bot.webp`,say:ART_SAY[a]||''}};
 const charSVG=(id,cls)=>`<svg class="art ${cls||''}" viewBox="0 0 100 100" aria-hidden="true">${CHARS[id]()}</svg>`;
 /* рисованные картинки темы: сверху персонаж смотрит вправо, снизу влево */
@@ -1375,7 +1377,7 @@ function resolveDesign(st,seed){
   const r=rng(seed*7919+13);
   const theme=d.theme&&d.theme!=='random'?THEMES.find(t=>t.id===d.theme)||THEMES[0]:THEMES[Math.floor(r()*THEMES.length)];
   const out={lv:+d.lv||2,bw:!!d.bw,theme,pal:PALETTES[Math.floor(r()*PALETTES.length)],frame:FRAMES[Math.floor(r()*FRAMES.length)],char:pick(r,theme.chars),seed};
-  out.img=artSet(theme,Math.floor(r()*99));return out;
+  out.img=artSet(theme,seed);return out;
 }
 
 function formItem(p,r){for(let k=0;k<200;k++){const it=FORMS[pick(r,p.forms)](r,p);if(it)return it}return{...E(2,'+',3),fail:true}}
@@ -1922,7 +1924,7 @@ const badgeH=i=>`<span class="cb"><i>${i+1}</i></span>`;
 /* задания с текстом и рисунками: каждая строка текста — в строке клеток, рисунки по высоте кратны клетке */
 function richItemHTML(it,i,showAns){
   if(it.type==='word')return `<div class="it rich span wq2">${badgeH(i)}<div class="rb"><p class="tl">${esc(it.q)}</p><div class="sol2"></div><div class="aline"><span>Ответ:</span><i>${showAns?esc(fmt(it.ans)):''}</i></div></div></div>`;
-  if(it.type==='grid')return `<div class="it rich">${badgeH(i)}<div class="rb">${gridSVG(it)}<span class="crow">${tokRow(`${it.ask} = □ ${gridUnit(it)}`,it,showAns)}</span></div></div>`;
+  if(it.type==='grid')return `<div class="it rich">${badgeH(i)}<div class="rb">${gridSVG(it,true)}<span class="crow">${tokRow(`${it.ask} = □ ${gridUnit(it)}`,it,showAns)}</span></div></div>`;
   if(it.type==='ch')return `<div class="it rich${it.svg?'':' span'}">${badgeH(i)}<div class="rb"><p class="tl">${esc(it.q)}</p>${it.svg||''}<span class="opts2">${it.opts.map(o=>`<span class="ob${showAns&&o===it.ans?' on':''}">${esc(o)}</span>`).join('')}</span></div></div>`;
   if(it.type==='cmp')return `<div class="it rich">${badgeH(i)}<div class="rb"><span class="crow cwrap">${tokRow(`${it.left} ◯ ${it.right}`,it,showAns)}</span></div></div>`;
   if(it.type==='own'){const q=it.q.includes('□')?it.q:it.q+' = □';
@@ -1937,7 +1939,7 @@ function snapCells(root){(root||document).querySelectorAll('.sheet').forEach(sh=
   rich.forEach(el=>{el.style.width='';el.style.whiteSpace='nowrap';const need=[...el.querySelectorAll('.rb > *')].reduce((m,x)=>Math.max(m,x.scrollWidth),0)+2*c;el.style.whiteSpace='';
     const w=Math.min(el.parentNode.clientWidth,Math.ceil(need/c-0.02)*c);const g=el.dataset.g;gw[g]=Math.max(gw[g]||0,w)});
   rich.forEach(el=>{el.style.width=gw[el.dataset.g]+'px'});
-  sh.querySelectorAll('.rb > .fig,.rb > .gfig,.rb > .pair').forEach(el=>{el.style.height='';const h=el.getBoundingClientRect().height;if(h)el.style.height=(Math.ceil(h/c-0.02)*c)+'px'});
+  sh.querySelectorAll('.rb > .fig,.rb > .gfig:not(.on),.rb > .pair').forEach(el=>{el.style.height='';const h=el.getBoundingClientRect().height;if(h)el.style.height=(Math.ceil(h/c-0.02)*c)+'px'});
   sh.querySelectorAll('.sgrid > *,.hT,.tB,.sh-items > *').forEach(el=>{if(el.classList.contains('ci'))return;el.style.minHeight='';const h=el.getBoundingClientRect().height;el.style.minHeight=(Math.ceil(h/c-0.03)*c)+'px'});
   /* клетка на весь лист: сетка листа проходит через начало заданий, шапка встаёт на те же линии */
 })}
@@ -2034,7 +2036,6 @@ function sheetParts(items,{topic,level,seed,studentName,answers,design}){
       pieces.splice(0,pieces.length,headPiece,...rest,...(tailPiece?[tailPiece]:[]));heroIn=true}
     else if(bot)pieces.push(`<div class="scene2">${bot}</div>`);
   }
-  if(D&&D.lv===1)pieces.push(`<div class="selfcheck"><span>Как я справился?</span>${FACES.map(f=>`<svg class="art" viewBox="0 0 40 40" aria-hidden="true">${f}</svg>`).join('')}</div>`);
   const cls=D?`lv${D.lv} fr-${D.frame}${D.bw?' bw':''}`:'';
   const pal=D?(D.bw?['#555','#999','#f2f2f2','#777']:D.pal):null;
   const style=D?`--p1:${pal[0]};--p2:${pal[1]};--p3:${pal[2]};--p4:${pal[3]}`:'';
@@ -2453,7 +2454,9 @@ function viewTopic(){
     row.querySelector('.b-rm').onclick=()=>{V.blocks.splice(i,1);render()};
   });
   if($('b-add'))$('b-add').onclick=()=>{V.blocks.push({tid:t.id,lv:Math.min(V.level,t.L.length-1),count:4,label:''});render()};
-  $('again').onclick=()=>{V.seed=newSeed();render()};
+  $('again').onclick=()=>{const cur=resolveDesign(st,V.seed);let s2=newSeed();
+    for(let k=0;k<30;k++){const nx=resolveDesign(st,s2);if(!cur.img||!nx.img||nx.theme.id!==cur.theme.id||nx.img.id!==cur.img.id)break;s2=newSeed()}
+    V.seed=s2;render()};
   $('print').onclick=()=>{materialize();go({screen:'print'})};
   $('link').onclick=()=>{materialize();render();linkModal()};
   const sc=$('setcur');if(sc)sc.onclick=()=>{st[CK(t.subject)]=t.id;save();render()};
@@ -2477,7 +2480,7 @@ function designBox(st,seed){const d=designOf(st),R=resolveDesign(st,seed);
     <div class="seg dseg" id="dlv">${LEVELS.map(([k,l])=>`<button type="button" data-lv="${k}" class="${String(d.lv)===k?'on':''}">${l}</button>`).join('')}</div>
     ${+d.lv<4?`<div class="drow"><select id="dth" aria-label="Сюжет"><option value="random"${d.theme==='random'?' selected':''}>Случайный сюжет</option>${THEMES.map(t=>`<option value="${t.id}"${d.theme===t.id?' selected':''}>${esc(t.n)}</option>`).join('')}</select>
       <label class="bwl"><input type="checkbox" id="dbw"${d.bw?' checked':''}> Ч/Б</label></div>
-      <button type="button" class="dprev" id="dgal">${R.img?artImg(R.img.char,'mini'):charSVG(R.char,'mini')}<span><b>${esc(R.theme.n)}</b><small>все 20 сюжетов →</small></span></button>`:'<span class="hint">Без украшений, как раньше.</span>'}</div>`}
+      <button type="button" class="dprev" id="dgal">${R.img?artImg(R.img.char,'mini'):charSVG(R.char,'mini')}<span><b>${esc(R.theme.n)}</b><small>все ${THEMES.length} ${plural(THEMES.length,['сюжет','сюжета','сюжетов'])} →</small></span></button>`:'<span class="hint">Без украшений, как раньше.</span>'}</div>`}
 function bindDesign(st){const d=designOf(st);const $=id=>document.getElementById(id);
   document.querySelectorAll('#dlv button').forEach(b=>b.onclick=()=>{d.lv=+b.dataset.lv;save();render()});
   if($('dth'))$('dth').onchange=e=>{d.theme=e.target.value;save();render()};
@@ -2486,7 +2489,7 @@ function bindDesign(st){const d=designOf(st);const $=id=>document.getElementById
 function viewGallery(){const st=student(V.studentId),d=designOf(st);
   app.innerHTML=`<div class="head"><div><h1>Сюжеты оформления</h1><p>Выберите сюжет для листов ${esc(st.name)} или оставьте случайный: тогда каждый новый лист в новом сюжете.</p></div>
     <button class="btn ${d.theme==='random'?'primary':''}" data-th="random">Случайный сюжет</button></div>
-    <div class="gal">${THEMES.map(t=>`<button class="gcard${d.theme===t.id?' on':''}" data-th="${t.id}"><span class="gchars${!t.art&&t.chars.length>2?' many':''}">${t.art?t.art.map((a,i)=>artImg(artSet(t,i).char)).join(''):t.chars.map(c=>charSVG(c)).join('')}</span>
+    <div class="gal">${THEMES.map(t=>`<button class="gcard${d.theme===t.id?' on':''}" data-th="${t.id}"><span class="gchars${!artList(t).length&&t.chars.length>2?' many':''}">${artList(t).length?artList(t).map((a,i)=>artImg(artSet(t,i).char)).join(''):t.chars.map(c=>charSVG(c)).join('')}</span>
       <b>${esc(t.n)}</b><span class="gstk">${t.stk.map(k=>stkSVG(k)).join('')}</span></button>`).join('')}</div>`;
   app.querySelectorAll('[data-th]').forEach(b=>b.onclick=()=>{d.theme=b.dataset.th;if(+d.lv===4)d.lv=2;save();history.back()})}
 function viewPrint(){
