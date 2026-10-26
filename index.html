@@ -198,6 +198,58 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .side-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
 a.btn{text-decoration:none}
 
+/* Рисунки и выбор ответа */
+.fig{display:block;width:100%;height:auto}
+.fig .ln{stroke:#1a1f2e;stroke-width:2;fill:none;stroke-linejoin:round;stroke-linecap:round}
+.fig .thin{stroke:#1a1f2e;stroke-width:1;fill:none}
+.fig .dt{fill:#1a1f2e}
+.fig .fl{fill:#cfd8ea;stroke:#1a1f2e;stroke-width:2}
+.fig .gl{stroke:#cfd7e6;stroke-width:.5}
+.fig .cell{fill:#e3e9f4;stroke:#1a1f2e;stroke-width:.8}
+.fig .axis{stroke:#d5402f;stroke-width:1.5;stroke-dasharray:4 3}
+.fig .bar{fill:#c9d4ec;stroke:#1a1f2e;stroke-width:1}
+.fig .tx{font-size:9px;font-family:var(--f-ui);fill:#1a1f2e}
+.fig .tx.b{font-weight:700;font-size:11px}
+.pair{display:flex;align-items:center;gap:8px}
+.pair .fig{max-width:45%}
+.it.pic{flex-direction:column;align-items:flex-start;white-space:normal;gap:1.2cqw;font-size:3cqw}
+.it.pic .fig{max-width:22cqw}
+.it.pic .fig.wide{max-width:42cqw}
+.it.pic .pair{width:100%}
+.it.pic .pair .fig{max-width:16cqw}
+.chq{line-height:1.4}
+.opts{display:flex;gap:1.6cqw;flex-wrap:wrap}
+.opt{border:.3cqw solid #8a94ab;border-radius:4cqw;padding:.4cqw 2cqw;font-size:2.7cqw}
+.ans .opt.on{border-color:var(--sheet-pen);color:var(--sheet-pen);font-weight:700}
+.opts-pad{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px}
+.opts-pad button{border:1.5px solid var(--line);background:var(--card);border-radius:12px;font-size:18px;font-weight:700;min-height:58px;padding:8px}
+.opts-pad button:hover{border-color:var(--ink)}
+.task .fig .ln,.task .fig .thin{stroke:var(--ink)}
+.task .fig .dt,.task .fig .tx{fill:var(--ink)}
+.task .fig .fl,.task .fig .cell,.task .fig .bar{fill:var(--ink-soft);stroke:var(--ink)}
+.task .fig .gl{stroke:var(--line)}
+.task .pair{justify-content:center}
+.task .pair b{font-size:20px}
+
+/* Каталог и поиск */
+.search{padding:14px 18px 0}
+.search input{width:100%;padding:11px 14px;border:1.5px solid var(--line);border-radius:10px;font:inherit;background:var(--card);color:var(--ink)}
+.search input:focus{border-color:var(--ink)}
+.sres{padding:10px 12px 14px;display:flex;flex-direction:column;gap:4px}
+.sr{text-align:left;border:0;background:none;border-radius:9px;padding:9px 10px;display:flex;flex-direction:column;gap:2px}
+.sr:hover{background:var(--ink-soft)}
+.sr-t{font-weight:600}
+.sr small{color:var(--ink-2);font-size:12.5px}
+.cg{border-top:1px solid var(--line)}
+.cg>summary{cursor:pointer;padding:12px 18px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:15px}
+.cg>summary .cnt{margin-left:auto;color:var(--ink-3);font-size:13px}
+.cp{margin:0 10px 6px}
+.cp>summary{cursor:pointer;padding:8px 10px;font-weight:600;color:var(--ink-2);font-size:14px;border-radius:8px}
+.cp>summary:hover{background:var(--ink-soft)}
+.topic .tt{display:flex;flex-direction:column;gap:2px}
+.topic .subs{font-size:12px;color:var(--ink-3);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.subchip{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--ink-soft);border-radius:10px;padding:8px 12px;margin:8px 0 0}
+
 /* Виды листа */
 .seg.tpl{gap:4px}
 .seg.tpl button{padding:7px 11px;font-size:14px;min-width:0}
@@ -417,9 +469,9 @@ function pair(op,p,r,t){
 
 /* выражения для порядка действий: свой маленький разбор, деление только нацело */
 function evalExpr(s){
-  const tok=s.match(/\d+|[+\-×÷()]/g);let i=0;
+  const tok=s.match(/\d+|[+\-×÷:()]/g);let i=0;
   function prim(){const x=tok[i++];if(x==='('){const v=sum();i++;return v}return Number(x)}
-  function prod(){let v=prim();while(tok[i]==='×'||tok[i]==='÷'){const o=tok[i++],w=prim();if(o==='×')v*=w;else{if(w===0||v%w)return NaN;v/=w}}return v}
+  function prod(){let v=prim();while(tok[i]==='×'||tok[i]==='÷'||tok[i]===':'){const o=tok[i++],w=prim();if(o==='×')v*=w;else{if(w===0||v%w)return NaN;v/=w}}return v}
   function sum(){let v=prod();while(tok[i]==='+'||tok[i]==='-'){const o=tok[i++],w=prod();v=o==='+'?v+w:v-w;if(v<0)return NaN}return v}
   const v=sum();return Number.isInteger(v)&&v>=0?v:NaN;
 }
@@ -429,7 +481,7 @@ function orderItem(p,r){
     const s=pat.replace(/[a-d]/g,()=>String(p.small?ri(r,2,9):ri(r,2,p.max||60)));
     const s2=s.replace(/(\d+)\s*÷\s*(\d+)/g,(m,x,y)=>`${Number(y)*ri(r,2,9)} ÷ ${y}`);
     const v=evalExpr(s2.replace(/\s/g,''));
-    if(!isNaN(v)&&v<=(p.cap||100))return{type:'expr',q:s2.replace(/-/g,'−'),ans:v};
+    if(!isNaN(v)&&v<=(p.cap||100))return{type:'expr',q:s2.replace(/-/g,'−').replace(/÷/g,':'),ans:v};
   }
   return{type:'expr',q:'2 + 3 × 4',ans:14};
 }
@@ -442,9 +494,10 @@ function generate(p,seed){
       sub.forEach(x=>{x.src=pt.tid;x.blk=k;x.lbl=pt.label||'';items.push(x)})});
     return items;
   }
-  if(p.kind==='word'||p.kind==='units'||p.kind==='grid'){
-    const make=p.kind==='word'?wordItem:p.kind==='units'?unitItem:gridItem;const seen=new Set();items.failed=0;
-    for(let i=0;i<n;i++){let it;for(let k=0;k<12;k++){it=make(p,r);const key=it.q||it.left+it.right||it.cells.join(';')+it.ask;if(!seen.has(key)){seen.add(key);break}}
+  if(p.kind==='word'||p.kind==='units'||p.kind==='grid'||p.kind==='forms'){
+    const make=p.kind==='word'?wordItem:p.kind==='units'?unitItem:p.kind==='grid'?gridItem:formItem;const seen=new Set();items.failed=0;
+    /* повторов не бывает: если разных вариантов меньше, чем мест на листе, лист становится короче */
+    for(let guard=0;items.length<n&&guard<n*40;guard++){const it=make(p,r);const key=JSON.stringify(it);if(seen.has(key))continue;seen.add(key);
       if(it.fail)items.failed++;items.push(it)}
     return items;
   }
@@ -476,7 +529,7 @@ function generate(p,seed){
   }
   return items;
 }
-const sym=o=>o==='-'?'−':o;
+const sym=o=>o==='-'?'−':o==='÷'?':':o;
 
 /* ---------- движок «Задачи»: проверенные шаблоны, в которые подставляются числа, имена и предметы ---------- */
 const plural=(n,[one,few,many])=>{const a=Math.abs(n)%100,b=a%10;if(a>10&&a<20)return many;if(b===1)return one;if(b>=2&&b<=4)return few;return many};
@@ -525,6 +578,14 @@ const WT={
     return{q:`За ${cnt(n,g.f)} заплатили ${cnt(s,RUB)}. Сколько рублей стоит ${g.one} ${g.f[0]}?`,ans:pr}},
   qty(r,p){const g=pick(r,GOODS),pr=ri(r,2,9)*5,n=ri(r,2,9),s=pr*n;if(!ok1(s))return;
     return{q:`${cap(g.f[0])} стоит ${cnt(pr,RUB)}. Сколько ${g.f[2]} можно купить на ${cnt(s,RUB)}?`,ans:n}},
+  kgSum(r,p){const a=ri(r,2,p.max-2),b=ri(r,1,p.max-a);return{q:`Арбуз весит ${a} кг, а дыня — ${b} кг. Сколько килограммов весят арбуз и дыня вместе?`,ans:a+b}},
+  kgDiff(r,p){const a=ri(r,3,p.max),b=ri(r,1,a-1);return{q:`Сумка с картошкой весит ${a} кг, а сумка с морковью — ${b} кг. На сколько килограммов сумка с картошкой тяжелее?`,ans:a-b}},
+  litre(r,p){const a=ri(r,1,p.max-2),b=ri(r,1,p.max-a);return{q:`В кастрюле было ${a} л воды. Налили ещё ${b} л. Сколько литров воды стало в кастрюле?`,ans:a+b}},
+  litreRem(r,p){const a=ri(r,3,p.max),b=ri(r,1,a-1);return{q:`В бидоне было ${a} л молока. Отлили ${b} л. Сколько литров молока осталось?`,ans:a-b}},
+  lenMore(r,p){const a=ri(r,2,p.max-2),b=ri(r,1,p.max-a);return{q:`Синяя лента длиной ${a} см, а красная на ${b} см длиннее. Какой длины красная лента? Ответ дай в сантиметрах.`,ans:a+b}},
+  lenDiff(r,p){const a=ri(r,3,p.max),b=ri(r,1,a-1);return{q:`Один отрезок длиной ${a} см, другой — ${b} см. На сколько сантиметров первый отрезок длиннее второго?`,ans:a-b}},
+  howTimesW(r,p){const[k1,k2]=two(r),o=pick(r,THINGS),a=ri(r,2,9),m=tabN(r,p);if(!ok1(a*m)||!ok1(a))return;
+    return{q:`У ${k1.gen} ${cnt(a*m,o)}, а у ${k2.gen} ${cnt(a,o)}. Во сколько раз у ${k1.gen} больше ${o[2]}, чем у ${k2.gen}?`,ans:m}},
   dist(r){const x=pick(r,VEH),v=ri(r,x.v[0]/5,x.v[1]/5)*5,t=ri(r,2,6);
     return{q:`${x.n} ехал ${t} ч со скоростью ${v} км/ч. Какое расстояние он проехал? Ответ дай в километрах.`,ans:v*t}},
   time(r){const x=pick(r,VEH),v=ri(r,x.v[0]/5,x.v[1]/5)*5,t=ri(r,2,6);
@@ -554,6 +615,10 @@ const UT={
   kgg2g:r=>{const k=ri(r,1,9),g=ri(r,1,9)*100;return{q:`${k} кг ${g} г = □ г`,ans:k*1000+g}},
   t2kg:r=>{const t=ri(r,2,9);return{q:`${t} т = □ кг`,ans:t*1000}},
   km2m:r=>{const k=ri(r,2,9);return{q:`${k} км = □ м`,ans:k*1000}},
+  cm2mm:r=>{const c=ri(r,2,9);return{q:`${c} см = □ мм`,ans:c*10}},
+  cmmm2mm:r=>{const c=ri(r,1,9),m=ri(r,1,9);return{q:`${c} см ${m} мм = □ мм`,ans:c*10+m}},
+  rub2kop:r=>{const k=ri(r,2,9);return r()<.5?{q:`${k} р. = □ к.`,ans:k*100}:{q:`${k*100} к. = □ р.`,ans:k}},
+  rubkop2kop:r=>{const k=ri(r,1,9),c=ri(r,1,9)*10;return{q:`${k} р. ${c} к. = □ к.`,ans:k*100+c}},
   kmm2m:r=>{const k=ri(r,1,9),m=ri(r,1,9)*100;return{q:`${k} км ${m} м = □ м`,ans:k*1000+m}}
 };
 function unitItem(p,r){const x=UT[pick(r,p.sets)](r);return x.type==='cmp'?{...x,u:true}:{type:'own',u:true,q:x.q,ans:String(x.ans)}}
@@ -581,9 +646,221 @@ function gridSVG(it){
 }
 const gridUnit=it=>it.ask==='P'?'см':'кв. см';
 
+/* ---------- малые генераторы: каждый делает один вид задания по своему правилу ----------
+   Генератор может вернуть null, если случайные числа не подошли: тогда берётся новая попытка.
+   Все генераторы прогоняются автоматической проверкой (ответ пересчитывается, условия выполнимы). */
+const E=(a,op,b,miss)=>{const res=op==='+'?a+b:op==='-'?a-b:op==='×'?a*b:a/b;miss=miss||'res';return{type:'eq',a,b,op,res,miss,ans:miss==='a'?a:miss==='b'?b:res}};
+const X=(a,op,b,miss)=>({...E(a,op,b,miss),x:true});
+const O=(q,ans)=>({type:'own',q,ans:String(ans)});
+const CMP=(l,r,lv,rv)=>({type:'cmp',left:String(l),right:String(r),ans:lv>rv?'>':lv<rv?'<':'='});
+const COL=(a,op,b)=>({type:'col',a,b,op,ans:op==='+'?a+b:op==='-'?a-b:a*b});
+const CH=(q,opts,ans,svg)=>({type:'ch',q,opts,ans,svg:svg||''});
+const shuffle=(r,a)=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const EMO=['🍎','🍐','🍓','🐱','🐶','🐰','🐻','🦊','🐟','🌸','⭐','🚗','🎈','🍄','🐞'];
+const EMO_N={'🍎':['яблоко','яблока','яблок'],'🍐':['груша','груши','груш'],'🍓':['клубничка','клубнички','клубничек'],'🐱':['котёнок','котёнка','котят'],'🐶':['щенок','щенка','щенков'],
+  '🐰':['зайчик','зайчика','зайчиков'],'🐻':['медвежонок','медвежонка','медвежат'],'🦊':['лисёнок','лисёнка','лисят'],'🐟':['рыбка','рыбки','рыбок'],'🌸':['цветок','цветка','цветков'],
+  '⭐':['звёздочка','звёздочки','звёздочек'],'🚗':['машинка','машинки','машинок'],'🎈':['шарик','шарика','шариков'],'🍄':['гриб','гриба','грибов'],'🐞':['божья коровка','божьи коровки','божьих коровок']};
+const ORD=['первый','второй','третий','четвёртый','пятый','шестой','седьмой','восьмой','девятый','десятый'];
+const MONTHS=['январь','февраль','март','апрель','май','июнь','июль','август','сентябрь','октябрь','ноябрь','декабрь'];
+const MDAYS=[31,28,31,30,31,30,31,31,30,31,30,31];
+const SEQS=[['утро','день','вечер','ночь'],['понедельник','вторник','среда','четверг','пятница','суббота','воскресенье']];
+const svgWrap=(w,h,body,label)=>`<svg class="fig" viewBox="0 0 ${w} ${h}" role="img" aria-label="${label||'Рисунок'}">${body}</svg>`;
+const deg=a=>a*Math.PI/180;
+
+/* рисунки */
+function angleSVG(a){const L=60,x0=20+Math.max(0,-L*Math.cos(deg(a))),y0=70,x1=x0+L,y1=y0,x2=x0+L*Math.cos(deg(a)),y2=y0-L*Math.sin(deg(a));
+  const mark=a===90?`<path d="M${x0+12} ${y0} L${x0+12} ${y0-12} L${x0} ${y0-12}" class="thin"/>`:`<path d="M${x0+14} ${y0} A14 14 0 0 0 ${(x0+14*Math.cos(deg(a))).toFixed(1)} ${(y0-14*Math.sin(deg(a))).toFixed(1)}" class="thin"/>`;
+  return svgWrap(Math.max(110,x0+L+20),82,`<path d="M${x1} ${y1} L${x0} ${y0} L${x2.toFixed(1)} ${y2.toFixed(1)}" class="ln"/>${mark}<circle cx="${x0}" cy="${y0}" r="2.5" class="dt"/>`,'Угол')}
+function lineSVG(kind,r){
+  const y=30;const dot=(x,yy)=>`<circle cx="${x}" cy="${yy}" r="3" class="dt"/>`;
+  if(kind==='точка')return svgWrap(120,60,dot(60,30),'Точка');
+  if(kind==='отрезок')return svgWrap(120,60,`<path d="M15 ${y} L105 ${y}" class="ln"/>${dot(15,y)}${dot(105,y)}`,'Отрезок');
+  if(kind==='луч')return svgWrap(120,60,`<path d="M15 ${y} L112 ${y}" class="ln"/>${dot(15,y)}<path d="M104 ${y-5} L112 ${y} L104 ${y+5}" class="ln"/>`,'Луч');
+  if(kind==='прямая линия')return svgWrap(120,60,`<path d="M4 ${y+10} L116 ${y-10}" class="ln"/>`,'Прямая');
+  if(kind==='кривая линия')return svgWrap(120,60,`<path d="M8 40 C 30 0, 55 60, 80 25 S 110 30, 114 18" class="ln"/>`,'Кривая');
+  const n=ri(r,3,5);let pts=[];for(let i=0;i<=n;i++)pts.push([10+i*(100/n),i%2?14:46]);
+  return svgWrap(120,60,`<path d="M${pts.map(p=>p.join(' ')).join(' L')}" class="ln"/>${pts.map(p=>dot(p[0],p[1])).join('')}`,'Ломаная')}
+function shapeSVG(kind,r){const R=r?ri(r,18,32):30,c=r?ri(r,0,8):0;
+  if(kind==='круг')return svgWrap(90,80,`<circle cx="${45}" cy="40" r="${R}" class="fl"/>`,'Круг');
+  if(kind==='окружность')return svgWrap(90,80,`<circle cx="45" cy="40" r="${R}" class="ln"/>`,'Окружность');
+  if(kind==='шар')return svgWrap(90,80,`<circle cx="45" cy="40" r="${R}" class="ln"/><ellipse cx="45" cy="40" rx="${R}" ry="${Math.round(R/3)}" class="thin"/>`,'Шар');
+  if(kind==='куб'){const a=24+c*2;return svgWrap(90,80,`<path d="M15 ${15+a/2} L${15+a} ${15+a/2} L${15+a} ${15+a*1.5} L15 ${15+a*1.5} Z M15 ${15+a/2} L${15+a/2} 15 L${15+a*1.5} 15 L${15+a} ${15+a/2} M${15+a*1.5} 15 L${15+a*1.5} ${15+a} L${15+a} ${15+a*1.5}" class="ln"/>`,'Куб')}
+  const n=r?ri(r,4,6):4,pts=[];for(let i=0;i<n;i++){const ang=-Math.PI/2+i*2*Math.PI/n+(r?r()*.4:0),rad=R+(r?ri(r,-4,4):0);pts.push([(45+rad*Math.cos(ang)).toFixed(1),(40+rad*Math.sin(ang)).toFixed(1)])}
+  return svgWrap(90,80,`<path d="M${pts.map(q=>q.join(' ')).join(' L')} Z" class="ln"/>`,'Многоугольник')}
+function triSVG(kind,r){
+  const P=kind==='прямоугольный'?[[15,72],[15+ri(r,50,90),72],[15,72-ri(r,35,58)]]
+    :kind==='тупоугольный'?[[40,72],[40+ri(r,50,70),72],[ri(r,5,28),72-ri(r,18,45)]]
+    :[[15,72],[105,72],[ri(r,42,78),ri(r,6,18)]];
+  return svgWrap(120,80,`<path d="M${P.map(p=>p.join(' ')).join(' L')} Z" class="ln"/>`,'Треугольник')}
+function cellsSVG(cells,w,h,axis){
+  const s=10,W=w,H=h;let g='';for(let x=0;x<=W;x++)g+=`<line x1="${x*s}" y1="0" x2="${x*s}" y2="${H*s}" class="gl"/>`;for(let y=0;y<=H;y++)g+=`<line x1="0" y1="${y*s}" x2="${W*s}" y2="${y*s}" class="gl"/>`;
+  const f=cells.map(c=>{const[x,y]=c;return`<rect x="${x*s}" y="${y*s}" width="${s}" height="${s}" class="cell"/>`}).join('');
+  const ax=axis!=null?`<line x1="${axis*s}" y1="-4" x2="${axis*s}" y2="${H*s+4}" class="axis"/>`:'';
+  return `<svg class="fig" viewBox="-2 -6 ${W*s+4} ${H*s+12}" role="img" aria-label="Фигура на клетках">${g}${f}${ax}</svg>`}
+function barSVG(names,vals,max){
+  const bw=34,gap=16,H=110,base=125,step=H/max;let g='';
+  for(let v=0;v<=max;v+=max>10?2:1){const y=base-v*step;g+=`<line x1="22" y1="${y}" x2="${22+names.length*(bw+gap)}" y2="${y}" class="gl"/><text x="18" y="${y+3}" class="tx" text-anchor="end">${v}</text>`}
+  const bars=names.map((n,i)=>{const x=30+i*(bw+gap),h=vals[i]*step;return`<rect x="${x}" y="${base-h}" width="${bw}" height="${h}" class="bar"/><text x="${x+bw/2}" y="${base+14}" class="tx" text-anchor="middle">${n}</text>`}).join('');
+  return `<svg class="fig wide" viewBox="0 0 ${40+names.length*(bw+gap)} 145" role="img" aria-label="Столбчатая диаграмма">${g}${bars}</svg>`}
+function polySVG(n,letters){
+  const cx=60,cy=48,R=36;const pts=[];for(let i=0;i<n;i++){const a=-Math.PI/2+i*2*Math.PI/n;pts.push([cx+R*Math.cos(a),cy+R*Math.sin(a)])}
+  const lab=pts.map((p,i)=>{const dx=(p[0]-cx)/R*11,dy=(p[1]-cy)/R*11;return`<text x="${(p[0]+dx).toFixed(1)}" y="${(p[1]+dy+4).toFixed(1)}" class="tx b" text-anchor="middle">${letters[i]}</text>`}).join('');
+  return svgWrap(120,100,`<path d="M${pts.map(p=>p.map(v=>v.toFixed(1)).join(' ')).join(' L')} Z" class="ln"/>${lab}`,'Многоугольник')}
+function segSVG(a,b){const s=8;return svgWrap(Math.max(a,b)*s+40,52,`<text x="4" y="18" class="tx b">А</text><path d="M18 14 L${18+a*s} 14" class="ln"/><text x="4" y="42" class="tx b">Б</text><path d="M18 38 L${18+b*s} 38" class="ln"/>`,'Два отрезка')}
+
+const FORMS={
+  /* счёт и числа до 10 и 20 */
+  countObj:r=>{const e=pick(r,EMO),n=ri(r,2,10);return O(`${e.repeat(n)} Сколько здесь ${EMO_N[e][2]}? □`,n)},
+  ordinal:r=>{const row=shuffle(r,EMO).slice(0,ri(r,4,6)),k=ri(r,0,row.length-1);return CH(`${row.join(' ')} Какой по счёту ${row[k]}, если считать слева?`,shuffle(r,[ORD[k],ORD[(k+1)%row.length],ORD[(k+row.length-1)%row.length]].filter((v,i,a)=>a.indexOf(v)===i)),ORD[k])},
+  after10:r=>{const n=ri(r,1,9);return O(`Число, которое идёт после ${n}: □`,n+1)},
+  before10:r=>{const n=ri(r,2,10);return O(`Число, которое стоит перед ${n}: □`,n-1)},
+  between10:r=>{const n=ri(r,0,8);return O(`${n} < □ < ${n+2}`,n+1)},
+  after20:r=>{const n=ri(r,10,19);return O(`Число, которое идёт после ${n}: □`,n+1)},
+  before20:r=>{const n=ri(r,11,20);return O(`Число, которое стоит перед ${n}: □`,n-1)},
+  cmp10:r=>{const a=ri(r,0,10),b=r()<.2?a:ri(r,0,10);return CMP(a,b,a,b)},
+  cmp20:r=>{const a=ri(r,10,20),b=r()<.2?a:ri(r,10,20);return CMP(a,b,a,b)},
+  cmp100:r=>{const a=ri(r,10,99);let b=r()<.15?a:(r()<.5?a+pick(r,[-10,10,-1,1,9,-9]):ri(r,10,99));b=Math.max(10,Math.min(99,b));return CMP(a,b,a,b)},
+  cmp1000:r=>{const a=ri(r,100,999);let b=r()<.15?a:(r()<.6?a+pick(r,[-100,100,-10,10,-1,1,-90,90]):ri(r,100,999));b=Math.max(100,Math.min(999,b));return CMP(a,b,a,b)},
+  cmpExpr10:r=>{const a=ri(r,1,8),b=ri(r,1,10-a),c=Math.max(0,Math.min(10,a+b+pick(r,[-2,-1,0,1,2])));return CMP(`${a} + ${b}`,c,a+b,c)},
+  compose10:r=>{const n=ri(r,3,10),a=ri(r,1,n-1);return E(a,'+',n-a,r()<.5?'a':'b')},
+  moreLess10:r=>{const a=ri(r,1,9),k=ri(r,1,3),more=r()<.5;if(!more&&a-k<0)return null;if(more&&a+k>10)return null;
+    return O(`Число, которое ${more?'больше':'меньше'} ${a} на ${k}: □`,more?a+k:a-k)},
+  pmk:(r,p)=>{const k=pick(r,p.k||[1,2,3]);if(r()<.5){const a=ri(r,1,10-k);return E(a,'+',k)}const a=ri(r,k,10);return E(a,'-',k)},
+  addk:(r,p)=>{const k=pick(r,p.k);const a=ri(r,1,10-k);return r()<.3?E(k,'+',a):E(a,'+',k)},
+  subFrom:(r,p)=>{const a=pick(r,p.from),w=r()<.35?'b':'res';if(a>10){const b=ri(r,a%10+1,9);return E(a,'-',b,w)}return E(a,'-',ri(r,1,a-1),w)},
+  subParts:r=>{const a=ri(r,4,10),b=ri(r,1,a-1);return pick(r,[O(`Уменьшаемое ${a}, вычитаемое ${b}. Разность = □`,a-b),E(a,'-',b,'a'),E(a,'-',b,'b')])},
+  addCarry:(r,p)=>{const k=pick(r,p.k||[2,3,4,5,6,7,8,9]);const a=ri(r,Math.max(2,11-k),9),w=r()<.3?'a':'res';return r()<.4?E(k,'+',a,w==='a'?'b':'res'):E(a,'+',k,w)},
+  commAdd:r=>{const a=ri(r,2,9),b=ri(r,1,10-a);return O(`${a} + ${b} = ${b} + □`,a)},
+  sumParts:r=>{const a=ri(r,1,9),b=ri(r,1,10-a);return pick(r,[O(`Слагаемые ${a} и ${b}. Сумма = □`,a+b),E(a,'+',b,'a'),E(a,'+',b,'b'),O(`${a+b} − ${a} = □`,b)])},
+  teen1:r=>E(10,'+',ri(r,1,9)),teen2:r=>{const u=ri(r,1,9);return E(10+u,'-',u)},teen3:r=>{const u=ri(r,1,9);return E(10+u,'-',10)},
+  teen4:r=>{const u=ri(r,1,8),b=ri(r,1,9-u);return pick(r,[E(10+u,'+',b),E(10+u+b,'-',b)])},
+  decUnits:r=>{const u=ri(r,1,9);return r()<.5?O(`${10+u} = 1 дес. □ ед.`,u):O(`1 дес. ${u} ед. = □`,10+u)},
+  countTens:r=>{const d=ri(r,2,10);return r()<.5?O(`${d} дес. = □`,d*10):O(`${d*10} = □ дес.`,d)},
+  num100:r=>{const d=ri(r,2,9),u=ri(r,1,9);return r()<.5?O(`${d} дес. ${u} ед. = □`,d*10+u):O(`${d*10+u} = □ дес. ${u} ед.`,d)},
+  /* устные вычисления до 100 */
+  u36p2:r=>{const t=ri(r,2,9),u=ri(r,1,7);return E(t*10+u,'+',ri(r,1,9-u))},
+  u36m2:r=>{const t=ri(r,2,9),u=ri(r,2,9);return E(t*10+u,'-',ri(r,1,u))},
+  u36p20:r=>{const t=ri(r,1,8),u=ri(r,1,9);return E(t*10+u,'+',ri(r,1,9-t)*10)},
+  u36m20:r=>{const t=ri(r,2,9),u=ri(r,1,9);return E(t*10+u,'-',ri(r,1,t-1)*10)},
+  u26p4:r=>{const t=ri(r,1,9),u=ri(r,1,9);return E(t*10+u,'+',10-u)},
+  u30m7:r=>E(ri(r,2,9)*10,'-',ri(r,1,9)),
+  u60m24:r=>{const t=ri(r,3,9),b=ri(r,11,t*10-11);return b%10===0?null:E(t*10,'-',b)},
+  u26p7:r=>{const t=ri(r,1,8),u=ri(r,2,9);return E(t*10+u,'+',ri(r,10-u,9))},
+  u35m7:r=>{const t=ri(r,2,9),u=ri(r,0,8);return E(t*10+u,'-',ri(r,u+1,9))},
+  commAdd100:r=>{const a=ri(r,11,60),b=ri(r,11,39);return O(`${a} + ${b} = ${b} + □`,a)},
+  assocAdd:r=>{const a=ri(r,11,40),b=ri(r,2,8),c=10-b;return O(`${a} + ${b} + ${c} = ${a} + (${b} + □)`,c)},
+  groupAdd:r=>{const b=ri(r,2,8),c=10-b,a=ri(r,11,79);return{type:'expr',q:`${a} + ${b} + ${c}`,ans:a+10}},
+  letters:r=>{const c=ri(r,2,30),a=ri(r,5,60);return r()<.5?O(`${a} + c при c = ${c}: □`,a+c):O(`${a+c} − c при c = ${c}: □`,a)},
+  eqAdd:r=>{const a=ri(r,11,60),b=ri(r,5,39);return X(a,'+',b,r()<.5?'a':'b')},
+  eqSub:r=>{const a=ri(r,30,99),b=ri(r,5,a-5);return X(a,'-',b,r()<.5?'a':'b')},
+  eqMul:r=>{const a=ri(r,2,9),b=ri(r,2,9);return r()<.5?X(a,'×',b,r()<.5?'a':'b'):X(a*b,'÷',b,r()<.5?'a':'b')},
+  checkAdd:r=>{const a=ri(r,12,60),b=ri(r,11,39),s=a+b;return O(`${a} + ${b} = ${s}. Проверка: ${s} − ${b} = □`,a)},
+  checkSub:r=>{const a=ri(r,40,99),b=ri(r,11,a-11),d=a-b;return O(`${a} − ${b} = ${d}. Проверка: ${d} + ${b} = □`,a)},
+  checkMul:r=>{const a=ri(r,12,40),b=ri(r,2,4),m=a*b;return m>99?null:O(`${a} × ${b} = ${m}. Проверка: ${m} : ${b} = □`,a)},
+  checkDiv:r=>{const b=ri(r,2,9),q=ri(r,11,30),a=b*q;return a>99?null:O(`${a} : ${b} = ${q}. Проверка: ${q} × ${b} = □`,a)},
+  /* письменные до 100 и 1000 */
+  colRound:r=>{const u=ri(r,1,9),t1=ri(r,1,7),t2=ri(r,1,8-t1);return COL(t1*10+u,'+',t2*10+10-u)},
+  col100:r=>{const a=ri(r,11,89);return a%10===0?null:COL(a,'+',100-a)},
+  col40m8:r=>COL(ri(r,2,9)*10,'-',ri(r,1,9)),
+  col50m24:r=>{const t=ri(r,3,9),b=ri(r,11,t*10-11);return b%10===0?null:COL(t*10,'-',b)},
+  colM3x1:r=>{const b=ri(r,2,9);return COL(ri(r,101,Math.floor(999/b)),'×',b)},
+  d3x1:r=>{const b=ri(r,2,9),q=ri(r,Math.ceil(100/b),Math.floor(999/b));return E(b*q,'÷',b)},
+  calc:r=>pick(r,[E(ri(r,100,999),'×',ri(r,2,9)),E(ri(r,1000,9999),'+',ri(r,1000,9999)),E(ri(r,5000,9999),'-',ri(r,1000,4999))]),
+  r1000:r=>{const a=ri(r,1,8),b=ri(r,1,9-a),t=ri(r,1,8);return pick(r,[E(a*100,'+',b*100),E((a+b)*100,'-',b*100),E(a*100+t*10,'+',ri(r,1,9)),E(a*100+t*10,'+',ri(r,1,9-t)*10),E(a*100+t*10,'-',t*10)])},
+  r1000md:r=>{const a=ri(r,2,4),b=ri(r,2,4),c=ri(r,11,24);return pick(r,[E(a*100,'×',b),E(a*b*100,'÷',b),E(a*b*10,'÷',a),E(c*10,'÷',10),E(c,'×',10)])},
+  /* умножение и деление */
+  sumToMul:r=>{const b=ri(r,2,9),k=ri(r,2,5);return O(`${Array(k).fill(b).join(' + ')} = ${b} × □`,k)},
+  mulComm:r=>{const a=ri(r,2,9),b=ri(r,2,9);return O(`${a} × ${b} = ${b} × □`,a)},
+  mulNames:r=>{const a=ri(r,2,9),b=ri(r,2,9);return pick(r,[O(`Множители ${a} и ${b}. Произведение = □`,a*b),O(`Делимое ${a*b}, делитель ${b}. Частное = □`,a),E(a,'×',b,'a'),E(a*b,'÷',b,'b')])},
+  mul10:r=>{const a=ri(r,2,9);return pick(r,[E(a,'×',10),E(10,'×',a),E(a*10,'÷',10),E(a*10,'÷',a)])},
+  tab:(r,p)=>{const t=p.tab||[2,9];const k=ri(r,t[0],t[1]),m=ri(r,2,9);const f=pick(r,p.tops||['×','÷']);if(f==='×')return r()<.5?E(k,'×',m):E(m,'×',k);return E(k*m,'÷',k)},
+  tabWin:(r,p)=>{const t=p.tab||[2,9];const k=ri(r,t[0],t[1]),m=ri(r,2,9);return r()<.5?E(k,'×',m,pick(r,['a','b'])):E(k*m,'÷',k,pick(r,['a','b']))},
+  even:r=>{const n=ri(r,10,98),ev=r()<.5;return O(`Ближайшее ${ev?'чётное':'нечётное'} число после ${n}: □`,ev?(n%2?n+1:n+2):(n%2?n+2:n+1))},
+  evenCh:r=>{const n=ri(r,10,99);return CH(`Число ${n} чётное или нечётное?`,['чётное','нечётное'],n%2?'нечётное':'чётное')},
+  incTimes:r=>{const a=ri(r,2,9),k=ri(r,2,5);return r()<.5?O(`${a} увеличить в ${k} ${plural(k,RAZ)}: □`,a*k):O(`${a*k} уменьшить в ${k} ${plural(k,RAZ)}: □`,a)},
+  howTimes:r=>{const b=ri(r,2,9),k=ri(r,2,9);return O(`Во сколько раз ${b*k} больше, чем ${b}? □`,k)},
+  mul1:r=>{const a=ri(r,2,99);return pick(r,[E(a,'×',1),E(1,'×',a),E(a,'÷',1),E(a,'÷',a)])},
+  mul0:r=>{const a=ri(r,2,99);return pick(r,[E(a,'×',0),E(0,'×',a),E(0,'÷',a)])},
+  roundMul:r=>{const a=ri(r,2,9),b=ri(r,2,9);return a*b*10>99?null:(r()<.5?E(a*10,'×',b):E(b,'×',a*10))},
+  m2x1:r=>{const a=ri(r,12,49),b=ri(r,2,9);return a%10===0||a*b>99?null:E(a,'×',b)},
+  m1x2:r=>{const a=ri(r,12,49),b=ri(r,2,9);return a%10===0||a*b>99?null:E(b,'×',a)},
+  sumMul:r=>{const a=ri(r,2,9),b=ri(r,2,9),c=ri(r,2,5);return{type:'expr',q:`(${a} + ${b}) × ${c}`,ans:(a+b)*c}},
+  sumDiv:r=>{const c=ri(r,2,5),a=c*ri(r,2,9),b=c*ri(r,2,9);return{type:'expr',q:`(${a} + ${b}) : ${c}`,ans:(a+b)/c}},
+  divRound:r=>{const b=ri(r,2,4),q=ri(r,2,4);return E(b*q*10,'÷',b*10)},
+  d2x1:r=>{const b=ri(r,2,9),q=ri(r,11,49);return b*q>99?null:E(b*q,'÷',b)},
+  d2x2:r=>{const b=ri(r,12,45),q=ri(r,2,4);return b*q>99||b%10===0?null:E(b*q,'÷',b)},
+  rem:r=>{const b=ri(r,2,9),q=ri(r,1,9),m=ri(r,1,b-1),a=b*q+m;return r()<.5?O(`${a} : ${b} = ${q} (ост. □)`,m):O(`${a} : ${b} = □ (ост. ${m})`,q)},
+  remCheck:r=>{const b=ri(r,2,9),q=ri(r,2,9),m=ri(r,1,b-1),a=b*q+m;return O(`${a} : ${b} = ${q} (ост. ${m}). Проверка: ${q} × ${b} + ${m} = □`,a)},
+  /* числа до 1000 */
+  hundreds:r=>{const h=ri(r,1,9);return r()<.5?O(`${h} сот. = □`,h*100):O(`${h*100} = □ сот.`,h)},
+  places:r=>{const h=ri(r,1,9),t=ri(r,1,9),u=ri(r,1,9),n=h*100+t*10+u;return pick(r,[O(`${h*100} + ${t*10} + ${u} = □`,n),O(`${n} = ${h*100} + □ + ${u}`,t*10),O(`${n} = □ сот. ${t} дес. ${u} ед.`,h)])},
+  countIn:r=>{const n=ri(r,120,999);return r()<.5?O(`Сколько всего десятков в числе ${n}? □`,Math.floor(n/10)):O(`Сколько всего сотен в числе ${n}? □`,Math.floor(n/100))},
+  x10:r=>{const a=ri(r,2,99);return pick(r,a<10?[E(a,'×',10),E(a,'×',100),E(a*10,'÷',10)]:[E(a,'×',10),E(a*10,'÷',10)])},
+  /* доли, круг, геометрия числами */
+  frac:r=>{const b=ri(r,2,9),q=ri(r,2,9);return O(`1/${b} от ${b*q} = □`,q)},
+  fracK:r=>{const b=ri(r,3,9),k=ri(r,2,b-1),q=ri(r,2,6);return O(`${k}/${b} от ${b*q} = □`,k*q)},
+  diam:r=>{const x=ri(r,2,15);return r()<.5?O(`Радиус круга ${x} см. Диаметр = □ см`,2*x):O(`Диаметр круга ${2*x} см. Радиус = □ см`,x)},
+  polyline:r=>{const n=ri(r,3,5),s=Array.from({length:n},()=>ri(r,1,9));return O(`Ломаная из ${n} звеньев: ${s.join(' см, ')} см. Длина ломаной = □ см`,s.reduce((a,b)=>a+b,0))},
+  perimPoly:r=>{const n=pick(r,[3,4,5]),s=Array.from({length:n},()=>ri(r,2,12));
+    if(n===3){const m=Math.max(...s);if(m>=s.reduce((a,b)=>a+b,0)-m)return null}
+    return O(`Стороны ${n===3?'треугольника':n===4?'четырёхугольника':'пятиугольника'}: ${s.join(' см, ')} см. Периметр = □ см`,s.reduce((a,b)=>a+b,0))},
+  rectP:r=>{const a=ri(r,3,15),b=ri(r,2,a);return O(a===b?`Сторона квадрата ${a} см. Периметр = □ см`:`Длина прямоугольника ${a} см, ширина ${b} см. Периметр = □ см`,2*(a+b))},
+  rectSide:r=>{const a=ri(r,4,12),b=ri(r,2,a-1);return O(`Периметр прямоугольника ${2*(a+b)} см, длина ${a} см. Ширина = □ см`,b)},
+  rectS:r=>{const a=ri(r,2,12),b=ri(r,2,9);return O(a===b?`Сторона квадрата ${a} см. Площадь = □ кв. см`:`Длина прямоугольника ${a} см, ширина ${b} см. Площадь = □ кв. см`,a*b)},
+  rectSb:r=>{const a=ri(r,3,12),b=ri(r,2,9);return O(`Площадь прямоугольника ${a*b} кв. см, длина ${a} см. Ширина = □ см`,b)},
+  areaUnits:r=>{const k=ri(r,2,9);return pick(r,[O(`${k} кв. дм = □ кв. см`,k*100),O(`${k} кв. м = □ кв. дм`,k*100),O(`${k*100} кв. см = □ кв. дм`,k)])},
+  /* картинки с выбором ответа */
+  lineKind:r=>{const ks=['точка','отрезок','луч','прямая линия','кривая линия','ломаная линия'];const k=pick(r,ks);
+    return CH('Что изображено на рисунке?',shuffle(r,[k,...shuffle(r,ks.filter(x=>x!==k)).slice(0,2)]),k,lineSVG(k,r))},
+  shapeKind:r=>{const pairs=[['многоугольник','круг'],['куб','шар']];const pr=pick(r,pairs),k=pick(r,pr);return CH('Что изображено на рисунке?',pr,k,shapeSVG(k,r))},
+  rightAngle:r=>{const a=pick(r,[90,90,ri(r,25,70),ri(r,110,150)]);return CH('Этот угол прямой?',['прямой','не прямой'],a===90?'прямой':'не прямой',angleSVG(a))},
+  angleKind:r=>{const k=pick(r,['острый','прямой','тупой']);const a=k==='прямой'?90:k==='острый'?ri(r,25,70):ri(r,110,155);return CH('Какой это угол?',['острый','прямой','тупой'],k,angleSVG(a))},
+  rectKind:r=>{const w=ri(r,2,6),h=r()<.5?w:ri(r,2,6);const cells=[];for(let x=1;x<=w;x++)for(let y=1;y<=h;y++)cells.push([x,y]);
+    return CH('Это квадрат или прямоугольник, который не квадрат?',['квадрат','не квадрат'],w===h?'квадрат':'не квадрат',cellsSVG(cells,w+2,h+2))},
+  rectSides:r=>{const a=ri(r,3,12),b=ri(r,2,a-1);return O(`Одна сторона прямоугольника ${a} см, соседняя ${b} см. Противоположная стороне ${a} см = □ см`,a)},
+  sym:r=>{const h=ri(r,3,5),half=[];for(let y=0;y<h;y++){const n=ri(r,1,3);for(let x=0;x<n;x++)half.push([2-x,y])}
+    const cells=[];for(const[x,y]of half){cells.push([x+1,y+1]);cells.push([6-x,y+1])}
+    const yes=r()<.5;let out=cells;if(!yes){const keep=cells.filter(c=>c[0]>3);const drop=pick(r,keep);out=cells.filter(c=>c!==drop);
+      if(out.every(c=>out.some(d=>d[1]===c[1]&&d[0]===7-c[0])))return null}
+    const uniq=[...new Map(out.map(c=>[c.join(','),c])).values()];
+    const isSym=uniq.every(c=>uniq.some(d=>d[1]===c[1]&&d[0]===7-c[0]));
+    return CH('Фигура симметрична относительно пунктирной линии?',['да','нет'],isSym?'да':'нет',cellsSVG(uniq,8,h+2,4))},
+  chart:r=>{const kids=shuffle(r,KIDS).slice(0,ri(r,3,4));const vals=kids.map(()=>ri(r,1,10));
+    const i=ri(r,0,kids.length-1),j=(i+1)%kids.length;const svg=barSVG(kids.map(k=>k.n),vals,10);
+    const kind=pick(r,['one','diff','sum']);if(kind==='diff'&&vals[i]===vals[j])return null;
+    const hi=vals[i]>=vals[j]?kids[i]:kids[j],lo=hi===kids[i]?kids[j]:kids[i],hv=Math.max(vals[i],vals[j]),lv=Math.min(vals[i],vals[j]);
+    return kind==='one'?{...O(`По диаграмме: сколько книг ${vb(kids[i],'прочитал','прочитала')} ${kids[i].n}? □`,vals[i]),svg}
+      :kind==='diff'?{...O(`По диаграмме: на сколько книг больше ${vb(hi,'прочитал','прочитала')} ${hi.n}, чем ${lo.n}? □`,hv-lv),svg}
+      :{...O(`По диаграмме: сколько книг прочитали все ребята вместе? □`,vals.reduce((x,y)=>x+y,0)),svg}},
+  space:r=>{const row=shuffle(r,EMO).slice(0,4),k=ri(r,1,2),side=pick(r,['справа','слева']);const ans=side==='справа'?row[k+1]:row[k-1];
+    return CH(`${row.join(' ')} Кто или что ${side} от ${row[k]}?`,shuffle(r,row.filter(x=>x!==row[k])),ans)},
+  vertical:r=>{const col=shuffle(r,EMO).slice(0,3),k=1,side=pick(r,['выше','ниже']);const ans=side==='выше'?col[0]:col[2];
+    return CH(`Сверху вниз: ${col.join(', ')}. Что ${side}, чем ${col[k]}?`,shuffle(r,[col[0],col[2]]),ans)},
+  events:r=>{const s=pick(r,SEQS),i=ri(r,0,s.length-2),j=ri(r,i+1,s.length-1);const q=r()<.5;
+    return CH(`Что бывает ${q?'раньше':'позже'}: ${s[i]} или ${s[j]}?`,shuffle(r,[s[i],s[j]]),q?s[i]:s[j])},
+  segCmp:r=>{const a=ri(r,2,12),b=r()<.2?a:ri(r,2,12);return CH('Какой отрезок длиннее?',['А','Б','одинаковые'],a>b?'А':a<b?'Б':'одинаковые',segSVG(a,b))},
+  polyLetters:r=>{const n=ri(r,3,6),L='ABCDEFKM'.split('').slice(0,n),name=L.join('');
+    if(r()<.5)return{...O(`Сколько вершин у многоугольника ${name}? □`,n),svg:polySVG(n,L)};
+    const wrong=L.slice();[wrong[1],wrong[2]]=[wrong[2],wrong[1]];if(n===3)return{...O(`Сколько сторон у треугольника ${name}? □`,3),svg:polySVG(n,L)};
+    return CH('Как правильно назвать многоугольник?',shuffle(r,[name,wrong.join('')]),name,polySVG(n,L))},
+  triSides:r=>{const k=pick(r,['равносторонний','равнобедренный','разносторонний']);let a=ri(r,3,9),b=a,c=a;
+    if(k==='равнобедренный'){c=ri(r,2,2*a-1);if(c===a)return null}
+    if(k==='разносторонний'){b=ri(r,3,9);c=ri(r,3,9);if(a===b||b===c||a===c)return null;const m=Math.max(a,b,c);if(m>=a+b+c-m)return null}
+    return CH(`Стороны треугольника ${a} см, ${b} см и ${c} см. Какой это треугольник?`,['равносторонний','равнобедренный','разносторонний'],k)},
+  triAngles:r=>{const k=pick(r,['остроугольный','прямоугольный','тупоугольный']);return CH('Какой это треугольник?',['остроугольный','прямоугольный','тупоугольный'],k,triSVG(k,r))},
+  circleKind:r=>{const k=pick(r,['окружность','круг']);return CH('Что изображено на рисунке?',['окружность','круг'],k,shapeSVG(k,r))},
+  areaCmp:r=>{const mk=()=>{const w=ri(r,2,5),h=ri(r,2,4),c=[];for(let x=1;x<=w;x++)for(let y=1;y<=h;y++)c.push([x,y]);return{c,w,h}};
+    const A=mk(),B=mk();const ans=A.c.length>B.c.length?'А':A.c.length<B.c.length?'Б':'одинаковые';
+    return CH('У какой фигуры площадь больше?',['А','Б','одинаковые'],ans,`<span class="pair"><b>А</b>${cellsSVG(A.c,A.w+2,A.h+2)}<b>Б</b>${cellsSVG(B.c,B.w+2,B.h+2)}</span>`)},
+  monthNext:r=>{const i=ri(r,0,10);return CH(`Какой месяц идёт после месяца «${MONTHS[i]}»?`,shuffle(r,[MONTHS[i+1],MONTHS[(i+2)%12],MONTHS[(i+11)%12]]),MONTHS[i+1])},
+  monthDays:r=>{const i=pick(r,[0,2,3,4,5,6,7,8,9,10,11]);return O(`Сколько дней в месяце «${MONTHS[i]}»? □`,MDAYS[i])},
+  yearUnits:r=>{const k=ri(r,2,5);return pick(r,[O(`${k} ${plural(k,['год','года','лет'])} = □ мес.`,12*k),O(`${k} нед. = □ сут.`,7*k),O(`${k} сут. = □ ч`,24*k),O(`1 год = □ мес.`,12)])}
+};
+function formItem(p,r){for(let k=0;k<200;k++){const it=FORMS[pick(r,p.forms)](r,p);if(it)return it}return{...E(2,'+',3),fail:true}}
+
 /* ---------- программа ---------- */
 const LV=['Базовый','Средний','Сложный'];
-const MATH={
+const OLD_MATH={
  1:[{s:'Числа от 1 до 10',topics:[
    {id:'g1-sum10',t:'Сложение и вычитание в пределах 10',L:[
      {n:'Только сложение',d:'Сумма до 10, без нуля',p:{kind:'examples',ops:['+'],lo:2,hi:10,count:12}},
@@ -672,7 +949,7 @@ const MATH={
 const W=(tpls,max,count,extra)=>({kind:'word',tpls,max,count,...(extra||{})});
 const U=(sets,count)=>({kind:'units',sets,count:count||9});
 const G=(ask,shape,count,big)=>({kind:'grid',ask,shape,count:count||6,big});
-MATH[1].push({s:'Задачи и величины',topics:[
+OLD_MATH[1].push({s:'Задачи и величины',topics:[
   {id:'g1-word',t:'Задачи в одно действие',L:[
     {n:'Было, стало, осталось',d:'в пределах 10',p:W(['sum','rem'],10,4)},
     {n:'Больше на, меньше на',d:'в пределах 20',p:W(['more','less'],20,4)},
@@ -681,7 +958,7 @@ MATH[1].push({s:'Задачи и величины',topics:[
     {n:'Дециметры и сантиметры',d:'2 дм = □ см',p:U(['dm2cm','cm2dm'])},
     {n:'Составные величины',d:'1 дм 5 см = □ см',p:U(['dmcm','dm2cm','cm2dm'])},
     {n:'Сравнение длин',d:'2 дм ◯ 18 см',p:U(['cmpLen','dmcm'])}]}]});
-MATH[2].push({s:'Задачи и величины',topics:[
+OLD_MATH[2].push({s:'Задачи и величины',topics:[
   {id:'g2-word',t:'Текстовые задачи',L:[
     {n:'В одно действие',d:'в пределах 100',p:W(['sum','rem','more','less','diff'],100,4)},
     {n:'В два действия',d:'в пределах 100',p:W(['steps','together'],100,3)},
@@ -694,7 +971,7 @@ MATH[2].push({s:'Задачи и величины',topics:[
     {n:'Прямоугольник на клетках',d:'сторона клетки 1 см',p:G('P','rect',6)},
     {n:'Большие прямоугольники',d:'до 7 клеток в длину',p:G('P','rect',6,true)},
     {n:'Фигуры из клеток',d:'прямоугольник без угла',p:G('P','L',6)}]}]});
-MATH[3].push({s:'Задачи и величины',topics:[
+OLD_MATH[3].push({s:'Задачи и величины',topics:[
   {id:'g3-word',t:'Задачи на умножение и деление',L:[
     {n:'Поровну и по несколько',d:'табличные числа',p:W(['groups','share','parts'],100,4,{tab:[2,9]})},
     {n:'В несколько раз',d:'больше и меньше в несколько раз',p:W(['times','fewer'],100,4,{tab:[2,9]})},
@@ -707,7 +984,7 @@ MATH[3].push({s:'Задачи и величины',topics:[
     {n:'Прямоугольник на клетках',d:'одна клетка 1 кв. см',p:G('S','rect',6)},
     {n:'Периметр и площадь',d:'вперемешку',p:G('PS','rect',6,true)},
     {n:'Фигуры из клеток',d:'прямоугольник без угла',p:G('S','L',6)}]}]});
-MATH[4].push({s:'Задачи и величины',topics:[
+OLD_MATH[4].push({s:'Задачи и величины',topics:[
   {id:'g4-move',t:'Задачи на движение',L:[
     {n:'Найти расстояние',d:'скорость × время',p:W(['dist'],0,4)},
     {n:'Найти время и скорость',d:'обратные задачи',p:W(['time','speed'],0,4)},
@@ -720,6 +997,195 @@ MATH[4].push({s:'Задачи и величины',topics:[
     {n:'Периметр и площадь',d:'прямоугольники',p:G('PS','rect',6,true)},
     {n:'Периметр сложной фигуры',d:'прямоугольник без угла',p:G('P','L',6,true)},
     {n:'Площадь сложной фигуры',d:'прямоугольник без угла',p:G('S','L',6,true)}]}]});
+
+/* ---------- каталог тем: 1–3 класс по учебнику М. И. Моро (обе части), 4 класс пока свой ----------
+   Тема — то, что отрабатывается одним генератором. Пункты учебника сохранены как подтемы:
+   по ним работает поиск, а подтема с настройкой открывает тему сразу с нужным видом заданий. */
+const F=(forms,count,extra)=>({kind:'forms',forms,count:count||12,...(extra||{})});
+const S_=(n,p)=>p?{n,p}:{n};
+const MATH={
+ 1:[
+  {part:1,s:'Подготовка к изучению чисел',topics:[
+   {id:'g1-count',t:'Счёт предметов',sub:[S_('Количественный счёт: один, два, три…',{forms:['countObj']}),S_('Порядковый счёт: первый, второй, третий…',{forms:['ordinal']})],syn:['посчитай','сколько'],L:[
+     {n:'Сколько предметов',d:'до 10',p:F(['countObj'],8)},{n:'Порядковый счёт',d:'какой по счёту',p:F(['ordinal'],6)},{n:'Вперемешку',d:'',p:F(['countObj','ordinal'],8)}]},
+   {id:'g1-space',t:'Расположение и порядок событий',sub:[S_('Расположение предметов: вверху, внизу, слева, справа',{forms:['space','vertical']}),S_('Последовательность событий: раньше, позже, сначала, потом',{forms:['events']})],syn:['слева','справа','выше','ниже','раньше','позже'],L:[
+     {n:'Слева и справа',d:'',p:F(['space'],6)},{n:'Выше, ниже, раньше, позже',d:'',p:F(['vertical','events'],6)},{n:'Вперемешку',d:'',p:F(['space','vertical','events'],8)}]},
+   {id:'g1-more',t:'Сравнение количества: больше, меньше, на сколько',sub:[S_('Сравнение количества: столько же, больше, меньше',{forms:['cmp10']}),S_('На сколько больше? На сколько меньше?',{kind:'word',tpls:['diff'],max:10}),S_('Разностное сравнение (часть 2)',{kind:'word',tpls:['diff','more','less'],max:10})],syn:['столько же','разностное'],L:[
+     {n:'Больше, меньше, столько же',d:'7 ◯ 4',p:F(['cmp10'],12)},{n:'На сколько больше',d:'задачи до 10',p:W(['diff'],10,4)},{n:'Задачи на разностное сравнение',d:'на больше, на меньше',p:W(['diff','more','less'],10,5)}]}]},
+  {part:1,s:'Числа от 1 до 10. Нумерация',topics:[
+   {id:'g1-num10',t:'Числа от 1 до 10 и число 0',sub:['Много и один. Число и цифра 1','Число и цифра 2','Число и цифра 3','Число и цифра 4','Число и цифра 5','Числа 6 и 7. Их запись','Числа 8 и 9. Их запись','Число 10','Число и цифра 0'],syn:['цифра','цифры','нумерация','соседи числа','ноль'],L:[
+     {n:'Соседи числа',d:'после и перед',p:F(['after10','before10'],10)},{n:'Состав числа',d:'3 + □ = 7',p:F(['compose10'],12)},{n:'Всё вместе',d:'',p:F(['after10','before10','between10','compose10'],12)}]},
+   {id:'g1-signs',t:'Знаки +, −, = и сравнение чисел',sub:['Знаки действий: плюс, минус, равно','Знаки сравнения: больше, меньше, равно','Равенство и неравенство'],syn:['больше','меньше','равно','неравенство'],L:[
+     {n:'Сравни числа',d:'7 ◯ 4',p:F(['cmp10'],12)},{n:'Сравни пример и число',d:'3 + 4 ◯ 6',p:F(['cmpExpr10'],12)},{n:'Вперемешку',d:'',p:F(['cmp10','cmpExpr10'],12)}]},
+   {id:'g1-pm',t:'Увеличение и уменьшение на несколько единиц',sub:['Увеличение и уменьшение числа на несколько единиц'],syn:['больше на','меньше на'],L:[
+     {n:'На 1',d:'5 + 1',p:F(['pmk'],12,{k:[1]})},{n:'На 1, 2, 3',d:'',p:F(['pmk','moreLess10'],12,{k:[1,2,3]})},{n:'Словами',d:'число больше 6 на 2',p:F(['moreLess10'],10)}]},
+   {id:'g1-len',t:'Длина. Сантиметр',sub:[S_('Длиннее, короче, одинаковые по длине',{forms:['segCmp']}),S_('Сантиметр. Измерение длины',{kind:'word',tpls:['lenMore','lenDiff'],max:10})],syn:['длиннее','короче','см','отрезки'],L:[
+     {n:'Какой отрезок длиннее',d:'по рисунку',p:F(['segCmp'],6)},{n:'Задачи про длину',d:'в сантиметрах',p:W(['lenMore','lenDiff'],10,4)},{n:'Вперемешку',d:'',p:{kind:'mix',parts:[{tid:'g1-len',count:3,p:F(['segCmp'],3)},{tid:'g1-len',count:3,p:W(['lenMore','lenDiff'],10,3)}],count:6}}]},
+   {id:'g1-geo',t:'Линии и фигуры',sub:['Точка','Кривая и прямая линии','Отрезок','Луч','Ломаная линия','Многоугольник и круг','Куб и шар'],syn:['геометрия','линия','фигуры'],L:[
+     {n:'Линии',d:'точка, отрезок, луч, ломаная',p:F(['lineKind'],6)},{n:'Фигуры',d:'многоугольник, круг, куб, шар',p:F(['shapeKind'],6)},{n:'Вперемешку',d:'',p:F(['lineKind','shapeKind'],8)}]}]},
+  {part:1,s:'Числа от 1 до 10. Сложение и вычитание',topics:[
+   {id:'g1-add14',t:'Прибавление и вычитание 1, 2, 3, 4',sub:[S_('Прибавление и вычитание 1',{k:[1]}),S_('Прибавление и вычитание 2',{k:[2]}),S_('Прибавление и вычитание 3',{k:[3]}),S_('Прибавление и вычитание 4 (часть 2)',{k:[4]})],syn:['плюс','минус'],L:[
+     {n:'±1 и ±2',d:'5 + 2',p:F(['pmk'],12,{k:[1,2]})},{n:'±1, ±2, ±3',d:'',p:F(['pmk'],15,{k:[1,2,3]})},{n:'±1…±4',d:'',p:F(['pmk'],15,{k:[1,2,3,4]})}]},
+   {id:'g1-terms',t:'Слагаемые и сумма',sub:['Слагаемые и сумма','Перестановка слагаемых (часть 2)','Связь между суммой и слагаемыми (часть 2)'],syn:['сумма','переместительное','состав'],L:[
+     {n:'Слагаемые и сумма',d:'',p:F(['sumParts'],10)},{n:'Перестановка слагаемых',d:'3 + 5 = 5 + □',p:F(['commAdd'],10)},{n:'Связь суммы и слагаемых',d:'□ + 3 = 8',p:F(['sumParts','compose10','commAdd'],12)}]},
+   {id:'g1-task',t:'Задача: условие, вопрос, решение',sub:['Задача: знакомство с условием, вопросом и решением'],syn:['задачи','текстовые'],L:[
+     {n:'Было, стало',d:'до 10',p:W(['sum'],10,4)},{n:'Было, осталось',d:'до 10',p:W(['sum','rem'],10,4)},{n:'Все задачи до 10',d:'',p:W(['sum','rem','more','less'],10,5)}]},
+   {id:'g1-angle',t:'Угол. Прямоугольник и квадрат',sub:[S_('Угол и прямой угол',{forms:['rightAngle']}),S_('Прямоугольник и квадрат (часть 2)',{forms:['rectKind']})],syn:['прямой угол','квадрат','прямоугольник'],L:[
+     {n:'Прямой угол',d:'',p:F(['rightAngle'],6)},{n:'Квадрат или нет',d:'',p:F(['rectKind'],6)},{n:'Вперемешку',d:'',p:F(['rightAngle','rectKind'],8)}]}]},
+  {part:2,s:'Сложение и вычитание в пределах 10',topics:[
+   {id:'g1-add59',t:'Прибавление 5, 6, 7, 8, 9',sub:['Прибавление 5, 6, 7, 8 и 9'],syn:['плюс'],L:[
+     {n:'+5 и +6',d:'',p:F(['addk'],12,{k:[5,6]})},{n:'+7, +8, +9',d:'',p:F(['addk'],12,{k:[7,8,9]})},{n:'+5…+9',d:'',p:F(['addk'],15,{k:[5,6,7,8,9]})}]},
+   {id:'g1-sub10',t:'Вычитание в пределах 10',sub:[S_('Уменьшаемое, вычитаемое, разность',{forms:['subParts']}),S_('Вычитание из 6 и 7',{forms:['subFrom'],from:[6,7]}),S_('Вычитание из 8 и 9',{forms:['subFrom'],from:[8,9]}),S_('Вычитание из 10',{forms:['subFrom'],from:[10]})],syn:['минус','разность'],L:[
+     {n:'Из 6 и 7',d:'',p:F(['subFrom'],12,{from:[6,7]})},{n:'Из 8, 9, 10',d:'',p:F(['subFrom'],12,{from:[8,9,10]})},{n:'Названия и вычисления',d:'',p:F(['subFrom','subParts'],12,{from:[6,7,8,9,10]})}]},
+   {id:'g1-mass',t:'Килограмм. Литр',sub:[S_('Килограмм',{tpls:['kgSum','kgDiff']}),S_('Литр',{tpls:['litre','litreRem']})],syn:['кг','масса','литр','вес'],L:[
+     {n:'Килограмм',d:'задачи',p:W(['kgSum','kgDiff'],10,4)},{n:'Литр',d:'задачи',p:W(['litre','litreRem'],10,4)},{n:'Вперемешку',d:'',p:W(['kgSum','kgDiff','litre','litreRem'],10,5)}]}]},
+  {part:2,s:'Числа от 11 до 20. Нумерация',topics:[
+   {id:'g1-num20',t:'Числа от 11 до 20',sub:['Образование и запись чисел второго десятка','Десяток и единицы','Счёт десятками'],syn:['второй десяток','десяток'],L:[
+     {n:'Десяток и единицы',d:'14 = 1 дес. 4 ед.',p:F(['decUnits'],10)},{n:'Соседи и сравнение',d:'',p:F(['after20','before20','cmp20'],12)},{n:'Всё вместе',d:'',p:F(['decUnits','after20','before20','cmp20','countTens'],12)}]},
+   {id:'g1-teen',t:'Вычисления вида 10 + 7, 17 − 7, 17 − 10',sub:['Вычисления вида 10 + 7, 17 − 7, 17 − 10'],syn:['без перехода'],L:[
+     {n:'10 + 7 и 17 − 7',d:'',p:F(['teen1','teen2'],12)},{n:'И 17 − 10',d:'',p:F(['teen1','teen2','teen3'],12)},{n:'Без перехода до 20',d:'13 + 4',p:F(['teen1','teen2','teen3','teen4'],15)}]},
+   {id:'g1-dm',t:'Дециметр',sub:['Дециметр'],syn:['дм','см'],L:[
+     {n:'Дециметры и сантиметры',d:'2 дм = □ см',p:U(['dm2cm','cm2dm'])},{n:'Составные величины',d:'1 дм 5 см = □ см',p:U(['dmcm','dm2cm','cm2dm'])},{n:'Сравнение длин',d:'2 дм ◯ 18 см',p:U(['cmpLen','dmcm'])}]},
+   {id:'g1-task2',t:'Задачи в два действия',sub:['План решения задачи в два действия'],syn:['составные задачи'],L:[
+     {n:'До 20',d:'',p:W(['steps'],20,3)},{n:'Вместе и всего',d:'',p:W(['steps','together'],20,3)},{n:'Вперемешку с одним действием',d:'',p:W(['steps','together','sum','rem'],20,4)}]}]},
+  {part:2,s:'Табличное сложение с переходом через десяток',topics:[
+   {id:'g1-addc',t:'Сложение с переходом через десяток',sub:[S_('Прибавление 2 и 3',{k:[2,3]}),S_('Прибавление 4',{k:[4]}),S_('Прибавление 5',{k:[5]}),S_('Прибавление 6',{k:[6]}),S_('Прибавление 7',{k:[7]}),S_('Прибавление 8 и 9',{k:[8,9]}),S_('Таблица сложения',{k:[2,3,4,5,6,7,8,9]})],syn:['таблица сложения','переход через десяток','плюс'],L:[
+     {n:'+2…+5',d:'8 + 4',p:F(['addCarry'],12,{k:[2,3,4,5]})},{n:'+6…+9',d:'7 + 8',p:F(['addCarry'],12,{k:[6,7,8,9]})},{n:'Таблица сложения',d:'',p:F(['addCarry'],15,{k:[2,3,4,5,6,7,8,9]})}]}]},
+  {part:2,s:'Табличное вычитание с переходом через десяток',topics:[
+   {id:'g1-subc',t:'Вычитание с переходом через десяток',sub:[S_('Вычитание из 11',{from:[11]}),S_('Вычитание из 12',{from:[12]}),S_('Вычитание из 13',{from:[13]}),S_('Вычитание из 14',{from:[14]}),S_('Вычитание из 15',{from:[15]}),S_('Вычитание из 16',{from:[16]}),S_('Вычитание из 17 и 18',{from:[17,18]})],syn:['переход через десяток','минус'],L:[
+     {n:'Из 11, 12, 13',d:'',p:F(['subFrom'],12,{from:[11,12,13]})},{n:'Из 14…18',d:'',p:F(['subFrom'],12,{from:[14,15,16,17,18]})},{n:'Все случаи',d:'',p:F(['subFrom'],15,{from:[11,12,13,14,15,16,17,18]})}]}]}],
+ 2:[
+  {part:1,s:'Числа от 1 до 100. Нумерация',topics:[
+   {id:'g2-num100',t:'Числа от 1 до 100',sub:['Повторение чисел от 1 до 20','Десяток. Счёт десятками до 100','Числа от 11 до 100: образование, чтение и запись'],syn:['двузначные','десятки','нумерация','круглые'],L:[
+     {n:'Счёт десятками',d:'4 дес. = □',p:F(['countTens'],10)},{n:'Десятки и единицы',d:'37 = □ дес. 7 ед.',p:F(['num100','countTens'],12)},{n:'Сравнение чисел',d:'47 ◯ 74',p:F(['cmp100','num100'],12)}]},
+   {id:'g2-len',t:'Единицы длины: мм, см, дм, м',sub:[S_('Миллиметр',{sets:['cm2mm','cmmm2mm']}),S_('Метр',{sets:['m2dm','m2cm']})],syn:['мм','метр','длина'],L:[
+     {n:'Миллиметр',d:'3 см = □ мм',p:U(['cm2mm','cmmm2mm'])},{n:'Метр',d:'2 м = □ см',p:U(['m2dm','m2cm','dm2cm'])},{n:'Все единицы',d:'',p:U(['cm2mm','cmmm2mm','m2dm','m2cm','dmcm','cmpLen'])}]},
+   {id:'g2-money',t:'Рубль и копейка',sub:['Рубль и копейка'],syn:['деньги','копейки','рубли'],L:[
+     {n:'Рубли в копейки',d:'3 р. = □ к.',p:U(['rub2kop'])},{n:'Составные',d:'2 р. 50 к. = □ к.',p:U(['rub2kop','rubkop2kop'])},{n:'Задачи на покупки',d:'',p:W(['cost','price','qty'],100,4)}]}]},
+  {part:1,s:'Сложение и вычитание в пределах 100',topics:[
+   {id:'g2-word',t:'Текстовые задачи',sub:['Задачи, обратные данной'],syn:['задачи','обратные'],L:[
+     {n:'В одно действие',d:'в пределах 100',p:W(['sum','rem','more','less','diff'],100,4)},{n:'В два действия',d:'',p:W(['steps','together'],100,3)},{n:'Вперемешку',d:'',p:W(['sum','rem','more','less','diff','steps','together'],100,4)}]},
+   {id:'g2-time',t:'Час и минута',sub:['Час и минута'],syn:['время','часы','минуты'],L:[
+     {n:'Часы в минуты',d:'2 ч = □ мин',p:U(['h2m','m2h'])},{n:'Составные',d:'1 ч 15 мин = □ мин',p:U(['hm2m','h2m'])},{n:'Вперемешку',d:'',p:U(['h2m','m2h','hm2m'])}]},
+   {id:'g2-poly',t:'Длина ломаной и периметр многоугольника',sub:[S_('Длина ломаной',{forms:['polyline']}),S_('Периметр многоугольника',{forms:['perimPoly']})],syn:['ломаная','периметр'],L:[
+     {n:'Длина ломаной',d:'',p:F(['polyline'],6)},{n:'Периметр многоугольника',d:'',p:F(['perimPoly'],6)},{n:'Вперемешку',d:'',p:F(['polyline','perimPoly'],8)}]},
+   {id:'g2-order',t:'Числовые выражения и порядок действий',sub:['Порядок выполнения действий. Скобки','Числовые выражения'],syn:['скобки','выражения','порядок'],L:[
+     {n:'Два действия',d:'45 − 12 + 8',p:{kind:'order',patterns:['a + b - c','a - b + c','a + b + c'],max:50,cap:100,count:10}},
+     {n:'Скобки',d:'60 − (25 + 13)',p:{kind:'order',patterns:['a - (b + c)','(a - b) + c','a + (b - c)','(a + b) - c'],max:60,cap:100,count:10}},
+     {n:'Удобный порядок',d:'34 + 7 + 3',p:F(['groupAdd'],10)}]},
+   {id:'g2-props',t:'Свойства сложения',sub:['Свойства сложения'],syn:['переместительное','сочетательное'],L:[
+     {n:'Переместительное',d:'45 + 23 = 23 + □',p:F(['commAdd100'],10)},{n:'Сочетательное',d:'(a + b) + c',p:F(['assocAdd'],10)},{n:'Удобные вычисления',d:'',p:F(['commAdd100','assocAdd','groupAdd'],12)}]},
+   {id:'g2-chart',t:'Столбчатые диаграммы',sub:['Столбчатые диаграммы'],syn:['диаграмма','график'],L:[
+     {n:'Читаем диаграмму',d:'',p:F(['chart'],4)},{n:'Сравниваем по диаграмме',d:'',p:F(['chart'],6)},{n:'Больше вопросов',d:'',p:F(['chart'],8)}]}]},
+  {part:1,s:'Устные вычисления',topics:[
+   {id:'g2-oral',t:'Устные вычисления в пределах 100',sub:[S_('Прибавление единиц и десятков: 36 + 2, 36 + 20',{forms:['u36p2','u36p20']}),S_('Вычитание единиц и десятков: 36 − 2, 36 − 20',{forms:['u36m2','u36m20']}),
+     S_('Дополнение до круглого десятка: 26 + 4, 95 + 5',{forms:['u26p4']}),S_('Вычитание из круглого десятка: 30 − 7',{forms:['u30m7']}),S_('Вычитание с переходом: 60 − 24',{forms:['u60m24']}),
+     S_('Прибавление с переходом через десяток: 26 + 7',{forms:['u26p7']}),S_('Вычитание с переходом через десяток: 35 − 7',{forms:['u35m7']})],syn:['устный счёт','в уме','двузначные'],L:[
+     {n:'Без перехода',d:'36 + 2, 36 − 20',p:F(['u36p2','u36m2','u36p20','u36m20'],15)},{n:'Круглые десятки',d:'26 + 4, 30 − 7',p:F(['u26p4','u30m7','u60m24'],15)},{n:'С переходом',d:'26 + 7, 35 − 7',p:F(['u26p7','u35m7','u60m24'],15)}]},
+   {id:'g2-letters',t:'Буквенные выражения и уравнения',sub:[S_('Буквенные выражения',{forms:['letters']}),S_('Уравнение',{forms:['eqAdd','eqSub']})],syn:['уравнение','икс','x','буквы'],L:[
+     {n:'Буквенные выражения',d:'a + 12 при a = 5',p:F(['letters'],8)},{n:'Уравнения',d:'x + 15 = 40',p:F(['eqAdd','eqSub'],10)},{n:'Вперемешку',d:'',p:F(['letters','eqAdd','eqSub'],10)}]},
+   {id:'g2-check',t:'Проверка сложения и вычитания',sub:['Проверка сложения','Проверка вычитания'],syn:['проверка'],L:[
+     {n:'Проверка сложения',d:'',p:F(['checkAdd'],8)},{n:'Проверка вычитания',d:'',p:F(['checkSub'],8)},{n:'Вперемешку',d:'',p:F(['checkAdd','checkSub'],10)}]}]},
+  {part:1,s:'Письменные вычисления',topics:[
+   {id:'g2-coladd',t:'Сложение двузначных чисел в столбик',sub:[S_('Без перехода через десяток: 45 + 23',{kind:'column',ops:['+'],lo:30,hi:99,digits:2,carry:'without',column:true}),S_('С переходом через десяток: 37 + 48',{kind:'column',ops:['+'],lo:30,hi:99,digits:2,carry:'with',column:true}),
+     S_('С получением круглого десятка: 37 + 53',{kind:'forms',forms:['colRound']}),S_('С получением 100: 87 + 13',{kind:'forms',forms:['col100']})],syn:['столбик','столбиком','письменное сложение'],L:[
+     {n:'Без перехода',d:'45 + 23',p:{kind:'column',ops:['+'],lo:30,hi:99,count:12,digits:2,carry:'without',column:true}},{n:'С переходом',d:'37 + 48',p:{kind:'column',ops:['+'],lo:30,hi:99,count:12,digits:2,carry:'with',column:true}},{n:'Круглый десяток и 100',d:'37 + 53, 87 + 13',p:F(['colRound','col100'],12)}]},
+   {id:'g2-colsub',t:'Вычитание двузначных чисел в столбик',sub:[S_('Без перехода через десяток: 57 − 26',{kind:'column',ops:['-'],lo:30,hi:99,digits:2,carry:'without',column:true}),S_('Вычитание вида 40 − 8',{kind:'forms',forms:['col40m8']}),S_('Вычитание вида 50 − 24',{kind:'forms',forms:['col50m24']}),
+     S_('С переходом через десяток: 52 − 24 (часть 2)',{kind:'column',ops:['-'],lo:30,hi:99,digits:2,carry:'with',column:true})],syn:['столбик','столбиком','письменное вычитание'],L:[
+     {n:'Без перехода',d:'57 − 26',p:{kind:'column',ops:['-'],lo:30,hi:99,count:12,digits:2,carry:'without',column:true}},{n:'Из круглых чисел',d:'40 − 8, 50 − 24',p:F(['col40m8','col50m24'],12)},{n:'С переходом',d:'52 − 24',p:{kind:'column',ops:['-'],lo:30,hi:99,count:12,digits:2,carry:'with',column:true}}]},
+   {id:'g2-angles',t:'Виды углов',sub:['Виды углов'],syn:['острый','тупой','прямой угол'],L:[
+     {n:'Прямой или нет',d:'',p:F(['rightAngle'],6)},{n:'Острый, прямой, тупой',d:'',p:F(['angleKind'],6)},{n:'Больше заданий',d:'',p:F(['angleKind'],9)}]}]},
+  {part:2,s:'Прямоугольник и симметрия',topics:[
+   {id:'g2-rect',t:'Прямоугольник: стороны и периметр',sub:[S_('Противоположные стороны прямоугольника',{kind:'forms',forms:['rectSides']}),S_('Периметр прямоугольника',{kind:'forms',forms:['rectP']})],syn:['периметр','прямоугольник','квадрат'],L:[
+     {n:'Периметр на клетках',d:'',p:G('P','rect',6)},{n:'Периметр по сторонам',d:'',p:F(['rectP','rectSides'],8)},{n:'Найди сторону',d:'по периметру',p:F(['rectP','rectSide'],8)}]},
+   {id:'g2-sym',t:'Симметричные фигуры',sub:['Симметричные фигуры'],syn:['симметрия','ось симметрии'],L:[
+     {n:'Симметрична ли фигура',d:'',p:F(['sym'],4)},{n:'Больше фигур',d:'',p:F(['sym'],6)},{n:'Ещё больше',d:'',p:F(['sym'],8)}]}]},
+  {part:2,s:'Умножение и деление',topics:[
+   {id:'g2-mulmean',t:'Смысл умножения',sub:['Смысл умножения','Замена суммы одинаковых слагаемых умножением','Названия чисел при умножении: множители и произведение','Переместительное свойство умножения'],syn:['умножение','множители','произведение'],L:[
+     {n:'Сумма и умножение',d:'3 + 3 + 3 = 3 × □',p:F(['sumToMul'],8)},{n:'Множители и произведение',d:'',p:F(['mulNames','mulComm'],10)},{n:'Задачи',d:'по 3 в 4 коробках',p:W(['groups'],100,4,{tab:[2,5]})}]},
+   {id:'g2-divmean',t:'Смысл деления',sub:['Смысл деления','Названия чисел при делении: делимое, делитель, частное','Связь множителей с произведением'],syn:['деление','частное','делимое'],L:[
+     {n:'Задачи на деление',d:'поровну',p:W(['share','parts'],100,4,{tab:[2,5]})},{n:'Названия чисел',d:'',p:F(['mulNames'],10)},{n:'Связь с умножением',d:'□ × 4 = 12',p:F(['tabWin'],12,{tab:[2,5]})}]},
+   {id:'g2-mul10',t:'Умножение и деление с числом 10',sub:['Умножение и деление с числом 10'],syn:['на 10'],L:[
+     {n:'Умножение на 10',d:'',p:F(['mul10'],10)},{n:'И деление',d:'',p:F(['mul10'],12)},{n:'Окошки',d:'',p:F(['mul10','tabWin'],12,{tab:[2,5]})}]}]},
+  {part:2,s:'Табличное умножение и деление',topics:[
+   {id:'g2-table',t:'Таблица умножения и деления',sub:[S_('Умножение числа 2 и на число 2. Деление на 2',{tab:[2,2]}),S_('Умножение числа 3 и на число 3. Деление на 3',{tab:[3,3]}),S_('Умножение и деление с числом 4',{tab:[4,4]}),S_('Умножение и деление с числом 5',{tab:[5,5]}),
+     S_('Умножение и деление с числом 6',{tab:[6,6]}),S_('Умножение и деление с числом 7',{tab:[7,7]}),S_('Умножение и деление с числом 8',{tab:[8,8]}),S_('Умножение и деление с числом 9',{tab:[9,9]}),S_('Обобщение таблицы умножения',{tab:[2,9]})],syn:['таблица','таблица умножения','умножение','деление'],L:[
+     {n:'На 2–5',d:'4 × 7, 35 : 5',p:F(['tab'],15,{tab:[2,5]})},{n:'На 2–9',d:'8 × 7, 56 : 8',p:F(['tab'],18,{tab:[2,9]})},{n:'Окошки',d:'6 × □ = 42',p:F(['tabWin'],18,{tab:[2,9]})}]},
+   {id:'g2-even',t:'Чётные и нечётные числа',sub:['Чётные и нечётные числа'],syn:['чётные','нечётные'],L:[
+     {n:'Чётное или нечётное',d:'',p:F(['evenCh'],10)},{n:'Следующее чётное',d:'',p:F(['even'],10)},{n:'Вперемешку',d:'',p:F(['evenCh','even'],12)}]},
+   {id:'g2-order2',t:'Порядок действий с умножением и делением',sub:['Порядок выполнения действий в выражениях с разными действиями'],syn:['порядок действий','скобки'],L:[
+     {n:'Без скобок',d:'24 + 6 × 3',p:{kind:'order',patterns:['a + b × c','a × b - c','a ÷ b + c','a - b × c'],small:true,cap:100,count:10}},
+     {n:'Со скобками',d:'(15 − 7) × 4',p:{kind:'order',patterns:['(a + b) × c','(a - b) × c','a × (b + c)','(a + b) ÷ c'],small:true,cap:150,count:10}},
+     {n:'Три действия',d:'5 × 6 + 24 : 4',p:{kind:'order',patterns:['a × b + c ÷ d','a × b - c × d','(a + b) × c - d','a ÷ b + c × d'],small:true,cap:150,count:10}}]},
+   {id:'g2-times',t:'Увеличение и уменьшение в несколько раз',sub:[S_('Увеличение числа в несколько раз',{kind:'forms',forms:['incTimes']}),S_('Уменьшение числа в несколько раз',{kind:'forms',forms:['incTimes']}),S_('Во сколько раз больше? Во сколько раз меньше?',{kind:'forms',forms:['howTimes']})],syn:['в несколько раз','во сколько раз'],L:[
+     {n:'Увеличь и уменьши',d:'',p:F(['incTimes'],10)},{n:'Во сколько раз',d:'',p:F(['howTimes','incTimes'],10)},{n:'Задачи',d:'',p:W(['times','fewer','howTimesW'],100,4,{tab:[2,9]})}]}]}],
+ 3:[
+  {part:1,s:'Повторение: сложение и вычитание до 100',topics:[
+   {id:'g3-rep100',t:'Сложение и вычитание до 100: повторение',sub:['Устные и письменные приёмы сложения и вычитания'],syn:['повторение','двузначные'],L:[
+     {n:'Устно',d:'',p:F(['u36p2','u36m20','u26p7','u35m7','u60m24'],15)},{n:'В столбик',d:'',p:{kind:'column',ops:['+','-'],lo:30,hi:99,count:12,digits:2,column:true}},{n:'Вперемешку',d:'',p:{kind:'examples',ops:['+','-'],lo:20,hi:99,count:15,digits:2,missing:'any'}}]},
+   {id:'g3-eq',t:'Уравнения',sub:['Решение уравнений'],syn:['уравнение','икс','x'],L:[
+     {n:'Сложение и вычитание',d:'x + 35 = 82',p:F(['eqAdd','eqSub'],10)},{n:'Умножение и деление',d:'x × 7 = 56',p:F(['eqMul'],10)},{n:'Вперемешку',d:'',p:F(['eqAdd','eqSub','eqMul'],12)}]},
+   {id:'g3-letters',t:'Обозначение фигур буквами',sub:['Обозначение геометрических фигур буквами'],syn:['вершины','буквы'],L:[
+     {n:'Вершины и стороны',d:'',p:F(['polyLetters'],6)},{n:'Больше фигур',d:'',p:F(['polyLetters'],8)},{n:'Ещё больше',d:'',p:F(['polyLetters'],10)}]}]},
+  {part:1,s:'Умножение и деление',topics:[
+   {id:'g3-table',t:'Таблица умножения и деления: повторение',sub:['Связь деления с умножением','Повторение табличного умножения и деления',S_('Умножение и деление с числом 5',{tab:[5,5]}),S_('Умножение и деление с числом 6',{tab:[6,6]}),S_('Умножение и деление с числом 7',{tab:[7,7]}),S_('Умножение и деление с числами 8 и 9',{tab:[8,9]})],syn:['таблица','таблица умножения'],L:[
+     {n:'На 5, 6, 7',d:'',p:F(['tab'],15,{tab:[5,7]})},{n:'На 2–9',d:'',p:F(['tab'],18,{tab:[2,9]})},{n:'Окошки',d:'',p:F(['tabWin'],18,{tab:[2,9]})}]},
+   {id:'g3-word',t:'Задачи на умножение и деление',sub:['Задачи-расчёты'],syn:['задачи','цена','стоимость'],L:[
+     {n:'Поровну и по несколько',d:'',p:W(['groups','share','parts'],100,4,{tab:[2,9]})},{n:'В несколько раз',d:'',p:W(['times','fewer','howTimesW'],100,4,{tab:[2,9]})},{n:'Цена, количество, стоимость',d:'',p:W(['cost','price','qty'],100,4)}]}]},
+  {part:1,s:'Площадь',topics:[
+   {id:'g3-area',t:'Площадь и её единицы',sub:[S_('Площадь фигуры',{kind:'grid',ask:'S',shape:'rect'}),S_('Сравнение площадей',{kind:'forms',forms:['areaCmp']}),'Единицы площади','Квадратный сантиметр',S_('Площадь прямоугольника',{kind:'forms',forms:['rectS','rectSb']}),S_('Квадратный дециметр',{kind:'forms',forms:['areaUnits']}),S_('Квадратный метр',{kind:'forms',forms:['areaUnits']})],syn:['площадь','кв см','квадратный'],L:[
+     {n:'Площадь на клетках',d:'',p:G('S','rect',6)},{n:'Площадь прямоугольника',d:'',p:F(['rectS','rectSb','areaCmp'],8)},{n:'Единицы площади и сложные фигуры',d:'',p:F(['areaUnits','rectS','rectSb'],10)}]}]},
+  {part:1,s:'Особые случаи умножения и деления',topics:[
+   {id:'g3-zero',t:'Умножение и деление с 0 и 1',sub:['Умножение на 1','Умножение на 0','Деление нуля на число','Закрепление правил действий с 0 и 1'],syn:['ноль','единица'],L:[
+     {n:'С единицей',d:'',p:F(['mul1'],10)},{n:'С нулём',d:'',p:F(['mul0'],10)},{n:'Вперемешку',d:'',p:F(['mul1','mul0'],12)}]}]},
+  {part:1,s:'Доли, окружность и круг',topics:[
+   {id:'g3-frac',t:'Доли',sub:['Доли'],syn:['дроби','половина','треть','четверть'],L:[
+     {n:'Одна доля',d:'1/4 от 20',p:F(['frac'],10)},{n:'Несколько долей',d:'3/4 от 20',p:F(['fracK'],10)},{n:'Вперемешку',d:'',p:F(['frac','fracK'],12)}]},
+   {id:'g3-circle',t:'Окружность, круг, диаметр',sub:[S_('Окружность и круг',{forms:['circleKind']}),S_('Диаметр окружности и круга',{forms:['diam']})],syn:['радиус','диаметр','окружность'],L:[
+     {n:'Окружность или круг',d:'',p:F(['circleKind'],6)},{n:'Радиус и диаметр',d:'',p:F(['diam'],8)},{n:'Вперемешку',d:'',p:F(['circleKind','diam'],8)}]}]},
+  {part:1,s:'Время',topics:[
+   {id:'g3-time',t:'Единицы времени: год, месяц, сутки, секунда',sub:[S_('Год',{kind:'forms',forms:['yearUnits']}),S_('Месяц',{kind:'forms',forms:['monthNext','monthDays']}),S_('Сутки',{kind:'units',sets:['day2h']}),S_('Секунда (часть 2)',{kind:'units',sets:['min2s']})],syn:['время','календарь','месяцы'],L:[
+     {n:'Год и месяц',d:'',p:F(['yearUnits','monthNext','monthDays'],8)},{n:'Сутки, часы, минуты',d:'3 сут = □ ч',p:U(['day2h','h2m','hm2m','m2h'])},{n:'Минуты и секунды',d:'',p:U(['min2s','h2m','day2h'])}]}]},
+  {part:2,s:'Внетабличное умножение и деление',topics:[
+   {id:'g3-extra',t:'Внетабличное умножение',sub:[S_('Внетабличное умножение и деление',{kind:'forms',forms:['roundMul','divRound']}),S_('Умножение суммы на число',{kind:'forms',forms:['sumMul']}),S_('Умножение двузначного на однозначное: 23 × 4',{kind:'forms',forms:['m2x1']}),S_('Умножение однозначного на двузначное: 4 × 23',{kind:'forms',forms:['m1x2']})],syn:['внетабличное','23 × 4'],L:[
+     {n:'Круглые числа',d:'20 × 3',p:F(['roundMul'],12)},{n:'Сумма на число',d:'(5 + 3) × 4',p:F(['sumMul'],8)},{n:'Двузначное на однозначное',d:'23 × 4',p:F(['m2x1','m1x2'],12)}]},
+   {id:'g3-extradiv',t:'Внетабличное деление',sub:[S_('Деление вида 80 : 20',{kind:'forms',forms:['divRound']}),S_('Деление суммы на число',{kind:'forms',forms:['sumDiv']}),S_('Деление двузначного на однозначное: 69 : 3, 78 : 2',{kind:'forms',forms:['d2x1']}),'Связь делимого, делителя и частного',S_('Деление двузначного на двузначное: 87 : 29, 66 : 22',{kind:'forms',forms:['d2x2']})],syn:['внетабличное деление'],L:[
+     {n:'80 : 20 и сумма на число',d:'',p:F(['divRound','sumDiv'],10)},{n:'69 : 3, 78 : 2',d:'',p:F(['d2x1'],12)},{n:'87 : 29',d:'',p:F(['d2x2','d2x1'],12)}]},
+   {id:'g3-checkmd',t:'Проверка умножения и деления',sub:['Проверка деления','Проверка умножения'],syn:['проверка'],L:[
+     {n:'Проверка умножения',d:'',p:F(['checkMul'],8)},{n:'Проверка деления',d:'',p:F(['checkDiv'],8)},{n:'Вперемешку',d:'',p:F(['checkMul','checkDiv'],10)}]}]},
+  {part:2,s:'Деление с остатком',topics:[
+   {id:'g3-rem',t:'Деление с остатком',sub:['Смысл деления с остатком','Выполнение деления с остатком',S_('Проверка деления с остатком',{forms:['remCheck']})],syn:['остаток'],L:[
+     {n:'Найди остаток',d:'17 : 5 = 3 (ост. □)',p:F(['rem'],10)},{n:'Частное и остаток',d:'',p:F(['rem'],12)},{n:'С проверкой',d:'',p:F(['rem','remCheck'],12)}]}]},
+  {part:2,s:'Числа от 1 до 1000. Нумерация',topics:[
+   {id:'g3-num1000',t:'Трёхзначные числа',sub:['Счёт сотнями','Образование и название трёхзначных чисел','Разряды счётных единиц','Запись трёхзначных чисел','Замена числа суммой разрядных слагаемых','Определение общего количества единиц, десятков и сотен в числе'],syn:['сотни','разряды','разрядные слагаемые'],L:[
+     {n:'Сотни',d:'4 сот. = □',p:F(['hundreds'],10)},{n:'Разряды',d:'400 + 50 + 7 = □',p:F(['places','hundreds'],12)},{n:'Сколько всего десятков',d:'',p:F(['places','countIn'],12)}]},
+   {id:'g3-cmp1000',t:'Сравнение трёхзначных чисел. В 10 и 100 раз',sub:[S_('Сравнение трёхзначных чисел',{forms:['cmp1000']}),S_('Увеличение и уменьшение числа в 10 и в 100 раз',{forms:['x10']})],syn:['сравнение','в 10 раз'],L:[
+     {n:'Сравнение',d:'457 ◯ 475',p:F(['cmp1000'],12)},{n:'В 10 и в 100 раз',d:'',p:F(['x10'],12)},{n:'Вперемешку',d:'',p:F(['cmp1000','x10'],12)}]}]},
+  {part:2,s:'Величины',topics:[
+   {id:'g3-units',t:'Грамм и километр',sub:[S_('Единицы массы: грамм',{sets:['kg2g','kgg2g']}),S_('Единицы длины: километр',{sets:['km2m','kmm2m']})],syn:['масса','граммы','км','километры'],L:[
+     {n:'Грамм',d:'3 кг = □ г',p:U(['kg2g','kgg2g'])},{n:'Километр',d:'2 км = □ м',p:U(['km2m','kmm2m'])},{n:'Вперемешку',d:'',p:U(['kg2g','kgg2g','km2m','kmm2m'])}]}]},
+  {part:2,s:'Сложение и вычитание в пределах 1000',topics:[
+   {id:'g3-oral1000',t:'Устное сложение и вычитание до 1000',sub:['Приёмы устного сложения и вычитания'],syn:['устно','в уме','сотни'],L:[
+     {n:'Сотни',d:'300 + 200',p:F(['r1000'],12)},{n:'Сотни и десятки',d:'450 + 30',p:F(['r1000'],15)},{n:'Больше примеров',d:'',p:F(['r1000'],18)}]},
+   {id:'g3-col1000',t:'Письменное сложение и вычитание до 1000',sub:['Приёмы письменного сложения и вычитания'],syn:['столбик','столбиком','трёхзначные'],L:[
+     {n:'Сложение',d:'356 + 248',p:{kind:'column',ops:['+'],lo:200,hi:999,count:12,digits:3,column:true}},{n:'Вычитание',d:'704 − 358',p:{kind:'column',ops:['-'],lo:200,hi:999,count:12,digits:3,column:true}},{n:'С переходом через разряд',d:'',p:{kind:'column',ops:['+','-'],lo:200,hi:999,count:12,digits:3,carry:'with',column:true}}]},
+   {id:'g3-tri',t:'Виды треугольников',sub:[S_('Виды треугольников по сторонам',{forms:['triSides']}),S_('Виды треугольников по углам',{forms:['triAngles']})],syn:['треугольник','равнобедренный','прямоугольный'],L:[
+     {n:'По сторонам',d:'',p:F(['triSides'],6)},{n:'По углам',d:'',p:F(['triAngles'],6)},{n:'Вперемешку',d:'',p:F(['triSides','triAngles'],8)}]}]},
+  {part:2,s:'Умножение и деление в пределах 1000',topics:[
+   {id:'g3-oralmd',t:'Устное умножение и деление до 1000',sub:['Приёмы устного умножения и деления'],syn:['устно','в уме'],L:[
+     {n:'Круглые сотни',d:'200 × 3',p:F(['r1000md'],12)},{n:'Больше примеров',d:'',p:F(['r1000md'],15)},{n:'С окошками',d:'',p:F(['r1000md','x10'],15)}]},
+   {id:'g3-colmul',t:'Письменное умножение на однозначное число',sub:['Письменное умножение трёхзначного числа на однозначное'],syn:['столбик','умножение в столбик'],L:[
+     {n:'Двузначное число',d:'47 × 6',p:{kind:'column',ops:['×'],aLo:12,aHi:99,count:12}},{n:'Трёхзначное число',d:'214 × 4',p:F(['colM3x1'],12)},{n:'Вперемешку',d:'',p:F(['colM3x1'],15)}]},
+   {id:'g3-coldiv',t:'Письменное деление на однозначное число',sub:['Письменное деление трёхзначного числа на однозначное','Алгоритм письменного деления, в том числе вида 748 : 2','Проверка деления умножением'],syn:['деление уголком','уголком','столбик'],L:[
+     {n:'Деление на однозначное',d:'748 : 2',p:F(['d3x1'],10)},{n:'Больше примеров',d:'',p:F(['d3x1'],12)},{n:'С проверкой',d:'',p:F(['d3x1','checkDiv'],12)}]},
+   {id:'g3-calc',t:'Знакомство с калькулятором',sub:['Знакомство с калькулятором'],syn:['калькулятор'],L:[
+     {n:'Вычисли на калькуляторе',d:'',p:F(['calc'],8)},{n:'Больше примеров',d:'',p:F(['calc'],10)},{n:'Ещё больше',d:'',p:F(['calc'],12)}]}]}],
+ 4:OLD_MATH[4].map(sec=>({...sec,part:1,unverified:true}))
+};
+/* старые темы прототипа переезжают в новые: прогресс учеников сохраняется */
+const ID_MAP={'g1-sum10':'g1-add14','g1-compose':'g1-terms','g1-compare':'g1-signs','g1-nocarry':'g1-teen','g1-carry':'g1-addc','g1-word':'g1-task','g1-len':'g1-dm',
+  'g2-tens':'g2-num100','g2-add':'g2-oral','g2-column':'g2-coladd','g2-mult23':'g2-table','g2-perim':'g2-rect','g3-div':'g3-table','g3-order':'g2-order2','g3-column':'g3-col1000','g3-word':'g3-word'};
+
 const RUS={
  1:[{s:'Письмо и орфография',topics:['Сочетания жи–ши, ча–ща, чу–щу','Заглавная буква в именах','Перенос слов','Звонкие и глухие согласные']}],
  2:[{s:'Орфография',topics:['Безударные гласные в корне','Парные согласные на конце слова','Разделительный мягкий знак','Словарные слова 2 класса']}],
@@ -741,7 +1207,12 @@ function exampleTopics(){return[
 
 /* ---------- состояние ---------- */
 const KEY='kletka-proto-v1';
-function demoState(){
+function demoState(){const d=demoState0();migrate(d);return d}
+function migrate(st){if(st.v===2)return st;const m=id=>ID_MAP[id]||id;
+  for(const s of st.students)s.current=m(s.current);for(const a of st.attempts)a.topicId=m(a.topicId);for(const h of st.assignments)h.topicId=m(h.topicId);
+  for(const c of st.customTopics||[])for(const L of c.L||[])if(L.p&&L.p.parts)for(const pt of L.p.parts)pt.tid=m(pt.tid);
+  st.v=2;return st}
+function demoState0(){
   const now=Date.now(),d=86400000;
   return{
     students:[
@@ -765,6 +1236,7 @@ let S;
 try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}
 if(!S||!S.students)S=demoState();
 if(!S.customTopics)S.customTopics=exampleTopics();
+migrate(S);
 TOPICS=allTopics();
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 
@@ -795,8 +1267,9 @@ const gradeWord=g=>g+' класс';
 function itemHTML(it,showAns){
   if(it.type==='word')return `<div class="wq">${esc(it.q)}</div><div class="sol"></div><div class="wa">Ответ: <span class="box">${showAns?fmt(it.ans):''}</span></div>`;
   if(it.type==='grid')return `${gridSVG(it)}<span class="ga">${it.ask} = <span class="box">${showAns?it.ans:''}</span> ${gridUnit(it)}</span>`;
+  if(it.type==='ch')return `<div class="chq">${esc(it.q)}</div>${it.svg}<div class="opts">${it.opts.map(o=>`<span class="opt${showAns&&o===it.ans?' on':''}">${esc(o)}</span>`).join('')}</div>`;
   if(it.type==='own'){const box=`<span class="box">${showAns?esc(it.ans):''}</span>`;
-    return it.q.includes('□')?`<span>${esc(it.q).replace('□',box)}</span>`:`<span>${esc(it.q)} = ${box}</span>`}
+    return (it.svg||'')+(it.q.includes('□')?`<span>${esc(it.q).replace('□',box)}</span>`:`<span>${esc(it.q)} = ${box}</span>`)}
   if(it.type==='col'){
     return `<div class="col"><span class="op">${sym(it.op)}</span><span>${fmt(it.a)}</span><span>${fmt(it.b)}</span><span class="bar"></span><span class="r">${showAns?fmt(it.ans):''}</span></div>`}
   if(it.type==='cmp')return `<span>${it.left}</span><span class="circ">${showAns?it.ans:''}</span><span>${it.right}</span>`;
@@ -808,6 +1281,7 @@ function itemHTML(it,showAns){
 function instr(it){
   if(!it)return'';
   if(it.type==='word')return'Реши задачу.';
+  if(it.type==='ch')return'Выбери правильный ответ.';
   if(it.type==='grid')return it.ask==='P'?'Найди периметр фигуры. Сторона клетки 1 см.':'Найди площадь фигуры. Одна клетка 1 кв. см.';
   if(it.u)return it.type==='cmp'?'Сравни величины: поставь знак >, < или =.':'Вырази в других единицах.';
   if(it.type==='cmp')return'Поставь знак >, < или = в кружок.';
@@ -821,9 +1295,9 @@ function instr(it){
    на экране части идут одной лентой, на печати раскладываются по страницам A4 */
 function sheetParts(items,{topic,level,seed,studentName,answers}){
   const kind=items[0]&&items[0].type;
-  const longOwn=kind==='own'&&items.some(x=>(x.q||'').length>16);
+  const ownLen=Math.max(0,...items.filter(x=>x.type==='own').map(x=>x.q.length+(x.svg?40:0)));
   const mixed=new Set(items.map(x=>x.type)).size>1||items.some(x=>x.src);
-  const cols=mixed?'c2':kind==='word'?'c1':kind==='col'?'c4':kind==='expr'?'c2':kind==='own'?(longOwn?'c1':'c3'):'c3';
+  const cols=mixed?'c2':kind==='word'?'c1':kind==='ch'?'c2':kind==='col'?'c4':kind==='expr'?'c2':kind==='own'?(ownLen>40?'c1':ownLen>16?'c2':'c3'):'c3';
   const title=answers?'Ответы':topic.t;
   const lvl=topic.sheet||topic.review?esc(topic.L[0].n):LV[level].toLowerCase()+' уровень';
   const newGroup=(it,i)=>{if(i===0)return true;const pr=items[i-1];return it.blk!=null?pr.blk!==it.blk:(pr.src!==it.src||pr.type!==it.type)};
@@ -836,7 +1310,7 @@ function sheetParts(items,{topic,level,seed,studentName,answers}){
   const pieces=items.map((it,i)=>{
     const tt=TOPICS[it.src]?TOPICS[it.src].t:'';
     const grp=mixed&&newGroup(it,i)?`<div class="grp"><b>${esc(it.lbl?it.lbl+' · '+tt:tt)}</b> ${esc(instr(it))}</div>`:'';
-    return grp+`<div class="it${it.type==='own'?' own':''}${it.type==='word'?' word':''}${it.type==='grid'?' grid':''}"><span class="n">${i+1}</span>${itemHTML(it,answers)}</div>`});
+    return grp+`<div class="it${it.type==='own'?' own':''}${it.type==='word'?' word':''}${it.type==='grid'?' grid':''}${it.type==='ch'||it.svg?' pic':''}"><span class="n">${i+1}</span>${itemHTML(it,answers)}</div>`});
   return{head,mini,cols,pieces,footL:esc(topic.section),footR:`Проверить онлайн: код варианта ${seed}`};
 }
 function sheetHTML(items,o){
@@ -946,7 +1420,7 @@ function viewStudent(){
   const st=student(V.studentId);const subj=st.subjects.includes(V.subject)?V.subject:st.subjects[0];V.subject=subj;
   const tabs=st.subjects.map(x=>`<button class="tab${x===subj?' on':''}" data-s="${x}">${SUBJ[x]}</button>`).join('');
   const row=t=>{const m=mastery(st.id,t.id);
-    return `<button class="topic" data-t="${t.id}"><span class="dot ${m.cls}"></span><span class="tt">${esc(t.t)}${t.custom?'<span class="mine">моя</span>':''}${curOf(st,t.subject)===t.id?'<span class="now">сейчас</span>':''}</span><span class="pct num">${m.pct!=null?m.pct+'%':''}</span></button>`};
+    return `<button class="topic" data-t="${t.id}"><span class="dot ${m.cls}"></span><span class="tt"><span>${esc(t.t)}${t.custom?'<span class="mine">моя</span>':''}${curOf(st,t.subject)===t.id?'<span class="now">сейчас</span>':''}</span>${t.sub&&t.sub.length>1?`<span class="subs">${t.sub.map(x=>esc(x.n||x)).join(' · ')}</span>`:''}</span><span class="pct num">${m.pct!=null?m.pct+'%':''}</span></button>`};
   const mine=g=>S.customTopics.filter(c=>c.subject===subj&&c.grade===g&&!c.review&&!c.sheet);
   const pos=trackPos(st,subj);let route;
   if(pos.i>=0){
@@ -973,18 +1447,27 @@ function viewStudent(){
       <div class="route-act"><button class="btn primary" id="r-new">+ Своя тема по русскому</button></div></section>`;
   }
   const grades=subj==='math'?[1,2,3,4]:[1,2,3,4].filter(g=>g===st.grade||mine(g).length);
-  let prog=`<div class="tools"><span class="hint">${subj==='math'?'Порядок тем общий для 1–4 класса. Откройте любую тему, чтобы дать задание или сделать её текущей.':'Ваши темы по русскому идут в маршруте по классам. Откройте тему, чтобы дать задание или сделать её текущей.'}</span><button class="btn small" id="newt">+ Своя тема</button></div>`;
-  for(const g of grades){
+  let prog=`<div class="tools"><span class="hint">${subj==='math'?'Программа по учебнику Моро: 1–3 класс сверены, 4 класс пока свой. Откройте тему, чтобы дать задание или сделать её текущей.':'Ваши темы по русскому идут в маршруте по классам. Откройте тему, чтобы дать задание или сделать её текущей.'}</span><button class="btn small" id="newt">+ Своя тема</button></div>`;
+  const cur=pos.i>=0?TOPICS[pos.tr[pos.i]]:null,cg=cur?cur.grade:st.grade,cp=cur?partOf(cur.id):1;
+  if(subj==='math')for(const g of grades){
+    const secs=MATH[g],parts=[...new Set(secs.map(x=>x.part))],my=mine(g),n=secs.reduce((a,x)=>a+x.topics.length,0)+my.length;
+    prog+=`<details class="cg"${g===cg?' open':''}><summary><b>${gradeWord(g)}</b>${g===st.grade?'<span class="chip">класс ученика</span>':''}${secs[0].unverified?'<span class="chip warn">не сверено с учебником</span>':''}<span class="cnt">${n} ${plural(n,['тема','темы','тем'])}</span></summary>`;
+    for(const pt of parts){const inner=secs.filter(x=>x.part===pt).map(sec=>`<div class="sec"><h3>${esc(sec.s)}</h3>${sec.topics.map(t=>row(TOPICS[t.id])).join('')}</div>`).join('');
+      prog+=parts.length>1?`<details class="cp"${g===cg&&pt===cp?' open':''}><summary>Часть ${pt}</summary>${inner}</details>`:inner}
+    if(my.length)prog+=`<div class="sec"><h3>${MY}</h3>${my.map(row).join('')}</div>`;
+    prog+='</details>';
+  }
+  if(subj!=='math')for(const g of grades){
     prog+=`<div class="gradehead">${gradeWord(g)}${g===st.grade?' · класс ученика':''}</div>`;
     const my=mine(g);
-    if(subj==='math')prog+=MATH[g].map(sec=>`<div class="sec"><h3>${esc(sec.s)}</h3>${sec.topics.map(t=>row(TOPICS[t.id])).join('')}</div>`).join('');
     if(my.length)prog+=`<div class="sec"><h3>${MY}</h3>${my.map(row).join('')}</div>`;
     if(subj!=='math'&&g===st.grade)prog+=`<div class="locked">Генератор «Вставь букву» появится в следующей версии, его темы встанут в этот же маршрут.</div>`+
       RUS[g].map(sec=>`<div class="sec"><h3>${esc(sec.s)} · скоро</h3>${sec.topics.map(t=>`<button class="topic" disabled><span class="dot"></span><span class="tt">${esc(t)}</span></button>`).join('')}</div>`).join('');
   }
   prog+=`<div class="legend"><span><i class="dot ok"></i>освоено, от 85%</span><span><i class="dot warn"></i>в работе</span><span><i class="dot bad"></i>западает, меньше 60%</span><span><i class="dot"></i>не решали</span></div>
     <p class="hint legend-note">Усвоение считается по трём последним работам: свежие и длинные весят больше. На базовом уровне — не выше 80%, поэтому «освоено» значит решено на среднем или сложном уровне.</p>`;
-  const body=route+(subj==='math'?`<details class="fullprog" id="fp"${V.progOpen?' open':''}><summary>Вся программа 1–4 класса</summary>${prog}</details>`:prog);
+  const body=`<div class="search"><input id="tq" type="search" autocomplete="off" aria-label="Найти тему" placeholder="Найти тему: слово или пример, например «таблица» или 37 + 48" value="${esc(V.q||'')}"></div>
+    <div id="sres" class="sres" hidden></div><div id="pmain">${route}${prog}</div>`;
   const atts=S.attempts.filter(a=>a.studentId===st.id&&TOPICS[a.topicId]).sort((a,b)=>b.date-a.date);
   const hws=S.assignments.filter(a=>a.studentId===st.id&&a.status==='выдано'&&TOPICS[a.topicId]);
   const side=`<div class="panel side"><div class="side-head"><h2>Работы и домашки</h2><button class="btn small quiet" id="imp">Внести результат</button></div>
@@ -1006,14 +1489,87 @@ function viewStudent(){
   if($('r-next'))$('r-next').onclick=()=>{st[CK(subj)]=pos.tr[pos.i+1];save();render()};
   if($('r-rev'))$('r-rev').onclick=()=>makeReview(st,subj);
   if($('r-new'))$('r-new').onclick=openBuilder;
-  if($('fp'))$('fp').ontoggle=e=>{V.progOpen=e.target.open};
+  const tq=$('tq');tq.oninput=()=>{V.q=tq.value;showSearch(st,subj)};showSearch(st,subj);
   $('newt').onclick=openBuilder;
   $('imp').onclick=importModal;
   $('delst').onclick=()=>{if(!V.confirmStDel){V.confirmStDel=true;render();return}deleteStudent(st)};
   app.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>{const h=S.assignments.find(x=>x.code===b.dataset.open);startPlayer(h)});
 }
+/* ---------- поиск темы: слова с опечатками, синонимы, подтемы учебника и пример вида 37 + 48 ---------- */
+const partOf=id=>{for(const g in MATH)for(const sec of MATH[g])if(sec.topics.some(t=>t.id===id))return sec.part;return 1};
+const secOf=id=>{for(const g in MATH)for(const sec of MATH[g])if(sec.topics.some(t=>t.id===id))return sec.s;return TOPICS[id]?TOPICS[id].section:''};
+const normT=x=>String(x).toLowerCase().replace(/ё/g,'е').replace(/[«»"(),.:;!?…]/g,' ').replace(/\s+/g,' ').trim();
+function lev(a,b){if(Math.abs(a.length-b.length)>2)return 9;const d=[];for(let i=0;i<=a.length;i++)d[i]=[i];for(let j=1;j<=b.length;j++)d[0][j]=j;
+  for(let i=1;i<=a.length;i++)for(let j=1;j<=b.length;j++)d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1));return d[a.length][b.length]}
+function tokScore(tk,words){let best=0;
+  for(const w of words){if(/^\d+$/.test(tk)){if(w===tk)best=3;continue}
+    if(w.startsWith(tk)){best=Math.max(best,3);continue}
+    if(tk.length>=4&&(lev(tk,w.slice(0,tk.length))<=1||lev(tk,w)<=(tk.length>=7?2:1)))best=Math.max(best,2)}
+  return best}
+function exampleTopic(a,op,b){
+  const t1=n=>n<10,rt=n=>n%10===0;
+  if(op==='+'){const s2=a+b;
+    if(s2<=10)return Math.min(a,b)<=4?['g1-add14',{k:[Math.min(a,b)]}]:['g1-add59'];
+    if(t1(a)&&t1(b))return['g1-addc',{k:[Math.min(a,b)]}];
+    if(s2<=20)return['g1-teen'];
+    if(s2<=100){if(t1(a)||t1(b)){const u=(t1(a)?b:a)%10,k=t1(a)?a:b;return u+k===10?['g2-oral',{forms:['u26p4']}]:u+k>10?['g2-oral',{forms:['u26p7']}]:['g2-oral',{forms:['u36p2','u36p20']}]}
+      if(rt(a)||rt(b))return['g2-oral',{forms:['u36p2','u36p20']}];
+      if(s2===100)return['g2-coladd',{kind:'forms',forms:['col100']}];
+      if(a%10+b%10===10)return['g2-coladd',{kind:'forms',forms:['colRound']}];
+      return a%10+b%10>10?['g2-coladd',{kind:'column',ops:['+'],lo:30,hi:99,digits:2,carry:'with',column:true}]:['g2-coladd',{kind:'column',ops:['+'],lo:30,hi:99,digits:2,carry:'without',column:true}]}
+    if(s2<=1000)return rt(a)&&rt(b)?['g3-oral1000']:['g3-col1000'];
+    return['g4-column']}
+  if(op==='-'){if(b>a)return null;if(a<=10)return['g1-sub10'];
+    if(a>10&&a<=18&&t1(b)&&a%10<b)return['g1-subc',{from:[a]}];
+    if(a<=20)return['g1-teen'];
+    if(a<=100){if(t1(b))return rt(a)?['g2-oral',{forms:['u30m7']}]:a%10<b?['g2-oral',{forms:['u35m7']}]:['g2-oral',{forms:['u36m2','u36m20']}];
+      if(rt(b))return['g2-oral',{forms:['u36m2','u36m20']}];
+      if(rt(a))return['g2-oral',{forms:['u60m24']}];
+      return a%10<b%10?['g2-colsub',{kind:'column',ops:['-'],lo:30,hi:99,digits:2,carry:'with',column:true}]:['g2-colsub',{kind:'column',ops:['-'],lo:30,hi:99,digits:2,carry:'without',column:true}]}
+    if(a<=1000)return rt(a)&&rt(b)?['g3-oral1000']:['g3-col1000'];
+    return['g4-column']}
+  if(op==='×'){if(a<=1||b<=1)return['g3-zero'];if(a===10||b===10)return['g2-mul10'];
+    if(a<=9&&b<=9){const k=Math.max(a,b);return['g2-table',{tab:[k,k]}]}
+    if(a*b<=100&&Math.max(a,b)<=99)return rt(a)||rt(b)?['g3-extra',{kind:'forms',forms:['roundMul']}]:['g3-extra',{kind:'forms',forms:['m2x1','m1x2']}];
+    if(a*b<1000)return a%100===0||b%100===0?['g3-oralmd']:['g3-colmul'];
+    return['g4-mul']}
+  if(b===0)return null;if(a===0||b===1||a===b)return['g3-zero'];if(a%b)return['g3-rem'];
+  const q=a/b;if(b===10)return['g2-mul10'];if(b<=9&&q<=9)return['g2-table',{tab:[b,b]}];
+  if(a<=99)return b>=10?(rt(a)&&rt(b)?['g3-extradiv',{kind:'forms',forms:['divRound']}]:['g3-extradiv',{kind:'forms',forms:['d2x2']}]):['g3-extradiv',{kind:'forms',forms:['d2x1']}];
+  if(a<=999)return rt(a)&&b<=9?['g3-oralmd']:['g3-coldiv'];
+  return null}
+function parseExample(q){const m=String(q).replace(/\s+/g,'').match(/^(\d+)([+\-−×xх*:÷\/])(\d+)/i);if(!m)return null;
+  const a=+m[1],b=+m[3],o=m[2],op=o==='+'?'+':/[-−]/.test(o)?'-':/[×xх*]/i.test(o)?'×':'÷';
+  const r=exampleTopic(a,op,b);if(!r||!TOPICS[r[0]])return null;
+  const t=TOPICS[r[0]],key=r[1]?JSON.stringify(r[1]):null;const si=key?(t.sub||[]).findIndex(x=>x.p&&JSON.stringify(x.p)===key):-1;
+  return{tid:r[0],si,over:r[1]||null,ex:`${a} ${sym(op)} ${b}`}}
+function searchTopics(q,subj){
+  const out=[];const ex=subj==='math'?parseExample(q):null;if(ex)out.push({...ex,score:100});
+  const toks=normT(q).split(' ').filter(t=>/^[a-zа-я0-9]+$/.test(t)&&(t.length>=2||/^\d+$/.test(t)));
+  if(!toks.length||(ex&&toks.every(t=>/^\d+$/.test(t))))return out;
+  const ids=subj==='math'?trackIds('math'):S.customTopics.filter(c=>c.subject===subj&&!c.review&&!c.sheet).map(c=>c.id);
+  for(const id of ids){const t=TOPICS[id];const syn=normT((t.syn||[]).join(' ')+' '+t.t).split(' ');
+    let best=null;
+    [{txt:t.t,si:-1},...(t.sub||[]).map((x,k)=>({txt:x.n||x,si:k}))].forEach(e=>{const words=[...normT(e.txt).split(' '),...syn];let sc=0;
+      for(const tk of toks){const v=tokScore(tk,words);if(!v)return;sc+=v}
+      const own=normT(e.txt).split(' ');sc+=toks.filter(tk=>tokScore(tk,own)).length;if(e.si<0)sc+=.5;
+      if(!best||sc>best.score)best={tid:id,si:e.si,score:sc}});
+    if(best&&!(ex&&best.tid===ex.tid))out.push(best)}
+  return out.sort((a,b)=>b.score-a.score).slice(0,15)}
+function showSearch(st,subj){
+  const box=document.getElementById('sres'),main=document.getElementById('pmain');if(!box)return;
+  const q=(V.q||'').trim();if(!q){box.hidden=true;main.hidden=false;return}
+  const res=searchTopics(q,subj);main.hidden=true;box.hidden=false;
+  box.innerHTML=res.length?res.map((r,k)=>{const t=TOPICS[r.tid],sb=r.si>=0?t.sub[r.si]:null;
+    return `<button class="sr" data-k="${k}"><span class="sr-t">${r.ex?`<span class="chip ok">по примеру ${esc(r.ex)}</span> `:''}${esc(sb?(sb.n||sb):t.t)}</span>
+      <small>${sb?'тема «'+esc(t.t)+'» · ':''}${gradeWord(t.grade)}${t.custom?'':' · часть '+partOf(t.id)+' · '+esc(secOf(t.id))}</small></button>`}).join('')
+    :`<p class="empty">Ничего не нашлось. Попробуйте другое слово или впишите пример, например 52 − 24.</p>`;
+  box.querySelectorAll('.sr').forEach(b=>b.onclick=()=>{const r=res[+b.dataset.k],t=TOPICS[r.tid],sb=r.si>=0?t.sub[r.si]:null;
+    openTopicSub(r.tid,r.over||(sb&&sb.p)||null,sb?(sb.n||sb):(r.ex?'похожие на '+r.ex:null))});
+}
+function openTopicSub(tid,over,name){openTopic(tid);if(over){V.over=over;V.subName=name||'выбранный вид';V.seed=newSeed();render()}}
 function openTopic(tid){const m=mastery(V.studentId,tid);const lv=m.cls==='ok'?2:m.cls==='bad'?0:1;
-  go({screen:'topic',topicId:tid,level:Math.min(lv,TOPICS[tid].L.length-1),seed:newSeed(),over:null,confirmDel:false,blocks:null})}
+  go({screen:'topic',topicId:tid,level:Math.min(lv,TOPICS[tid].L.length-1),seed:newSeed(),over:null,subName:null,confirmDel:false,blocks:null})}
 
 function curParams(){const t=TOPICS[V.topicId];return{...t.L[V.level].p,...(V.over||{})}}
 
@@ -1021,7 +1577,7 @@ function curParams(){const t=TOPICS[V.topicId];return{...t.L[V.level].p,...(V.ov
 const TPL=[['train','Тренировка'],['lesson','Урок'],['test','Проверочная'],['home','Домашка'],['own','Свой']];
 const TPL_HINT={train:'Одна тема, задания выбранного уровня.',lesson:'Разминка по прошлой теме, тема урока, задачи и бонус.',
   test:'Тема, задачи и величины. Подходит для контроля.',home:'Короче урока: тема, одна задача и повторение.',own:'Соберите лист из блоков: любые темы, уровни и количество.'};
-const WORD_OF={1:'g1-word',2:'g2-word',3:'g3-word',4:'g4-move'},EXTRA_OF={1:'g1-len',2:'g2-perim',3:'g3-area',4:'g4-units'};
+const WORD_OF={1:'g1-task',2:'g2-word',3:'g3-word',4:'g4-move'},EXTRA_OF={1:'g1-dm',2:'g2-rect',3:'g3-area',4:'g4-units'};
 const TASKS=['задание','задания','заданий'];
 function tplBlocks(tpl,st,t,lvl){
   const tr=trackIds(t.subject),i=tr.indexOf(t.id),prev=i>0?tr[i-1]:null;
@@ -1080,6 +1636,7 @@ function viewTopic(){
     <button type="button" class="btn small quiet" id="to-own">Изменить состав</button>`;
   const total=items.length;
   app.innerHTML=`<div class="head"><div><span class="label">${gradeWord(t.grade)} · ${esc(t.section)}</span><h1>${esc(t.t)}</h1>
+    ${V.subName&&tpl==='train'?`<p class="subchip">Подтема: <b>${esc(V.subName)}</b> <button class="btn small quiet" id="subx">Показать всю тему</button></p>`:''}
     <p>${m.pct!=null?`Усвоение ${m.pct}%${m.low?' (мало данных)':''} — ${mNote(m)}. `:'Тему ещё не решали. '}${fixed?'Лист уже собран.':'Уровень подобран по прошлым результатам, лист уже собран.'}</p></div></div>
     <div class="topic-grid">
       <div class="levels">${tplSeg}
@@ -1103,7 +1660,8 @@ function viewTopic(){
     const n=paginate(tmp,items,{topic:shown,level:shownLv,seed:V.seed,studentName:st.name});tmp.remove();
     $('pg-hint').textContent=`при печати: ${pagesWord(n)} и ключ`};
   countPages();if(document.fonts&&document.fonts.ready)document.fonts.ready.then(countPages);
-  app.querySelectorAll('.lvl').forEach(b=>b.onclick=()=>go({level:+b.dataset.l,seed:newSeed(),over:null}));
+  app.querySelectorAll('.lvl').forEach(b=>b.onclick=()=>go({level:+b.dataset.l,seed:newSeed(),over:null,subName:null}));
+  if($('subx'))$('subx').onclick=()=>go({over:null,subName:null,seed:newSeed()});
   if($('tpl'))$('tpl').querySelectorAll('button').forEach(b=>b.onclick=()=>{const k=b.dataset.k;
     if(k==='own'&&tpl!=='own')V.blocks=(tpl==='train'?tplBlocks('lesson',st,t,V.level):blocks).map(x=>({...x}));
     go({tpl:k,seed:newSeed()})});
@@ -1358,6 +1916,8 @@ function qText(it){
   const sl=()=>`<span class="slot${P.input?' filled':''}">${esc(P.input)||'?'}</span>`;
   if(it.type==='word')return `<span class="wq">${esc(it.q)}</span><span class="wa">Ответ: ${sl()}</span>`;
   if(it.type==='grid')return `<span class="gwrap">${gridSVG(it)}</span><span class="wa">${it.ask} = ${sl()} ${gridUnit(it)}</span>`;
+  if(it.type==='ch')return `<span class="wq">${esc(it.q)}</span>${it.svg?`<span class="gwrap">${it.svg}</span>`:''}`;
+  if(it.svg)return `<span class="gwrap">${it.svg}</span><span class="wq">${esc(it.q).replace('□',sl())}</span>`;
   if(it.type==='own'){const slot=`<span class="slot${P.input?' filled':''}">${esc(P.input)||'?'}</span>`;
     return it.q.includes('□')?`<span>${esc(it.q).replace('□',slot)}</span>`:`<span>${esc(it.q)} =</span>${slot}`}
   if(it.type==='cmp')return `${it.left} <span class="slot${P.input?' filled':''}">${P.input||'?'}</span> ${it.right}`;
@@ -1367,7 +1927,7 @@ function qText(it){
   return `${it.miss==='a'?slot:fmt(it.a)} ${sym(it.op)} ${it.miss==='b'?slot:fmt(it.b)} = ${it.miss==='res'?slot:fmt(it.res)}`;
 }
 function plainQ(it){
-  if(it.type==='word')return it.q.length>70?it.q.slice(0,67)+'…':it.q;
+  if(it.type==='word'||it.type==='ch'||it.svg)return it.q.length>70?it.q.slice(0,67)+'…':it.q;
   if(it.type==='grid')return (it.ask==='P'?'Периметр':'Площадь')+` фигуры из ${it.cells.length} клеток`;
   if(it.type==='own')return it.q.includes('□')?it.q:it.q+' = □';
   if(it.type==='cmp')return `${it.left} ◯ ${it.right}`;
@@ -1379,7 +1939,8 @@ function plainQ(it){
 function viewPlayer(){
   const it=P.items[P.i];const who=P.name||student(P.h.studentId).name;
   const tm=textMode(it);
-  const pad=it.type==='cmp'
+  const pad=it.type==='ch'?`<div class="opts-pad">${it.opts.map((o,k)=>`<button data-opt="${k}">${esc(o)}</button>`).join('')}</div>`
+    :it.type==='cmp'
     ?`<div class="signs">${['<','=','>'].map(s=>`<button data-sign="${s}" aria-label="знак ${s}">${s}</button>`).join('')}</div>`
     :tm?`<div class="txt"><input id="tx" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Ответ" placeholder="Ответ" value="${esc(P.input)}"><button class="btn primary" id="txok">Готово</button></div>`
     :`<div class="pad">${[1,2,3,4,5,6,7,8,9].map(n=>`<button data-k="${n}">${n}</button>`).join('')}<button class="del" data-k="del">Стереть</button><button data-k="0">0</button><button class="go" data-k="ok">Готово</button></div>`;
@@ -1389,11 +1950,12 @@ function viewPlayer(){
       <div class="score num"><span>${P.score}<small>очки</small></span><span>${P.streak}<small>подряд</small></span></div></div>
     <div class="prog"><i style="width:${P.i/P.items.length*100}%"></i></div>
     <p class="pl-instr">${esc(instr(it))}</p>
-    <div class="task${it.type==='own'&&it.q.length>16?' long':''}${it.type==='word'?' word':''}${it.type==='grid'?' grid':''}" aria-live="polite"><div class="q">${qText(it)}</div>${P.fb?`<div class="fb ${P.fb.ok?'ok':'bad'}">${P.fb.ok?'Верно! +10':'Правильный ответ: '+esc(P.fb.ans)}</div>`:''}</div>
+    <div class="task${it.type==='own'&&!it.svg&&it.q.length>16&&it.q.length<=26?' long':''}${it.type==='word'||it.type==='ch'||it.svg||(it.type==='own'&&it.q.length>26)?' word':''}${it.type==='grid'?' grid':''}" aria-live="polite"><div class="q">${qText(it)}</div>${P.fb?`<div class="fb ${P.fb.ok?'ok':'bad'}">${P.fb.ok?'Верно! +10':'Правильный ответ: '+esc(P.fb.ans)}</div>`:''}</div>
     ${pad}
     <div style="text-align:center"><button class="btn small quiet" id="stop">Закончить досрочно</button></div></div>`;
   app.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>key(b.dataset.k));
   app.querySelectorAll('[data-sign]').forEach(b=>b.onclick=()=>{P.input=b.dataset.sign;submit()});
+  app.querySelectorAll('[data-opt]').forEach(b=>b.onclick=()=>{if(P.lock)return;P.input=it.opts[+b.dataset.opt];submit()});
   if(tm){const tx=document.getElementById('tx');const send=()=>{if(!P.lock&&P.input.trim())submit()};
     tx.oninput=()=>{P.input=tx.value};tx.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();send()}};
     document.getElementById('txok').onclick=send;if(!P.lock)tx.focus()}
@@ -1438,7 +2000,7 @@ document.addEventListener('keydown',e=>{
   if(V.screen!=='player'||!P||mroot.innerHTML)return;
   const it=P.items[P.i];
   if(it.type==='cmp'){if(['<','>','='].includes(e.key)){P.input=e.key;submit()}return}
-  if(textMode(it))return;
+  if(textMode(it)||it.type==='ch')return;
   if(/^[0-9]$/.test(e.key))key(e.key);else if(e.key==='Backspace')key('del');else if(e.key==='Enter')key('ok');
 });
 let STUDENT_MODE=false;
