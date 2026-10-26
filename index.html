@@ -297,6 +297,27 @@ details.done>summary{cursor:pointer;color:var(--ink-3);font-size:13.5px;padding:
 details.done>summary:hover{background:var(--ink-soft)}
 details.done .topic{opacity:.7}
 
+/* Клетки тетради */
+.sh-items{--c:2.8cqw;display:grid;column-gap:calc(var(--c) * 2);row-gap:var(--c);padding:var(--c) !important;background-size:var(--c) var(--c) !important;background-position:0 0 !important;align-items:start}
+.sh-items>*{margin:0 !important}
+.sh-items>.span,.sh-items>.grp,.sh-items>.selfcheck,.sh-items>.word{grid-column:1/-1}
+.sheet .sh-items .it.ci{display:flex;gap:0;align-items:flex-start;white-space:nowrap;font-size:inherit;padding:0}
+.c{width:var(--c);height:var(--c);display:inline-flex;align-items:center;justify-content:center;font-size:calc(var(--c) * .8);line-height:1;font-variant-numeric:tabular-nums;flex:none}
+.crow,.cl{display:flex}
+.cb{width:calc(var(--c) * 2);height:var(--c);display:inline-flex;align-items:center;flex:none}
+.cb i{font-style:normal;font-size:calc(var(--c) * .5);color:#6b748c;width:var(--c);text-align:center}
+.lv1 .cb i,.lv2 .cb i{background:var(--p1);color:#fff;border-radius:50%;width:calc(var(--c) * .8);height:calc(var(--c) * .8);display:grid;place-items:center;margin-left:calc(var(--c) * .1);font-weight:700}
+.lv3 .cb i{color:var(--p1);font-weight:700}
+.cbox{display:inline-flex;box-shadow:inset 0 0 0 .3cqw #7d88a3;border-radius:.3cqw}
+.lv1 .cbox,.lv2 .cbox{box-shadow:inset 0 0 0 .3cqw var(--p1)}
+.c.circ{position:relative}
+.c.circ::before{content:"";position:absolute;inset:8%;border:.3cqw solid #7d88a3;border-radius:50%}
+.ans .c.a{color:var(--sheet-pen);font-weight:700}
+.ccol{position:relative;display:flex;flex-direction:column}
+.cl.bar{box-shadow:inset 0 .32cqw 0 0 #1a1f2e}
+.csign{position:absolute;left:0;top:var(--c);transform:translate(-50%,-50%);font-size:calc(var(--c) * .8);line-height:1}
+.sh-items .it.word,.sh-items .grp{align-self:stretch}
+
 /* Оформление листов */
 .art{display:block}
 .sheet{position:relative}
@@ -331,7 +352,7 @@ details.done .topic{opacity:.7}
 .lv1 .it .n,.lv2 .it .n{background:var(--p1);color:#fff;border-radius:50%;width:4.4cqw;height:4.4cqw;display:inline-grid;place-items:center;font-weight:700;font-size:2.1cqw;flex:none}
 .lv3 .it .n{color:var(--p1);font-weight:700}
 .lv1 .box,.lv2 .box{border-color:var(--p1)}
-.lv1 .sh-items,.lv2 .sh-items,.lv3 .sh-items{font-size:3.1cqw;gap:3cqw 3cqw}
+.lv1 .sh-items,.lv2 .sh-items,.lv3 .sh-items{font-size:3.1cqw}
 /* школьная клетка: на заданиях и на строке с именем, классом, датой; шапка с рисунком без клетки */
 .sh-items,.sh-head,.sh-mini{background-color:#fff;background-image:linear-gradient(#c9dcf0 .13cqw,transparent .13cqw),linear-gradient(90deg,#c9dcf0 .13cqw,transparent .13cqw);background-size:2.6cqw 2.6cqw;padding:1.6cqw;border-radius:1cqw;border:.15cqw solid #b7cde6}
 .bw .sh-items,.bw .sh-head,.bw .sh-mini{background-image:linear-gradient(#d4d4d4 .13cqw,transparent .13cqw),linear-gradient(90deg,#d4d4d4 .13cqw,transparent .13cqw);border-color:#c4c4c4}
@@ -1768,6 +1789,45 @@ function instr(it){
 }
 /* лист раскладывается на части: шапка, задания (по одному куску на задание) и подвал;
    на экране части идут одной лентой, на печати раскладываются по страницам A4 */
+/* ---------- задания в клетках: каждая цифра и знак — в своей клетке, всё по линиям тетради ---------- */
+const CELL=2.8; /* размер клетки в процентах ширины листа: на A4 около 6 мм */
+const noSp=x=>String(x).replace(/[\s\u00a0]/g,'');
+const cellable=it=>it.type==='eq'||it.type==='col'||it.type==='expr'
+  ||(it.type==='cmp'&&/^[\d\s\u00a0+−×:]+$/.test(it.left+it.right))
+  ||(it.type==='own'&&!it.svg&&/^[\d\s\u00a0+−×:()=□x]+$/.test(it.q));
+function cellStr(it){
+  if(it.type==='eq'){const b=v=>it.x?'x':'□';return `${it.miss==='a'?b():it.a}${sym(it.op)}${it.miss==='b'?b():it.b}=${it.miss==='res'?b():it.res}`}
+  if(it.type==='cmp')return `${noSp(it.left)}◯${noSp(it.right)}`;
+  if(it.type==='expr')return `${noSp(it.q)}=□`;
+  return noSp(it.q)}
+const ansLen=it=>String(it.ans).length;
+function colRows(it){const A=String(it.a),B=String(it.b),R=String(it.ans);
+  const parts=it.op==='×'&&B.length>1?B.length:0;
+  const d=Math.max(A.length,B.length,R.length);return{A,B,R,parts,d}}
+function cellWidth(it){
+  if(it.type==='col')return 2+colRows(it).d;
+  let w=2;for(const ch of cellStr(it))w+=ch==='□'?ansLen(it):1;
+  if(it.type==='eq'&&it.x)w+=3+ansLen(it);
+  return w}
+const cc=(ch,cls)=>`<span class="c${cls?' '+cls:''}">${ch}</span>`;
+function cellItemHTML(it,i,showAns){
+  const badge=`<span class="cb"><i>${i+1}</i></span>`;
+  if(it.type==='col'){const{A,B,R,parts,d}=colRows(it);
+    const row=(str,cls,a)=>`<span class="cl${cls?' '+cls:''}">${Array.from({length:d},(_,k)=>{const ch=str[k-(d-str.length)];return cc(ch==null?'':ch,a&&ch!=null?'a':'')}).join('')}</span>`;
+    let rows=row(A)+row(B);
+    if(parts){rows+=Array.from({length:parts},(_,k)=>row('',k===0?'bar':'')).join('');rows+=row(showAns?R:'','bar',true)}
+    else rows+=row(showAns?R:'','bar',true);
+    return `${badge}<span class="ccol">${rows}<span class="csign">${sym(it.op)}</span></span>`}
+  let cells='';
+  for(const ch of cellStr(it)){
+    if(ch==='□'){const R=String(it.ans);cells+=`<span class="cbox">${[...R].map(x=>cc(showAns?x:'','a')).join('')}</span>`}
+    else if(ch==='◯')cells+=cc(showAns?it.ans:'','circ a');
+    else cells+=cc(ch==='-'?'−':ch)}
+  if(it.type==='eq'&&it.x){const R=String(it.ans);cells+=cc('')+cc('x')+cc('=')+`<span class="cbox">${[...R].map(x=>cc(showAns?x:'','a')).join('')}</span>`}
+  return `${badge}<span class="crow">${cells}</span>`}
+/* высоты всех частей листа кратны клетке: тогда цифры каждого задания попадают в клетки */
+function snapCells(root){(root||document).querySelectorAll('.sheet').forEach(sh=>{const c=sh.clientWidth*CELL/100;if(!c)return;
+  sh.querySelectorAll('.sh-items > *').forEach(el=>{if(el.classList.contains('ci'))return;el.style.minHeight='';const h=el.getBoundingClientRect().height;el.style.minHeight=(Math.ceil(h/c-0.03)*c)+'px'})})}
 function sheetParts(items,{topic,level,seed,studentName,answers,design}){
   const D=design&&!answers&&design.lv<4?design:null;
   const kind=items[0]&&items[0].type;
@@ -1780,6 +1840,14 @@ function sheetParts(items,{topic,level,seed,studentName,answers,design}){
   /* на «Строгом» шрифт крупнее, поэтому три колонки только для коротких примеров */
   const fit=c=>maxLen>(tight?28:34)?'c1':maxLen>(D?13:11)&&c==='c3'?'c2':c;
   const cols=mixed?fit('c2'):kind==='word'?'c1':kind==='ch'?'c2':kind==='col'?(Math.max(...items.map(x=>String(fmt(x.ans)).length))>(tight?4:6)?'c3':'c4'):fit(kind==='expr'?'c2':kind==='own'?(ownLen>40?'c1':ownLen>16?'c2':'c3'):'c3');
+  /* сетка колонок в клетках: ширина задания и промежутки кратны клетке */
+  const padX=!D?7:D.lv===3?8:9;const avail=Math.floor((100-2*padX-2*CELL)/CELL);
+  const cellItems=items.filter(cellable);const k0=cellItems.length?Math.max(...cellItems.map(cellWidth)):0;
+  const nOld={c1:1,c2:2,c3:3,c4:4}[cols]||2;
+  const k=k0?Math.min(k0,avail):Math.floor((avail+2)/nOld)-2;
+  const nCols=Math.max(1,Math.floor((avail+2)/(k+2)));
+  const gridStyle=`grid-template-columns:repeat(${nCols},calc(var(--c) * ${k}))`;
+  const spanAll=it=>!cellable(it)&&(cellItems.length>0||it.type==='word');
   const title=answers?'Ответы':topic.t;
   const lvl=topic.sheet||topic.review?esc(topic.L[0].n):LV[level].toLowerCase()+' уровень';
   const newGroup=(it,i)=>{if(i===0)return true;const pr=items[i-1];return it.blk!=null?pr.blk!==it.blk:(pr.src!==it.src||pr.type!==it.type)};
@@ -1797,7 +1865,8 @@ function sheetParts(items,{topic,level,seed,studentName,answers,design}){
     const tt=TOPICS[it.src]?TOPICS[it.src].t:'';
     const gi=D&&D.lv<=2?stkSVG(D.theme.stk[(it.blk||0)%D.theme.stk.length],'gico'):'';
     const grp=mixed&&newGroup(it,i)?`<div class="grp">${gi}<b>${esc(it.lbl?it.lbl+' · '+tt:tt)}</b> ${esc(instr(it))}</div>`:'';
-    return grp+`<div class="it${it.type==='own'?' own':''}${it.type==='word'?' word':''}${it.type==='grid'?' grid':''}${it.type==='ch'||it.svg?' pic':''}"><span class="n">${i+1}</span>${itemHTML(it,answers)}</div>`});
+    if(cellable(it))return grp+`<div class="it ci">${cellItemHTML(it,i,answers)}</div>`;
+    return grp+`<div class="it${it.type==='own'?' own':''}${it.type==='word'?' word':''}${it.type==='grid'?' grid':''}${it.type==='ch'||it.svg?' pic':''}${spanAll(it)?' span':''}"><span class="n">${i+1}</span>${itemHTML(it,answers)}</div>`});
   if(D&&D.lv===1)pieces.push(`<div class="selfcheck"><span>Как я справился?</span>${FACES.map(f=>`<svg class="art" viewBox="0 0 40 40" aria-hidden="true">${f}</svg>`).join('')}</div>`);
   const cls=D?`lv${D.lv} fr-${D.frame}${D.bw?' bw':''}`:'';
   const pal=D?(D.bw?['#555','#999','#f2f2f2','#777']:D.pal):null;
@@ -1806,12 +1875,12 @@ function sheetParts(items,{topic,level,seed,studentName,answers,design}){
     if(D.lv<=2){const slots=D.lv===1?[[6,3.5,9],[94,3.5,9],[6,97,9],[94,97,9],[3.6,36,6],[96.4,52,6],[3.6,70,6],[96.4,84,6]]:[[94,3.5,7],[6,97,7],[94,97,7]];
       h+=shuffle(r,slots).slice(0,D.lv===1?5:2).map(([x,y,z])=>stkSVG(pick(r,D.theme.stk),'deco-stk',`left:${x}%;top:${y}%;width:${z}cqw;height:${z}cqw;transform:translate(-50%,-50%) rotate(${ri(r,-18,18)}deg)`)).join('')}
     return `<div class="deco" aria-hidden="true">${h}</div>`};
-  return{head,mini,cols,pieces,cls,style,deco,footL:esc(topic.section),footR:`Проверить онлайн: код варианта ${seed}`};
+  return{head,mini,cols,gridStyle,pieces,cls,style,deco,footL:esc(topic.section),footR:`Проверить онлайн: код варианта ${seed}`};
 }
 function sheetHTML(items,o){
   const s=sheetParts(items,o);
   return `<div class="sheet${o.answers?' ans':''} ${s.cls}" style="${s.style}">${s.deco(0)}<div class="sheet-in">${s.head}
-    <div class="sh-items ${s.cols}">${s.pieces.join('')}</div>
+    <div class="sh-items" style="${s.gridStyle}">${s.pieces.join('')}</div>
     <div class="sh-foot"><span>${s.footL}</span><span>${s.footR}</span></div></div></div>`;
 }
 /* раскладка по страницам A4: задания добавляются по одному, пока страница не переполнится */
@@ -1819,15 +1888,15 @@ function paginate(host,items,o){
   const s=sheetParts(items,o);host.innerHTML='';
   let pn=0;
   const newPage=first=>{const d=document.createElement('div');d.className='sheet page'+(o.answers?' ans':'')+' '+s.cls;d.setAttribute('style',s.style);
-    d.innerHTML=`${s.deco(pn++)}<div class="sheet-in">${first?s.head:s.mini}<div class="sh-items ${s.cols}"></div><div class="sh-foot"><span>${s.footL}</span><span class="pg"></span></div></div>`;
+    d.innerHTML=`${s.deco(pn++)}<div class="sheet-in">${first?s.head:s.mini}<div class="sh-items" style="${s.gridStyle}"></div><div class="sh-foot"><span>${s.footL}</span><span class="pg"></span></div></div>`;
     host.appendChild(d);return d};
   let page=newPage(true);
   const over=pg=>{const inner=pg.querySelector('.sheet-in');return inner.scrollHeight>pg.clientHeight+1};
   for(const html of s.pieces){
     let grid=page.querySelector('.sh-items');const before=grid.children.length;
-    grid.insertAdjacentHTML('beforeend',html);
+    grid.insertAdjacentHTML('beforeend',html);snapCells(page.parentNode);
     if(over(page)&&before>0){const n=grid.children.length-before;for(let k=0;k<n;k++)grid.lastElementChild.remove();
-      page=newPage(false);page.querySelector('.sh-items').insertAdjacentHTML('beforeend',html)}
+      page=newPage(false);page.querySelector('.sh-items').insertAdjacentHTML('beforeend',html);snapCells(page.parentNode)}
   }
   const pages=[...host.children];pages.forEach((pg,k)=>pg.querySelector('.pg').textContent=`Страница ${k+1} из ${pages.length} · ${s.footR}`);
   return pages.length;
@@ -1871,6 +1940,7 @@ function crumbs(){
 
 function render(){
   crumbs();
+  requestAnimationFrame(()=>snapCells(app));
   ({students:viewStudents,student:viewStudent,topic:viewTopic,print:viewPrint,player:viewPlayer,done:viewDone,builder:viewBuilder,works:viewWorks,work:viewWork,gallery:viewGallery,
     badlink:()=>{app.innerHTML='<div class="player"><div class="panel finish"><h1 style="font-size:22px">Ссылка не открывается</h1><p style="margin:0">Похоже, она скопирована не целиком. Попроси репетитора прислать её ещё раз.</p></div></div>'}})[V.screen]();
 }
@@ -2199,7 +2269,7 @@ function viewTopic(){
   const countPages=()=>{if(V.screen!=='topic'||!$('pg-hint'))return;const tmp=document.createElement('div');tmp.className='pg-measure';document.body.appendChild(tmp);
     const n=paginate(tmp,items,{topic:shown,level:shownLv,seed:V.seed,studentName:st.name,design:resolveDesign(st,V.seed)});tmp.remove();
     $('pg-hint').textContent=`при печати: ${pagesWord(n)} и ключ`};
-  countPages();if(document.fonts&&document.fonts.ready)document.fonts.ready.then(countPages);
+  snapCells(app);countPages();if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{snapCells(app);countPages()});
   app.querySelectorAll('.lvl').forEach(b=>b.onclick=()=>go({level:+b.dataset.l,seed:newSeed(),over:null,subName:null}));
   bindDesign(st);
   if($('subx'))$('subx').onclick=()=>go({over:null,subName:null,seed:newSeed()});
