@@ -1,0 +1,1041 @@
+<!doctype html>
+<html lang="ru">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Клетка для репетитора</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=Unbounded:wght@600;700&display=swap">
+<style>
+/* Layout: тетрадь в клетку. Рабочие панели лежат на сетке, красная ручка учителя — только для ошибок, ключа и «сейчас проходим». */
+:root{
+  --paper:#F7F9FC; --grid:#E3EAF4; --card:#FFFFFF; --line:#D5DDEA;
+  --ink:#1F2C55; --ink-2:#5B6888; --ink-3:#66718D;
+  --pen:#D5402F; --pen-soft:#FBE6E2;
+  --ink-soft:#E6ECF8;
+  --ok:#2C8A57; --ok-soft:#E1F2E8; --warn:#C98A12; --warn-soft:#FBF0D9; --bad:#D5402F; --bad-soft:#FBE6E2; --none:#B4BDD0;
+  --sheet:#FFFFFF; --sheet-ink:#1A1F2E; --sheet-line:#C9D2E2; --sheet-pen:#D5402F;
+  --f-ui:"Golos Text", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-disp:"Unbounded", "Golos Text", system-ui, sans-serif;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#11151F; --grid:#1A2130; --card:#171D2A; --line:#283247;
+  --ink:#E4E9F5; --ink-2:#A3AECA; --ink-3:#8E9AB6;
+  --pen:#FF7863; --pen-soft:#3A1F1D; --ink-soft:#222B40;
+  --ok:#5CC98C; --ok-soft:#173326; --warn:#E8B04A; --warn-soft:#33290F; --bad:#FF7863; --bad-soft:#3A1F1D; --none:#4A5470;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#11151F; --grid:#1A2130; --card:#171D2A; --line:#283247;
+  --ink:#E4E9F5; --ink-2:#A3AECA; --ink-3:#8E9AB6;
+  --pen:#FF7863; --pen-soft:#3A1F1D; --ink-soft:#222B40;
+  --ok:#5CC98C; --ok-soft:#173326; --warn:#E8B04A; --warn-soft:#33290F; --bad:#FF7863; --bad-soft:#3A1F1D; --none:#4A5470;
+  color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background-color:var(--paper);color:var(--ink);font-family:var(--f-ui);font-size:15px;line-height:1.5;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:22px 22px;min-height:100vh}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--card)}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(--pen);outline-offset:2px}
+h1,h2,h3{margin:0;text-wrap:balance}
+.num{font-variant-numeric:tabular-nums}
+
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--card);border-bottom:1px solid var(--line)}
+.top-in{max-width:1180px;margin:0 auto;display:flex;align-items:center;gap:18px;padding-block:12px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.logo{display:flex;align-items:center;gap:9px;font-family:var(--f-disp);font-weight:700;font-size:18px;letter-spacing:-.01em;background:none;border:0;padding:0}
+.logo i{width:18px;height:18px;border:2px solid var(--ink);display:grid;grid-template:1fr 1fr/1fr 1fr;border-radius:3px;overflow:hidden}
+.logo i b{border-right:1px solid var(--ink);border-bottom:1px solid var(--ink)}
+.logo i b:nth-child(4){background:var(--pen)}
+.crumbs{display:flex;align-items:center;gap:6px;color:var(--ink-2);font-size:14px;flex-wrap:wrap;min-width:0}
+.crumbs button{background:none;border:0;padding:4px 6px;border-radius:6px;color:var(--ink-2)}
+.crumbs button:hover{background:var(--ink-soft);color:var(--ink)}
+.crumbs .cur{color:var(--ink);font-weight:600;padding:4px 6px}
+.steps{margin-left:auto;display:flex;gap:4px;font-size:12px;color:var(--ink-3)}
+.steps span{padding:3px 8px;border-radius:99px;border:1px solid var(--line);white-space:nowrap}
+.steps span.on{border-color:var(--ink);color:var(--ink);font-weight:600}
+.steps span.done{background:var(--ink);border-color:var(--ink);color:var(--card)}
+
+.wrap{max-width:1180px;margin:0 auto;padding-block:28px 60px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:20px}
+.head h1{font-family:var(--f-disp);font-weight:600;font-size:clamp(22px,3vw,30px);letter-spacing:-.015em}
+.head p{margin:4px 0 0;color:var(--ink-2)}
+.label{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:var(--r);padding:10px 16px;font-weight:600;border:1.5px solid var(--ink);background:var(--card);color:var(--ink);min-height:42px}
+.btn:hover{background:var(--ink-soft)}
+.btn.primary{background:var(--ink);color:var(--card)}
+.btn.primary:hover{filter:brightness(1.15);background:var(--ink)}
+.btn.pen{border-color:var(--pen);color:var(--pen)}
+.btn.small{padding:6px 11px;min-height:34px;font-size:14px}
+.btn.quiet{border-color:var(--line)}
+
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px}
+
+/* Ученики */
+.students{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.st{text-align:left;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:12px;transition:border-color .15s,transform .15s}
+.st:hover{border-color:var(--ink);transform:translateY(-1px)}
+.st-top{display:flex;align-items:center;gap:12px}
+.ava{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font-weight:700;background:var(--ink-soft);color:var(--ink);flex:none}
+.st h3{font-size:17px;font-weight:600}
+.st .grade{color:var(--ink-2);font-size:14px}
+.st-now{border-top:1px dashed var(--line);padding-top:10px;display:flex;flex-direction:column;gap:2px}
+.st-now .t{font-weight:500}
+.st-now .t2{font-size:13.5px;color:var(--ink-2)}
+.st-foot{display:flex;gap:6px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;border-radius:99px;padding:3px 9px;background:var(--ink-soft);color:var(--ink-2);white-space:nowrap}
+.chip.ok{background:var(--ok-soft);color:var(--ok)} .chip.warn{background:var(--warn-soft);color:var(--warn)} .chip.bad{background:var(--bad-soft);color:var(--bad)}
+.add-card{border:1.5px dashed var(--line);background:transparent;border-radius:14px;color:var(--ink-2);min-height:170px;display:grid;place-items:center;font-weight:600}
+.add-card:hover{border-color:var(--ink);color:var(--ink)}
+
+/* Ученик */
+.cols{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:18px;align-items:start}
+.tabs{display:flex;gap:4px;padding:6px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.tab{border:0;background:none;padding:8px 14px;border-radius:8px;font-weight:600;color:var(--ink-2)}
+.tab.on{background:var(--ink-soft);color:var(--ink)}
+.sec{padding:14px 18px 6px}
+.sec h3{font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);font-weight:600;margin-bottom:6px}
+.topic{width:100%;display:flex;align-items:center;gap:12px;padding:11px 10px;border:0;background:none;border-radius:9px;text-align:left}
+.topic:hover{background:var(--ink-soft)}
+.topic .tt{flex:1;min-width:0}
+.topic .pct{font-size:13px;color:var(--ink-2)}
+.topic[disabled]{cursor:default;opacity:.55}
+.topic[disabled]:hover{background:none}
+.dot{width:11px;height:11px;border-radius:50%;flex:none;background:var(--none)}
+.dot.ok{background:var(--ok)} .dot.warn{background:var(--warn)} .dot.bad{background:var(--bad)}
+.now{font-size:11.5px;font-weight:700;color:var(--pen);border:1.5px solid var(--pen);border-radius:5px;padding:0 6px;margin-left:8px;white-space:nowrap;transform:rotate(-2deg);display:inline-block}
+.legend{display:flex;gap:14px;flex-wrap:wrap;padding:12px 18px 16px;color:var(--ink-2);font-size:13px;border-top:1px solid var(--line);margin-top:8px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.locked{margin:12px 18px;padding:12px 14px;border-radius:10px;background:var(--ink-soft);color:var(--ink-2);font-size:14px}
+.side{padding:16px 18px;display:flex;flex-direction:column;gap:12px}
+.side h2{font-size:16px;font-weight:600}
+.res{border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:4px}
+.res-top{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.res .t{font-weight:500;font-size:14px}
+.res .m{color:var(--ink-2);font-size:13px}
+.res details{font-size:13px}
+.res summary{cursor:pointer;color:var(--pen);font-weight:600}
+.mist{display:flex;flex-direction:column;gap:3px;margin-top:6px}
+.mist div{display:flex;justify-content:space-between;gap:8px}
+.mist s{color:var(--pen)}
+.empty{color:var(--ink-3);font-size:14px}
+
+/* Тема */
+.topic-grid{display:grid;grid-template-columns:minmax(0,380px) minmax(0,1fr);gap:22px;align-items:start}
+.levels{display:flex;flex-direction:column;gap:10px}
+.lvl{text-align:left;border:1.5px solid var(--line);background:var(--card);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+.lvl:hover{border-color:var(--ink-2)}
+.lvl.on{border-color:var(--ink);box-shadow:0 0 0 3px var(--ink-soft)}
+.lvl-top{display:flex;align-items:center;gap:10px}
+.lvl-mark{display:flex;gap:3px}
+.lvl-mark i{width:8px;height:14px;border-radius:2px;background:var(--line)}
+.lvl-mark i.f{background:var(--ink)}
+.lvl b{font-size:15px}
+.lvl .d{color:var(--ink-2);font-size:13.5px}
+.lvl .ex{font-size:13.5px;color:var(--ink);background:var(--ink-soft);border-radius:6px;padding:3px 8px;align-self:flex-start}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+.actions .btn{flex:1 1 auto}
+.hint{font-size:13px;color:var(--ink-3)}
+.tune{border-top:1px solid var(--line);padding-top:12px;margin-top:4px}
+.tune summary{cursor:pointer;font-weight:600;color:var(--ink-2);font-size:14px}
+.tune-row{display:flex;gap:10px;align-items:center;margin-top:10px;flex-wrap:wrap;font-size:14px}
+.tune-row input{width:84px;padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);font:inherit}
+
+/* Лист A4 */
+.sheet-wrap{display:flex;flex-direction:column;gap:10px;min-width:0}
+.sheet-bar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.sheet{container-type:inline-size;background:var(--sheet);color:var(--sheet-ink);aspect-ratio:210/297;width:100%;max-width:100%;border-radius:4px;
+  box-shadow:0 1px 2px rgba(20,30,60,.08),0 10px 30px rgba(20,30,60,.10);overflow:hidden;font-family:var(--f-ui)}
+.sheet-in{padding:6cqw 7cqw;display:flex;flex-direction:column;gap:3.4cqw;height:100%}
+.sh-head{display:grid;grid-template-columns:1fr auto;gap:1cqw 4cqw;font-size:2.3cqw;color:#4e5870}
+.sh-head .fld{border-bottom:.25cqw solid var(--sheet-line);padding-bottom:.6cqw;min-width:22cqw}
+.sh-head .fld b{color:var(--sheet-ink);font-weight:600}
+.sh-title{font-family:var(--f-disp);font-weight:600;font-size:4cqw;letter-spacing:-.01em;line-height:1.2}
+.sh-sub{font-size:2.3cqw;color:#4e5870;margin-top:-2cqw}
+.sh-items{display:grid;gap:3.2cqw 4cqw;font-size:3.5cqw;font-variant-numeric:tabular-nums}
+.sh-items.c3{grid-template-columns:repeat(3,1fr)}
+.sh-items.c2{grid-template-columns:repeat(2,1fr)}
+.sh-items.c4{grid-template-columns:repeat(4,1fr)}
+.it{display:flex;align-items:center;gap:1.2cqw;white-space:nowrap}
+.sh-items.c1{grid-template-columns:1fr}
+.grp{grid-column:1/-1;font-size:2.3cqw;color:#4e5870;border-bottom:.2cqw solid var(--sheet-line);padding-bottom:.6cqw;margin-top:1cqw}
+.grp b{color:var(--sheet-ink);font-weight:600;margin-right:1cqw}
+.it.own{white-space:normal;font-size:3.1cqw;align-items:baseline}
+.it.own .box{min-width:9cqw}
+.it .n{font-size:2.1cqw;color:#6b748c;width:3.2cqw}
+.box{display:inline-block;min-width:7cqw;height:5.2cqw;border:.3cqw solid #8a94ab;border-radius:.8cqw;vertical-align:middle;text-align:center;line-height:4.6cqw}
+.circ{display:inline-block;width:5cqw;height:5cqw;border:.3cqw solid #8a94ab;border-radius:50%;text-align:center;line-height:4.4cqw}
+.ans .box,.ans .circ{border-color:var(--sheet-pen);color:var(--sheet-pen);font-weight:600}
+.col{display:inline-grid;grid-template-columns:auto auto;column-gap:1cqw;font-size:3.6cqw;line-height:1.25;justify-items:end}
+.col .op{grid-row:1/3;align-self:center;justify-self:start}
+.col .bar{grid-column:1/3;border-top:.3cqw solid var(--sheet-ink);width:100%;margin:.4cqw 0}
+.col .r{grid-column:2;min-width:9cqw;height:5cqw;border:.3cqw dashed #b3bbcc;border-radius:.6cqw;color:var(--sheet-pen);font-weight:600;text-align:right;padding-right:.6cqw}
+.sh-foot{margin-top:auto;display:flex;justify-content:space-between;font-size:2cqw;color:#6b748c;border-top:.2cqw solid var(--sheet-line);padding-top:1.4cqw}
+.key-stamp{color:var(--sheet-pen);border:.35cqw solid var(--sheet-pen);border-radius:1cqw;padding:.3cqw 1.6cqw;font-weight:700;transform:rotate(-3deg);display:inline-block;font-size:2.6cqw}
+
+/* Маршрут */
+.route{padding:16px 18px 18px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:12px}
+.route-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.route-head h2{font-size:16px;font-weight:600}
+.route-row{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr);gap:8px;position:relative}
+.rt{text-align:left;border:1.5px solid var(--line);background:var(--card);border-radius:11px;padding:10px 12px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.rt:hover{border-color:var(--ink-2)}
+.rt.cur{border:2px solid var(--ink);background:var(--ink-soft)}
+.rt.cur .rt-t{font-size:16px}
+.rt.prev{opacity:.8}
+.rt.empty{border-style:dashed;color:var(--ink-3)}
+.rt .label{font-size:11px}
+.rt-t{font-weight:600;font-size:14px;line-height:1.3;overflow-wrap:break-word;hyphens:auto;-webkit-hyphens:auto}
+.rt-m{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--ink-2)}
+.route-act{display:flex;gap:8px;flex-wrap:wrap}
+.btn[disabled]{opacity:.45;cursor:default}
+.fullprog>summary{cursor:pointer;padding:14px 18px;font-weight:600;color:var(--ink-2)}
+.fullprog>summary:hover{color:var(--ink)}
+@media (max-width:700px){.route-row{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.rt.cur{grid-column:1/-1;order:-1}}
+
+/* Конструктор */
+.builder{padding:18px;display:flex;flex-direction:column;gap:16px}
+.bgroup{display:flex;flex-direction:column;gap:16px}
+.builder input[type=text],.builder textarea{padding:10px 12px;border:1px solid var(--line);border-radius:9px;font:inherit;background:var(--card);color:var(--ink);width:100%}
+.builder textarea{resize:vertical;min-height:150px;line-height:1.55}
+.builder input[type=number]{padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);font:inherit;width:96px}
+.kinds{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px}
+.kinds button{text-align:left;border:1.5px solid var(--line);background:var(--card);border-radius:10px;padding:8px 10px;display:flex;flex-direction:column;gap:2px}
+.kinds button span{font-size:12.5px;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.kinds button.on{border-color:var(--ink);box-shadow:0 0 0 3px var(--ink-soft)}
+.checks.row{flex-direction:row;flex-wrap:wrap;gap:6px 16px}
+.berr{color:var(--pen);font-size:14px;font-weight:500}
+.berr:empty{display:none}
+.pv-empty{border:1.5px dashed var(--line);border-radius:12px;padding:40px 20px;text-align:center;color:var(--ink-3)}
+.tools{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 18px 0}
+.tools label{display:flex;gap:8px;align-items:center;font-size:14px;color:var(--ink-2)}
+.gradehead{padding:16px 18px 0;font-family:var(--f-disp);font-weight:600;font-size:15px}
+.mine{font-size:11px;font-weight:700;color:var(--ink-2);border:1px solid var(--line);border-radius:5px;padding:0 5px;margin-left:8px}
+.txt{display:flex;gap:8px}
+.txt input{flex:1;min-width:0;font:inherit;font-size:22px;font-weight:600;padding:12px 14px;border:2px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink)}
+.task.long{font-size:clamp(20px,4.5vw,26px)}
+
+/* Печать */
+.print-pages{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:22px}
+.note{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--pen);border-radius:10px;padding:12px 16px;color:var(--ink-2);font-size:14px;margin-bottom:18px}
+
+/* Модалка */
+.veil{position:fixed;inset:0;background:rgba(10,15,30,.45);display:grid;place-items:center;z-index:20;
+  padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.modal{background:var(--card);border-radius:16px;width:min(480px,100%);padding:22px;display:flex;flex-direction:column;gap:14px;max-height:100%;overflow:auto}
+.modal h2{font-family:var(--f-disp);font-weight:600;font-size:20px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field select{padding:10px 12px;border:1px solid var(--line);border-radius:9px;font:inherit;background:var(--card);color:var(--ink);max-width:100%}
+.field input[type=text]{padding:10px 12px;border:1px solid var(--line);border-radius:9px;font:inherit;background:var(--card);color:var(--ink)}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{border:1.5px solid var(--line);background:var(--card);border-radius:9px;padding:8px 14px;font-weight:600;min-width:46px}
+.seg button.on{border-color:var(--ink);background:var(--ink);color:var(--card)}
+.checks{display:flex;flex-direction:column;gap:6px}
+.checks label{display:flex;gap:9px;align-items:center}
+.code{font-family:var(--f-disp);font-size:26px;letter-spacing:.06em;text-align:center;padding:14px;border:2px dashed var(--ink);border-radius:12px}
+.linkbox{display:flex;gap:8px}
+.linkbox input{flex:1;min-width:0;padding:9px 11px;border:1px solid var(--line);border-radius:9px;font:inherit;font-size:14px;background:var(--ink-soft);color:var(--ink)}
+.modal-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+
+/* Ученик решает */
+.player{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+.pl-instr{margin:0;text-align:center;font-weight:600;color:var(--ink-2)}
+.pl-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.pl-who{font-size:14px;color:var(--ink-2)}
+.score{display:flex;gap:14px;font-weight:700}
+.score span{display:flex;flex-direction:column;align-items:center;line-height:1.1}
+.score small{font-size:11px;font-weight:600;color:var(--ink-3);text-transform:uppercase;letter-spacing:.05em}
+.prog{height:8px;background:var(--line);border-radius:99px;overflow:hidden}
+.prog i{display:block;height:100%;background:var(--ink);transition:width .25s}
+.task{background:var(--card);border:1px solid var(--line);border-radius:16px;min-height:170px;display:grid;place-items:center;padding:20px;font-size:clamp(30px,7vw,44px);font-weight:700;font-variant-numeric:tabular-nums;text-align:center;position:relative}
+.task .q{display:flex;align-items:center;justify-content:center;gap:.3em;flex-wrap:wrap}
+.task .slot{display:inline-block;min-width:1.6em;padding:0 .2em;border:3px dashed var(--ink-3);border-radius:10px;color:var(--ink)}
+.task .slot.filled{border-style:solid;border-color:var(--ink)}
+.task .col{font-size:inherit;column-gap:.25em}
+.task .col .bar{border-top:3px solid var(--ink)}
+.task .col .r{height:1.2em;min-width:2.5em;border:3px dashed var(--ink-3);border-radius:8px;color:var(--ink);font-weight:700;padding-right:.15em}
+.fb{position:absolute;bottom:10px;left:0;right:0;font-size:15px;font-weight:700}
+.fb.ok{color:var(--ok)} .fb.bad{color:var(--pen)}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.pad button{border:1.5px solid var(--line);background:var(--card);border-radius:12px;font-size:24px;font-weight:700;min-height:58px}
+.pad button:hover{border-color:var(--ink)}
+.pad .go{background:var(--ink);color:var(--card);border-color:var(--ink);font-size:18px}
+.pad .del{color:var(--pen);font-size:17px}
+.signs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.signs button{border:1.5px solid var(--line);background:var(--card);border-radius:12px;font-size:34px;font-weight:700;min-height:72px}
+.signs button:hover{border-color:var(--ink)}
+.finish{text-align:center;display:flex;flex-direction:column;gap:12px;align-items:center;padding:28px 20px}
+.big{font-family:var(--f-disp);font-size:52px;font-weight:700;line-height:1}
+.sent{display:inline-flex;gap:8px;align-items:center;background:var(--ok-soft);color:var(--ok);font-weight:600;border-radius:99px;padding:6px 14px;font-size:14px}
+.demo-bar{background:var(--pen-soft);color:var(--pen);font-size:13px;font-weight:600;text-align:center;padding:6px;border-radius:8px}
+.foot{margin-top:40px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:var(--ink-3);font-size:13px}
+.foot button{background:none;border:0;color:var(--ink-2);text-decoration:underline;padding:0}
+
+@media (max-width:900px){.cols,.topic-grid{grid-template-columns:minmax(0,1fr)}.steps{display:none}}
+@media (max-width:600px){.top-in{flex-wrap:wrap;gap:4px 12px;padding-block:10px}.crumbs{flex-basis:100%;font-size:13px;gap:2px}.crumbs button,.crumbs .cur{padding:2px 4px}
+  .crumbs .cur{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}.wrap{padding-block:20px 48px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<header class="top"><div class="top-in">
+  <button class="logo" id="home" aria-label="К списку учеников"><i><b></b><b></b><b></b><b></b></i>Клетка</button>
+  <nav class="crumbs" id="crumbs" aria-label="Где вы"></nav>
+  <div class="steps" id="steps" aria-label="Задание за 3 клика"></div>
+</div></header>
+<main class="wrap" id="app" lang="ru"></main>
+<div id="modal-root"></div>
+
+<script>
+/* ---------- генератор случайных чисел с seed ---------- */
+function rng(seed){let a=seed>>>0;return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const ri=(r,lo,hi)=>lo+Math.floor(r()*(hi-lo+1));
+const pick=(r,arr)=>arr[Math.floor(r()*arr.length)];
+const fmt=n=>typeof n==='number'?(Math.abs(n)>=10000?n.toLocaleString('ru-RU'):String(n)):n;
+const TR={а:'a',б:'b',в:'v',г:'g',д:'d',е:'e',ё:'e',ж:'zh',з:'z',и:'i',й:'y',к:'k',л:'l',м:'m',н:'n',о:'o',п:'p',р:'r',с:'s',т:'t',у:'u',ф:'f',х:'h',ц:'ts',ч:'ch',ш:'sh',щ:'sch',ъ:'',ы:'y',ь:'',э:'e',ю:'yu',я:'ya'};
+const translit=s=>s.toLowerCase().split('').map(c=>TR[c]??c).join('').replace(/[^a-z0-9]/g,'')||'UCHENIK';
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+/* ---------- движок «Арифметика» ---------- */
+const digitsOf=n=>String(n).split('').reverse().map(Number);
+function carries(a,b){const x=digitsOf(a),y=digitsOf(b);let c=0,any=false;for(let i=0;i<Math.max(x.length,y.length);i++){const s=(x[i]||0)+(y[i]||0)+c;c=s>=10?1:0;if(c)any=true}return any}
+function borrows(a,b){const x=digitsOf(a),y=digitsOf(b);for(let i=0;i<y.length;i++)if((x[i]||0)<y[i])return true;return false}
+function onesCarry(a,b){return a%10+b%10>=10}
+function onesBorrow(a,b){return a%10<b%10}
+
+function pair(op,p,r,t){
+  const hiEff=p.ramp===false?p.hi:Math.max(p.lo,Math.round(p.lo+(p.hi-p.lo)*(0.45+0.55*t)));
+  const minOp=p.digits?10**(p.digits-1):1;
+  const step=p.round?10:1;
+  const carryFn=p.column?(op==='+'?carries:borrows):(op==='+'?onesCarry:onesBorrow);
+  for(let k=0;k<400;k++){
+    let a,b,res;
+    if(op==='+'){
+      res=ri(r,Math.ceil(Math.max(p.lo,2*minOp)/step),Math.floor(hiEff/step))*step;
+      a=ri(r,Math.ceil(minOp/step),Math.floor((res-minOp)/step))*step;b=res-a;
+      if(a<minOp||b<minOp)continue;
+      if(p.lo>=11&&!p.digits&&res<11)continue;
+    }else if(op==='-'){
+      a=ri(r,Math.ceil(Math.max(p.lo,2*minOp)/step),Math.floor(hiEff/step))*step;
+      b=ri(r,Math.ceil(minOp/step),Math.floor((a-(p.allowZero?0:minOp))/step))*step;res=a-b;
+      if(b<minOp||res<0)continue;
+    }else if(op==='×'){
+      if(p.table){a=ri(r,p.table[0],p.table[1]);b=ri(r,2,9);if(r()<.5)[a,b]=[b,a]}
+      else if(p.extra==='round'){a=ri(r,2,9)*10;b=ri(r,2,9);if(r()<.5)[a,b]=[b,a]}
+      else if(p.extra==='2x1'){a=ri(r,12,49);b=ri(r,2,9);if(a%10===0||a*b>400)continue}
+      else{a=ri(r,p.aLo,Math.max(p.aLo,Math.round(p.aLo+(p.aHi-p.aLo)*(0.4+0.6*t))));b=ri(r,2,9)}
+      res=a*b;
+    }else{
+      if(p.table){b=ri(r,p.table[0],p.table[1]);const q=ri(r,2,9);a=b*q;res=q}
+      else if(p.extra==='round'){b=ri(r,2,9);const q=ri(r,2,9)*10;a=b*q;res=q}
+      else{b=ri(r,2,9);const q=ri(r,11,30);a=b*q;res=q;if(a>99&&!p.big)continue}
+    }
+    if((op==='+'||op==='-')&&p.carry){const c=carryFn(a,b);if(p.carry==='with'&&!c)continue;if(p.carry==='without'&&c)continue}
+    return{a,b,op,res};
+  }
+  return{a:2,b:3,op:'+',res:5,fallback:true};
+}
+
+/* выражения для порядка действий: свой маленький разбор, деление только нацело */
+function evalExpr(s){
+  const tok=s.match(/\d+|[+\-×÷()]/g);let i=0;
+  function prim(){const x=tok[i++];if(x==='('){const v=sum();i++;return v}return Number(x)}
+  function prod(){let v=prim();while(tok[i]==='×'||tok[i]==='÷'){const o=tok[i++],w=prim();if(o==='×')v*=w;else{if(w===0||v%w)return NaN;v/=w}}return v}
+  function sum(){let v=prod();while(tok[i]==='+'||tok[i]==='-'){const o=tok[i++],w=prod();v=o==='+'?v+w:v-w;if(v<0)return NaN}return v}
+  const v=sum();return Number.isInteger(v)&&v>=0?v:NaN;
+}
+function orderItem(p,r){
+  for(let k=0;k<500;k++){
+    const pat=pick(r,p.patterns);
+    const s=pat.replace(/[a-d]/g,()=>String(p.small?ri(r,2,9):ri(r,2,p.max||60)));
+    const s2=s.replace(/(\d+)\s*÷\s*(\d+)/g,(m,x,y)=>`${Number(y)*ri(r,2,9)} ÷ ${y}`);
+    const v=evalExpr(s2.replace(/\s/g,''));
+    if(!isNaN(v)&&v<=(p.cap||100))return{type:'expr',q:s2.replace(/-/g,'−'),ans:v};
+  }
+  return{type:'expr',q:'2 + 3 × 4',ans:14};
+}
+
+function generate(p,seed){
+  const r=rng(seed);const items=[];const n=p.count;
+  if(p.kind==='mix'){
+    items.failed=0;
+    p.parts.forEach((pt,k)=>{const sub=generate({...pt.p,count:p.per},seed+k*7919);items.failed+=sub.failed||0;sub.forEach(x=>{x.src=pt.tid;items.push(x)})});
+    return items;
+  }
+  if(p.kind==='own'){
+    const arr=p.list.slice();for(let i=arr.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]]}
+    return arr.slice(0,Math.min(n,arr.length)).map(x=>({type:'own',q:x.q,ans:x.ans}));
+  }
+  items.failed=0;
+  for(let i=0;i<n;i++){
+    const t=n>1?i/(n-1):1;
+    if(p.kind==='order'){items.push(orderItem(p,r));continue}
+    if(p.kind==='compare'){
+      if(p.cmp==='num'){const x=ri(r,p.lo,p.hi);let y=r()<.2?x:x+ri(r,-3,3);y=Math.max(0,y);items.push({type:'cmp',left:String(x),right:String(y),ans:x>y?'>':x<y?'<':'='})}
+      else{const e=pair(pick(r,p.ops),p,r,t);if(e.fallback)items.failed++;const right=Math.max(0,r()<.25?e.res:e.res+pick(r,[-2,-1,1,2]));
+        items.push({type:'cmp',left:`${fmt(e.a)} ${sym(e.op)} ${fmt(e.b)}`,right:fmt(right),ans:e.res>right?'>':e.res<right?'<':'='})}
+      continue}
+    const e=pair(pick(r,p.ops),p,r,t);if(e.fallback)items.failed++;
+    if(p.kind==='column'){items.push({type:'col',a:e.a,b:e.b,op:e.op,ans:e.res});continue}
+    let miss='res';
+    if(p.missing==='any')miss=pick(r,['a','b','res']);else if(p.missing)miss=p.missing;
+    if(p.missing==='ab')miss=pick(r,['a','b']);
+    const ans=miss==='a'?e.a:miss==='b'?e.b:e.res;
+    items.push({type:'eq',a:e.a,b:e.b,op:e.op,res:e.res,miss,ans,x:!!p.xvar});
+  }
+  return items;
+}
+const sym=o=>o==='-'?'−':o;
+
+/* ---------- программа ---------- */
+const LV=['Базовый','Средний','Сложный'];
+const MATH={
+ 1:[{s:'Числа от 1 до 10',topics:[
+   {id:'g1-sum10',t:'Сложение и вычитание в пределах 10',L:[
+     {n:'Только сложение',d:'Сумма до 10, без нуля',p:{kind:'examples',ops:['+'],lo:2,hi:10,count:12}},
+     {n:'Сложение и вычитание',d:'Вперемешку, нарастает к концу листа',p:{kind:'examples',ops:['+','-'],lo:2,hi:10,count:15}},
+     {n:'Пропуск в любом месте',d:'3 + □ = 7 и □ − 2 = 5',p:{kind:'examples',ops:['+','-'],lo:2,hi:10,count:15,missing:'any'}}]},
+   {id:'g1-compose',t:'Состав числа',L:[
+     {n:'Числа до 5',d:'2 + □ = 5',p:{kind:'examples',ops:['+'],lo:2,hi:5,count:12,missing:'b',ramp:false}},
+     {n:'Числа до 10',d:'4 + □ = 9',p:{kind:'examples',ops:['+'],lo:3,hi:10,count:15,missing:'ab'}},
+     {n:'Состав через вычитание',d:'□ + 3 = 8 и 8 − □ = 3',p:{kind:'examples',ops:['+','-'],lo:3,hi:10,count:15,missing:'ab'}}]},
+   {id:'g1-compare',t:'Сравнение чисел',L:[
+     {n:'Два числа',d:'7 ◯ 4',p:{kind:'compare',cmp:'num',lo:0,hi:10,count:15}},
+     {n:'Пример и число',d:'3 + 4 ◯ 6',p:{kind:'compare',cmp:'expr',ops:['+'],lo:2,hi:10,count:12}},
+     {n:'Пример с вычитанием',d:'9 − 3 ◯ 5',p:{kind:'compare',cmp:'expr',ops:['+','-'],lo:2,hi:10,count:15}}]}]},
+  {s:'Числа от 11 до 20',topics:[
+   {id:'g1-nocarry',t:'Без перехода через десяток',L:[
+     {n:'Сложение',d:'12 + 5',p:{kind:'examples',ops:['+'],lo:11,hi:19,count:12,carry:'without'}},
+     {n:'Сложение и вычитание',d:'17 − 4',p:{kind:'examples',ops:['+','-'],lo:11,hi:19,count:15,carry:'without'}},
+     {n:'Пропуск в любом месте',d:'13 + □ = 18',p:{kind:'examples',ops:['+','-'],lo:11,hi:19,count:15,carry:'without',missing:'any'}}]},
+   {id:'g1-carry',t:'С переходом через десяток',L:[
+     {n:'Сложение',d:'8 + 5',p:{kind:'examples',ops:['+'],lo:11,hi:18,count:12,carry:'with'}},
+     {n:'Сложение и вычитание',d:'14 − 6',p:{kind:'examples',ops:['+','-'],lo:11,hi:18,count:15,carry:'with'}},
+     {n:'Пропуск в любом месте',d:'7 + □ = 13',p:{kind:'examples',ops:['+','-'],lo:11,hi:18,count:15,carry:'with',missing:'any'}}]}]}],
+ 2:[{s:'Числа от 1 до 100',topics:[
+   {id:'g2-tens',t:'Круглые десятки',L:[
+     {n:'Сложение',d:'30 + 40',p:{kind:'examples',ops:['+'],lo:20,hi:100,count:12,round:true}},
+     {n:'Сложение и вычитание',d:'90 − 60',p:{kind:'examples',ops:['+','-'],lo:20,hi:100,count:15,round:true}},
+     {n:'Пропуск в любом месте',d:'50 + □ = 80',p:{kind:'examples',ops:['+','-'],lo:20,hi:100,count:15,round:true,missing:'any'}}]},
+   {id:'g2-add',t:'Сложение и вычитание двузначных',L:[
+     {n:'Без перехода через десяток',d:'34 + 25',p:{kind:'examples',ops:['+','-'],lo:20,hi:99,count:15,digits:2,carry:'without'}},
+     {n:'С переходом через десяток',d:'38 + 47',p:{kind:'examples',ops:['+','-'],lo:20,hi:99,count:15,digits:2,carry:'with'}},
+     {n:'Вперемешку с пропуском',d:'□ − 18 = 35',p:{kind:'examples',ops:['+','-'],lo:20,hi:99,count:15,digits:2,missing:'any'}}]},
+   {id:'g2-column',t:'Сложение и вычитание в столбик',L:[
+     {n:'Сложение без перехода',d:'столбик, 42 + 35',p:{kind:'column',ops:['+'],lo:30,hi:99,count:12,digits:2,carry:'without',column:true}},
+     {n:'Сложение с переходом',d:'столбик, 47 + 38',p:{kind:'column',ops:['+'],lo:30,hi:99,count:12,digits:2,carry:'with',column:true}},
+     {n:'Сложение и вычитание',d:'столбик, 82 − 47',p:{kind:'column',ops:['+','-'],lo:30,hi:99,count:12,digits:2,column:true}}]}]},
+  {s:'Умножение и деление',topics:[
+   {id:'g2-mult23',t:'Умножение и деление на 2 и 3',L:[
+     {n:'Умножение на 2',d:'2 × 7',p:{kind:'examples',ops:['×'],table:[2,2],count:12}},
+     {n:'Умножение на 2 и 3',d:'3 × 6',p:{kind:'examples',ops:['×'],table:[2,3],count:15}},
+     {n:'Умножение и деление',d:'18 ÷ 3',p:{kind:'examples',ops:['×','÷'],table:[2,3],count:15}}]},
+   {id:'g2-order',t:'Порядок действий со скобками',L:[
+     {n:'Два действия',d:'45 − 12 + 8',p:{kind:'order',patterns:['a + b - c','a - b + c','a + b + c'],max:50,cap:100,count:10}},
+     {n:'Скобки',d:'60 − (25 + 13)',p:{kind:'order',patterns:['a - (b + c)','(a - b) + c','a + (b - c)','(a + b) - c'],max:60,cap:100,count:10}},
+     {n:'Скобки и умножение',d:'(4 + 3) × 2',p:{kind:'order',patterns:['(a + b) × c','a × b + c','a + b × c'],small:true,cap:100,count:10}}]}]}],
+ 3:[{s:'Табличное умножение и деление',topics:[
+   {id:'g3-table',t:'Таблица умножения',L:[
+     {n:'Таблица на 2–5',d:'4 × 7',p:{kind:'examples',ops:['×'],table:[2,5],count:15}},
+     {n:'Вся таблица',d:'8 × 7',p:{kind:'examples',ops:['×'],table:[2,9],count:18}},
+     {n:'Окошки',d:'6 × □ = 42',p:{kind:'examples',ops:['×'],table:[2,9],count:18,missing:'ab'}}]},
+   {id:'g3-div',t:'Табличное деление',L:[
+     {n:'Деление на 2–5',d:'35 ÷ 5',p:{kind:'examples',ops:['÷'],table:[2,5],count:15}},
+     {n:'Деление на 2–9',d:'56 ÷ 8',p:{kind:'examples',ops:['÷'],table:[2,9],count:18}},
+     {n:'Умножение и деление с окошком',d:'□ ÷ 7 = 6',p:{kind:'examples',ops:['×','÷'],table:[2,9],count:18,missing:'any'}}]},
+   {id:'g3-order',t:'Порядок действий',L:[
+     {n:'Без скобок',d:'24 + 6 × 3',p:{kind:'order',patterns:['a + b × c','a × b - c','a ÷ b + c','a - b × c'],small:true,cap:100,count:10}},
+     {n:'Со скобками',d:'(15 − 7) × 4',p:{kind:'order',patterns:['(a + b) × c','(a - b) × c','a × (b + c)','(a + b) ÷ c'],small:true,cap:150,count:10}},
+     {n:'Три действия',d:'5 × 6 + 24 ÷ 4',p:{kind:'order',patterns:['a × b + c ÷ d','a × b - c × d','(a + b) × c - d','a ÷ b + c × d'],small:true,cap:150,count:10}}]}]},
+  {s:'Числа до 1000',topics:[
+   {id:'g3-extra',t:'Внетабличное умножение и деление',L:[
+     {n:'Круглые числа',d:'40 × 3 и 80 ÷ 4',p:{kind:'examples',ops:['×','÷'],extra:'round',count:15}},
+     {n:'Двузначное на однозначное',d:'23 × 4',p:{kind:'examples',ops:['×'],extra:'2x1',count:15}},
+     {n:'Деление двузначного',d:'84 ÷ 4',p:{kind:'examples',ops:['÷'],extra:'div',count:15}}]},
+   {id:'g3-column',t:'Трёхзначные числа в столбик',L:[
+     {n:'Сложение',d:'столбик, 356 + 248',p:{kind:'column',ops:['+'],lo:200,hi:999,count:12,digits:3,column:true}},
+     {n:'Вычитание',d:'столбик, 704 − 358',p:{kind:'column',ops:['-'],lo:200,hi:999,count:12,digits:3,column:true}},
+     {n:'Вперемешку с переходом',d:'столбик, 617 − 289',p:{kind:'column',ops:['+','-'],lo:200,hi:999,count:12,digits:3,carry:'with',column:true}}]}]}],
+ 4:[{s:'Многозначные числа',topics:[
+   {id:'g4-column',t:'Сложение и вычитание многозначных',L:[
+     {n:'Четырёхзначные',d:'столбик, 4 527 + 3 186',p:{kind:'column',ops:['+','-'],lo:2000,hi:9999,count:12,digits:4,column:true}},
+     {n:'Пятизначные',d:'столбик, 35 270 − 18 455',p:{kind:'column',ops:['+','-'],lo:20000,hi:99999,count:12,digits:4,column:true}},
+     {n:'С переходом через разряд',d:'столбик, 60 004 − 27 368',p:{kind:'column',ops:['+','-'],lo:20000,hi:99999,count:12,digits:4,carry:'with',column:true}}]},
+   {id:'g4-mul',t:'Умножение на однозначное число',L:[
+     {n:'Двузначное число',d:'столбик, 47 × 6',p:{kind:'column',ops:['×'],aLo:12,aHi:99,count:12}},
+     {n:'Трёхзначное число',d:'столбик, 386 × 7',p:{kind:'column',ops:['×'],aLo:102,aHi:999,count:12}},
+     {n:'Четырёхзначное число',d:'столбик, 2 408 × 9',p:{kind:'column',ops:['×'],aLo:1002,aHi:9999,count:12}}]},
+   {id:'g4-eq',t:'Уравнения',L:[
+     {n:'Сложение и вычитание',d:'x + 35 = 82',p:{kind:'examples',ops:['+','-'],lo:20,hi:99,digits:2,count:12,missing:'ab',xvar:true}},
+     {n:'Умножение и деление',d:'x × 7 = 56',p:{kind:'examples',ops:['×','÷'],table:[2,9],count:12,missing:'ab',xvar:true}},
+     {n:'Большие числа',d:'x − 248 = 517',p:{kind:'examples',ops:['+','-'],lo:200,hi:999,digits:3,count:12,missing:'ab',xvar:true}}]},
+   {id:'g4-order',t:'Порядок действий',L:[
+     {n:'Два действия',d:'120 − 8 × 9',p:{kind:'order',patterns:['a - b × c','a + b ÷ c','a × b + c'],max:99,cap:500,count:10}},
+     {n:'Скобки',d:'(56 + 24) ÷ 8',p:{kind:'order',patterns:['(a + b) × c','(a - b) ÷ c','a × (b - c)'],small:true,cap:300,count:10}},
+     {n:'Три действия',d:'7 × 8 − 36 ÷ 4 + 5',p:{kind:'order',patterns:['a × b - c ÷ d','(a + b) × c - d','a ÷ b × c + d'],small:true,cap:300,count:10}}]}]}]
+};
+const RUS={
+ 1:[{s:'Письмо и орфография',topics:['Сочетания жи–ши, ча–ща, чу–щу','Заглавная буква в именах','Перенос слов','Звонкие и глухие согласные']}],
+ 2:[{s:'Орфография',topics:['Безударные гласные в корне','Парные согласные на конце слова','Разделительный мягкий знак','Словарные слова 2 класса']}],
+ 3:[{s:'Состав слова и части речи',topics:['Корень, приставка, суффикс','Непроизносимые согласные','Род и число имён существительных','Словарные слова 3 класса']}],
+ 4:[{s:'Части речи',topics:['Падежи имён существительных','Безударные окончания существительных','Спряжение глаголов','Словарные слова 4 класса']}]
+};
+const SUBJ={math:'Математика',rus:'Русский язык'};
+function allTopics(){const m={};for(const g in MATH)for(const sec of MATH[g])for(const t of sec.topics)m[t.id]={...t,grade:+g,section:sec.s,subject:'math'};
+  for(const c of (S&&S.customTopics)||[])m[c.id]=c;return m}
+let TOPICS={};
+const MY='Мои темы';
+const parseList=text=>{const list=[];let bad=0;for(const raw of text.split('\n')){const line=raw.trim();if(!line)continue;const k=line.lastIndexOf('=');
+  const q=k>0?line.slice(0,k).trim():'',ans=k>0?line.slice(k+1).trim():'';if(q&&ans)list.push({q,ans});else bad++}return{list,bad}};
+function exampleTopics(){return[
+  {id:'c-perim',custom:true,subject:'math',grade:2,section:MY,t:'Периметр: свои задачи',L:[{n:'Свой список',d:'6 задач, порядок перемешивается',p:{kind:'own',count:6,list:parseList(
+    'Периметр квадрата со стороной 5 см (в см) = 20\nПериметр прямоугольника 6 см на 4 см (в см) = 20\nСторона квадрата с периметром 24 см (в см) = 6\nПериметр треугольника со сторонами 3, 4 и 5 см = 12\nПериметр прямоугольника 10 см на 2 см (в см) = 24\nПериметр квадрата со стороной 9 см (в см) = 36').list}}]},
+  {id:'c-slovar',custom:true,subject:'rus',grade:2,section:MY,t:'Словарные слова: вставь букву',L:[{n:'Свой список',d:'8 слов, порядок перемешивается',p:{kind:'own',count:8,list:parseList(
+    'м□локо = о\nк□рова = о\nв□рона = о\nс□бака = о\nп□нал = е\nт□традь = е\nк□рандаш = а\nз□яц = а').list}}]}]}
+
+/* ---------- состояние ---------- */
+const KEY='kletka-proto-v1';
+function demoState(){
+  const now=Date.now(),d=86400000;
+  return{
+    students:[
+      {id:'s1',name:'Маша Котова',grade:2,subjects:['math','rus'],current:'g2-add',currentRus:'c-slovar'},
+      {id:'s2',name:'Тимур Ахмедов',grade:3,subjects:['math'],current:'g3-table'},
+      {id:'s3',name:'Алиса Лебедева',grade:1,subjects:['math','rus'],current:'g1-carry'},
+      {id:'s4',name:'Егор Смирнов',grade:4,subjects:['math'],current:'g4-mul'}],
+    attempts:[
+      {id:'a1',studentId:'s1',topicId:'g2-tens',level:1,correct:15,total:15,time:212,date:now-6*d,mistakes:[]},
+      {id:'a2',studentId:'s1',topicId:'g2-add',level:0,correct:13,total:15,time:340,date:now-3*d,mistakes:[{q:'47 − 23 = □',given:'14',ans:'24'},{q:'52 + 36 = □',given:'78',ans:'88'}]},
+      {id:'a3',studentId:'s1',topicId:'g2-column',level:0,correct:7,total:12,time:410,date:now-1*d,mistakes:[{q:'45 + 32',given:'67',ans:'77'},{q:'61 + 27',given:'98',ans:'88'}]},
+      {id:'a4',studentId:'s2',topicId:'g3-table',level:1,correct:11,total:18,time:290,date:now-2*d,mistakes:[{q:'7 × 8 = □',given:'54',ans:'56'},{q:'6 × 9 = □',given:'56',ans:'54'},{q:'8 × 6 = □',given:'46',ans:'48'}]},
+      {id:'a5',studentId:'s3',topicId:'g1-sum10',level:2,correct:15,total:15,time:180,date:now-5*d,mistakes:[]},
+      {id:'a6',studentId:'s3',topicId:'g1-compose',level:1,correct:14,total:15,time:205,date:now-4*d,mistakes:[{q:'□ + 6 = 9',given:'2',ans:'3'}]},
+      {id:'a7',studentId:'s4',topicId:'g4-column',level:1,correct:12,total:12,time:520,date:now-7*d,mistakes:[]}],
+    assignments:[{code:'EGOR-3071',studentId:'s4',topicId:'g4-mul',level:1,seed:3071,date:now-1*d,status:'выдано'}],
+    customTopics:exampleTopics()
+  };
+}
+let S;
+try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+if(!S||!S.students)S=demoState();
+if(!S.customTopics)S.customTopics=exampleTopics();
+TOPICS=allTopics();
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+
+let V={screen:'students'};
+const newSeed=()=>1000+Math.floor(Math.random()*9000);
+
+function mastery(sid,tid){
+  const a=S.attempts.filter(x=>x.studentId===sid&&x.topicId===tid).sort((x,y)=>y.date-x.date)[0];
+  if(!a)return{cls:'',pct:null};
+  const pct=Math.round(a.correct/a.total*100);
+  return{cls:pct>=85?'ok':pct>=60?'warn':'bad',pct};
+}
+const student=id=>S.students.find(s=>s.id===id);
+const initials=n=>n.split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase();
+const ago=t=>{const d=Math.floor((Date.now()-t)/86400000);return d<=0?'сегодня':d===1?'вчера':d<5?d+' дня назад':d+' дней назад'};
+const gradeWord=g=>g+' класс';
+
+/* ---------- отрисовка листа ---------- */
+function itemHTML(it,showAns){
+  if(it.type==='own'){const box=`<span class="box">${showAns?esc(it.ans):''}</span>`;
+    return it.q.includes('□')?`<span>${esc(it.q).replace('□',box)}</span>`:`<span>${esc(it.q)} = ${box}</span>`}
+  if(it.type==='col'){
+    return `<div class="col"><span class="op">${sym(it.op)}</span><span>${fmt(it.a)}</span><span>${fmt(it.b)}</span><span class="bar"></span><span class="r">${showAns?fmt(it.ans):''}</span></div>`}
+  if(it.type==='cmp')return `<span>${it.left}</span><span class="circ">${showAns?it.ans:''}</span><span>${it.right}</span>`;
+  if(it.type==='expr')return `<span>${it.q} =</span><span class="box">${showAns?fmt(it.ans):''}</span>`;
+  const blank=v=>showAns?`<span class="box">${fmt(v)}</span>`:(it.x?'<b>x</b>':'<span class="box"></span>');
+  const A=it.miss==='a'?blank(it.a):fmt(it.a),B=it.miss==='b'?blank(it.b):fmt(it.b),R=it.miss==='res'?blank(it.res):fmt(it.res);
+  return `<span>${A}</span><span>${sym(it.op)}</span><span>${B}</span><span>=</span><span>${R}</span>`;
+}
+function instr(it){
+  if(!it)return'';
+  if(it.type==='cmp')return'Поставь знак >, < или = в кружок.';
+  if(it.type==='col')return'Реши в столбик.';
+  if(it.type==='expr')return'Найди значение выражения, соблюдай порядок действий.';
+  if(it.type==='own')return'Впиши ответ.';
+  if(it.x)return'Найди x.';
+  return'Впиши ответ в окошко.';
+}
+function sheetHTML(items,{topic,level,seed,studentName,answers}){
+  const kind=items[0]&&items[0].type;
+  const longOwn=kind==='own'&&items.some(x=>x.q.length>16);
+  const mixed=new Set(items.map(x=>x.type)).size>1||items.some(x=>x.src);
+  const cols=mixed?'c2':kind==='col'?'c4':kind==='expr'?'c2':kind==='own'?(longOwn?'c1':'c3'):'c3';
+  const title=answers?'Ответы':topic.t;
+  return `<div class="sheet${answers?' ans':''}"><div class="sheet-in">
+    <div class="sh-head"><div class="fld">Имя: <b>${esc(studentName||'')}</b></div><div class="fld">Дата: </div>
+    <div class="fld">${gradeWord(topic.grade)} · ${LV[level].toLowerCase()} уровень</div><div class="fld">Вариант <b class="num">${seed}</b></div></div>
+    <div><div class="sh-title">${answers?'<span class="key-stamp">Ключ</span> ':''}${esc(title)}</div></div>
+    <div class="sh-sub">${answers?esc(topic.t):esc(topic.L[level].n)+'. '+(mixed?'Задания из нескольких пройденных тем, у каждой своё указание.':esc(instr(items[0])))}</div>
+    <div class="sh-items ${cols}">${items.map((it,i)=>{
+      const head=mixed&&(i===0||items[i-1].src!==it.src||items[i-1].type!==it.type)
+        ?`<div class="grp"><b>${esc(TOPICS[it.src]?TOPICS[it.src].t:'')}</b> ${esc(instr(it))}</div>`:'';
+      return head+`<div class="it${it.type==='own'?' own':''}"><span class="n">${i+1}</span>${itemHTML(it,answers)}</div>`}).join('')}</div>
+    <div class="sh-foot"><span>${esc(topic.section)}</span><span>Проверить онлайн: код варианта ${seed}</span></div>
+  </div></div>`;
+}
+
+/* ---------- экраны ---------- */
+const app=document.getElementById('app');
+function go(v){V={...V,...v};render();window.scrollTo({top:0})}
+
+function crumbs(){
+  const c=document.getElementById('crumbs');const parts=[];
+  const st=V.studentId&&student(V.studentId);
+  if(V.screen==='students'){parts.push('<span class="cur">Ученики</span>')}
+  else{parts.push('<button data-go="students">Ученики</button>')}
+  if(st&&V.screen!=='students'){parts.push('›');parts.push(V.screen==='student'?`<span class="cur">${esc(st.name)}</span>`:`<button data-go="student">${esc(st.name)}</button>`)}
+  if(V.topicId&&['topic','print'].includes(V.screen)){parts.push('›');parts.push(V.screen==='topic'?`<span class="cur">${esc(TOPICS[V.topicId].t)}</span>`:`<button data-go="topic">${esc(TOPICS[V.topicId].t)}</button>`)}
+  if(V.screen==='print'){parts.push('›');parts.push('<span class="cur">Печать</span>')}
+  if(V.screen==='builder'){parts.push('›');parts.push('<span class="cur">Своя тема</span>')}
+  if(['player','done'].includes(V.screen)){parts.length=0;parts.push('<span class="cur">Экран ученика</span>')}
+  c.innerHTML=parts.join(' ');
+  c.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>go({screen:b.dataset.go}));
+  const steps=document.getElementById('steps');
+  const n={students:0,student:1,topic:2,print:3}[V.screen];
+  if(n===undefined){steps.innerHTML='';return}
+  steps.innerHTML=['Ученик','Тема','Печать или ссылка'].map((s,i)=>`<span class="${i<n?'done':i===n?'on':''}">${i+1}. ${s}</span>`).join('');
+}
+
+function render(){
+  crumbs();
+  ({students:viewStudents,student:viewStudent,topic:viewTopic,print:viewPrint,player:viewPlayer,done:viewDone,builder:viewBuilder})[V.screen]();
+}
+
+/* текущая тема хранится отдельно по каждому предмету */
+const CK=subj=>subj==='rus'?'currentRus':'current';
+const curOf=(st,subj)=>st[CK(subj)];
+
+function viewStudents(){
+  const cards=S.students.map(s=>{
+    const cur=TOPICS[s.current];const m=cur?mastery(s.id,cur.id):{cls:''};
+    const rp=s.subjects.includes('rus')?trackPos(s,'rus'):null;const rus=rp&&rp.i>=0?TOPICS[rp.tr[rp.i]]:null;
+    const hw=S.assignments.filter(a=>a.studentId===s.id&&a.status==='выдано').length;
+    const last=S.attempts.filter(a=>a.studentId===s.id).sort((a,b)=>b.date-a.date)[0];
+    return `<button class="st" data-id="${s.id}">
+      <div class="st-top"><div class="ava">${esc(initials(s.name))}</div><div><h3>${esc(s.name)}</h3><div class="grade">${gradeWord(s.grade)} · ${s.subjects.map(x=>SUBJ[x]).join(', ')}</div></div></div>
+      <div class="st-now"><span class="label">Сейчас проходим</span><span class="t">${cur?esc(cur.t):'Тема не выбрана'}</span>${rus?`<span class="t2">Русский: ${esc(rus.t)}</span>`:''}</div>
+      <div class="st-foot">${m.pct!=null?`<span class="chip ${m.cls}">${m.pct}% в последней работе</span>`:'<span class="chip">ещё не решал эту тему</span>'}
+      ${hw?`<span class="chip warn">ждём домашку: ${hw}</span>`:''}${last?`<span class="chip">активность ${ago(last.date)}</span>`:''}</div>
+    </button>`}).join('');
+  app.innerHTML=`<div class="head"><div><h1>Ученики</h1><p>У каждого ученика свой маршрут по программе 1–4 класса.</p></div></div>
+    <div class="students">${cards}<button class="add-card" id="add">+ Добавить ученика</button></div>
+    <div class="foot"><span>Прототип. Данные хранятся только в этом браузере.</span><button id="reset">Вернуть демо-данные</button></div>`;
+  app.querySelectorAll('.st').forEach(b=>b.onclick=()=>go({screen:'student',studentId:b.dataset.id,subject:'math',confirmStDel:false}));
+  document.getElementById('add').onclick=addStudentModal;
+  document.getElementById('reset').onclick=()=>{S=demoState();TOPICS=allTopics();save();render()};
+}
+
+/* порядок тем: по математике встроенная программа 1–4 класса, свои темы встают в конец своего класса;
+   по русскому пока только свои темы, по классам */
+function trackIds(subj='math'){const ids=[];for(const g of [1,2,3,4]){if(subj==='math')for(const sec of MATH[g])for(const t of sec.topics)ids.push(t.id);
+  for(const c of S.customTopics)if(c.subject===subj&&c.grade===g&&!c.review)ids.push(c.id)}return ids}
+function trackPos(st,subj='math'){const tr=trackIds(subj);if(!tr.length)return{tr,i:-1};let i=tr.indexOf(curOf(st,subj));
+  if(i<0){if(subj==='math')i=tr.indexOf(MATH[st.grade][0].topics[0].id);else{i=tr.findIndex(id=>TOPICS[id].grade>=st.grade);if(i<0)i=0}}
+  return{tr,i}}
+function makeReview(st,subj='math'){
+  const {tr,i}=trackPos(st,subj);const prev=tr.slice(0,i);
+  const weak=prev.map(id=>({id,m:mastery(st.id,id)})).filter(x=>x.m.pct!=null&&x.m.pct<85).sort((a,b)=>a.m.pct-b.m.pct).map(x=>x.id);
+  const pick=weak.slice(0,3);
+  for(let k=prev.length-1;k>=0&&pick.length<3;k--)if(!pick.includes(prev[k]))pick.push(prev[k]);
+  pick.sort((a,b)=>tr.indexOf(a)-tr.indexOf(b));
+  const parts=pick.map(id=>{const t=TOPICS[id];return{tid:id,p:t.L[Math.min(1,t.L.length-1)].p}});
+  const rv={id:'rev-'+Date.now(),review:true,custom:true,subject:subj,grade:st.grade,section:'Повторение',t:'Повторение пройденного',
+    L:[{n:`Микс из ${pick.length} ${pick.length===1?'темы':'тем'}`,d:pick.map(id=>TOPICS[id].t).join(' · '),p:{kind:'mix',parts,per:4,count:parts.length*4}}]};
+  S.customTopics=S.customTopics.filter(c=>!(c.review&&c.forStudent===st.id&&!S.assignments.some(a=>a.topicId===c.id)));
+  rv.forStudent=st.id;S.customTopics.push(rv);TOPICS=allTopics();save();openTopic(rv.id);
+}
+function deleteStudent(st){
+  S.students=S.students.filter(s=>s.id!==st.id);
+  S.attempts=S.attempts.filter(a=>a.studentId!==st.id);
+  S.assignments=S.assignments.filter(a=>a.studentId!==st.id);
+  S.customTopics=S.customTopics.filter(c=>c.forStudent!==st.id);
+  TOPICS=allTopics();save();go({screen:'students',studentId:null,confirmStDel:false});
+}
+function viewStudent(){
+  const st=student(V.studentId);const subj=st.subjects.includes(V.subject)?V.subject:st.subjects[0];V.subject=subj;
+  const tabs=st.subjects.map(x=>`<button class="tab${x===subj?' on':''}" data-s="${x}">${SUBJ[x]}</button>`).join('');
+  const row=t=>{const m=mastery(st.id,t.id);
+    return `<button class="topic" data-t="${t.id}"><span class="dot ${m.cls}"></span><span class="tt">${esc(t.t)}${t.custom?'<span class="mine">моя</span>':''}${curOf(st,t.subject)===t.id?'<span class="now">сейчас</span>':''}</span><span class="pct num">${m.pct!=null?m.pct+'%':''}</span></button>`};
+  const mine=g=>S.customTopics.filter(c=>c.subject===subj&&c.grade===g&&!c.review);
+  const pos=trackPos(st,subj);let route;
+  if(pos.i>=0){
+    const {tr,i}=pos;
+    const tile=(id,label,cls)=>{if(!id)return `<div class="rt empty ${cls}"><span class="label">${label}</span><span class="rt-t">${cls==='prev'?'Это первая тема':label==='Потом'?'':subj==='math'?'Дальше программы 1–4 класса пока нет':'Дальше тем нет, добавьте свою'}</span></div>`;
+      const t=TOPICS[id],m=mastery(st.id,id);
+      return `<button class="rt ${cls}" data-t="${id}"><span class="label">${label}</span><span class="rt-t">${esc(t.t)}</span><span class="rt-m"><i class="dot ${m.cls}"></i>${gradeWord(t.grade)}${m.pct!=null?' · '+m.pct+'%':''}</span></button>`};
+    const cur=TOPICS[tr[i]],ahead=cur.grade-st.grade,mc=mastery(st.id,cur.id);
+    route=`<section class="route" aria-label="Маршрут ученика">
+      <div class="route-head"><h2>Маршрут · ${SUBJ[subj]}</h2>${ahead>0?`<span class="chip ok">впереди школы на ${ahead} ${ahead===1?'класс':'класса'}</span>`:ahead<0?`<span class="chip warn">догоняем: тема ${gradeWord(cur.grade)}а</span>`:''}</div>
+      <div class="route-row">${tile(tr[i-1],'Пройдено','prev')}${tile(tr[i],'Сейчас','cur')}${tile(tr[i+1],'Дальше','next')}${tile(tr[i+2],'Потом','next')}</div>
+      <div class="route-act"><button class="btn primary" id="r-task">Задание по текущей теме</button>
+        <button class="btn" id="r-next"${tr[i+1]?'':' disabled'}>Тема пройдена, дальше →</button>
+        <button class="btn pen" id="r-rev"${i>0?'':' disabled'}>Повторить пройденное</button></div>
+      ${tr[i+1]&&mc.pct!=null&&mc.pct<85?`<p class="hint" style="margin:0">По текущей теме последний результат ${mc.pct}%. Перейти дальше можно, но тему стоит закрепить.</p>`:''}
+    </section>`;
+  }else{
+    route=`<section class="route" aria-label="Маршрут ученика"><div class="route-head"><h2>Маршрут · ${SUBJ[subj]}</h2></div>
+      <p class="empty" style="margin:0">Тем по русскому пока нет. Создайте свою тему списком, например «м□локо = о», и она станет первой в маршруте.</p>
+      <div class="route-act"><button class="btn primary" id="r-new">+ Своя тема по русскому</button></div></section>`;
+  }
+  const grades=subj==='math'?[1,2,3,4]:[1,2,3,4].filter(g=>g===st.grade||mine(g).length);
+  let prog=`<div class="tools"><span class="hint">${subj==='math'?'Порядок тем общий для 1–4 класса. Откройте любую тему, чтобы дать задание или сделать её текущей.':'Ваши темы по русскому идут в маршруте по классам. Откройте тему, чтобы дать задание или сделать её текущей.'}</span><button class="btn small" id="newt">+ Своя тема</button></div>`;
+  for(const g of grades){
+    prog+=`<div class="gradehead">${gradeWord(g)}${g===st.grade?' · класс ученика':''}</div>`;
+    const my=mine(g);
+    if(subj==='math')prog+=MATH[g].map(sec=>`<div class="sec"><h3>${esc(sec.s)}</h3>${sec.topics.map(t=>row(TOPICS[t.id])).join('')}</div>`).join('');
+    if(my.length)prog+=`<div class="sec"><h3>${MY}</h3>${my.map(row).join('')}</div>`;
+    if(subj!=='math'&&g===st.grade)prog+=`<div class="locked">Генератор «Вставь букву» появится в следующей версии, его темы встанут в этот же маршрут.</div>`+
+      RUS[g].map(sec=>`<div class="sec"><h3>${esc(sec.s)} · скоро</h3>${sec.topics.map(t=>`<button class="topic" disabled><span class="dot"></span><span class="tt">${esc(t)}</span></button>`).join('')}</div>`).join('');
+  }
+  prog+=`<div class="legend"><span><i class="dot ok"></i>освоено, от 85%</span><span><i class="dot warn"></i>в работе</span><span><i class="dot bad"></i>западает, меньше 60%</span><span><i class="dot"></i>не решали</span></div>`;
+  const body=route+(subj==='math'?`<details class="fullprog" id="fp"${V.progOpen?' open':''}><summary>Вся программа 1–4 класса</summary>${prog}</details>`:prog);
+  const atts=S.attempts.filter(a=>a.studentId===st.id&&TOPICS[a.topicId]).sort((a,b)=>b.date-a.date);
+  const hws=S.assignments.filter(a=>a.studentId===st.id&&a.status==='выдано'&&TOPICS[a.topicId]);
+  const side=`<div class="panel side"><h2>Работы и домашки</h2>
+    ${hws.map(h=>`<div class="res"><div class="res-top"><span class="t">${esc(TOPICS[h.topicId].t)}</span><span class="chip warn">ждём</span></div>
+      <span class="m">Код <b>${esc(h.code)}</b> · выдано ${ago(h.date)}</span>
+      <div><button class="btn small quiet" data-open="${esc(h.code)}">Открыть как ученик</button></div></div>`).join('')}
+    ${atts.map(a=>{const p=Math.round(a.correct/a.total*100);const c=p>=85?'ok':p>=60?'warn':'bad';
+      return `<div class="res"><div class="res-top"><span class="t">${esc(TOPICS[a.topicId].t)}</span><span class="chip ${c} num">${a.correct} из ${a.total}</span></div>
+      <span class="m">${LV[a.level]} уровень · ${Math.floor(a.time/60)} мин ${a.time%60} с · ${ago(a.date)}${a.via?' · из повторения':''}${a.answered!=null&&a.answered<a.total?` · <b style="color:var(--pen)">сдано досрочно, решено ${a.answered}</b>`:''}</span>
+      ${a.mistakes.length?`<details><summary>Ошибки: ${a.mistakes.length}</summary><div class="mist">${a.mistakes.map(m=>`<div><span>${esc(m.q)}</span><span>ответ <s>${esc(m.given)}</s> → ${esc(m.ans)}</span></div>`).join('')}</div></details>`:''}</div>`}).join('')}
+    ${!hws.length&&!atts.length?'<p class="empty">Пока пусто. Выдайте первое задание по ссылке: результат появится здесь.</p>':''}</div>`;
+  app.innerHTML=`<div class="head"><div><h1>${esc(st.name)}</h1><p>${gradeWord(st.grade)} в школе. Маршрут показывает, где ученик сейчас по программе.</p></div>
+    <button class="btn small ${V.confirmStDel?'pen':'quiet'}" id="delst">${V.confirmStDel?'Нажмите ещё раз: ученик и его работы удалятся':'Удалить ученика'}</button></div>
+    <div class="cols"><div class="panel"><div class="tabs">${tabs}</div>${body}</div>${side}</div>`;
+  app.querySelectorAll('.tab').forEach(b=>b.onclick=()=>go({subject:b.dataset.s,confirmStDel:false}));
+  app.querySelectorAll('.topic[data-t],.rt[data-t]').forEach(b=>b.onclick=()=>openTopic(b.dataset.t));
+  const $=id=>document.getElementById(id);
+  if($('r-task'))$('r-task').onclick=()=>openTopic(pos.tr[pos.i]);
+  if($('r-next'))$('r-next').onclick=()=>{st[CK(subj)]=pos.tr[pos.i+1];save();render()};
+  if($('r-rev'))$('r-rev').onclick=()=>makeReview(st,subj);
+  if($('r-new'))$('r-new').onclick=openBuilder;
+  if($('fp'))$('fp').ontoggle=e=>{V.progOpen=e.target.open};
+  $('newt').onclick=openBuilder;
+  $('delst').onclick=()=>{if(!V.confirmStDel){V.confirmStDel=true;render();return}deleteStudent(st)};
+  app.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>{const h=S.assignments.find(x=>x.code===b.dataset.open);startPlayer(h)});
+}
+function openTopic(tid){const m=mastery(V.studentId,tid);const lv=m.cls==='ok'?2:m.cls==='bad'?0:1;
+  go({screen:'topic',topicId:tid,level:Math.min(lv,TOPICS[tid].L.length-1),seed:newSeed(),over:null,confirmDel:false})}
+
+function curParams(){const t=TOPICS[V.topicId];return{...t.L[V.level].p,...(V.over||{})}}
+
+function viewTopic(){
+  const st=student(V.studentId);const t=TOPICS[V.topicId];
+  const items=generate(curParams(),V.seed);
+  const m=mastery(st.id,t.id);
+  const lv=t.L.map((L,i)=>`<button class="lvl${i===V.level?' on':''}" data-l="${i}">
+     <div class="lvl-top"><span class="lvl-mark">${[0,1,2].map(k=>`<i class="${k<=i?'f':''}"></i>`).join('')}</span><b>${LV[i]}: ${esc(L.n)}</b></div>
+     <span class="d">${esc(L.d)} · ${L.p.count} заданий</span></button>`).join('');
+  const p=curParams();const tunable=p.kind!=='order'&&!p.table&&!p.extra&&p.ops&&!p.aLo&&p.cmp!=='num';
+  app.innerHTML=`<div class="head"><div><span class="label">${gradeWord(t.grade)} · ${esc(t.section)}</span><h1>${esc(t.t)}</h1>
+    <p>${m.pct!=null?`Последняя работа: ${m.pct}%. `:''}Уровень подобран по прошлым результатам, лист уже собран.</p></div></div>
+    <div class="topic-grid">
+      <div class="levels">${lv}
+        <div class="actions"><button class="btn primary" id="link">Ссылка ученику</button><button class="btn" id="print">Печать</button></div>
+        <button class="btn quiet" id="again">Другой вариант</button>
+        ${tunable?`<details class="tune"><summary>Настроить точнее</summary>
+          <div class="tune-row"><label for="lo">Числа от</label><input id="lo" type="number" value="${p.lo}"><label for="hi">до</label><input id="hi" type="number" value="${p.hi}"></div>
+          <div class="tune-row"><label for="cnt">Сколько заданий</label><input id="cnt" type="number" min="4" max="24" value="${p.count}"><button class="btn small" id="apply">Применить</button></div></details>`:''}
+        <p class="hint">Печатный лист и онлайн-версия по ссылке совпадают задание в задание: вариант ${V.seed}.</p>
+        <div class="actions">${t.review?'<span class="hint">Сначала берутся темы с худшим результатом, потом последние пройденные. Результат запишется в каждую из этих тем.</span>':curOf(st,t.subject)===t.id?'<span class="hint">Это текущая тема ученика.</span>':'<button class="btn small quiet" id="setcur">Сделать текущей темой</button>'}
+          ${t.custom&&!t.review?`<button class="btn small ${V.confirmDel?'pen':'quiet'}" id="del">${V.confirmDel?'Нажмите ещё раз, чтобы удалить':'Удалить тему'}</button>`:''}</div>
+      </div>
+      <div class="sheet-wrap"><div class="sheet-bar"><span class="label">Предпросмотр листа A4</span><span class="hint">ключ с ответами печатается вторым листом</span></div>
+        ${sheetHTML(items,{topic:t,level:V.level,seed:V.seed,studentName:st.name})}</div>
+    </div>`;
+  app.querySelectorAll('.lvl').forEach(b=>b.onclick=()=>go({level:+b.dataset.l,seed:newSeed(),over:null}));
+  document.getElementById('again').onclick=()=>{V.seed=newSeed();render()};
+  document.getElementById('print').onclick=()=>go({screen:'print'});
+  document.getElementById('link').onclick=linkModal;
+  const sc=document.getElementById('setcur');if(sc)sc.onclick=()=>{st[CK(t.subject)]=t.id;save();render()};
+  const dl=document.getElementById('del');
+  if(dl)dl.onclick=()=>{
+    if(!V.confirmDel){V.confirmDel=true;render();return}
+    S.customTopics=S.customTopics.filter(c=>c.id!==t.id);
+    for(const s of S.students){if(s.current===t.id)s.current=MATH[s.grade][0].topics[0].id;if(s.currentRus===t.id)delete s.currentRus}
+    S.attempts=S.attempts.filter(a=>a.topicId!==t.id);S.assignments=S.assignments.filter(a=>a.topicId!==t.id);
+    TOPICS=allTopics();save();go({screen:'student',topicId:null,confirmDel:false,subject:t.subject});
+  };
+  const ap=document.getElementById('apply');
+  if(ap)ap.onclick=()=>{const lo=+document.getElementById('lo').value,hi=+document.getElementById('hi').value,c=+document.getElementById('cnt').value;
+    if(!(hi>lo&&lo>=0&&c>=4&&c<=24))return;V.over={lo,hi,count:c};V.seed=newSeed();render()};
+}
+
+function viewPrint(){
+  const st=student(V.studentId);const t=TOPICS[V.topicId];const items=generate(curParams(),V.seed);
+  const o={topic:t,level:V.level,seed:V.seed,studentName:st.name};
+  app.innerHTML=`<div class="head"><div><h1>Печать</h1><p>${esc(t.t)} · ${LV[V.level].toLowerCase()} уровень · вариант ${V.seed}</p></div>
+    <button class="btn" id="back">← К теме</button></div>
+    <div class="note">В рабочей версии здесь будет кнопка «Скачать PDF». В прототипе показаны оба листа в том виде, в каком они уйдут на принтер: задание и ключ для вас.</div>
+    <div class="print-pages">${sheetHTML(items,o)}${sheetHTML(items,{...o,answers:true})}</div>`;
+  document.getElementById('back').onclick=()=>go({screen:'topic'});
+}
+
+/* ---------- конструктор своей темы ---------- */
+const KINDS=[['examples','Примеры','7 + 5 = □'],['window','Окошки','7 + □ = 12'],['compare','Сравнение','7 + 5 ◯ 11'],['column','Столбик','47 + 38 в столбик'],['eq','Уравнения','x + 5 = 12']];
+const OPS=[['+','сложение'],['-','вычитание'],['×','умножение'],['÷','деление']];
+function openBuilder(){
+  const st=student(V.studentId);const subject=V.subject||'math';
+  V.b={mode:subject==='rus'?'own':'gen',name:'',grade:st.grade,subject,kind:'examples',ops:['+','-'],lo:1,hi:20,carry:'any',count:12,text:''};
+  go({screen:'builder',seed:newSeed()});
+}
+function buildTopic(b){
+  const base={id:'c'+Date.now(),custom:true,subject:b.subject,grade:b.grade,section:MY,t:b.name.trim()||'Новая тема'};
+  if(b.mode==='own'){const {list}=parseList(b.text);const c=Math.min(b.count,list.length);
+    return{...base,L:[{n:'Свой список',d:`${list.length} заданий, порядок перемешивается`,p:{kind:'own',count:c,list}}]}}
+  let ops=b.ops.slice();
+  const p={kind:b.kind==='column'?'column':b.kind==='compare'?'compare':'examples',ops,lo:b.lo,hi:b.hi,count:b.count};
+  if(b.kind==='compare')p.cmp='expr';
+  if(b.kind==='window')p.missing='any';
+  if(b.kind==='eq'){p.missing='ab';p.xvar=true}
+  if(b.carry!=='any')p.carry=b.carry;
+  if(b.kind==='column'){p.column=true;p.ops=ops.filter(o=>o!=='÷');if(p.ops.includes('×')){p.ops=['×'];p.aLo=Math.max(2,b.lo);p.aHi=Math.max(b.lo+1,b.hi)}}
+  else if(ops.some(o=>o==='×'||o==='÷'))p.table=[2,9];
+  const mid=Math.max(b.lo+2,Math.round(b.lo+(b.hi-b.lo)/2));
+  const harder=b.kind==='examples'?{...p,missing:'any'}:{...p,count:Math.min(24,p.count+4)};
+  return{...base,L:[
+    {n:'Попроще',d:p.table&&!ops.some(o=>o==='+'||o==='-')?'таблица на 2–5':`числа до ${fmt(mid)}`,p:{...p,hi:mid,aHi:p.aHi?Math.max(p.aLo+1,Math.round((p.aLo+p.aHi)/2)):undefined,table:p.table?[2,5]:undefined}},
+    {n:'Как задано',d:p.table&&!ops.some(o=>o==='+'||o==='-')?'вся таблица':`числа от ${fmt(b.lo)} до ${fmt(b.hi)}`,p},
+    {n:'Посложнее',d:b.kind==='examples'?'пропуск в любом месте':`длиннее лист: ${harder.count} заданий`,p:harder}]};
+}
+function builderErrors(b){
+  const e=[];
+  if(b.mode==='own'){const {list,bad}=parseList(b.text);
+    if(list.length<2)e.push('Добавьте хотя бы 2 строки в формате «вопрос = ответ».');
+    if(bad)e.push(`Строк без знака «=» или без ответа: ${bad}. Они не попадут в тему.`);}
+  else{
+    if(!b.ops.length)e.push('Выберите хотя бы одно действие.');
+    if(b.kind==='column'&&b.ops.length&&b.ops.every(o=>o==='÷'))e.push('Столбиком можно складывать, вычитать и умножать. Деление в столбик появится позже.');
+    if(!(Number.isFinite(b.lo)&&Number.isFinite(b.hi))||b.lo<0||b.hi<=b.lo+1)e.push('Число «до» должно быть хотя бы на 2 больше, чем «от».');
+    if(b.hi>100000)e.push('Слишком большие числа: максимум 100 000.');
+  }
+  if(!(b.count>=4&&b.count<=24))e.push('Заданий на листе: от 4 до 24.');
+  return e;
+}
+function viewBuilder(){
+  const st=student(V.studentId);const b=V.b;
+  const seg=(id,arr,val)=>`<div class="seg" id="${id}">${arr.map(([v,l])=>`<button type="button" data-v="${v}" class="${String(v)===String(val)?'on':''}">${l}</button>`).join('')}</div>`;
+  app.innerHTML=`<div class="head"><div><span class="label">${SUBJ[b.subject]}</span><h1>Своя тема</h1>
+    <p>Тема появится в разделе «${MY}» у всех учеников выбранного класса.</p></div></div>
+  <div class="topic-grid"><form class="panel builder" id="bf" novalidate>
+    <div class="field"><label class="label" for="b-name">Название</label><input id="b-name" type="text" autocomplete="off" placeholder="${b.subject==='rus'?'Например, Словарные слова: овощи':'Например, Сложение в пределах 50'}" value="${esc(b.name)}"></div>
+    <div class="field"><span class="label">Класс</span>${seg('b-grade',[[1,'1'],[2,'2'],[3,'3'],[4,'4']],b.grade)}</div>
+    ${b.subject==='math'?`<div class="field"><span class="label">Откуда задания</span>${seg('b-mode',[['gen','Генератор'],['own','Свой список']],b.mode)}</div>`:''}
+    <div id="gen-f" class="bgroup"${b.mode!=='gen'?' hidden':''}>
+      <div class="field"><span class="label">Вид задания</span><div class="kinds" id="b-kind">${KINDS.map(([v,l,ex])=>`<button type="button" data-v="${v}" class="${v===b.kind?'on':''}"><b>${l}</b><span>${ex}</span></button>`).join('')}</div></div>
+      <div class="field"><span class="label">Действия</span><div class="checks row">${OPS.map(([o,l])=>`<label><input type="checkbox" data-op="${o}" ${b.ops.includes(o)?'checked':''}> ${sym(o)} ${l}</label>`).join('')}</div>
+        <span class="hint">Умножение и деление берутся из таблицы умножения. В столбике умножается число из диапазона на однозначное.</span></div>
+      <div class="field"><span class="label">Числа</span><div class="tune-row" style="margin:0"><label for="b-lo">от</label><input id="b-lo" type="number" min="0" value="${b.lo}"><label for="b-hi">до</label><input id="b-hi" type="number" min="2" value="${b.hi}"></div></div>
+      <div class="field"><span class="label">Переход через десяток</span>${seg('b-carry',[['any','Неважно'],['without','Без перехода'],['with','С переходом']],b.carry)}</div>
+    </div>
+    <div id="own-f" class="bgroup"${b.mode!=='own'?' hidden':''}>
+      <div class="field"><label class="label" for="b-text">Задания, по одному на строку: вопрос = ответ</label>
+        <textarea id="b-text" rows="8" placeholder="${b.subject==='rus'?'м□локо = о\nк□рова = о\nп□нал = е':'Периметр квадрата со стороной 5 см = 20\n12 дм = □ см = 120\nСколько минут в часе = 60'}">${esc(b.text)}</textarea>
+        <span class="hint" id="b-parsed"></span><span class="hint">Знак □ показывает, где ученик впишет ответ. Без □ окошко встанет после вопроса. Ответ может быть числом или словом.</span></div>
+    </div>
+    <div class="field"><label class="label" for="b-count">Заданий на листе</label><input id="b-count" type="number" min="4" max="24" value="${b.count}" style="width:90px"></div>
+    <div class="berr" id="b-err" role="alert"></div>
+    <div class="modal-actions"><button type="button" class="btn quiet" id="b-cancel">Отмена</button><button type="submit" class="btn primary">Сохранить тему</button></div>
+  </form>
+  <div class="sheet-wrap"><div class="sheet-bar"><span class="label">Предпросмотр листа</span><button type="button" class="btn small quiet" id="b-reseed">Другой вариант</button></div>
+    <div id="b-warn"></div><div id="b-prev"></div></div></div>`;
+  const $=id=>document.getElementById(id);
+  const segBind=(id,key,num)=>$(id)&&$(id).querySelectorAll('button').forEach(btn=>btn.onclick=()=>{b[key]=num?+btn.dataset.v:btn.dataset.v;$(id).querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===btn));
+    if(key==='mode'){$('gen-f').hidden=b.mode!=='gen';$('own-f').hidden=b.mode!=='own'}refresh()});
+  segBind('b-grade','grade',true);segBind('b-mode','mode');segBind('b-kind','kind');segBind('b-carry','carry');
+  $('b-name').oninput=e=>{b.name=e.target.value;refresh()};
+  $('b-lo').oninput=e=>{b.lo=parseInt(e.target.value,10);refresh()};
+  $('b-hi').oninput=e=>{b.hi=parseInt(e.target.value,10);refresh()};
+  $('b-count').oninput=e=>{b.count=parseInt(e.target.value,10);refresh()};
+  $('b-text').oninput=e=>{b.text=e.target.value;refresh()};
+  app.querySelectorAll('[data-op]').forEach(c=>c.onchange=()=>{b.ops=OPS.map(o=>o[0]).filter(o=>app.querySelector(`[data-op="${o}"]`).checked);refresh()});
+  $('b-reseed').onclick=()=>{V.seed=newSeed();refresh()};
+  $('b-cancel').onclick=()=>go({screen:'student'});
+  $('bf').onsubmit=e=>{e.preventDefault();
+    const errs=builderErrors(b).filter(x=>!x.startsWith('Строк без'));
+    if(!b.name.trim())errs.unshift('Введите название темы.');
+    if(!errs.length&&b.mode==='gen'){const t0=buildTopic(b);const it0=generate(t0.L[1].p,V.seed);
+      if(it0.failed*2>it0.length)errs.push('Под эти условия почти ничего не подбирается. Расширьте диапазон или уберите условие о переходе через десяток.')}
+    if(errs.length){$('b-err').innerHTML=errs.map(esc).join('<br>');return}
+    const t=buildTopic(b);S.customTopics.push(t);TOPICS=allTopics();save();
+    go({screen:'topic',topicId:t.id,level:t.L.length>1?1:0,seed:newSeed(),over:null,subject:t.subject});
+  };
+  function refresh(){
+    const errs=builderErrors(b);$('b-err').innerHTML=errs.map(esc).join('<br>');
+    if(b.mode==='own'){const {list}=parseList(b.text);$('b-parsed').textContent=`Принято заданий: ${list.length}`}
+    const blocking=errs.filter(x=>!x.startsWith('Строк без'));
+    if(blocking.length){$('b-prev').innerHTML='<div class="pv-empty">Здесь появится лист, как только условия будут заполнены.</div>';$('b-warn').innerHTML='';return}
+    const t=buildTopic(b);const lv=t.L.length>1?1:0;const items=generate(t.L[lv].p,V.seed);
+    $('b-warn').innerHTML=items.failed?`<div class="note">Под эти условия не подбирается ${items.failed} из ${items.length} заданий. Расширьте диапазон чисел или уберите условие о переходе через десяток.</div>`:'';
+    $('b-prev').innerHTML=sheetHTML(items,{topic:t,level:lv,seed:V.seed,studentName:st.name});
+  }
+  refresh();$('b-name').focus();
+}
+
+/* ---------- модалки ---------- */
+const mroot=document.getElementById('modal-root');
+function modal(html,bind){mroot.innerHTML=`<div class="veil" id="veil"><div class="modal" role="dialog" aria-modal="true">${html}</div></div>`;
+  const v=document.getElementById('veil');v.onclick=e=>{if(e.target===v)close()};bind&&bind();const f=v.querySelector('input,button');f&&f.focus()}
+function close(){mroot.innerHTML=''}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&mroot.innerHTML)close()});
+
+function linkModal(){
+  const st=student(V.studentId);const t=TOPICS[V.topicId];
+  const code=translit(st.name.split(' ')[0]).toUpperCase().slice(0,6)+'-'+V.seed;
+  let h=S.assignments.find(a=>a.code===code);
+  if(!h){h={code,studentId:st.id,topicId:t.id,level:V.level,seed:V.seed,over:V.over,date:Date.now(),status:'выдано'};S.assignments.unshift(h);save()}
+  const url='https://kletka.app/r/'+encodeURIComponent(code);
+  modal(`<h2>Домашка выдана</h2>
+    <p style="margin:0;color:var(--ink-2)">${esc(st.name)} откроет ссылку или введёт код на kletka.app. Регистрация не нужна. Результат придёт вам в карточку ученика.</p>
+    <div class="code">${esc(code)}</div>
+    <div class="linkbox"><input id="lnk" type="text" readonly value="${url}"><button class="btn small" id="cp">Скопировать</button></div>
+    <p class="hint" style="margin:0">Ссылка в прототипе условная. Чтобы увидеть, что получит ученик, откройте экран ученика.</p>
+    <div class="modal-actions"><button class="btn quiet" id="cl">Готово</button><button class="btn primary" id="as">Открыть как ученик</button></div>`,()=>{
+    document.getElementById('cl').onclick=close;
+    document.getElementById('as').onclick=()=>{close();startPlayer(h)};
+    const cp=document.getElementById('cp');cp.onclick=()=>{const i=document.getElementById('lnk');
+      const ok=()=>{cp.textContent='Скопировано'};
+      if(navigator.clipboard)navigator.clipboard.writeText(i.value).then(ok,()=>{i.select()});else i.select()};
+  });
+}
+
+function addStudentModal(){
+  let grade=2;const subj=new Set(['math']);
+  modal(`<h2>Новый ученик</h2>
+    <div class="field"><label for="nm" class="label">Имя и фамилия</label><input id="nm" type="text" placeholder="Например, Соня Петрова" autocomplete="off"></div>
+    <div class="field"><span class="label">Класс в школе</span><div class="seg" id="gr">${[1,2,3,4].map(g=>`<button data-g="${g}" class="${g===grade?'on':''}">${g}</button>`).join('')}</div></div>
+    <div class="field"><label class="label" for="st-start">С какой темы начать математику</label><select id="st-start"></select>
+      <span class="hint">Если ученик сильнее программы, выберите тему старшего класса. Маршрут пойдёт от неё.</span></div>
+    <div class="field" id="rus-start-f" hidden><label class="label" for="st-start-rus">С какой темы начать русский</label><select id="st-start-rus"></select></div>
+    <div class="field"><span class="label">Предметы</span><div class="checks">
+      <label><input type="checkbox" id="sm" checked> Математика</label><label><input type="checkbox" id="sr"> Русский язык</label></div></div>
+    <p class="hint" id="err" style="margin:0"></p>
+    <div class="modal-actions"><button class="btn quiet" id="cl">Отмена</button><button class="btn primary" id="ok">Добавить</button></div>`,()=>{
+    const fillStart=()=>{const sel=document.getElementById('st-start');
+      sel.innerHTML=[1,2,3,4].map(g=>`<optgroup label="${gradeWord(g)}">${trackIds().filter(id=>TOPICS[id].grade===g).map(id=>`<option value="${id}">${esc(TOPICS[id].t)}</option>`).join('')}</optgroup>`).join('');
+      sel.value=MATH[grade][0].topics[0].id;
+      const rt=trackIds('rus'),rs=document.getElementById('st-start-rus');
+      document.getElementById('rus-start-f').hidden=!(rt.length&&document.getElementById('sr').checked);
+      rs.innerHTML=rt.map(id=>`<option value="${id}">${gradeWord(TOPICS[id].grade)} · ${esc(TOPICS[id].t)}</option>`).join('');
+      const d=rt.find(id=>TOPICS[id].grade>=grade);if(d)rs.value=d};
+    fillStart();
+    document.getElementById('sr').onchange=fillStart;
+    document.querySelectorAll('#gr button').forEach(b=>b.onclick=()=>{grade=+b.dataset.g;document.querySelectorAll('#gr button').forEach(x=>x.classList.toggle('on',x===b));fillStart()});
+    document.getElementById('cl').onclick=close;
+    document.getElementById('ok').onclick=()=>{
+      const name=document.getElementById('nm').value.trim();
+      const subjects=[document.getElementById('sm').checked&&'math',document.getElementById('sr').checked&&'rus'].filter(Boolean);
+      if(!name){document.getElementById('err').textContent='Введите имя ученика.';return}
+      if(!subjects.length){document.getElementById('err').textContent='Отметьте хотя бы один предмет.';return}
+      const id='s'+Date.now();
+      const ns={id,name,grade,subjects,current:document.getElementById('st-start').value};
+      if(subjects.includes('rus')&&trackIds('rus').length)ns.currentRus=document.getElementById('st-start-rus').value;
+      S.students.push(ns);save();close();
+      go({screen:'student',studentId:id,subject:subjects[0]});
+    };
+  });
+}
+
+/* ---------- экран ученика ---------- */
+let P=null;
+function startPlayer(h){
+  const t=TOPICS[h.topicId];const p={...t.L[h.level].p,...(h.over||{})};
+  P={h,t,items:generate(p,h.seed),i:0,input:'',correct:0,streak:0,score:0,mistakes:[],log:[],start:Date.now(),fb:null,lock:false};
+  V.studentId=h.studentId;go({screen:'player'});
+}
+const isNumAns=it=>/^\d+$/.test(String(it.ans));
+const textMode=it=>it.type==='own'&&!isNumAns(it);
+const norm=s=>String(s).trim().toLowerCase().replace(/ё/g,'е').replace(/\s+/g,' ');
+function qText(it){
+  if(it.type==='own'){const slot=`<span class="slot${P.input?' filled':''}">${esc(P.input)||'?'}</span>`;
+    return it.q.includes('□')?`<span>${esc(it.q).replace('□',slot)}</span>`:`<span>${esc(it.q)} =</span>${slot}`}
+  if(it.type==='cmp')return `${it.left} <span class="slot${P.input?' filled':''}">${P.input||'?'}</span> ${it.right}`;
+  if(it.type==='expr')return `${it.q} = <span class="slot${P.input?' filled':''}">${P.input||'?'}</span>`;
+  if(it.type==='col')return `<div class="col"><span class="op">${sym(it.op)}</span><span>${fmt(it.a)}</span><span>${fmt(it.b)}</span><span class="bar"></span><span class="r">${P.input||''}</span></div>`;
+  const slot=`<span class="slot${P.input?' filled':''}">${P.input||(it.x?'x':'?')}</span>`;
+  return `${it.miss==='a'?slot:fmt(it.a)} ${sym(it.op)} ${it.miss==='b'?slot:fmt(it.b)} = ${it.miss==='res'?slot:fmt(it.res)}`;
+}
+function plainQ(it){
+  if(it.type==='own')return it.q.includes('□')?it.q:it.q+' = □';
+  if(it.type==='cmp')return `${it.left} ◯ ${it.right}`;
+  if(it.type==='expr')return `${it.q} = □`;
+  if(it.type==='col')return `${fmt(it.a)} ${sym(it.op)} ${fmt(it.b)}`;
+  const s=v=>it.x?'x':'□';
+  return `${it.miss==='a'?s():fmt(it.a)} ${sym(it.op)} ${it.miss==='b'?s():fmt(it.b)} = ${it.miss==='res'?s():fmt(it.res)}`;
+}
+function viewPlayer(){
+  const it=P.items[P.i];const st=student(P.h.studentId);
+  const tm=textMode(it);
+  const pad=it.type==='cmp'
+    ?`<div class="signs">${['<','=','>'].map(s=>`<button data-sign="${s}" aria-label="знак ${s}">${s}</button>`).join('')}</div>`
+    :tm?`<div class="txt"><input id="tx" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Ответ" placeholder="Ответ" value="${esc(P.input)}"><button class="btn primary" id="txok">Готово</button></div>`
+    :`<div class="pad">${[1,2,3,4,5,6,7,8,9].map(n=>`<button data-k="${n}">${n}</button>`).join('')}<button class="del" data-k="del">Стереть</button><button data-k="0">0</button><button class="go" data-k="ok">Готово</button></div>`;
+  app.innerHTML=`<div class="player">
+    <div class="demo-bar">Так домашку видит ученик на телефоне или компьютере</div>
+    <div class="pl-head"><div><div class="pl-who">${esc(st.name)} · ${esc(P.t.t)}</div><div class="label">Задание ${P.i+1} из ${P.items.length}</div></div>
+      <div class="score num"><span>${P.score}<small>очки</small></span><span>${P.streak}<small>подряд</small></span></div></div>
+    <div class="prog"><i style="width:${P.i/P.items.length*100}%"></i></div>
+    <p class="pl-instr">${esc(instr(it))}</p>
+    <div class="task${it.type==='own'&&it.q.length>16?' long':''}" aria-live="polite"><div class="q">${qText(it)}</div>${P.fb?`<div class="fb ${P.fb.ok?'ok':'bad'}">${P.fb.ok?'Верно! +10':'Правильный ответ: '+esc(P.fb.ans)}</div>`:''}</div>
+    ${pad}
+    <div style="text-align:center"><button class="btn small quiet" id="stop">Закончить досрочно</button></div></div>`;
+  app.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>key(b.dataset.k));
+  app.querySelectorAll('[data-sign]').forEach(b=>b.onclick=()=>{P.input=b.dataset.sign;submit()});
+  if(tm){const tx=document.getElementById('tx');const send=()=>{if(!P.lock&&P.input.trim())submit()};
+    tx.oninput=()=>{P.input=tx.value};tx.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();send()}};
+    document.getElementById('txok').onclick=send;if(!P.lock)tx.focus()}
+  document.getElementById('stop').onclick=finish;
+}
+function key(k){
+  if(!P||P.lock||V.screen!=='player')return;
+  if(k==='del')P.input=P.input.slice(0,-1);
+  else if(k==='ok'){if(P.input)submit();return}
+  else if(P.input.length<7)P.input+=k;
+  P.fb=null;viewPlayer();
+}
+function submit(){
+  const it=P.items[P.i];const ok=norm(it.ans)===norm(P.input);
+  P.log.push({src:it.src,ok});
+  if(ok){P.correct++;P.streak++;P.score+=10}else{P.streak=0;P.mistakes.push({q:plainQ(it),given:P.input,ans:String(fmt(it.ans)),src:it.src})}
+  P.fb={ok,ans:String(fmt(it.ans))};P.lock=true;viewPlayer();
+  setTimeout(()=>{P.lock=false;P.fb=null;P.input='';P.i++;if(P.i>=P.items.length)finish();else viewPlayer()},ok?650:1500);
+}
+function finish(){
+  if(!P)return;
+  const a={id:'a'+Date.now(),studentId:P.h.studentId,topicId:P.t.id,level:P.h.level,correct:P.correct,total:P.items.length,answered:P.i,time:Math.round((Date.now()-P.start)/1000),date:Date.now(),mistakes:P.mistakes};
+  if(P.t.review){
+    const by={};for(const x of P.log){by[x.src]=by[x.src]||{c:0,n:0};by[x.src].n++;if(x.ok)by[x.src].c++}
+    Object.keys(by).forEach((src,k)=>S.attempts.push({id:a.id+'-'+k,studentId:a.studentId,topicId:src,level:Math.min(1,TOPICS[src].L.length-1),
+      correct:by[src].c,total:by[src].n,time:a.time,date:a.date,mistakes:P.mistakes.filter(m=>m.src===src),via:'review'}));
+  }else S.attempts.push(a);
+  const h=S.assignments.find(x=>x.code===P.h.code);if(h)h.status='сдано';save();
+  P.result=a;go({screen:'done'});
+}
+function viewDone(){
+  const a=P.result;const pct=Math.round(a.correct/a.total*100);
+  const word=pct>=85?'Отлично!':pct>=60?'Хорошо, есть над чем поработать':'Давай потренируемся ещё';
+  app.innerHTML=`<div class="player"><div class="demo-bar">Экран ученика</div>
+    <div class="panel finish"><span class="label">${esc(P.t.t)}</span><div class="big num">${a.correct} из ${a.total}</div>
+      <p style="margin:0;font-size:18px;font-weight:600">${word}</p><span class="sent">✓ Результат отправлен репетитору</span>
+      <p class="hint" style="margin:0">Время: ${Math.floor(a.time/60)} мин ${a.time%60} с. Очки: ${P.score}.</p></div>
+    <button class="btn primary" id="back">Вернуться к репетитору и посмотреть результат</button></div>`;
+  document.getElementById('back').onclick=()=>{const sid=P.h.studentId;P=null;go({screen:'student',studentId:sid,subject:'math'})};
+}
+document.addEventListener('keydown',e=>{
+  if(V.screen!=='player'||!P||mroot.innerHTML)return;
+  const it=P.items[P.i];
+  if(it.type==='cmp'){if(['<','>','='].includes(e.key)){P.input=e.key;submit()}return}
+  if(textMode(it))return;
+  if(/^[0-9]$/.test(e.key))key(e.key);else if(e.key==='Backspace')key('del');else if(e.key==='Enter')key('ok');
+});
+document.getElementById('home').onclick=()=>go({screen:'students'});
+render();
+</script>
+
+</html>

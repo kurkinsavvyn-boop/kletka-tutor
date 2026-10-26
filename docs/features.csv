@@ -1,0 +1,26 @@
+feature,area,priority,original,clone,notes
+Генератор с параметрами и новым вариантом по кнопке,generators,must,yes,no,ядро сервиса
+Печать A4 + лист ответов,output,must,yes,no,
+Онлайн-режим с мгновенной проверкой,player,must,yes,no,очки серия таймер
+Ссылка для ученика,sharing,must,yes,no,у оригинала данные в URL#; у нас — с сохранением результата
+Свои вопросы: тест с вариантами,content,must,yes,no,
+Свои слова: кроссворд/филворд,content,should,yes,no,
+Несколько вариантов + ключ учителю,output,should,yes,no,
+Движок Арифметика (примеры окошки сравнение цепочки столбик),generators,must,yes,no,
+Движок Вставь букву по банку слов,generators,must,yes,no,банк слов — свой
+Движок Уравнения и текстовые задачи,generators,should,yes,no,
+Движок Разбор (состав слова части речи падежи),generators,should,yes,no,
+Движок Соотнеси/карточки/мемори,generators,should,yes,no,
+Движок Порядок,generators,could,yes,no,
+Сборка набора на занятие,lesson,should,yes,no,у оригинала «Лист дня» по возрасту
+Ученики и классы,students,must,no,no,нового нет у оригинала
+Дерево тем предмет→класс→тема,curriculum,must,no,no,новое
+Три уровня сложности на тему,curriculum,must,no,no,новое
+Сбор результатов ученика,results,must,no,no,новое
+Карта прогресса по темам,results,should,no,no,новое
+Задание на ошибки,results,should,no,no,новое
+Отчёт родителю,results,could,no,no,новое
+Библиотека своих наборов в аккаунте,content,should,partial,no,у оригинала только localStorage
+Интерактивные уроки с озвучкой,lessons,could,yes,no,
+Иллюстрации маскот тексты банки оригинала,content,skip,yes,no,чужой контент — делаем свой
+Реклама и SEO-тексты,marketing,skip,yes,no,не нужно
