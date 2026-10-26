@@ -1339,7 +1339,7 @@ const PALETTES=[
   ['#F4A73B','#E8573F','#FFF4DC','#3A86C8'],['#2BB39A','#F2B23E','#E6F7F2','#E8573F'],['#D9467A','#8E5BD9','#FCE8F1','#E8A93B'],['#2E7FD8','#20AFB8','#E5F1FD','#F59E3C'],
   ['#4A9B4F','#C98A2E','#EBF6E8','#D9534F'],['#7A5AF8','#E8609E','#F0ECFF','#25A897'],['#F0699A','#3BA9D6','#FFF0F5','#E8A520'],['#E8573F','#E8A520','#FFEDE6','#3D5A98']];
 const FRAMES=['solid','dashed','double','dots','stripes'];
-const LEVELS=[['any','Любой'],['1','Сказка'],['2','Яркий'],['3','Спокойный'],['4','Строгий']];
+const LEVELS=[['1','Сказка'],['2','Яркий'],['3','Спокойный'],['4','Строгий']];
 /* рисованные сюжеты: у темы до трёх наборов, набор выбирается по номеру варианта.
    top — сверху слева (смотрит вправо), bot — снизу справа (смотрит влево), char — самостоятельная картинка для «Яркого» */
 /* пропорции картинок (ширина / высота), чтобы заранее знать их высоту на листе */
@@ -1354,10 +1354,9 @@ const artImg=(src,cls)=>`<img class="art pic ${cls||''}" src="${src}" alt="" ari
 const stkSVG=(id,cls,style)=>`<svg class="art stk ${cls||''}" viewBox="0 0 40 40" aria-hidden="true"${style?` style="${style}"`:''}>${STK[id]()}</svg>`;
 /* оформление листа выбирается по номеру варианта: одинаковое на бумаге и на экране */
 function resolveDesign(st,seed){
-  const d=(st&&st.design)||{lv:'any',theme:'random',bw:false};
+  const d=(st&&st.design)||{lv:2,theme:'random',bw:false};
   const r=rng(seed*7919+13);
-  /* «Любой»: оформление тоже выбирается по номеру варианта, из всех четырёх */
-  const lv=d.lv==='any'||!d.lv?1+Math.floor(rng(seed*31+7)()*4):+d.lv;
+  const lv=+d.lv||2;
   /* удалённая тема (например, «Супергерои») считается случайной */
   const theme=(d.theme&&THEMES.find(t=>t.id===d.theme))||THEMES[Math.floor(r()*THEMES.length)];
   const out={lv,bw:!!d.bw,theme,pal:PALETTES[Math.floor(r()*PALETTES.length)],frame:FRAMES[Math.floor(r()*FRAMES.length)],char:pick(r,theme.chars),seed};
@@ -1797,8 +1796,8 @@ try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}
 if(!S||!S.students)S=demoState();
 if(!S.customTopics)S.customTopics=exampleTopics();
 migrate(S);
-/* оформление по умолчанию — «Любой»: один раз переводим на него всех учеников */
-if(!S.designAny){for(const st of S.students)st.design={lv:'any',theme:'random',bw:!!(st.design&&st.design.bw)};S.designAny=1}
+/* сюжет по умолчанию — «Любой»: один раз переводим на него всех учеников; оформление остаётся одним из четырёх */
+if(S.designAny!==2){for(const st of S.students){const d=st.design||{};st.design={lv:+d.lv||2,theme:'random',bw:!!d.bw}}S.designAny=2}
 TOPICS=allTopics();
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 
@@ -2460,15 +2459,15 @@ function viewTopic(){
 }
 
 /* ---------- настройка оформления: запоминается в карточке ученика ---------- */
-const designOf=st=>st.design||(st.design={lv:'any',theme:'random',bw:false});
+const designOf=st=>st.design||(st.design={lv:2,theme:'random',bw:false});
 function designBox(st,seed){const d=designOf(st),R=resolveDesign(st,seed);
   return `<div class="field design"><span class="label">Оформление листа</span>
     <div class="seg dseg" id="dlv">${LEVELS.map(([k,l])=>`<button type="button" data-lv="${k}" class="${String(d.lv)===k?'on':''}">${l}</button>`).join('')}</div>
-    ${String(d.lv)!=='4'?`<div class="drow"><select id="dth" aria-label="Сюжет"><option value="random"${d.theme==='random'?' selected':''}>Любой сюжет</option>${THEMES.map(t=>`<option value="${t.id}"${d.theme===t.id?' selected':''}>${esc(t.n)}</option>`).join('')}</select>
+    ${+d.lv<4?`<div class="drow"><select id="dth" aria-label="Сюжет"><option value="random"${d.theme==='random'?' selected':''}>Любой сюжет</option>${THEMES.map(t=>`<option value="${t.id}"${d.theme===t.id?' selected':''}>${esc(t.n)}</option>`).join('')}</select>
       <label class="bwl"><input type="checkbox" id="dbw"${d.bw?' checked':''}> Ч/Б</label></div>
       <button type="button" class="dprev" id="dgal">${R.img?artImg(R.img.char,'mini'):charSVG(R.char,'mini')}<span><b>${esc(R.theme.n)}</b><small>все ${THEMES.length} ${plural(THEMES.length,['сюжет','сюжета','сюжетов'])} →</small></span></button>`:'<span class="hint">Без украшений, как раньше.</span>'}</div>`}
 function bindDesign(st){const d=designOf(st);const $=id=>document.getElementById(id);
-  document.querySelectorAll('#dlv button').forEach(b=>b.onclick=()=>{d.lv=b.dataset.lv==='any'?'any':+b.dataset.lv;save();render()});
+  document.querySelectorAll('#dlv button').forEach(b=>b.onclick=()=>{d.lv=+b.dataset.lv;save();render()});
   if($('dth'))$('dth').onchange=e=>{d.theme=e.target.value;save();render()};
   if($('dbw'))$('dbw').onchange=e=>{d.bw=e.target.checked;save();render()};
   if($('dgal'))$('dgal').onclick=()=>go({screen:'gallery'})}
