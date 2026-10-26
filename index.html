@@ -611,6 +611,51 @@ img.art.pic{object-fit:contain;display:block}
 @media (max-width:600px){.top-in{flex-wrap:wrap;gap:4px 12px;padding-block:10px}.crumbs{flex-basis:100%;font-size:13px;gap:2px}.crumbs button,.crumbs .cur{padding:2px 4px}
   .crumbs .cur{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}.wrap{padding-block:20px 48px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* ---------- Минимализм: один акцент, меньше рамок и подписей ---------- */
+.btn.link{border:0;background:none;padding:6px 4px;min-height:0;color:var(--ink-2);font-weight:600}
+.btn.link:hover{background:none;color:var(--ink);text-decoration:underline}
+.sthead{background:none;border:0;padding:0;margin:0 0 18px;align-items:flex-start}
+.sth-t{flex-direction:row;align-items:baseline;flex-wrap:wrap;gap:4px 12px}
+.sth-t span{color:var(--ink-2);font-weight:500}
+.more-btn{border:1px solid var(--line);width:38px;height:38px;font-size:20px}
+.wait-chip{border:0;background:var(--warn-soft);color:var(--warn);font-weight:700;font-size:13px;padding:3px 10px;border-radius:99px;white-space:nowrap}
+button.wait-chip:hover{filter:brightness(.96)}
+.panel{border-radius:12px}
+.route{gap:10px;padding:16px 18px}
+.route-head h2,.tools h2{font-size:13px;font-weight:600;color:var(--ink-3);text-transform:uppercase;letter-spacing:.06em}
+.tools{padding:16px 18px 4px}
+.rlist{gap:0}
+.rl{border:0;border-radius:8px;padding:9px 10px;background:none}
+.rl:hover{background:var(--ink-soft)}
+.rl.cur{border:0;background:var(--ink-soft);padding:12px 10px}
+.rl.cur .rl-mark{background:var(--ink);color:var(--card)}
+.rl.cur .rl-t small{color:var(--ink-2);font-weight:400}
+.rl.next{background:none;border:0}
+.rl.next .rl-mark{background:none;border:1.5px solid var(--line)}
+.rl.next .rl-t{font-weight:500}
+.rl.next .rl-t small{color:var(--ink-2);font-weight:400}
+.rl.prev{opacity:.5}
+.rl-empty{border:0;padding:6px 10px}
+.legend{font-size:12.5px}
+.st{gap:8px;padding:16px}
+.st-top{justify-content:space-between;align-items:flex-start}
+.st-now{border-top:0;padding-top:0;flex-direction:row;justify-content:space-between;gap:10px;color:var(--ink-2)}
+.st-now .t{font-weight:500;color:var(--ink)}
+.st-now .pct{font-weight:700}
+.add-card{min-height:96px}
+.head{margin-bottom:16px}
+.head p{font-size:14px}
+.levels{gap:16px}
+.levels .label{font-size:12px}
+.fold{border-top:1px solid var(--line);padding-top:10px}
+.fold summary{cursor:pointer;color:var(--ink-2);font-weight:600;font-size:14px}
+.fold[open]{display:flex;flex-direction:column;gap:10px}
+.fold .tune-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.fold .tune-row input{width:72px;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);font:inherit}
+.bsum{margin:0;padding-left:18px;font-size:14px;color:var(--ink-2)}
+.bsum li span{margin-left:6px}
+.sheet-bar{margin-bottom:8px}
 </style>
 
 <header class="top"><div class="top-in">
@@ -2108,7 +2153,7 @@ function crumbs(){
   if(['player','done'].includes(V.screen)){parts.length=0;parts.push('<span class="cur">Экран ученика</span>')}
   c.innerHTML=parts.join(' ');
   c.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>go({screen:b.dataset.go}));
-  const steps=document.getElementById('steps');
+  const steps=document.getElementById('steps');steps.innerHTML='';return;
   const n={students:0,student:1,topic:2,print:3}[V.screen];
   if(n===undefined){steps.innerHTML='';return}
   steps.innerHTML=['Ученик','Тема','Печать или ссылка'].map((s,i)=>`<span class="${i<n?'done':i===n?'on':''}">${i+1}. ${s}</span>`).join('');
@@ -2132,12 +2177,10 @@ function viewStudents(){
     const hw=S.assignments.filter(a=>a.studentId===s.id&&a.status==='выдано').length;
     const last=S.attempts.filter(a=>a.studentId===s.id).sort((a,b)=>b.date-a.date)[0];
     return `<button class="st" data-id="${s.id}">
-      <div class="st-top"><div class="ava">${esc(initials(s.name))}</div><div><h3>${esc(s.name)}</h3><div class="grade">${gradeWord(s.grade)} · ${s.subjects.map(x=>SUBJ[x]).join(', ')}</div></div></div>
-      <div class="st-now"><span class="label">Сейчас проходим</span><span class="t">${cur?esc(cur.t):'Тема не выбрана'}</span>${rus?`<span class="t2">Русский: ${esc(rus.t)}</span>`:''}</div>
-      <div class="st-foot">${m.pct!=null?`<span class="chip ${m.cls}">усвоение ${m.pct}%${m.low?', мало данных':''}</span>`:'<span class="chip">ещё не решал эту тему</span>'}
-      ${hw?`<span class="chip warn">ждём домашку: ${hw}</span>`:''}${last?`<span class="chip">активность ${ago(last.date)}</span>`:''}</div>
+      <div class="st-top"><div><h3>${esc(s.name)}</h3><div class="grade">${gradeWord(s.grade)}</div></div>${hw?`<span class="wait-chip">ждём ${hw}</span>`:''}</div>
+      <div class="st-now"><span class="t">${cur?esc(cur.t):'Тема не выбрана'}</span>${m.pct!=null?`<span class="pct num">${m.pct}%</span>`:''}</div>
     </button>`}).join('');
-  app.innerHTML=`<div class="head"><div><h1>Ученики</h1><p>У каждого ученика свой маршрут по программе 1–4 класса.</p></div></div>
+  app.innerHTML=`<div class="head"><div><h1>Ученики</h1></div></div>
     <div class="students">${cards}<button class="add-card" id="add">+ Добавить ученика</button></div>
     <div class="foot"><span>Прототип. Данные хранятся только в этом браузере.</span><button id="reset">Вернуть демо-данные</button></div>`;
   app.querySelectorAll('.st').forEach(b=>b.onclick=()=>go({screen:'student',studentId:b.dataset.id,subject:'math',confirmStDel:false}));
@@ -2184,32 +2227,30 @@ function viewStudent(){
       const mark=kind==='cur'?'▶':kind==='prev'?(m.cls==='ok'?'✓':m.cls?'!':'·'):'';
       const mk=kind==='prev'?(m.cls==='ok'?'ok':m.cls?m.cls:''):'';
       return `<button class="rl ${kind}" data-t="${id}"><span class="rl-mark ${mk}">${mark}</span>
-        <span class="rl-t">${esc(t.t)}<small>${tag?tag+' · ':''}${gradeWord(t.grade)}</small></span>
+        <span class="rl-t">${esc(t.t)}${t.grade!==st.grade?`<small>${gradeWord(t.grade)}</small>`:''}</span>
         <span class="rl-p">${m.pct!=null?m.pct+'%':''}${m.pct!=null&&m.low?'<small>мало данных</small>':''}</span></button>`};
     const cur=TOPICS[tr[i]],ahead=cur.grade-st.grade,mc=mastery(st.id,cur.id);
     route=`<section class="route" aria-label="Маршрут ученика">
-      <div class="route-head"><h2>Маршрут · ${SUBJ[subj]}</h2>${ahead>0?`<span class="chip ok">впереди школы на ${ahead} ${ahead===1?'класс':'класса'}</span>`:ahead<0?`<span class="chip warn">догоняем: тема ${gradeWord(cur.grade)}а</span>`:''}</div>
+      <div class="route-head"><h2>Маршрут</h2></div>
       <div class="rlist">${tr[i-2]?row(tr[i-2],'prev'):''}${tr[i-1]?row(tr[i-1],'prev'):'<div class="rl-empty">Это первая тема программы</div>'}${row(tr[i],'cur','сейчас')}
         ${tr[i+1]?row(tr[i+1],'next','дальше'):`<div class="rl-empty">${subj==='math'?'Дальше программы 1–4 класса пока нет':'Дальше тем нет, добавьте свою'}</div>`}${tr[i+2]?row(tr[i+2],'next','потом'):''}</div>
-      <div class="route-act"><button class="btn primary" id="r-task">Задание по текущей теме</button>
-        <button class="btn" id="r-next"${tr[i+1]?'':' disabled'}>Тема пройдена, дальше →</button>
-        <button class="btn pen" id="r-rev"${i>0?'':' disabled'}>Повторить пройденное</button></div>
-      ${tr[i+1]&&mc.pct!=null&&mc.pct<85?`<p class="hint" style="margin:0">Усвоение текущей темы ${mc.pct}%. Перейти дальше можно, но тему стоит закрепить.</p>`:''}
+      <div class="route-act"><button class="btn primary" id="r-task">Задание</button>
+        ${tr[i+1]?'<button class="btn link" id="r-next">Тема пройдена →</button>':''}</div>
     </section>`;
   }else{
     route=`<section class="route" aria-label="Маршрут ученика"><div class="route-head"><h2>Маршрут · ${SUBJ[subj]}</h2></div>
-      <p class="empty" style="margin:0">Тем по русскому пока нет. Создайте свою тему списком, например «м□локо = о», и она станет первой в маршруте.</p>
+      <p class="empty" style="margin:0">Тем пока нет.</p>
       <div class="route-act"><button class="btn primary" id="r-new">+ Своя тема по русскому</button></div></section>`;
   }
   const grades=subj==='math'?[1,2,3,4]:[1,2,3,4].filter(g=>g===st.grade||mine(g).length);
-  let prog=`<div class="tools"><span class="hint">${subj==='math'?'Программа 1–4 класса по учебнику Моро. Откройте тему, чтобы дать задание или сделать её текущей.':'Ваши темы по русскому идут в маршруте по классам. Откройте тему, чтобы дать задание или сделать её текущей.'}</span><button class="btn small" id="newt">+ Своя тема</button></div>`;
+  let prog=`<div class="tools"><h2>Все темы</h2></div>`;
   const cur=pos.i>=0?TOPICS[pos.tr[pos.i]]:null,cg=cur?cur.grade:st.grade,cp=cur?partOf(cur.id):1;
   const trI=id=>pos.tr.indexOf(id);
   const secRows=ts=>{const done=ts.filter(t=>pos.i>=0&&trI(t.id)>=0&&trI(t.id)<pos.i),rest=ts.filter(t=>!done.includes(t));
     return (done.length?`<details class="done"><summary>Пройдено: ${done.length} ${plural(done.length,['тема','темы','тем'])}</summary>${done.map(t=>row(TOPICS[t.id])).join('')}</details>`:'')+rest.map(t=>row(TOPICS[t.id])).join('')};
   if(subj==='math')for(const g of grades){
     const secs=MATH[g],parts=[...new Set(secs.map(x=>x.part))],my=mine(g),n=secs.reduce((a,x)=>a+x.topics.length,0)+my.length;
-    prog+=`<details class="cg"${g===cg?' open':''}><summary><b>${gradeWord(g)}</b>${g===st.grade?'<span class="chip">класс ученика</span>':''}${secs[0].unverified?'<span class="chip warn">не сверено с учебником</span>':''}<span class="cnt">${n} ${plural(n,['тема','темы','тем'])}</span></summary>`;
+    prog+=`<details class="cg"${g===cg?' open':''}><summary><b>${gradeWord(g)}</b>${secs[0].unverified?'<span class="chip warn">не сверено с учебником</span>':''}<span class="cnt">${n} ${plural(n,['тема','темы','тем'])}</span></summary>`;
     for(const pt of parts){const inner=secs.filter(x=>x.part===pt).map(sec=>`<div class="sec"><h3>${esc(sec.s)}</h3>${secRows(sec.topics)}</div>`).join('');
       prog+=parts.length>1?`<details class="cp"${g===cg&&pt===cp?' open':''}><summary>Часть ${pt}</summary>${inner}</details>`:inner}
     if(my.length)prog+=`<div class="sec"><h3>${MY}</h3>${secRows(my)}</div>`;
@@ -2222,32 +2263,30 @@ function viewStudent(){
     if(subj!=='math'&&g===st.grade)prog+=`<div class="locked">Генератор «Вставь букву» появится в следующей версии, его темы встанут в этот же маршрут.</div>`+
       RUS[g].map(sec=>`<div class="sec"><h3>${esc(sec.s)} · скоро</h3>${sec.topics.map(t=>`<button class="topic" disabled><span class="dot"></span><span class="tt">${esc(t)}</span></button>`).join('')}</div>`).join('');
   }
-  prog+=`<div class="legend"><span><i class="dot ok"></i>освоено, от 85%</span><span><i class="dot warn"></i>в работе</span><span><i class="dot bad"></i>западает, меньше 60%</span><span><i class="dot"></i>не решали</span></div>
-    <p class="hint legend-note">Усвоение считается по трём последним работам: свежие и длинные весят больше. На базовом уровне — не выше 80%, поэтому «освоено» значит решено на среднем или сложном уровне.</p>`;
-  const body=`<div class="search"><input id="tq" type="search" autocomplete="off" aria-label="Найти тему" placeholder="Найти тему: слово или пример, например «таблица» или 37 + 48" value="${esc(V.q||'')}"></div>
+  prog+=`<div class="legend"><span><i class="dot ok"></i>освоено</span><span><i class="dot warn"></i>в работе</span><span><i class="dot bad"></i>западает</span></div>`;
+  const body=`<div class="search"><input id="tq" type="search" autocomplete="off" aria-label="Найти тему" placeholder="Найти тему или пример: 37 + 48" value="${esc(V.q||'')}"></div>
     <div id="sres" class="sres" hidden></div><div id="pmain">${route}${prog}</div>`;
   const nWait=S.assignments.filter(a=>a.studentId===st.id&&a.status==='выдано'&&TOPICS[a.topicId]).length;
   const nDone=S.assignments.filter(a=>a.studentId===st.id&&a.status==='сдано').length+S.attempts.filter(a=>a.studentId===st.id&&!a.hw&&!a.via).length;
-  app.innerHTML=`<div class="sthead"><div class="ava big">${esc(initials(st.name))}</div><div class="sth-t"><h1>${esc(st.name)}</h1><span>${gradeWord(st.grade)}</span></div>
+  const canRev=pos.i>0;
+  app.innerHTML=`<div class="sthead"><div class="sth-t"><h1>${esc(st.name)}</h1><span>${gradeWord(st.grade)}</span>${nWait?`<button class="wait-chip" id="works2">ждём ${nWait} ${plural(nWait,['домашку','домашки','домашек'])}</button>`:''}</div>
       <div class="more"><button class="more-btn" id="more" aria-label="Ещё действия" aria-expanded="${V.menu?'true':'false'}">⋯</button>
-        ${V.menu?`<div class="more-pop"><button class="edit" id="edst">Редактировать</button><button class="${V.confirmStDel?'danger':''}" id="delst">${V.confirmStDel?'Нажмите ещё раз: ученик и все его работы удалятся':'Удалить ученика'}</button></div>`:''}</div></div>
-    <button class="worksbtn${nWait?' wait':''}" id="works"><span class="wb-ic" aria-hidden="true">${nWait?'!':'✓'}</span><span class="wb-t"><b>Работы и домашки</b>
-      <small>${nWait?`ждём ${nWait} ${plural(nWait,['домашку','домашки','домашек'])} · `:'все домашки сданы · '}${nDone} ${plural(nDone,['работа','работы','работ'])}</small></span>
-      ${nWait?`<span class="wb-n num">${nWait}</span>`:''}<span class="arr">→</span></button>
+        ${V.menu?`<div class="more-pop"><button class="edit" id="works">Работы и домашки${nDone?` · ${nDone}`:''}</button>${canRev?'<button class="edit" id="r-rev">Повторить пройденное</button>':''}<button class="edit" id="newt">+ Своя тема</button><button class="edit" id="edst">Редактировать</button><button class="${V.confirmStDel?'danger':''}" id="delst">${V.confirmStDel?'Нажмите ещё раз: ученик и все его работы удалятся':'Удалить ученика'}</button></div>`:''}</div></div>
     <div class="panel">${st.subjects.length>1?`<div class="tabs">${tabs}</div>`:''}${body}</div>`;
   app.querySelectorAll('.tab').forEach(b=>b.onclick=()=>go({subject:b.dataset.s,confirmStDel:false}));
   app.querySelectorAll('.topic[data-t],.rl[data-t]').forEach(b=>b.onclick=()=>openTopic(b.dataset.t));
   const $=id=>document.getElementById(id);
   if($('r-task'))$('r-task').onclick=()=>openTopic(pos.tr[pos.i]);
   if($('r-next'))$('r-next').onclick=()=>{st[CK(subj)]=pos.tr[pos.i+1];save();render()};
-  if($('r-rev'))$('r-rev').onclick=()=>makeReview(st,subj);
+  if($('r-rev'))$('r-rev').onclick=()=>{V.menu=false;makeReview(st,subj)};
   if($('r-new'))$('r-new').onclick=openBuilder;
   const tq=$('tq');tq.oninput=()=>{V.q=tq.value;showSearch(st,subj)};showSearch(st,subj);
-  $('newt').onclick=openBuilder;
+  if($('newt'))$('newt').onclick=()=>{V.menu=false;openBuilder()};
   $('more').onclick=()=>{V.menu=!V.menu;V.confirmStDel=false;render()};
   if($('edst'))$('edst').onclick=()=>{V.menu=false;render();editStudentModal(st)};
   if($('delst'))$('delst').onclick=()=>{if(!V.confirmStDel){V.confirmStDel=true;render();return}V.menu=false;deleteStudent(st)};
-  $('works').onclick=()=>go({screen:'works',menu:false});
+  if($('works'))$('works').onclick=()=>go({screen:'works',menu:false});
+  if($('works2'))$('works2').onclick=()=>go({screen:'works',menu:false});
 }
 
 /* ---------- работы и домашки ученика ---------- */
@@ -2404,12 +2443,11 @@ function viewTopic(){
   let shown=t,shownLv=V.level,blocks=null,items;
   if(tpl!=='train'){blocks=currentBlocks(st,t);shown=sheetTopic(tplName(tpl),blocks,t);shownLv=0;items=generate(shown.L[0].p,V.seed)}
   else items=generate(curParams(),V.seed);
-  const lv=t.L.map((L,i)=>`<button class="lvl${i===V.level?' on':''}" data-l="${i}">
-     <div class="lvl-top"><span class="lvl-mark">${[0,1,2].map(k=>`<i class="${k<=i?'f':''}"></i>`).join('')}</span><b>${LV[i]}: ${esc(L.n)}</b></div>
-     <span class="d">${L.d?esc(L.d)+' · ':''}${L.p.count} ${plural(L.p.count,TASKS)}</span></button>`).join('');
+  const LC=t.L[V.level]||t.L[0];
+  const lv=t.L.length>1?`<div class="field"><span class="label">Уровень</span><div class="seg" id="lvseg">${t.L.map((L,i)=>`<button type="button" class="${i===V.level?'on':''}" data-l="${i}" title="${esc(L.n)}">${LV[i]}</button>`).join('')}</div>
+     <span class="hint">${esc(LC.n)}${LC.d?' · '+esc(LC.d):''}</span></div>`:'';
   const p=curParams();const tunable=tpl==='train'&&p.kind!=='order'&&!p.table&&!p.extra&&p.ops&&!p.aLo&&p.cmp!=='num';
-  const tplSeg=fixed?'':`<div class="field"><span class="label">Вид листа</span><div class="seg tpl" id="tpl">${TPL.map(([k,l])=>`<button type="button" data-k="${k}" class="${k===tpl?'on':''}">${l}</button>`).join('')}</div>
-    <span class="hint">${TPL_HINT[tpl]}</span></div>`;
+  const tplSeg=fixed?'':`<div class="field"><span class="label">Лист</span><div class="seg tpl" id="tpl">${TPL.map(([k,l])=>`<button type="button" data-k="${k}" class="${k===tpl?'on':''}">${l}</button>`).join('')}</div></div>`;
   const opts=sel=>[1,2,3,4].map(g=>{const ids=trackIds(t.subject).filter(id=>TOPICS[id].grade===g);return ids.length?`<optgroup label="${gradeWord(g)}">${ids.map(id=>`<option value="${id}"${id===sel?' selected':''}>${esc(TOPICS[id].t)}</option>`).join('')}</optgroup>`:''}).join('');
   let blocksHTML='';
   if(tpl==='own')blocksHTML=`<div class="blocks">${blocks.map((b,i)=>`<div class="brow" data-i="${i}">
@@ -2418,35 +2456,32 @@ function viewTopic(){
         <input class="b-cnt" type="number" min="1" max="20" value="${b.count}" aria-label="Сколько заданий в блоке ${i+1}">
         <button type="button" class="bi b-up" aria-label="Поднять блок"${i?'':' disabled'}>↑</button><button type="button" class="bi b-dn" aria-label="Опустить блок"${i<blocks.length-1?'':' disabled'}>↓</button><button type="button" class="bi b-rm" aria-label="Удалить блок"${blocks.length>1?'':' disabled'}>✕</button></div></div>`).join('')}
     ${blocks.length<6?'<button type="button" class="btn small quiet" id="b-add">+ Блок</button>':''}</div>`;
-  else if(tpl!=='train')blocksHTML=`<ol class="bsum">${blocks.map(b=>`<li><b>${esc(b.label)}</b><span>${esc(TOPICS[b.tid].t)} · ${b.count} ${plural(b.count,TASKS)}</span></li>`).join('')}</ol>
-    <button type="button" class="btn small quiet" id="to-own">Изменить состав</button>`;
+  else if(tpl!=='train')blocksHTML=`<details class="fold"><summary>Состав листа</summary><ol class="bsum">${blocks.map(b=>`<li><b>${esc(b.label)}</b><span>${esc(TOPICS[b.tid].t)} · ${b.count}</span></li>`).join('')}</ol>
+    <button type="button" class="btn small quiet" id="to-own">Изменить</button></details>`;
   const total=items.length;
-  app.innerHTML=`<div class="head"><div><span class="label">${gradeWord(t.grade)} · ${esc(t.section)}</span><h1>${esc(t.t)}</h1>
-    ${V.subName&&tpl==='train'?`<p class="subchip">Подтема: <b>${esc(V.subName)}</b> <button class="btn small quiet" id="subx">Показать всю тему</button></p>`:''}
-    <p>${m.pct!=null?`Усвоение ${m.pct}%${m.low?' (мало данных)':''} — ${mNote(m)}. `:'Тему ещё не решали. '}${fixed?'Лист уже собран.':'Уровень подобран по прошлым результатам, лист уже собран.'}</p></div></div>
+  app.innerHTML=`<div class="head"><div><h1>${esc(t.t)}</h1>
+    <p>${gradeWord(t.grade)}${m.pct!=null?` · усвоение ${m.pct}%`:''}${V.subName&&tpl==='train'?` · ${esc(V.subName)} <button class="btn link" id="subx">вся тема</button>`:''}</p></div></div>
     <div class="topic-grid">
-      <div class="levels">${tplSeg}${designBox(st,V.seed)}
-        ${tpl==='own'?'':(tpl==='train'?'':'<span class="label">Уровень темы</span>')+lv}
-        ${blocksHTML}
-        <div class="actions"><button class="btn primary" id="link">Ссылка ученику</button><button class="btn" id="print">Печать</button></div>
-        <button class="btn quiet" id="again">Другой вариант</button>
-        ${tunable?`<details class="tune"><summary>Настроить точнее</summary>
-          <div class="tune-row"><label for="lo">Числа от</label><input id="lo" type="number" value="${p.lo}"><label for="hi">до</label><input id="hi" type="number" value="${p.hi}"></div>
-          <div class="tune-row"><label for="cnt">Сколько заданий</label><input id="cnt" type="number" min="4" max="24" value="${p.count}"><button class="btn small" id="apply">Применить</button></div></details>`:''}
-        <p class="hint">${tpl!=='train'?`На листе ${total} ${plural(total,TASKS)}. `:''}Печатный лист и онлайн-версия по ссылке совпадают задание в задание: вариант ${V.seed}.</p>
-        <div class="actions">${fixed?`<span class="hint">${t.review?'Сначала берутся темы с худшим результатом, потом последние пройденные. ':''}Результат запишется в каждую тему листа отдельно.</span>`:curOf(st,t.subject)===t.id?'<span class="hint">Это текущая тема ученика.</span>':'<button class="btn small quiet" id="setcur">Сделать текущей темой</button>'}
-          ${t.custom&&!fixed?`<button class="btn small ${V.confirmDel?'pen':'quiet'}" id="del">${V.confirmDel?'Нажмите ещё раз, чтобы удалить':'Удалить тему'}</button>`:''}</div>
+      <div class="levels">${tplSeg}${tpl==='own'?'':lv}
+        ${blocksHTML}${designBox(st,V.seed)}
+        <div class="actions"><button class="btn primary" id="print">Печать</button><button class="btn" id="link">Ссылка ученику</button></div>
+        <details class="fold"><summary>Ещё</summary>
+          ${tunable?`<div class="tune-row"><label for="lo">Числа от</label><input id="lo" type="number" value="${p.lo}"><label for="hi">до</label><input id="hi" type="number" value="${p.hi}"></div>
+          <div class="tune-row"><label for="cnt">Заданий</label><input id="cnt" type="number" min="4" max="24" value="${p.count}"><button class="btn small" id="apply">Применить</button></div>`:''}
+          ${fixed||curOf(st,t.subject)===t.id?'':'<button class="btn small quiet" id="setcur">Сделать текущей темой</button>'}
+          ${t.custom&&!fixed?`<button class="btn small ${V.confirmDel?'pen':'quiet'}" id="del">${V.confirmDel?'Нажмите ещё раз, чтобы удалить':'Удалить тему'}</button>`:''}
+        </details>
       </div>
-      <div class="sheet-wrap"><div class="sheet-bar"><span class="label">Так лист выглядит на экране</span><span class="hint" id="pg-hint"></span></div>
+      <div class="sheet-wrap"><div class="sheet-bar"><span class="hint" id="pg-hint"></span><button class="btn small quiet" id="again" title="Другой вариант">⟳ Другой вариант</button></div>
         ${sheetHTML(items,{topic:shown,level:shownLv,seed:V.seed,studentName:st.name,design:resolveDesign(st,V.seed)})}</div>
     </div>`;
   const $=id=>document.getElementById(id);
   /* считаем страницы печати в невидимом черновике той же ширины */
   const countPages=()=>{if(V.screen!=='topic'||!$('pg-hint'))return;const tmp=document.createElement('div');tmp.className='pg-measure';document.body.appendChild(tmp);
     const n=paginate(tmp,items,{topic:shown,level:shownLv,seed:V.seed,studentName:st.name,design:resolveDesign(st,V.seed)});tmp.remove();
-    $('pg-hint').textContent=`при печати: ${pagesWord(n)} и ключ`};
+    $('pg-hint').textContent=pagesWord(n)};
   snapCells(app);countPages();if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{snapCells(app);countPages()});
-  app.querySelectorAll('.lvl').forEach(b=>b.onclick=()=>go({level:+b.dataset.l,seed:newSeed(),over:null,subName:null}));
+  app.querySelectorAll('#lvseg [data-l]').forEach(b=>b.onclick=()=>go({level:+b.dataset.l,seed:newSeed(),over:null,subName:null}));
   bindDesign(st);
   if($('subx'))$('subx').onclick=()=>go({over:null,subName:null,seed:newSeed()});
   if($('tpl'))$('tpl').querySelectorAll('button').forEach(b=>b.onclick=()=>{const k=b.dataset.k;
@@ -2484,11 +2519,11 @@ function viewTopic(){
 /* ---------- настройка оформления: запоминается в карточке ученика ---------- */
 const designOf=st=>st.design||(st.design={lv:2,theme:'random',bw:false});
 function designBox(st,seed){const d=designOf(st),R=resolveDesign(st,seed);
-  return `<div class="field design"><span class="label">Оформление листа</span>
+  return `<div class="field design"><span class="label">Оформление</span>
     <div class="seg dseg" id="dlv">${LEVELS.map(([k,l])=>`<button type="button" data-lv="${k}" class="${String(d.lv)===k?'on':''}">${l}</button>`).join('')}</div>
     ${+d.lv<4?`<div class="drow"><select id="dth" aria-label="Сюжет"><option value="random"${d.theme==='random'?' selected':''}>Любой сюжет</option>${THEMES.map(t=>`<option value="${t.id}"${d.theme===t.id?' selected':''}>${esc(t.n)}</option>`).join('')}</select>
-      <label class="bwl"><input type="checkbox" id="dbw"${d.bw?' checked':''}> Ч/Б</label></div>
-      <button type="button" class="dprev" id="dgal">${R.img?artImg(R.img.char,'mini'):charSVG(R.char,'mini')}<span><b>${esc(R.theme.n)}</b><small>все ${THEMES.length} ${plural(THEMES.length,['сюжет','сюжета','сюжетов'])} →</small></span></button>`:'<span class="hint">Без украшений, как раньше.</span>'}</div>`}
+      <label class="bwl"><input type="checkbox" id="dbw"${d.bw?' checked':''}> Ч/Б</label><button type="button" class="btn link" id="dgal">все сюжеты</button></div>
+`:''}</div>`}
 function bindDesign(st){const d=designOf(st);const $=id=>document.getElementById(id);
   document.querySelectorAll('#dlv button').forEach(b=>b.onclick=()=>{d.lv=+b.dataset.lv;save();render()});
   if($('dth'))$('dth').onchange=e=>{d.theme=e.target.value;save();render()};
