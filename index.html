@@ -250,6 +250,51 @@ a.btn{text-decoration:none}
 .topic .subs{font-size:12px;color:var(--ink-3);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .subchip{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--ink-soft);border-radius:10px;padding:8px 12px;margin:8px 0 0}
 
+/* Шапка ученика и работы */
+.sthead{display:flex;align-items:center;gap:14px;background:var(--pen-soft);border:2px solid var(--pen);border-radius:16px;padding:14px 16px;margin-bottom:12px}
+.ava.big{width:52px;height:52px;font-size:19px;background:var(--pen);color:var(--card)}
+.sth-t{display:flex;flex-direction:column;min-width:0;flex:1}
+.sth-t h1{font-family:var(--f-disp);font-weight:600;font-size:clamp(20px,3vw,26px);letter-spacing:-.01em;overflow-wrap:anywhere}
+.sth-t span{color:var(--pen);font-weight:600}
+.more{position:relative}
+.more-btn{width:42px;height:42px;border-radius:10px;border:1.5px solid var(--pen);background:var(--card);font-size:22px;line-height:1;font-weight:700}
+.more-pop{position:absolute;right:0;top:48px;z-index:6;background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 10px 30px rgba(20,30,60,.18);padding:6px;min-width:220px}
+.more-pop button{width:100%;text-align:left;border:0;background:none;padding:10px 12px;border-radius:8px;color:var(--bad);font-weight:600}
+.more-pop button:hover{background:var(--bad-soft)}
+.more-pop button.danger{background:var(--bad);color:var(--card)}
+.worksbtn{width:100%;display:flex;align-items:center;gap:12px;border:2px solid var(--blue);background:var(--blue-soft);border-radius:14px;padding:12px 16px;margin-bottom:12px;text-align:left;font-size:16px}
+.worksbtn:hover{filter:brightness(.97)}
+.wb-ic{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-weight:800;background:var(--blue);color:var(--card);flex:none}
+.wb-t{display:flex;flex-direction:column;gap:2px;min-width:0}
+.wb-t small{font-size:13.5px;color:var(--blue);font-weight:600}
+.wb-n{min-width:34px;height:34px;padding:0 10px;border-radius:99px;display:grid;place-items:center;font-weight:800;font-size:17px;background:var(--warn);color:var(--card);margin-left:auto}
+.worksbtn.wait{border-color:var(--warn);background:var(--warn-soft)}
+.worksbtn.wait .wb-ic{background:var(--warn)}
+.worksbtn.wait .wb-t small{color:var(--warn)}
+.worksbtn.wait .wb-n+.arr{margin-left:4px}
+.worksbtn .arr,.wk .arr{margin-left:auto;color:var(--ink-3);font-weight:700}
+.wlist{display:flex;flex-direction:column;padding:6px}
+.wk{display:flex;align-items:center;gap:10px;border:0;background:none;border-radius:10px;padding:12px;text-align:left}
+.wk:hover{background:var(--ink-soft)}
+.wk.static:hover{background:none}
+.wk-t{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}
+.wk-t small{color:var(--ink-2);font-size:13px}
+.wk-t details{font-size:13px;margin-top:4px}
+.wk-t summary{cursor:pointer;color:var(--pen);font-weight:600}
+.wwork{padding:6px}
+.wrow{display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 12px;border-radius:9px}
+.wrow+.wrow{border-top:1px solid var(--line)}
+.wrow.bad{background:var(--bad-soft)}
+.wn{color:var(--ink-3);font-variant-numeric:tabular-nums}
+.wq2{overflow-wrap:break-word}
+.wa2{text-align:right;font-variant-numeric:tabular-nums}
+.wrow.ok .wa2{color:var(--ok)}
+.wrow.bad s{color:var(--bad)}
+details.done{margin:2px 0 6px}
+details.done>summary{cursor:pointer;color:var(--ink-3);font-size:13.5px;padding:6px 10px;border-radius:8px}
+details.done>summary:hover{background:var(--ink-soft)}
+details.done .topic{opacity:.7}
+
 /* Виды листа */
 .seg.tpl{gap:4px}
 .seg.tpl button{padding:7px 11px;font-size:14px;min-width:0}
@@ -1340,17 +1385,29 @@ const pagesWord=n=>`${n} ${plural(n,['страница','страницы','ст
 
 /* ---------- экраны ---------- */
 const app=document.getElementById('app');
-function go(v){V={...V,...v};render();window.scrollTo({top:0})}
+/* каждый экран — отдельный шаг в истории браузера: «Назад» возвращает на прошлый экран, а не уводит с сайта */
+let popping=false;
+const navKey=v=>[v.screen,v.studentId,v.topicId,v.code].join('|');
+function go(v){const before=navKey(V);V={...V,...v};render();window.scrollTo({top:0});
+  if(popping||STUDENT_MODE||['player','done'].includes(V.screen))return;
+  try{const st={V:JSON.parse(JSON.stringify(V))};if(navKey(V)!==before)history.pushState(st,'');else history.replaceState(st,'')}catch(e){}}
+window.addEventListener('popstate',e=>{if(STUDENT_MODE||!e.state||!e.state.V)return;
+  mroot.innerHTML='';popping=true;V=e.state.V;P=null;
+  if(V.studentId&&!student(V.studentId))V={screen:'students'};
+  if(V.topicId&&!TOPICS[V.topicId]&&['topic','print'].includes(V.screen))V={...V,screen:'student'};
+  render();popping=false});
 
 function crumbs(){
   const c=document.getElementById('crumbs');const parts=[];
   const st=V.studentId&&student(V.studentId);
   if(V.screen==='students'){parts.push('<span class="cur">Ученики</span>')}
   else{parts.push('<button data-go="students">Ученики</button>')}
-  if(st&&V.screen!=='students'){parts.push('›');parts.push(V.screen==='student'?`<span class="cur">${esc(st.name)}</span>`:`<button data-go="student">${esc(st.name)}</button>`)}
+  if(st&&V.screen!=='students'&&!['player','done'].includes(V.screen)){parts.push('›');parts.push(V.screen==='student'?`<span class="cur">${esc(st.name)}</span>`:`<button data-go="student">${esc(st.name)}</button>`)}
   if(V.topicId&&['topic','print'].includes(V.screen)){parts.push('›');parts.push(V.screen==='topic'?`<span class="cur">${esc(TOPICS[V.topicId].t)}</span>`:`<button data-go="topic">${esc(TOPICS[V.topicId].t)}</button>`)}
   if(V.screen==='print'){parts.push('›');parts.push('<span class="cur">Печать</span>')}
   if(V.screen==='builder'){parts.push('›');parts.push('<span class="cur">Своя тема</span>')}
+  if(V.screen==='works'){parts.push('›');parts.push('<span class="cur">Работы и домашки</span>')}
+  if(V.screen==='work'){parts.push('›');parts.push('<button data-go="works">Работы и домашки</button>');parts.push('›');parts.push(`<span class="cur">${esc(V.code||'')}</span>`)}
   if(['player','done'].includes(V.screen)){parts.length=0;parts.push('<span class="cur">Экран ученика</span>')}
   c.innerHTML=parts.join(' ');
   c.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>go({screen:b.dataset.go}));
@@ -1362,7 +1419,7 @@ function crumbs(){
 
 function render(){
   crumbs();
-  ({students:viewStudents,student:viewStudent,topic:viewTopic,print:viewPrint,player:viewPlayer,done:viewDone,builder:viewBuilder,
+  ({students:viewStudents,student:viewStudent,topic:viewTopic,print:viewPrint,player:viewPlayer,done:viewDone,builder:viewBuilder,works:viewWorks,work:viewWork,
     badlink:()=>{app.innerHTML='<div class="player"><div class="panel finish"><h1 style="font-size:22px">Ссылка не открывается</h1><p style="margin:0">Похоже, она скопирована не целиком. Попроси репетитора прислать её ещё раз.</p></div></div>'}})[V.screen]();
 }
 
@@ -1449,12 +1506,15 @@ function viewStudent(){
   const grades=subj==='math'?[1,2,3,4]:[1,2,3,4].filter(g=>g===st.grade||mine(g).length);
   let prog=`<div class="tools"><span class="hint">${subj==='math'?'Программа по учебнику Моро: 1–3 класс сверены, 4 класс пока свой. Откройте тему, чтобы дать задание или сделать её текущей.':'Ваши темы по русскому идут в маршруте по классам. Откройте тему, чтобы дать задание или сделать её текущей.'}</span><button class="btn small" id="newt">+ Своя тема</button></div>`;
   const cur=pos.i>=0?TOPICS[pos.tr[pos.i]]:null,cg=cur?cur.grade:st.grade,cp=cur?partOf(cur.id):1;
+  const trI=id=>pos.tr.indexOf(id);
+  const secRows=ts=>{const done=ts.filter(t=>pos.i>=0&&trI(t.id)>=0&&trI(t.id)<pos.i),rest=ts.filter(t=>!done.includes(t));
+    return (done.length?`<details class="done"><summary>Пройдено: ${done.length} ${plural(done.length,['тема','темы','тем'])}</summary>${done.map(t=>row(TOPICS[t.id])).join('')}</details>`:'')+rest.map(t=>row(TOPICS[t.id])).join('')};
   if(subj==='math')for(const g of grades){
     const secs=MATH[g],parts=[...new Set(secs.map(x=>x.part))],my=mine(g),n=secs.reduce((a,x)=>a+x.topics.length,0)+my.length;
     prog+=`<details class="cg"${g===cg?' open':''}><summary><b>${gradeWord(g)}</b>${g===st.grade?'<span class="chip">класс ученика</span>':''}${secs[0].unverified?'<span class="chip warn">не сверено с учебником</span>':''}<span class="cnt">${n} ${plural(n,['тема','темы','тем'])}</span></summary>`;
-    for(const pt of parts){const inner=secs.filter(x=>x.part===pt).map(sec=>`<div class="sec"><h3>${esc(sec.s)}</h3>${sec.topics.map(t=>row(TOPICS[t.id])).join('')}</div>`).join('');
+    for(const pt of parts){const inner=secs.filter(x=>x.part===pt).map(sec=>`<div class="sec"><h3>${esc(sec.s)}</h3>${secRows(sec.topics)}</div>`).join('');
       prog+=parts.length>1?`<details class="cp"${g===cg&&pt===cp?' open':''}><summary>Часть ${pt}</summary>${inner}</details>`:inner}
-    if(my.length)prog+=`<div class="sec"><h3>${MY}</h3>${my.map(row).join('')}</div>`;
+    if(my.length)prog+=`<div class="sec"><h3>${MY}</h3>${secRows(my)}</div>`;
     prog+='</details>';
   }
   if(subj!=='math')for(const g of grades){
@@ -1468,20 +1528,15 @@ function viewStudent(){
     <p class="hint legend-note">Усвоение считается по трём последним работам: свежие и длинные весят больше. На базовом уровне — не выше 80%, поэтому «освоено» значит решено на среднем или сложном уровне.</p>`;
   const body=`<div class="search"><input id="tq" type="search" autocomplete="off" aria-label="Найти тему" placeholder="Найти тему: слово или пример, например «таблица» или 37 + 48" value="${esc(V.q||'')}"></div>
     <div id="sres" class="sres" hidden></div><div id="pmain">${route}${prog}</div>`;
-  const atts=S.attempts.filter(a=>a.studentId===st.id&&TOPICS[a.topicId]).sort((a,b)=>b.date-a.date);
-  const hws=S.assignments.filter(a=>a.studentId===st.id&&a.status==='выдано'&&TOPICS[a.topicId]);
-  const side=`<div class="panel side"><div class="side-head"><h2>Работы и домашки</h2><button class="btn small quiet" id="imp">Внести результат</button></div>
-    ${hws.map(h=>`<div class="res"><div class="res-top"><span class="t">${esc(TOPICS[h.topicId].t)}</span><span class="chip warn">ждём</span></div>
-      <span class="m">Код <b>${esc(h.code)}</b> · выдано ${ago(h.date)}</span>
-      <div><button class="btn small quiet" data-open="${esc(h.code)}">Открыть как ученик</button></div></div>`).join('')}
-    ${atts.map(a=>{const p=Math.round(a.correct/a.total*100);const c=p>=85?'ok':p>=60?'warn':'bad';
-      return `<div class="res"><div class="res-top"><span class="t">${esc(TOPICS[a.topicId].t)}</span><span class="chip ${c} num">${a.correct} из ${a.total}</span></div>
-      <span class="m">${LV[a.level]} уровень · ${Math.floor(a.time/60)} мин ${a.time%60} с · ${ago(a.date)}${a.via?' · из повторения':''}${a.answered!=null&&a.answered<a.total?` · <b style="color:var(--pen)">сдано досрочно, решено ${a.answered}</b>`:''}</span>
-      ${a.mistakes.length?`<details><summary>Ошибки: ${a.mistakes.length}</summary><div class="mist">${a.mistakes.map(m=>`<div><span>${esc(m.q)}</span><span>ответ <s>${esc(m.given)}</s> → ${esc(m.ans)}</span></div>`).join('')}</div></details>`:''}</div>`}).join('')}
-    ${!hws.length&&!atts.length?'<p class="empty">Пока пусто. Выдайте первое задание по ссылке: результат появится здесь.</p>':''}</div>`;
-  app.innerHTML=`<div class="head"><div><h1>${esc(st.name)}</h1><p>${gradeWord(st.grade)} в школе. Маршрут показывает, где ученик сейчас по программе.</p></div>
-    <button class="btn small ${V.confirmStDel?'pen':'quiet'}" id="delst">${V.confirmStDel?'Нажмите ещё раз: ученик и его работы удалятся':'Удалить ученика'}</button></div>
-    <div class="cols"><div class="panel"><div class="tabs">${tabs}</div>${body}</div>${side}</div>`;
+  const nWait=S.assignments.filter(a=>a.studentId===st.id&&a.status==='выдано'&&TOPICS[a.topicId]).length;
+  const nDone=S.assignments.filter(a=>a.studentId===st.id&&a.status==='сдано').length+S.attempts.filter(a=>a.studentId===st.id&&!a.hw&&!a.via).length;
+  app.innerHTML=`<div class="sthead"><div class="ava big">${esc(initials(st.name))}</div><div class="sth-t"><h1>${esc(st.name)}</h1><span>${gradeWord(st.grade)}</span></div>
+      <div class="more"><button class="more-btn" id="more" aria-label="Ещё действия" aria-expanded="${V.menu?'true':'false'}">⋯</button>
+        ${V.menu?`<div class="more-pop"><button class="${V.confirmStDel?'danger':''}" id="delst">${V.confirmStDel?'Нажмите ещё раз: ученик и все его работы удалятся':'Удалить ученика'}</button></div>`:''}</div></div>
+    <button class="worksbtn${nWait?' wait':''}" id="works"><span class="wb-ic" aria-hidden="true">${nWait?'!':'✓'}</span><span class="wb-t"><b>Работы и домашки</b>
+      <small>${nWait?`ждём ${nWait} ${plural(nWait,['домашку','домашки','домашек'])} · `:'все домашки сданы · '}${nDone} ${plural(nDone,['работа','работы','работ'])}</small></span>
+      ${nWait?`<span class="wb-n num">${nWait}</span>`:''}<span class="arr">→</span></button>
+    <div class="panel"><div class="tabs">${tabs}</div>${body}</div>`;
   app.querySelectorAll('.tab').forEach(b=>b.onclick=()=>go({subject:b.dataset.s,confirmStDel:false}));
   app.querySelectorAll('.topic[data-t],.rl[data-t]').forEach(b=>b.onclick=()=>openTopic(b.dataset.t));
   const $=id=>document.getElementById(id);
@@ -1491,9 +1546,40 @@ function viewStudent(){
   if($('r-new'))$('r-new').onclick=openBuilder;
   const tq=$('tq');tq.oninput=()=>{V.q=tq.value;showSearch(st,subj)};showSearch(st,subj);
   $('newt').onclick=openBuilder;
-  $('imp').onclick=importModal;
-  $('delst').onclick=()=>{if(!V.confirmStDel){V.confirmStDel=true;render();return}deleteStudent(st)};
-  app.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>{const h=S.assignments.find(x=>x.code===b.dataset.open);startPlayer(h)});
+  $('more').onclick=()=>{V.menu=!V.menu;V.confirmStDel=false;render()};
+  if($('delst'))$('delst').onclick=()=>{if(!V.confirmStDel){V.confirmStDel=true;render();return}V.menu=false;deleteStudent(st)};
+  $('works').onclick=()=>go({screen:'works',menu:false});
+}
+
+/* ---------- работы и домашки ученика ---------- */
+const resChip=(c,t)=>{const p=Math.round(c/t*100);return `<span class="chip ${p>=85?'ok':p>=60?'warn':'bad'} num">${c} из ${t}</span>`};
+function viewWorks(){
+  const st=student(V.studentId);
+  const hs=S.assignments.filter(a=>a.studentId===st.id&&TOPICS[a.topicId]).sort((a,b)=>b.date-a.date);
+  const old=S.attempts.filter(a=>a.studentId===st.id&&!a.hw&&!a.via&&TOPICS[a.topicId]).sort((a,b)=>b.date-a.date);
+  const hRow=h=>{const t=TOPICS[h.topicId];return `<button class="wk" data-code="${esc(h.code)}"><span class="wk-t"><b>${esc(t.sheet||t.review?t.L[0].n+': '+t.t:t.t)}</b>
+      <small>Код ${esc(h.code)} · выдано ${ago(h.date)}${h.result?' · '+Math.floor(h.result.time/60)+' мин '+h.result.time%60+' с':''}</small></span>
+      ${h.status==='сдано'&&h.result?resChip(h.result.correct,h.result.total):h.status==='сдано'?'<span class="chip ok">сдано</span>':'<span class="chip warn">ждём</span>'}<span class="arr">→</span></button>`};
+  app.innerHTML=`<div class="head"><div><h1>Работы и домашки</h1><p>${esc(st.name)}, ${gradeWord(st.grade)}. Откройте работу, чтобы увидеть каждое задание и ответ ученика.</p></div>
+    <button class="btn" id="imp">Внести результат по коду</button></div>
+    <div class="panel wlist">${hs.length?hs.map(hRow).join(''):'<p class="empty">Домашек пока нет. Выдайте задание по ссылке на экране темы.</p>'}</div>
+    ${old.length?`<h2 class="pr-h" style="margin-top:22px">Работы до этой версии</h2><div class="panel wlist">${old.map(a=>`<div class="wk static"><span class="wk-t"><b>${esc(TOPICS[a.topicId].t)}</b>
+      <small>${LV[Math.min(a.level||0,2)]} уровень · ${ago(a.date)}</small>${a.mistakes.length?`<details><summary>Ошибки: ${a.mistakes.length}</summary><div class="mist">${a.mistakes.map(m=>`<div><span>${esc(m.q)}</span><span>ответ <s>${esc(m.given)}</s> → ${esc(m.ans)}</span></div>`).join('')}</div></details>`:''}</span>${resChip(a.correct,a.total)}</div>`).join('')}</div>`:''}`;
+  document.getElementById('imp').onclick=importModal;
+  app.querySelectorAll('.wk[data-code]').forEach(b=>b.onclick=()=>go({screen:'work',code:b.dataset.code}));
+}
+function viewWork(){
+  const st=student(V.studentId);const h=S.assignments.find(a=>a.code===V.code);
+  if(!h||!TOPICS[h.topicId]){app.innerHTML='<p class="empty">Работа не найдена.</p>';return}
+  const t=TOPICS[h.topicId];const items=generate({...t.L[h.level].p,...(h.over||{})},h.seed);const r=h.result;
+  const rows=items.map((it,i)=>{const done=r&&r.answers&&i<r.answers.length;const ok=done&&r.oks[i];
+    return `<div class="wrow ${done?(ok?'ok':'bad'):''}"><span class="wn">${i+1}</span><span class="wq2">${esc(plainQ(it))}</span>
+      <span class="wa2">${done?(ok?`<b>${esc(r.answers[i])}</b> ✓`:`<s>${esc(r.answers[i])}</s> → <b>${esc(fmt(it.ans))}</b>`):`<span class="hint">ответ: ${esc(fmt(it.ans))}</span>`}</span></div>`}).join('');
+  app.innerHTML=`<div class="head"><div><span class="label">${esc(st.name)} · код ${esc(h.code)}</span><h1>${esc(t.sheet||t.review?t.L[0].n+': '+t.t:t.t)}</h1>
+    <p>${r?`Результат ${r.correct} из ${r.total}${r.answered<r.total?`, решено ${r.answered}`:''} · ${Math.floor(r.time/60)} мин ${r.time%60} с · сдано ${ago(r.date)}`:h.status==='сдано'?'Сдано до этой версии: подробных ответов нет.':'Ученик ещё не сдал работу. Ниже задания с правильными ответами.'}</p></div>
+    ${h.status==='выдано'?'<button class="btn" id="as">Решить здесь как ученик</button>':''}</div>
+    <div class="panel wwork">${rows}</div>`;
+  const as=document.getElementById('as');if(as)as.onclick=()=>startPlayer(h);
 }
 /* ---------- поиск темы: слова с опечатками, синонимы, подтемы учебника и пример вида 37 + 48 ---------- */
 const partOf=id=>{for(const g in MATH)for(const sec of MATH[g])if(sec.topics.some(t=>t.id===id))return sec.part;return 1};
@@ -1828,7 +1914,8 @@ function recordResult(h,r){
     const by={};for(const[src,ok]of r.log){by[src]=by[src]||{c:0,n:0};by[src].n++;if(ok)by[src].c++}
     Object.keys(by).filter(src=>TOPICS[src]).forEach((src,k)=>S.attempts.push({...base,id:id+'-'+k,topicId:src,level:Math.min(1,TOPICS[src].L.length-1),
       correct:by[src].c,total:by[src].n,mistakes:r.mistakes.filter(m=>m.src===src),via:'review'}));
-  }else S.attempts.push({...base,id,topicId:h.topicId,level:h.level,correct:r.correct,total:r.total,answered:r.answered,mistakes:r.mistakes});
+  }else S.attempts.push({...base,id,topicId:h.topicId,level:h.level,correct:r.correct,total:r.total,answered:r.answered,mistakes:r.mistakes,hw:h.code});
+  h.result={correct:r.correct,total:r.total,answered:r.answered,time:r.time,date:Date.now(),answers:r.log.map(x=>x[2]==null?'':String(x[2])),oks:r.log.map(x=>x[1]?1:0)};
   h.status='сдано';save();
 }
 function importModal(){
@@ -1843,7 +1930,7 @@ function importModal(){
       const h=S.assignments.find(a=>a.code===d.c);
       if(!h){err.textContent=`Домашки ${d.c} нет в этом браузере. Код подходит только к домашке, которую выдали здесь.`;return}
       if(h.status==='сдано'){err.textContent=`Результат домашки ${d.c} уже внесён.`;return}
-      recordResult(h,{correct:d.k,total:d.n,answered:d.a,time:d.tm,log:d.l,mistakes:d.m||[]});close();go({screen:'student',studentId:h.studentId})};
+      recordResult(h,{correct:d.k,total:d.n,answered:d.a,time:d.tm,log:d.l,mistakes:d.m||[]});close();go({screen:'work',studentId:h.studentId,code:h.code})};
   });
 }
 function linkModal(){
@@ -1970,7 +2057,7 @@ function key(k){
 }
 function submit(){
   const it=P.items[P.i];const ok=norm(it.ans)===norm(P.input);
-  P.log.push([it.src||'',ok?1:0]);
+  P.log.push([it.src||'',ok?1:0,P.input]);
   if(ok){P.correct++;P.streak++;P.score+=10}else{P.streak=0;P.mistakes.push({q:plainQ(it),given:P.input,ans:String(fmt(it.ans)),src:it.src})}
   P.fb={ok,ans:String(fmt(it.ans))};P.lock=true;viewPlayer();
   setTimeout(()=>{P.lock=false;P.fb=null;P.input='';P.i++;if(P.i>=P.items.length)finish();else viewPlayer()},ok?650:1500);
@@ -1991,10 +2078,10 @@ function viewDone(){
       <p class="hint" style="margin:0">Время: ${Math.floor(a.time/60)} мин ${a.time%60} с. Очки: ${P.score}.</p></div>
     ${P.remote?`<div class="panel rbox"><b>Отправь этот код репетитору</b><span class="hint">Скопируй и пришли в мессенджере. По нему репетитор увидит твой результат и ошибки.</span>
       <textarea id="rcode" readonly rows="3">${P.rcode}</textarea><button class="btn primary" id="rcp">Скопировать код</button></div>`
-      :'<button class="btn primary" id="back">Вернуться к репетитору и посмотреть результат</button>'}</div>`;
+      :'<button class="btn primary" id="back">Вернуться к репетитору: разбор работы</button>'}</div>`;
   if(P.remote){const b=document.getElementById('rcp');b.onclick=()=>{const t=document.getElementById('rcode');const ok=()=>{b.textContent='Код скопирован'};
     if(navigator.clipboard)navigator.clipboard.writeText(t.value).then(ok,()=>{t.select()});else t.select()};return}
-  document.getElementById('back').onclick=()=>{const sid=P.h.studentId;P=null;go({screen:'student',studentId:sid,subject:'math'})};
+  document.getElementById('back').onclick=()=>{const sid=P.h.studentId,code=P.h.code;P=null;go({screen:'work',studentId:sid,code})};
 }
 document.addEventListener('keydown',e=>{
   if(V.screen!=='player'||!P||mroot.innerHTML)return;
@@ -2012,6 +2099,7 @@ let STUDENT_MODE=false;
   catch(e){V={screen:'badlink'}}}}
 document.getElementById('home').onclick=()=>{if(!STUDENT_MODE)go({screen:'students'})};
 render();
+if(!STUDENT_MODE)try{history.replaceState({V:JSON.parse(JSON.stringify(V))},'')}catch(e){}
 </script>
 
 </html>
