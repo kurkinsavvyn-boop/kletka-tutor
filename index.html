@@ -368,12 +368,11 @@ details.done .topic{opacity:.7}
 .band .sh-sub{margin-top:1cqw}
 .band-art .art{width:15cqw;height:15cqw}
 img.art.pic{object-fit:contain;display:block}
-.hero-art img.art.pic{width:24cqw;height:30cqw}
-.band-art img.art.pic{height:19cqw;width:15cqw}
-.sh-items>.scene2{grid-column:1/-1;display:flex;justify-content:flex-end;align-items:flex-start;gap:var(--c);height:calc(var(--c) * 8)}
+.hero-art img.art.pic{width:36cqw;height:46cqw}
+.band-art img.art.pic{height:30cqw;width:22cqw;margin:-6cqw 0 -3cqw}
+.sh-items>.scene2{grid-column:1/-1;display:flex;justify-content:flex-end;align-items:flex-start;gap:0;height:calc(var(--c) * 16)}
 .scene2 img.art.pic{height:100%;width:auto}
-.scene2 .say{margin-top:calc(var(--c) * 2);height:calc(var(--c) * 2);line-height:calc(var(--c) * 2);padding:0 var(--c);font-size:calc(var(--c) * .9);font-weight:800;color:var(--p1);background:#fff;border:.35cqw solid var(--p1);border-radius:var(--c);position:relative}
-.scene2 .say::after{content:"";position:absolute;right:calc(var(--c) * -1.1);top:calc(var(--c) * .55);border:calc(var(--c) * .5) solid transparent;border-left-color:var(--p1)}
+.scene2 img.art.pic.say{height:calc(var(--c) * 4);width:auto;margin-top:calc(var(--c) * 1)}
 .bw img.art.pic{filter:grayscale(1)}
 .lv1 .sh-title,.lv2 .sh-title,.lv3 .sh-title{color:var(--p1)}
 .lv3 .tico{width:5.4cqw;height:5.4cqw;display:inline-block;vertical-align:-1cqw;margin-right:1cqw}
@@ -1301,7 +1300,7 @@ const THEMES=[
   {id:'cheb',n:'Ушастик и крокодил',chars:['cheburashka','gena'],stk:['orange','accordion','house','star']},
   {id:'pogodi',n:'Волк и Заяц',chars:['wolf','hare'],stk:['carrot','note','star','sun']},
   {id:'prosto',n:'Простоквашино',chars:['matroskin','sharik'],stk:['milk','bone','house','sun'],
-   img:{top:'art/prost-top.webp',bot:'art/prost-bot.webp',char:'art/prost-char.webp',say:'Кто там?'}},
+   img:{top:'art/prost-top.webp',bot:'art/prost-bot.webp',char:'art/prost-char.webp',say:'art/prost-say.webp'}},
   {id:'carlson',n:'Малыш с пропеллером',chars:['carlson'],stk:['jam','propeller','cloud','cake']},
   {id:'umka',n:'Белый медвежонок',chars:['umka'],stk:['snowflake','fishS','moon','star']},
   {id:'lion',n:'Львёнок и черепаха',chars:['lion','turtle'],stk:['sun','palm','flower','note']},
@@ -1932,7 +1931,7 @@ function sheetParts(items,{topic,level,seed,studentName,answers,design}){
     const grp=mixed&&newGroup(it,i)?`<div class="grp">${gi}<b>${esc(it.lbl?it.lbl+' · '+tt:tt)}</b> ${esc(instr(it))}</div>`:'';
     if(cellable(it))return grp+`<div class="it ci">${cellItemHTML(it,i,answers)}</div>`;
     return grp+richItemHTML(it,i,answers)});
-  if(D&&D.lv===1&&D.theme.img)pieces.push(`<div class="scene2"><span class="say">${esc(D.theme.img.say||'')}</span>${artImg(D.theme.img.bot)}</div>`);
+  if(D&&D.lv===1&&D.theme.img)pieces.push(`<div class="scene2">${D.theme.img.say?artImg(D.theme.img.say,'say'):''}${artImg(D.theme.img.bot)}</div>`);
   if(D&&D.lv===1)pieces.push(`<div class="selfcheck"><span>Как я справился?</span>${FACES.map(f=>`<svg class="art" viewBox="0 0 40 40" aria-hidden="true">${f}</svg>`).join('')}</div>`);
   const cls=D?`lv${D.lv} fr-${D.frame}${D.bw?' bw':''}`:'';
   const pal=D?(D.bw?['#555','#999','#f2f2f2','#777']:D.pal):null;
