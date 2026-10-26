@@ -351,7 +351,7 @@ details.done .topic{opacity:.7}
 .sheet .sh-head{padding:0 !important}
 .sh-items>.heroG,.sh-items>.tailG{grid-column:1/-1;display:flex;gap:calc(var(--c) * 2);align-items:stretch}
 .hA{position:relative;flex:none;min-height:calc(var(--c) * 13)}
-.hA .art{position:absolute;inset:0;width:100% !important;height:100% !important;object-fit:contain;object-position:center top}
+.hA .art{position:absolute;inset:0;width:100% !important;height:100% !important;object-fit:contain;object-position:center}
 .hR{flex:1;min-width:0;display:flex;flex-direction:column;gap:var(--c)}
 .hT{display:flex;flex-direction:column;gap:var(--c)}
 .hT .sh-title{line-height:1.1}
@@ -437,6 +437,8 @@ img.art.pic{object-fit:contain;display:block}
 .gchars{display:flex;justify-content:center;gap:4px}
 .gchars .art{width:76px;height:76px}
 .gchars.many .art{width:48px;height:48px}
+.gchars img.art.pic{width:auto;height:96px;max-width:31%}
+.dprev img.art.pic{width:44px;height:44px}
 .gstk{display:flex;gap:6px}
 .gstk .art{width:26px;height:26px}
 
@@ -1321,16 +1323,15 @@ const STK={
 
 /* 20 сюжетов: персонажи и наклейки */
 const THEMES=[
-  {id:'honey',n:'Медвежонок с мёдом',chars:['bear','piglet'],stk:['honey','balloon','bee','flower']},
-  {id:'leopold',n:'Кот в бабочке и мышата',chars:['catBow','mouse'],stk:['cheese','bow','heart','flower']},
-  {id:'funtik',n:'Поросёнок в шляпе',chars:['funtik','mokus'],stk:['umbrella','balloon','candy','star']},
-  {id:'cheb',n:'Ушастик и крокодил',chars:['cheburashka','gena'],stk:['orange','accordion','house','star']},
-  {id:'pogodi',n:'Волк и Заяц',chars:['wolf','hare'],stk:['carrot','note','star','sun']},
-  {id:'prosto',n:'Простоквашино',chars:['matroskin','sharik'],stk:['milk','bone','house','sun'],
-   img:{top:'art/prost-top.webp',bot:'art/prost-bot.webp',char:'art/prost-char.webp',say:'art/prost-say.webp'}},
-  {id:'carlson',n:'Малыш с пропеллером',chars:['carlson'],stk:['jam','propeller','cloud','cake']},
-  {id:'umka',n:'Белый медвежонок',chars:['umka'],stk:['snowflake','fishS','moon','star']},
-  {id:'lion',n:'Львёнок и черепаха',chars:['lion','turtle'],stk:['sun','palm','flower','note']},
+  {id:'honey',n:'Винни-Пух',art:['pooh-1','pooh-2','pooh-3'],chars:['bear','piglet'],stk:['honey','balloon','bee','flower']},
+  {id:'leopold',n:'Кот Леопольд',art:['leopold-1','leopold-2','leopold-3'],chars:['catBow','mouse'],stk:['cheese','bow','heart','flower']},
+  {id:'funtik',n:'Поросёнок Фунтик',art:['funtik-1','funtik-2','funtik-3'],chars:['funtik','mokus'],stk:['umbrella','balloon','candy','star']},
+  {id:'cheb',n:'Чебурашка',art:['cheburashka-1','cheburashka-2','cheburashka-3'],chars:['cheburashka','gena'],stk:['orange','accordion','house','star']},
+  {id:'pogodi',n:'Ну, погоди!',art:['pogodi-1','pogodi-2','pogodi-3'],chars:['wolf','hare'],stk:['carrot','note','star','sun']},
+  {id:'prosto',n:'Простоквашино',art:['prostokvashino-1','prostokvashino-2','prostokvashino-3'],chars:['matroskin','sharik'],stk:['milk','bone','house','sun']},
+  {id:'carlson',n:'Малыш и Карлсон',art:['carlson-1','carlson-2','carlson-3'],chars:['carlson'],stk:['jam','propeller','cloud','cake']},
+  {id:'umka',n:'Умка',art:['umka-1','umka-2'],chars:['umka'],stk:['snowflake','fishS','moon','star']},
+  {id:'lion',n:'Львёнок и Черепаха',art:['lion-1','lion-2','lion-3'],chars:['lion','turtle'],stk:['sun','palm','flower','note']},
   {id:'heroes',n:'Супергерои',chars:['ironHero','spiderHero','thunderHero','sorcerer'],stk:['lightning','shield','star','rocket']},
   {id:'space',n:'Космос',chars:['astronaut','robot'],stk:['rocket','planet','star','moon']},
   {id:'dino',n:'Динозавры',chars:['trex','stego'],stk:['egg','leaf','palm','star']},
@@ -1348,6 +1349,11 @@ const PALETTES=[
   ['#4A9B4F','#C98A2E','#EBF6E8','#D9534F'],['#7A5AF8','#E8609E','#F0ECFF','#25A897'],['#F0699A','#3BA9D6','#FFF0F5','#E8A520'],['#E8573F','#E8A520','#FFEDE6','#3D5A98']];
 const FRAMES=['solid','dashed','double','dots','stripes'];
 const LEVELS=[['1','Сказка'],['2','Яркий'],['3','Спокойный'],['4','Строгий']];
+/* рисованные сюжеты: у темы до трёх наборов, набор выбирается по номеру варианта.
+   top — сверху слева (смотрит вправо), bot — снизу справа (смотрит влево), char — самостоятельная картинка для «Яркого» */
+const ART_SAY={'prostokvashino-1':'art/prostokvashino-1-say.webp'};
+const artSet=(t,k)=>{if(!t.art||!t.art.length)return null;const a=t.art[((k%t.art.length)+t.art.length)%t.art.length];
+  return{id:a,top:`art/${a}-top.webp`,bot:`art/${a}-mid.webp`,char:`art/${a}-bot.webp`,say:ART_SAY[a]||''}};
 const charSVG=(id,cls)=>`<svg class="art ${cls||''}" viewBox="0 0 100 100" aria-hidden="true">${CHARS[id]()}</svg>`;
 /* рисованные картинки темы: сверху персонаж смотрит вправо, снизу влево */
 const artImg=(src,cls)=>`<img class="art pic ${cls||''}" src="${src}" alt="" aria-hidden="true">`;
@@ -1357,7 +1363,8 @@ function resolveDesign(st,seed){
   const d=(st&&st.design)||{lv:2,theme:'random',bw:false};
   const r=rng(seed*7919+13);
   const theme=d.theme&&d.theme!=='random'?THEMES.find(t=>t.id===d.theme)||THEMES[0]:THEMES[Math.floor(r()*THEMES.length)];
-  return{lv:+d.lv||2,bw:!!d.bw,theme,pal:PALETTES[Math.floor(r()*PALETTES.length)],frame:FRAMES[Math.floor(r()*FRAMES.length)],char:pick(r,theme.chars),seed};
+  const out={lv:+d.lv||2,bw:!!d.bw,theme,pal:PALETTES[Math.floor(r()*PALETTES.length)],frame:FRAMES[Math.floor(r()*FRAMES.length)],char:pick(r,theme.chars),seed};
+  out.img=artSet(theme,Math.floor(r()*99));return out;
 }
 
 function formItem(p,r){for(let k=0;k<200;k++){const it=FORMS[pick(r,p.forms)](r,p);if(it)return it}return{...E(2,'+',3),fail:true}}
@@ -1954,8 +1961,8 @@ function sheetParts(items,{topic,level,seed,studentName,answers,design}){
     <div class="fld">${gradeWord(topic.grade)} · ${lvl}</div><div class="fld">Вариант <b class="num">${seed}</b></div></div>`;
   const titleH=`<div class="sh-title">${answers?'<span class="key-stamp">Ключ</span> ':''}${D&&D.lv===3?stkSVG(D.theme.stk[0],'tico'):''}${esc(title)}</div>`;
   const head=!D?`${fields}<div>${titleH}</div><div class="sh-sub">${subText}</div>`
-    :D.lv===1?`${fields}<div class="hero"><div class="hero-art">${D.theme.img?artImg(D.theme.img.top):charSVG(D.char)}</div><div class="hero-r">${titleH}<div class="bubble">${subText}</div></div></div>`
-    :D.lv===2?`<div class="band"><div class="band-t">${titleH}<div class="sh-sub">${subText}</div></div><div class="band-art">${D.theme.img?artImg(D.theme.img.char):charSVG(D.char)}</div></div>${fields}`
+    :D.lv===1?`${fields}<div class="hero"><div class="hero-art">${D.img?artImg(D.img.top):charSVG(D.char)}</div><div class="hero-r">${titleH}<div class="bubble">${subText}</div></div></div>`
+    :D.lv===2?`<div class="band"><div class="band-t">${titleH}<div class="sh-sub">${subText}</div></div><div class="band-art">${D.img?artImg(D.img.char):charSVG(D.char)}</div></div>${fields}`
     :`${fields}<div>${titleH}</div><div class="sh-sub">${subText}</div>`;
   const mini=`<div class="sh-mini">${D&&D.lv<=2?stkSVG(D.theme.stk[1],'gico'):''}<b>${esc(studentName||'')}</b><span>${answers?'Ключ · ':''}${esc(topic.t)} · продолжение</span></div>`;
   /* задания идут строкой с переносом; ширина — по самому широкому заданию своей части, поэтому в части они встают ровными колонками */
@@ -1979,14 +1986,14 @@ function sheetParts(items,{topic,level,seed,studentName,answers,design}){
       const q=it.type==='own'?it.q:it.type==='cmp'?it.left+' ◯ '+it.right:plainQ(it);let w=2;for(const ch of String(q))w+=/[\d+−×:=<>()◯□-]/.test(ch)?1:/\s/.test(ch)?0.3:0.5;return Math.ceil(w)+ansLen(it)};
     /* сколько колонок заданий помещается рядом с картинкой шириной pic клеток */
     const kAt=list=>Math.max(0,...list.filter(cellable).map(cellWidth));
-    const sideFit=(pic,kk)=>{const w=avail-pic-2;if(w<6)return null;if(kk&&kk<=w)return{n:Math.floor((w+2)/(kk+2)),kw:kk};return kk?null:{n:1,kw:w}};
-    const sg=(f,html)=>`<div class="sgrid" style="width:calc(var(--c) * ${f.n*(f.kw+2)-2})">${html}</div>`;
-    const bot=D.theme.img&&D.theme.img.bot?`${D.theme.img.say?artImg(D.theme.img.say,'say'):''}${artImg(D.theme.img.bot)}`:'';
+    const sideFit=(pic,kk)=>{const w=avail-pic-2;if(w<6)return null;if(kk&&kk<=w)return{n:Math.floor((w+2)/(kk+2)),kw:kk,w,pic};return kk?null:{n:1,kw:w,w,pic}};
+    const sg=(f,html)=>`<div class="sgrid" style="width:calc(var(--c) * ${f.w})">${html}</div>`;
+    const bot=D.img&&D.img.bot?`${D.img.say?artImg(D.img.say,'say'):''}${artImg(D.img.bot)}`:'';
     const kH=kAt(items.slice(0,8));let F=null;for(let pic=12;pic>=8&&!F;pic--)F=sideFit(pic,kH);
     if(F){
-      const wP=avail-(F.n*(F.kw+2));
+      const wP=F.pic;
       let used=0,col=0,rowH=0,M=0;
-      const sideW=F.n*(F.kw+2)-2;
+      const sideW=F.w;
       for(let i=0;i<items.length;i++){const it=items[i],g=mixed&&newGroup(it,i);
         if(!isSpan(it)&&estW(it)>sideW)break;
         if((g||isSpan(it))&&col){used+=rowH+1;col=0;rowH=0}
@@ -1995,19 +2002,19 @@ function sheetParts(items,{topic,level,seed,studentName,answers,design}){
         if(isSpan(it)){used+=estH(it)+1;M++;continue}
         rowH=Math.max(rowH,estH(it));col++;M++;if(col===F.n){used+=rowH+1;col=0;rowH=0}}
       if(!M)M=0;
-      const art=D.theme.img?artImg(D.theme.img.top):charSVG(D.char);
+      const art=D.img?artImg(D.img.top):charSVG(D.char);
       const headPiece=`<div class="heroG" style="width:calc(var(--c) * ${avail})"><div class="hA" style="width:calc(var(--c) * ${wP})">${art}</div><div class="hR"><div class="hT">${titleH}<div class="bubble">${subText}</div></div>${sg(F,pieces.slice(0,M).join(''))}</div></div>`;
       let rest=pieces.slice(M),tailPiece='';
       const kT=kAt(items.slice(-8));let F2=null;if(bot)for(let pic=13;pic>=8&&!F2;pic--)F2=sideFit(pic,kT);
       if(F2){let t=items.length,h=0,c2=0,rh=0;
-        const sideW2=F2.n*(F2.kw+2)-2;
+        const sideW2=F2.w;
         while(t>M){const it=items[t-1];if(isSpan(it)||estW(it)>sideW2)break;
           rh=Math.max(rh,estH(it));c2++;t--;
           if(mixed&&newGroup(it,t)){t+=c2;c2=0;break}
           if(c2===F2.n){if(h+rh>10){t+=c2;c2=0;break}h+=rh+1;c2=0;rh=0}}
         t+=c2;
         if(t<items.length){rest=pieces.slice(M,t);
-          tailPiece=`<div class="tailG" style="width:calc(var(--c) * ${avail})">${sg(F2,pieces.slice(t).join(''))}<div class="tB" style="width:calc(var(--c) * ${avail-(F2.n*(F2.kw+2))})">${bot}</div></div>`}
+          tailPiece=`<div class="tailG" style="width:calc(var(--c) * ${avail})">${sg(F2,pieces.slice(t).join(''))}<div class="tB" style="width:calc(var(--c) * ${F2.pic})">${bot}</div></div>`}
         else tailPiece=`<div class="scene2">${bot}</div>`}
       else if(bot)tailPiece=`<div class="scene2">${bot}</div>`;
       pieces.splice(0,pieces.length,headPiece,...rest,...(tailPiece?[tailPiece]:[]));heroIn=true}
@@ -2456,7 +2463,7 @@ function designBox(st,seed){const d=designOf(st),R=resolveDesign(st,seed);
     <div class="seg dseg" id="dlv">${LEVELS.map(([k,l])=>`<button type="button" data-lv="${k}" class="${String(d.lv)===k?'on':''}">${l}</button>`).join('')}</div>
     ${+d.lv<4?`<div class="drow"><select id="dth" aria-label="Сюжет"><option value="random"${d.theme==='random'?' selected':''}>Случайный сюжет</option>${THEMES.map(t=>`<option value="${t.id}"${d.theme===t.id?' selected':''}>${esc(t.n)}</option>`).join('')}</select>
       <label class="bwl"><input type="checkbox" id="dbw"${d.bw?' checked':''}> Ч/Б</label></div>
-      <button type="button" class="dprev" id="dgal">${charSVG(R.char,'mini')}<span><b>${esc(R.theme.n)}</b><small>все 20 сюжетов →</small></span></button>`:'<span class="hint">Без украшений, как раньше.</span>'}</div>`}
+      <button type="button" class="dprev" id="dgal">${R.img?artImg(R.img.char,'mini'):charSVG(R.char,'mini')}<span><b>${esc(R.theme.n)}</b><small>все 20 сюжетов →</small></span></button>`:'<span class="hint">Без украшений, как раньше.</span>'}</div>`}
 function bindDesign(st){const d=designOf(st);const $=id=>document.getElementById(id);
   document.querySelectorAll('#dlv button').forEach(b=>b.onclick=()=>{d.lv=+b.dataset.lv;save();render()});
   if($('dth'))$('dth').onchange=e=>{d.theme=e.target.value;save();render()};
@@ -2465,7 +2472,7 @@ function bindDesign(st){const d=designOf(st);const $=id=>document.getElementById
 function viewGallery(){const st=student(V.studentId),d=designOf(st);
   app.innerHTML=`<div class="head"><div><h1>Сюжеты оформления</h1><p>Выберите сюжет для листов ${esc(st.name)} или оставьте случайный: тогда каждый новый лист в новом сюжете.</p></div>
     <button class="btn ${d.theme==='random'?'primary':''}" data-th="random">Случайный сюжет</button></div>
-    <div class="gal">${THEMES.map(t=>`<button class="gcard${d.theme===t.id?' on':''}" data-th="${t.id}"><span class="gchars${t.chars.length>2?' many':''}">${t.chars.map(c=>charSVG(c)).join('')}</span>
+    <div class="gal">${THEMES.map(t=>`<button class="gcard${d.theme===t.id?' on':''}" data-th="${t.id}"><span class="gchars${!t.art&&t.chars.length>2?' many':''}">${t.art?t.art.map((a,i)=>artImg(artSet(t,i).char)).join(''):t.chars.map(c=>charSVG(c)).join('')}</span>
       <b>${esc(t.n)}</b><span class="gstk">${t.stk.map(k=>stkSVG(k)).join('')}</span></button>`).join('')}</div>`;
   app.querySelectorAll('[data-th]').forEach(b=>b.onclick=()=>{d.theme=b.dataset.th;if(+d.lv===4)d.lv=2;save();history.back()})}
 function viewPrint(){
