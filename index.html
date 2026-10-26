@@ -165,11 +165,11 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .it.word{grid-column:1/-1;flex-direction:column;align-items:stretch;white-space:normal;font-size:2.9cqw;gap:1cqw;position:relative;padding-left:4.2cqw}
 .it.word .n{position:absolute;left:0;top:.4cqw}
 .it.word .wq{line-height:1.45}
-.it.word .sol{height:5cqw;background-image:linear-gradient(var(--sheet-line) .15cqw,transparent .15cqw);background-size:100% 3.5cqw;opacity:.7}
+.it.word .sol{height:7cqw;background-image:linear-gradient(var(--sheet-line) .15cqw,transparent .15cqw);background-size:100% 3.5cqw;opacity:.7}
 .it.word .wa{display:flex;align-items:center;gap:1.2cqw;align-self:flex-end}
 .it.grid{flex-direction:column;align-items:flex-start;font-size:3cqw}
 .it.grid .n{align-self:flex-start}
-.gfig{width:100%;max-width:17cqw;height:auto}
+.gfig{width:100%;max-width:24cqw;height:auto}
 .gfig .gl line{stroke:#cfd7e6;stroke-width:.4}
 .gfig .gf rect{fill:#e3e9f4}
 .gfig .ge line{stroke:#1a1f2e;stroke-width:1.2;stroke-linecap:round}
@@ -188,6 +188,14 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .col .r{grid-column:2;min-width:9cqw;height:5cqw;border:.3cqw dashed #b3bbcc;border-radius:.6cqw;color:var(--sheet-pen);font-weight:600;text-align:right;padding-right:.6cqw}
 .sh-foot{margin-top:auto;display:flex;justify-content:space-between;font-size:2cqw;color:#6b748c;border-top:.2cqw solid var(--sheet-line);padding-top:1.4cqw}
 .key-stamp{color:var(--sheet-pen);border:.35cqw solid var(--sheet-pen);border-radius:1cqw;padding:.3cqw 1.6cqw;font-weight:700;transform:rotate(-3deg);display:inline-block;font-size:2.6cqw}
+
+/* Режим ученика по ссылке и код результата */
+.student-mode .crumbs,.student-mode .steps{display:none}
+.student-mode .logo{cursor:default}
+.rbox{padding:16px;display:flex;flex-direction:column;gap:10px}
+.rbox textarea,#rc{width:100%;font:13px/1.4 ui-monospace,Menlo,monospace;padding:10px;border:1px solid var(--line);border-radius:9px;background:var(--ink-soft);color:var(--ink);resize:vertical;word-break:break-all}
+.side-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+a.btn{text-decoration:none}
 
 /* Виды листа */
 .seg.tpl{gap:4px}
@@ -247,7 +255,13 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .task.long{font-size:clamp(20px,4.5vw,26px)}
 
 /* Печать */
-.print-pages{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:22px}
+.print-pages{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,420px),1fr));gap:22px;margin-bottom:26px}
+.pr-h{font-size:16px;font-weight:600;margin:0 0 12px}
+.pg-measure{position:absolute;left:-9999px;top:0;width:600px;visibility:hidden}
+.sheet.page{aspect-ratio:210/297;overflow:hidden}
+.sheet.page .sheet-in{height:100%;min-height:0}
+.sh-mini{display:flex;justify-content:space-between;gap:2cqw;font-size:2.3cqw;color:#4e5870;border-bottom:.25cqw solid var(--sheet-line);padding-bottom:1cqw}
+.sh-mini b{color:var(--sheet-ink)}
 .note{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--pen);border-radius:10px;padding:12px 16px;color:var(--ink-2);font-size:14px;margin-bottom:18px}
 
 /* Модалка */
@@ -768,26 +782,52 @@ function instr(it){
   if(it.x)return'Найди x.';
   return'Впиши ответ в окошко.';
 }
-function sheetHTML(items,{topic,level,seed,studentName,answers}){
+/* лист раскладывается на части: шапка, задания (по одному куску на задание) и подвал;
+   на экране части идут одной лентой, на печати раскладываются по страницам A4 */
+function sheetParts(items,{topic,level,seed,studentName,answers}){
   const kind=items[0]&&items[0].type;
   const longOwn=kind==='own'&&items.some(x=>(x.q||'').length>16);
   const mixed=new Set(items.map(x=>x.type)).size>1||items.some(x=>x.src);
-  const cols=mixed?(items.some(x=>x.type==='expr')?'c2':'c3'):kind==='word'?'c1':kind==='col'?'c4':kind==='expr'?'c2':kind==='own'?(longOwn?'c1':'c3'):'c3';
+  const cols=mixed?'c2':kind==='word'?'c1':kind==='col'?'c4':kind==='expr'?'c2':kind==='own'?(longOwn?'c1':'c3'):'c3';
   const title=answers?'Ответы':topic.t;
   const lvl=topic.sheet||topic.review?esc(topic.L[0].n):LV[level].toLowerCase()+' уровень';
   const newGroup=(it,i)=>{if(i===0)return true;const pr=items[i-1];return it.blk!=null?pr.blk!==it.blk:(pr.src!==it.src||pr.type!==it.type)};
-  return `<div class="sheet${answers?' ans':''}"><div class="sheet-in">
-    <div class="sh-head"><div class="fld">Имя: <b>${esc(studentName||'')}</b></div><div class="fld">Дата: </div>
+  const head=`<div class="sh-head"><div class="fld">Имя: <b>${esc(studentName||'')}</b></div><div class="fld">Дата: </div>
     <div class="fld">${gradeWord(topic.grade)} · ${lvl}</div><div class="fld">Вариант <b class="num">${seed}</b></div></div>
     <div><div class="sh-title">${answers?'<span class="key-stamp">Ключ</span> ':''}${esc(title)}</div></div>
-    <div class="sh-sub">${answers?esc(topic.t):esc(topic.L[level].n)+'. '+(mixed?'Лист из нескольких частей, у каждой своё указание.':esc(instr(items[0])))}</div>
-    <div class="sh-items ${cols}">${items.map((it,i)=>{
-      const tt=TOPICS[it.src]?TOPICS[it.src].t:'';
-      const head=mixed&&newGroup(it,i)?`<div class="grp"><b>${esc(it.lbl?it.lbl+' · '+tt:tt)}</b> ${esc(instr(it))}</div>`:'';
-      return head+`<div class="it${it.type==='own'?' own':''}${it.type==='word'?' word':''}${it.type==='grid'?' grid':''}"><span class="n">${i+1}</span>${itemHTML(it,answers)}</div>`}).join('')}</div>
-    <div class="sh-foot"><span>${esc(topic.section)}</span><span>Проверить онлайн: код варианта ${seed}</span></div>
-  </div></div>`;
+    <div class="sh-sub">${answers?esc(topic.t):esc(topic.L[level].n)+'. '+(mixed?'Лист из нескольких частей, у каждой своё указание.':esc(instr(items[0])))}</div>`;
+  const mini=`<div class="sh-mini"><b>${esc(studentName||'')}</b><span>${answers?'Ключ · ':''}${esc(topic.t)} · продолжение</span></div>`;
+  /* заголовок части держится вместе со своим первым заданием */
+  const pieces=items.map((it,i)=>{
+    const tt=TOPICS[it.src]?TOPICS[it.src].t:'';
+    const grp=mixed&&newGroup(it,i)?`<div class="grp"><b>${esc(it.lbl?it.lbl+' · '+tt:tt)}</b> ${esc(instr(it))}</div>`:'';
+    return grp+`<div class="it${it.type==='own'?' own':''}${it.type==='word'?' word':''}${it.type==='grid'?' grid':''}"><span class="n">${i+1}</span>${itemHTML(it,answers)}</div>`});
+  return{head,mini,cols,pieces,footL:esc(topic.section),footR:`Проверить онлайн: код варианта ${seed}`};
 }
+function sheetHTML(items,o){
+  const s=sheetParts(items,o);
+  return `<div class="sheet${o.answers?' ans':''}"><div class="sheet-in">${s.head}
+    <div class="sh-items ${s.cols}">${s.pieces.join('')}</div>
+    <div class="sh-foot"><span>${s.footL}</span><span>${s.footR}</span></div></div></div>`;
+}
+/* раскладка по страницам A4: задания добавляются по одному, пока страница не переполнится */
+function paginate(host,items,o){
+  const s=sheetParts(items,o);host.innerHTML='';
+  const newPage=first=>{const d=document.createElement('div');d.className='sheet page'+(o.answers?' ans':'');
+    d.innerHTML=`<div class="sheet-in">${first?s.head:s.mini}<div class="sh-items ${s.cols}"></div><div class="sh-foot"><span>${s.footL}</span><span class="pg"></span></div></div>`;
+    host.appendChild(d);return d};
+  let page=newPage(true);
+  const over=pg=>{const inner=pg.querySelector('.sheet-in');return inner.scrollHeight>pg.clientHeight+1};
+  for(const html of s.pieces){
+    let grid=page.querySelector('.sh-items');const before=grid.children.length;
+    grid.insertAdjacentHTML('beforeend',html);
+    if(over(page)&&before>0){const n=grid.children.length-before;for(let k=0;k<n;k++)grid.lastElementChild.remove();
+      page=newPage(false);page.querySelector('.sh-items').insertAdjacentHTML('beforeend',html)}
+  }
+  const pages=[...host.children];pages.forEach((pg,k)=>pg.querySelector('.pg').textContent=`Страница ${k+1} из ${pages.length} · ${s.footR}`);
+  return pages.length;
+}
+const pagesWord=n=>`${n} ${plural(n,['страница','страницы','страниц'])}`;
 
 /* ---------- экраны ---------- */
 const app=document.getElementById('app');
@@ -813,7 +853,8 @@ function crumbs(){
 
 function render(){
   crumbs();
-  ({students:viewStudents,student:viewStudent,topic:viewTopic,print:viewPrint,player:viewPlayer,done:viewDone,builder:viewBuilder})[V.screen]();
+  ({students:viewStudents,student:viewStudent,topic:viewTopic,print:viewPrint,player:viewPlayer,done:viewDone,builder:viewBuilder,
+    badlink:()=>{app.innerHTML='<div class="player"><div class="panel finish"><h1 style="font-size:22px">Ссылка не открывается</h1><p style="margin:0">Похоже, она скопирована не целиком. Попроси репетитора прислать её ещё раз.</p></div></div>'}})[V.screen]();
 }
 
 /* текущая тема хранится отдельно по каждому предмету */
@@ -906,7 +947,7 @@ function viewStudent(){
   const body=route+(subj==='math'?`<details class="fullprog" id="fp"${V.progOpen?' open':''}><summary>Вся программа 1–4 класса</summary>${prog}</details>`:prog);
   const atts=S.attempts.filter(a=>a.studentId===st.id&&TOPICS[a.topicId]).sort((a,b)=>b.date-a.date);
   const hws=S.assignments.filter(a=>a.studentId===st.id&&a.status==='выдано'&&TOPICS[a.topicId]);
-  const side=`<div class="panel side"><h2>Работы и домашки</h2>
+  const side=`<div class="panel side"><div class="side-head"><h2>Работы и домашки</h2><button class="btn small quiet" id="imp">Внести результат</button></div>
     ${hws.map(h=>`<div class="res"><div class="res-top"><span class="t">${esc(TOPICS[h.topicId].t)}</span><span class="chip warn">ждём</span></div>
       <span class="m">Код <b>${esc(h.code)}</b> · выдано ${ago(h.date)}</span>
       <div><button class="btn small quiet" data-open="${esc(h.code)}">Открыть как ученик</button></div></div>`).join('')}
@@ -927,6 +968,7 @@ function viewStudent(){
   if($('r-new'))$('r-new').onclick=openBuilder;
   if($('fp'))$('fp').ontoggle=e=>{V.progOpen=e.target.open};
   $('newt').onclick=openBuilder;
+  $('imp').onclick=importModal;
   $('delst').onclick=()=>{if(!V.confirmStDel){V.confirmStDel=true;render();return}deleteStudent(st)};
   app.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>{const h=S.assignments.find(x=>x.code===b.dataset.open);startPlayer(h)});
 }
@@ -1012,10 +1054,15 @@ function viewTopic(){
         <div class="actions">${fixed?`<span class="hint">${t.review?'Сначала берутся темы с худшим результатом, потом последние пройденные. ':''}Результат запишется в каждую тему листа отдельно.</span>`:curOf(st,t.subject)===t.id?'<span class="hint">Это текущая тема ученика.</span>':'<button class="btn small quiet" id="setcur">Сделать текущей темой</button>'}
           ${t.custom&&!fixed?`<button class="btn small ${V.confirmDel?'pen':'quiet'}" id="del">${V.confirmDel?'Нажмите ещё раз, чтобы удалить':'Удалить тему'}</button>`:''}</div>
       </div>
-      <div class="sheet-wrap"><div class="sheet-bar"><span class="label">Предпросмотр листа A4</span><span class="hint">ключ с ответами печатается вторым листом</span></div>
+      <div class="sheet-wrap"><div class="sheet-bar"><span class="label">Так лист выглядит на экране</span><span class="hint" id="pg-hint"></span></div>
         ${sheetHTML(items,{topic:shown,level:shownLv,seed:V.seed,studentName:st.name})}</div>
     </div>`;
   const $=id=>document.getElementById(id);
+  /* считаем страницы печати в невидимом черновике той же ширины */
+  const countPages=()=>{if(V.screen!=='topic'||!$('pg-hint'))return;const tmp=document.createElement('div');tmp.className='pg-measure';document.body.appendChild(tmp);
+    const n=paginate(tmp,items,{topic:shown,level:shownLv,seed:V.seed,studentName:st.name});tmp.remove();
+    $('pg-hint').textContent=`при печати: ${pagesWord(n)} и ключ`};
+  countPages();if(document.fonts&&document.fonts.ready)document.fonts.ready.then(countPages);
   app.querySelectorAll('.lvl').forEach(b=>b.onclick=()=>go({level:+b.dataset.l,seed:newSeed(),over:null}));
   if($('tpl'))$('tpl').querySelectorAll('button').forEach(b=>b.onclick=()=>{const k=b.dataset.k;
     if(k==='own'&&tpl!=='own')V.blocks=(tpl==='train'?tplBlocks('lesson',st,t,V.level):blocks).map(x=>({...x}));
@@ -1052,8 +1099,13 @@ function viewPrint(){
   const o={topic:t,level:V.level,seed:V.seed,studentName:st.name};
   app.innerHTML=`<div class="head"><div><h1>Печать</h1><p>${esc(t.t)} · ${t.sheet||t.review?esc(t.L[0].n):LV[V.level].toLowerCase()+' уровень'} · вариант ${V.seed}</p></div>
     <button class="btn" id="back">← К теме</button></div>
-    <div class="note">В рабочей версии здесь будет кнопка «Скачать PDF». В прототипе показаны оба листа в том виде, в каком они уйдут на принтер: задание и ключ для вас.</div>
-    <div class="print-pages">${sheetHTML(items,o)}${sheetHTML(items,{...o,answers:true})}</div>`;
+    <div class="note">В рабочей версии здесь будет кнопка «Скачать PDF». Если задания не помещаются на один лист A4, они переносятся на следующий, задание не разрывается.</div>
+    <h2 class="pr-h" id="pr-h1">Задание</h2><div class="print-pages" id="pr-tasks"></div>
+    <h2 class="pr-h" id="pr-h2">Ключ для вас</h2><div class="print-pages" id="pr-keys"></div>`;
+  const lay=()=>{if(V.screen!=='print')return;
+    const a=paginate(document.getElementById('pr-tasks'),items,o),b=paginate(document.getElementById('pr-keys'),items,{...o,answers:true});
+    document.getElementById('pr-h1').textContent=`Задание · ${pagesWord(a)}`;document.getElementById('pr-h2').textContent=`Ключ для вас · ${pagesWord(b)}`};
+  lay();if(document.fonts&&document.fonts.ready)document.fonts.ready.then(lay);
   document.getElementById('back').onclick=()=>go({screen:'topic'});
 }
 
@@ -1165,18 +1217,48 @@ function modal(html,bind){mroot.innerHTML=`<div class="veil" id="veil"><div clas
 function close(){mroot.innerHTML=''}
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&mroot.innerHTML)close()});
 
+/* настоящая ссылка: задание целиком лежит в адресе после #, сервер не нужен */
+const SITE='https://kurkinsavvyn-boop.github.io/kletka-tutor/';
+const b64e=o=>{const b=new TextEncoder().encode(JSON.stringify(o));let x='';b.forEach(c=>x+=String.fromCharCode(c));return btoa(x).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')};
+const b64d=str=>{const t=str.replace(/-/g,'+').replace(/_/g,'/');const bin=atob(t);return JSON.parse(new TextDecoder().decode(Uint8Array.from(bin,c=>c.charCodeAt(0))))};
+function hwLink(h){const t=TOPICS[h.topicId];
+  return SITE+'#hw='+b64e({v:1,c:h.code,n:student(h.studentId).name,t:t.t,g:t.grade,mix:!!(t.review||t.sheet),p:{...t.L[h.level].p,...(h.over||{})},s:h.seed})}
+/* результат записывается одинаково и с экрана ученика в этом браузере, и из кода результата */
+function recordResult(h,r){
+  const t=TOPICS[h.topicId];const base={studentId:h.studentId,time:r.time,date:Date.now()};const id='a'+Date.now();
+  if(t&&(t.review||t.sheet)){
+    const by={};for(const[src,ok]of r.log){by[src]=by[src]||{c:0,n:0};by[src].n++;if(ok)by[src].c++}
+    Object.keys(by).filter(src=>TOPICS[src]).forEach((src,k)=>S.attempts.push({...base,id:id+'-'+k,topicId:src,level:Math.min(1,TOPICS[src].L.length-1),
+      correct:by[src].c,total:by[src].n,mistakes:r.mistakes.filter(m=>m.src===src),via:'review'}));
+  }else S.attempts.push({...base,id,topicId:h.topicId,level:h.level,correct:r.correct,total:r.total,answered:r.answered,mistakes:r.mistakes});
+  h.status='сдано';save();
+}
+function importModal(){
+  modal(`<h2>Внести результат</h2>
+    <p style="margin:0;color:var(--ink-2)">Вставьте код, который ученик получил после решения домашки по ссылке. Он начинается с <b>KL-</b>.</p>
+    <div class="field"><label class="label" for="rc">Код результата</label><textarea id="rc" rows="4" spellcheck="false" placeholder="KL-…"></textarea></div>
+    <p class="hint" id="rc-err" style="margin:0"></p>
+    <div class="modal-actions"><button class="btn quiet" id="cl">Отмена</button><button class="btn primary" id="ok">Внести</button></div>`,()=>{
+    document.getElementById('cl').onclick=close;
+    document.getElementById('ok').onclick=()=>{const raw=document.getElementById('rc').value.trim().replace(/^KL-/,'').replace(/\s+/g,'');const err=document.getElementById('rc-err');
+      let d;try{d=b64d(raw)}catch(e){err.textContent='Код не читается. Проверьте, что он скопирован целиком.';return}
+      const h=S.assignments.find(a=>a.code===d.c);
+      if(!h){err.textContent=`Домашки ${d.c} нет в этом браузере. Код подходит только к домашке, которую выдали здесь.`;return}
+      if(h.status==='сдано'){err.textContent=`Результат домашки ${d.c} уже внесён.`;return}
+      recordResult(h,{correct:d.k,total:d.n,answered:d.a,time:d.tm,log:d.l,mistakes:d.m||[]});close();go({screen:'student',studentId:h.studentId})};
+  });
+}
 function linkModal(){
   const st=student(V.studentId);const t=TOPICS[V.topicId];
   const code=translit(st.name.split(' ')[0]).toUpperCase().slice(0,6)+'-'+V.seed;
   let h=S.assignments.find(a=>a.code===code);
   if(!h){h={code,studentId:st.id,topicId:t.id,level:V.level,seed:V.seed,over:V.over,date:Date.now(),status:'выдано'};S.assignments.unshift(h);save()}
-  const url='https://kletka.app/r/'+encodeURIComponent(code);
-  modal(`<h2>Домашка выдана</h2>
-    <p style="margin:0;color:var(--ink-2)">${esc(st.name)} откроет ссылку или введёт код на kletka.app. Регистрация не нужна. Результат придёт вам в карточку ученика.</p>
-    <div class="code">${esc(code)}</div>
+  const url=hwLink(h);
+  modal(`<h2>Домашка ${esc(code)}</h2>
+    <p style="margin:0;color:var(--ink-2)">Отправьте ссылку ученику: ${esc(st.name)} откроет её на телефоне или компьютере, регистрация не нужна.</p>
     <div class="linkbox"><input id="lnk" type="text" readonly value="${url}"><button class="btn small" id="cp">Скопировать</button></div>
-    <p class="hint" style="margin:0">Ссылка в прототипе условная. Чтобы увидеть, что получит ученик, откройте экран ученика.</p>
-    <div class="modal-actions"><button class="btn quiet" id="cl">Готово</button><button class="btn primary" id="as">Открыть как ученик</button></div>`,()=>{
+    <p class="hint" style="margin:0">После решения ученик получит код результата. Попросите прислать его вам и вставьте в карточке ученика: «Внести результат». В рабочей версии результат будет приходить сам.</p>
+    <div class="modal-actions"><a class="btn quiet" href="${url}" target="_blank" rel="noopener">Открыть ссылку</a><button class="btn quiet" id="cl">Готово</button><button class="btn primary" id="as">Решить здесь как ученик</button></div>`,()=>{
     document.getElementById('cl').onclick=close;
     document.getElementById('as').onclick=()=>{close();startPlayer(h)};
     const cp=document.getElementById('cp');cp.onclick=()=>{const i=document.getElementById('lnk');
@@ -1255,15 +1337,15 @@ function plainQ(it){
   return `${it.miss==='a'?s():fmt(it.a)} ${sym(it.op)} ${it.miss==='b'?s():fmt(it.b)} = ${it.miss==='res'?s():fmt(it.res)}`;
 }
 function viewPlayer(){
-  const it=P.items[P.i];const st=student(P.h.studentId);
+  const it=P.items[P.i];const who=P.name||student(P.h.studentId).name;
   const tm=textMode(it);
   const pad=it.type==='cmp'
     ?`<div class="signs">${['<','=','>'].map(s=>`<button data-sign="${s}" aria-label="знак ${s}">${s}</button>`).join('')}</div>`
     :tm?`<div class="txt"><input id="tx" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Ответ" placeholder="Ответ" value="${esc(P.input)}"><button class="btn primary" id="txok">Готово</button></div>`
     :`<div class="pad">${[1,2,3,4,5,6,7,8,9].map(n=>`<button data-k="${n}">${n}</button>`).join('')}<button class="del" data-k="del">Стереть</button><button data-k="0">0</button><button class="go" data-k="ok">Готово</button></div>`;
   app.innerHTML=`<div class="player">
-    <div class="demo-bar">Так домашку видит ученик на телефоне или компьютере</div>
-    <div class="pl-head"><div><div class="pl-who">${esc(st.name)} · ${esc(P.t.t)}</div><div class="label">Задание ${P.i+1} из ${P.items.length}</div></div>
+    ${P.remote?'':'<div class="demo-bar">Так домашку видит ученик на телефоне или компьютере</div>'}
+    <div class="pl-head"><div><div class="pl-who">${esc(who)} · ${esc(P.t.t)}</div><div class="label">Задание ${P.i+1} из ${P.items.length}</div></div>
       <div class="score num"><span>${P.score}<small>очки</small></span><span>${P.streak}<small>подряд</small></span></div></div>
     <div class="prog"><i style="width:${P.i/P.items.length*100}%"></i></div>
     <p class="pl-instr">${esc(instr(it))}</p>
@@ -1286,30 +1368,30 @@ function key(k){
 }
 function submit(){
   const it=P.items[P.i];const ok=norm(it.ans)===norm(P.input);
-  P.log.push({src:it.src,ok});
+  P.log.push([it.src||'',ok?1:0]);
   if(ok){P.correct++;P.streak++;P.score+=10}else{P.streak=0;P.mistakes.push({q:plainQ(it),given:P.input,ans:String(fmt(it.ans)),src:it.src})}
   P.fb={ok,ans:String(fmt(it.ans))};P.lock=true;viewPlayer();
   setTimeout(()=>{P.lock=false;P.fb=null;P.input='';P.i++;if(P.i>=P.items.length)finish();else viewPlayer()},ok?650:1500);
 }
 function finish(){
   if(!P)return;
-  const a={id:'a'+Date.now(),studentId:P.h.studentId,topicId:P.t.id,level:P.h.level,correct:P.correct,total:P.items.length,answered:P.i,time:Math.round((Date.now()-P.start)/1000),date:Date.now(),mistakes:P.mistakes};
-  if(P.t.review||P.t.sheet){
-    const by={};for(const x of P.log){by[x.src]=by[x.src]||{c:0,n:0};by[x.src].n++;if(x.ok)by[x.src].c++}
-    Object.keys(by).forEach((src,k)=>S.attempts.push({id:a.id+'-'+k,studentId:a.studentId,topicId:src,level:Math.min(1,TOPICS[src].L.length-1),
-      correct:by[src].c,total:by[src].n,time:a.time,date:a.date,mistakes:P.mistakes.filter(m=>m.src===src),via:'review'}));
-  }else S.attempts.push(a);
-  const h=S.assignments.find(x=>x.code===P.h.code);if(h)h.status='сдано';save();
-  P.result=a;go({screen:'done'});
+  const r={correct:P.correct,total:P.items.length,answered:P.i,time:Math.round((Date.now()-P.start)/1000),log:P.log,mistakes:P.mistakes};
+  if(P.remote){P.rcode='KL-'+b64e({v:1,c:P.h.code,k:r.correct,n:r.total,a:r.answered,tm:r.time,l:r.log,m:r.mistakes.slice(0,30)})}
+  else{const h=S.assignments.find(x=>x.code===P.h.code);if(h)recordResult(h,r)}
+  P.result=r;go({screen:'done'});
 }
 function viewDone(){
   const a=P.result;const pct=Math.round(a.correct/a.total*100);
   const word=pct>=85?'Отлично!':pct>=60?'Хорошо, есть над чем поработать':'Давай потренируемся ещё';
-  app.innerHTML=`<div class="player"><div class="demo-bar">Экран ученика</div>
+  app.innerHTML=`<div class="player">${P.remote?'':'<div class="demo-bar">Экран ученика</div>'}
     <div class="panel finish"><span class="label">${esc(P.t.t)}</span><div class="big num">${a.correct} из ${a.total}</div>
-      <p style="margin:0;font-size:18px;font-weight:600">${word}</p><span class="sent">✓ Результат отправлен репетитору</span>
+      <p style="margin:0;font-size:18px;font-weight:600">${word}</p>${P.remote?'':'<span class="sent">✓ Результат записан в карточку ученика</span>'}
       <p class="hint" style="margin:0">Время: ${Math.floor(a.time/60)} мин ${a.time%60} с. Очки: ${P.score}.</p></div>
-    <button class="btn primary" id="back">Вернуться к репетитору и посмотреть результат</button></div>`;
+    ${P.remote?`<div class="panel rbox"><b>Отправь этот код репетитору</b><span class="hint">Скопируй и пришли в мессенджере. По нему репетитор увидит твой результат и ошибки.</span>
+      <textarea id="rcode" readonly rows="3">${P.rcode}</textarea><button class="btn primary" id="rcp">Скопировать код</button></div>`
+      :'<button class="btn primary" id="back">Вернуться к репетитору и посмотреть результат</button>'}</div>`;
+  if(P.remote){const b=document.getElementById('rcp');b.onclick=()=>{const t=document.getElementById('rcode');const ok=()=>{b.textContent='Код скопирован'};
+    if(navigator.clipboard)navigator.clipboard.writeText(t.value).then(ok,()=>{t.select()});else t.select()};return}
   document.getElementById('back').onclick=()=>{const sid=P.h.studentId;P=null;go({screen:'student',studentId:sid,subject:'math'})};
 }
 document.addEventListener('keydown',e=>{
@@ -1319,7 +1401,14 @@ document.addEventListener('keydown',e=>{
   if(textMode(it))return;
   if(/^[0-9]$/.test(e.key))key(e.key);else if(e.key==='Backspace')key('del');else if(e.key==='Enter')key('ok');
 });
-document.getElementById('home').onclick=()=>go({screen:'students'});
+let STUDENT_MODE=false;
+{const m=location.hash.match(/^#hw=([\w-]+)/);
+ if(m){STUDENT_MODE=true;document.body.classList.add('student-mode');
+  try{const d=b64d(m[1]);
+    P={h:{code:d.c,level:0},t:{t:d.t,grade:d.g,sheet:d.mix},name:d.n,remote:true,items:generate(d.p,d.s),i:0,input:'',correct:0,streak:0,score:0,mistakes:[],log:[],start:Date.now(),fb:null,lock:false};
+    V={screen:'player'};document.title=d.t+' · Клетка'}
+  catch(e){V={screen:'badlink'}}}}
+document.getElementById('home').onclick=()=>{if(!STUDENT_MODE)go({screen:'students'})};
 render();
 </script>
 
