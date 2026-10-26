@@ -662,6 +662,11 @@ const UT={
   kgg2g:r=>{const k=ri(r,1,9),g=ri(r,1,9)*100;return{q:`${k} кг ${g} г = □ г`,ans:k*1000+g}},
   t2kg:r=>{const t=ri(r,2,9);return{q:`${t} т = □ кг`,ans:t*1000}},
   km2m:r=>{const k=ri(r,2,9);return{q:`${k} км = □ м`,ans:k*1000}},
+  m2mm:r=>{const k=ri(r,2,9);return{q:`${k} м = □ мм`,ans:k*1000}},
+  mcm2cm:r=>{const m=ri(r,1,9),c=ri(r,1,99);return{q:`${m} м ${c} см = □ см`,ans:m*100+c}},
+  t2c:r=>{const t=ri(r,2,9);return r()<.5?{q:`${t} т = □ ц`,ans:t*10}:{q:`${t*10} ц = □ т`,ans:t}},
+  c2kg:r=>{const c=ri(r,2,9);return r()<.5?{q:`${c} ц = □ кг`,ans:c*100}:{q:`${c*100} кг = □ ц`,ans:c}},
+  tc2kg:r=>{const t=ri(r,1,9),c=ri(r,1,9);return{q:`${t} т ${c} ц = □ кг`,ans:t*1000+c*100}},
   cm2mm:r=>{const c=ri(r,2,9);return{q:`${c} см = □ мм`,ans:c*10}},
   cmmm2mm:r=>{const c=ri(r,1,9),m=ri(r,1,9);return{q:`${c} см ${m} мм = □ мм`,ans:c*10+m}},
   rub2kop:r=>{const k=ri(r,2,9);return r()<.5?{q:`${k} р. = □ к.`,ans:k*100}:{q:`${k*100} к. = □ р.`,ans:k}},
@@ -903,6 +908,56 @@ const FORMS={
   monthDays:r=>{const i=pick(r,[0,2,3,4,5,6,7,8,9,10,11]);return O(`Сколько дней в месяце «${MONTHS[i]}»? □`,MDAYS[i])},
   yearUnits:r=>{const k=ri(r,2,5);return pick(r,[O(`${k} ${plural(k,['год','года','лет'])} = □ мес.`,12*k),O(`${k} нед. = □ сут.`,7*k),O(`${k} сут. = □ ч`,24*k),O(`1 год = □ мес.`,12)])}
 };
+
+/* ---------- малые генераторы 4 класса ---------- */
+function solidSVG(kind){
+  const L=c=>`class="${c||'ln'}"`;
+  if(kind==='куб')return svgWrap(100,90,`<path d="M15 35 L60 35 L60 80 L15 80 Z M15 35 L35 15 L80 15 L60 35 M80 15 L80 60 L60 80" ${L()}/><path d="M15 80 L35 60 L80 60 M35 60 L35 15" ${L('thin')} stroke-dasharray="3 3"/>`,'Куб');
+  if(kind==='прямоугольный параллелепипед')return svgWrap(120,90,`<path d="M10 40 L80 40 L80 80 L10 80 Z M10 40 L32 18 L102 18 L80 40 M102 18 L102 58 L80 80" ${L()}/><path d="M10 80 L32 58 L102 58 M32 58 L32 18" ${L('thin')} stroke-dasharray="3 3"/>`,'Параллелепипед');
+  if(kind==='пирамида')return svgWrap(110,90,`<path d="M10 75 L70 75 L95 58 M10 75 L55 8 L70 75 M55 8 L95 58" ${L()}/><path d="M10 75 L35 58 L95 58 M35 58 L55 8" ${L('thin')} stroke-dasharray="3 3"/>`,'Пирамида');
+  if(kind==='цилиндр')return svgWrap(100,90,`<ellipse cx="50" cy="18" rx="32" ry="9" ${L()}/><path d="M18 18 L18 72 M82 18 L82 72 M18 72 A32 9 0 0 0 82 72" ${L()}/><path d="M18 72 A32 9 0 0 1 82 72" ${L('thin')} stroke-dasharray="3 3"/>`,'Цилиндр');
+  if(kind==='конус')return svgWrap(100,90,`<path d="M50 8 L18 72 M50 8 L82 72 M18 72 A32 9 0 0 0 82 72" ${L()}/><path d="M18 72 A32 9 0 0 1 82 72" ${L('thin')} stroke-dasharray="3 3"/>`,'Конус');
+  return svgWrap(100,90,`<circle cx="50" cy="45" r="34" ${L()}/><ellipse cx="50" cy="45" rx="34" ry="10" ${L('thin')}/>`,'Шар')}
+const SOLIDS=['куб','прямоугольный параллелепипед','пирамида','цилиндр','конус','шар'];
+const SOLID_N={'куб':[6,12,8],'прямоугольный параллелепипед':[6,12,8],'пирамида':[5,8,5]};
+Object.assign(FORMS,{
+  bigPlaces:r=>{const d=[ri(r,1,9),ri(r,0,9),ri(r,1,9),ri(r,0,9),ri(r,1,9)],n=+d.join('');const parts=d.map((x,i)=>x*10**(4-i)).filter(x=>x);const k=ri(r,0,parts.length-1);
+    return O(`${fmt(n)} = ${parts.map((x,i)=>i===k?'□':fmt(x)).join(' + ')}`,parts[k])},
+  bigClasses:r=>{const n=ri(r,100000,999999);return r()<.5?O(`Сколько всего тысяч в числе ${fmt(n)}? □`,Math.floor(n/1000)):O(`Какая цифра стоит в разряде десятков тысяч в числе ${fmt(n)}? □`,Math.floor(n/10000)%10)},
+  bigWrite:r=>{if(r()<.5){const t=ri(r,2,999),u=ri(r,1,999);return O(`${t} тыс. ${u} ед. = □`,t*1000+u)}const m=ri(r,1,9),t=ri(r,1,999);return O(`${m} млн ${t} тыс. = □`,m*1000000+t*1000)},
+  bigCmp:r=>{const a=ri(r,10000,999999);let b=r()<.15?a:a+pick(r,[-1000,1000,-100,100,-1,1,-9000,9000,-90000,90000]);if(b<10000||b>999999)return null;return CMP(fmt(a),fmt(b),a,b)},
+  x1000:r=>{const a=ri(r,2,999),k=pick(r,[10,100,1000]);return r()<.5?E(a,'×',k):E(a*k,'÷',k)},
+  areaUnits4:r=>{const k=ri(r,2,9);return pick(r,[O(`${k} кв. см = □ кв. мм`,k*100),O(`${k} кв. м = □ кв. дм`,k*100),O(`${k} кв. м = □ кв. см`,k*10000),O(`${k} кв. км = □ кв. м`,k*1000000),O(`${k*100} кв. мм = □ кв. см`,k)])},
+  century:r=>{if(r()<.5){const k=ri(r,2,9);return O(`${k} ${plural(k,['век','века','веков'])} = □ лет`,k*100)}const y=ri(r,1001,2025);return O(`В каком веке был ${y} год? □ век`,Math.floor((y-1)/100)+1)},
+  time24:r=>{if(r()<.5){const h=ri(r,13,23);return O(`Сейчас ${h} ч. Сколько часов осталось до полуночи? □`,24-h)}const a=ri(r,5,15),d=ri(r,2,8);return O(`Поезд отправился в ${a} ч и был в пути ${d} ч. Во сколько он прибыл? □ ч`,a+d)},
+  valAdd:r=>{const g1=ri(r,1,18)*50,g2=ri(r,1,18)*50,a=ri(r,1,5),b=ri(r,1,4),m1=ri(r,5,95),m2=ri(r,5,95),h1=ri(r,1,4),h2=ri(r,1,3),n1=ri(r,1,11)*5,n2=ri(r,1,11)*5;
+    return pick(r,[O(`${a} кг ${g1} г + ${b} кг ${g2} г = □ г`,(a+b)*1000+g1+g2),O(`${a} м ${m1} см + ${b} м ${m2} см = □ см`,(a+b)*100+m1+m2),O(`${h1} ч ${n1} мин + ${h2} ч ${n2} мин = □ мин`,(h1+h2)*60+n1+n2),
+      (a+1)*100+m1>b*100+m2?O(`${a+1} м ${m1} см − ${b} м ${m2} см = □ см`,(a+1)*100+m1-b*100-m2):null])},
+  valMul:r=>{const m=ri(r,1,5),c=ri(r,5,95),k=ri(r,2,9),g=ri(r,1,18)*50;return r()<.5?O(`${m} м ${c} см × ${k} = □ см`,(m*100+c)*k):O(`${m} кг ${g} г × ${k} = □ г`,(m*1000+g)*k)},
+  eqAdd4:r=>{const a=ri(r,100,5000),b=ri(r,100,5000);return X(a,'+',b,r()<.5?'a':'b')},
+  eqSub4:r=>{const a=ri(r,1000,9999),b=ri(r,100,a-100);return X(a,'-',b,r()<.5?'a':'b')},
+  eqMul4:r=>{const a=ri(r,12,999),b=ri(r,2,9);return r()<.5?X(a,'×',b,r()<.5?'a':'b'):X(a*b,'÷',b,r()<.5?'a':'b')},
+  fracK4:r=>{const b=pick(r,[2,3,4,5,6,8,10]),k=ri(r,1,b-1),q=ri(r,2,50);return O(`${k}/${b} от ${b*q} = □`,k*q)},
+  fracWhole:r=>{const b=pick(r,[2,3,4,5,6,8,10]),q=ri(r,2,50);if(r()<.5)return O(`1/${b} числа равна ${q}. Число = □`,b*q);const k=ri(r,2,Math.max(2,b-1));return k>=b?null:O(`${k}/${b} числа равны ${k*q}. Число = □`,b*q)},
+  groupMul:r=>{const pr=pick(r,[[25,4],[50,2],[20,5],[125,8],[5,2]]),a=ri(r,3,99);return{type:'expr',q:`${pr[0]} × ${a} × ${pr[1]}`,ans:pr[0]*pr[1]*a}},
+  numByProd:r=>{const a=ri(r,12,99),b=ri(r,2,5),c=ri(r,2,5);return{type:'expr',q:`${a} × (${b} × ${c})`,ans:a*b*c}},
+  divByProd:r=>{const c=ri(r,2,5),d=ri(r,2,5),q=ri(r,3,40);return{type:'expr',q:`${c*d*q} : (${c} × ${d})`,ans:q}},
+  mul0:r=>{const a=ri(r,12,99),b=ri(r,2,9);return pick(r,[E(a*10,'×',b),E(a,'×',b*10),E(a*10,'×',b*10),E(a*100,'×',b)])},
+  div0:r=>{const q=ri(r,12,99),b=ri(r,2,9)*pick(r,[10,100]);return E(q*b,'÷',b)},
+  remDiv10:r=>{const n=ri(r,1000,9999),k=pick(r,[10,100,1000]);if(n%k===0)return null;return r()<.5?O(`${n} : ${k} = □ (ост. ${n%k})`,Math.floor(n/k)):O(`${n} : ${k} = ${Math.floor(n/k)} (ост. □)`,n%k)},
+  d4x1:r=>{const b=ri(r,2,9),q=ri(r,Math.ceil(1000/b),Math.floor(9999/b));return E(b*q,'÷',b)},
+  d4x1z:r=>{const b=ri(r,2,9),q=pick(r,[ri(r,1,9)*100+ri(r,1,9),ri(r,1,9)*1000+ri(r,1,9)*10,ri(r,1,9)*1000+ri(r,1,9)]),a=b*q;return a<1000||a>99999?null:E(a,'÷',b)},
+  colM1big:r=>{const b=ri(r,2,9);return COL(ri(r,1002,9999),'×',b)},
+  colM2:r=>COL(ri(r,102,999),'×',ri(r,12,99)),
+  colM3:r=>COL(ri(r,102,999),'×',ri(r,102,999)),
+  dBy2:r=>{const b=ri(r,12,99),q=ri(r,11,99);return E(b*q,'÷',b)},
+  remBy2:r=>{const b=ri(r,12,99),q=ri(r,2,99),m=ri(r,1,b-1),a=b*q+m;return r()<.5?O(`${a} : ${b} = ${q} (ост. □)`,m):O(`${a} : ${b} = □ (ост. ${m})`,q)},
+  dBy3:r=>{const b=ri(r,102,999),q=ri(r,2,99);return E(b*q,'÷',b)},
+  solidKind:r=>{const k=pick(r,SOLIDS);return CH('Как называется это тело?',shuffle(r,[k,...shuffle(r,SOLIDS.filter(x=>x!==k)).slice(0,2)]),k,solidSVG(k))},
+  solidCount:r=>{const k=pick(r,Object.keys(SOLID_N)),w=ri(r,0,2);const name=['граней','рёбер','вершин'][w];
+    return{...O(`Сколько ${name} у фигуры «${k}»? □`,SOLID_N[k][w]),svg:solidSVG(k)}}
+});
+
 function formItem(p,r){for(let k=0;k<200;k++){const it=FORMS[pick(r,p.forms)](r,p);if(it)return it}return{...E(2,'+',3),fail:true}}
 
 /* ---------- программа ---------- */
@@ -1227,7 +1282,57 @@ const MATH={
      {n:'Деление на однозначное',d:'748 : 2',p:F(['d3x1'],10)},{n:'Больше примеров',d:'',p:F(['d3x1'],12)},{n:'С проверкой',d:'',p:F(['d3x1','checkDiv'],12)}]},
    {id:'g3-calc',t:'Знакомство с калькулятором',sub:['Знакомство с калькулятором'],syn:['калькулятор'],L:[
      {n:'Вычисли на калькуляторе',d:'',p:F(['calc'],8)},{n:'Больше примеров',d:'',p:F(['calc'],10)},{n:'Ещё больше',d:'',p:F(['calc'],12)}]}]}],
- 4:OLD_MATH[4].map(sec=>({...sec,part:1,unverified:true}))
+ 4:[
+  {part:1,s:'Числа от 1 до 1000: повторение',topics:[
+   {id:'g4-rep1000',t:'Повторение: числа от 1 до 1000',sub:[S_('Нумерация. Счёт предметов. Разряды',{kind:'forms',forms:['places','cmp1000']}),S_('Числовые выражения. Порядок выполнения действий',{kind:'order',patterns:['a + b × c','(a + b) × c','a × b - c ÷ d'],small:true,cap:300}),
+     S_('Сложение и вычитание',{kind:'column',ops:['+','-'],lo:200,hi:999,digits:3,column:true}),S_('Умножение и деление',{kind:'forms',forms:['colM3x1','d3x1']})],syn:['повторение','трёхзначные'],L:[
+     {n:'Разряды и сравнение',d:'',p:F(['places','cmp1000'],12)},{n:'Порядок действий',d:'(a + b) × c',p:{kind:'order',patterns:['a + b × c','(a + b) × c','a × b - c ÷ d','(a + b) × c - d'],small:true,cap:300,count:10}},{n:'Вычисления до 1000',d:'',p:F(['colM3x1','d3x1','r1000','r1000md'],12)}]}]},
+  {part:1,s:'Числа, которые больше 1000. Нумерация',topics:[
+   {id:'g4-bignum',t:'Многозначные числа: разряды и классы',sub:['Нумерация. Разряды и классы','Чтение многозначных чисел',S_('Запись многозначных чисел',{forms:['bigWrite']}),S_('Разрядные слагаемые',{forms:['bigPlaces']}),S_('Класс миллионов. Класс миллиардов',{forms:['bigWrite','bigClasses']})],syn:['многозначные','классы','миллион','тысячи'],L:[
+     {n:'Разрядные слагаемые',d:'45 302 = 40 000 + …',p:F(['bigPlaces'],10)},{n:'Классы и разряды',d:'сколько всего тысяч',p:F(['bigClasses','bigPlaces'],10)},{n:'Запись чисел',d:'2 млн 300 тыс.',p:F(['bigWrite','bigClasses','bigPlaces'],12)}]},
+   {id:'g4-bigcmp',t:'Сравнение многозначных чисел. В 10, 100, 1000 раз',sub:[S_('Сравнение многозначных чисел',{forms:['bigCmp']}),S_('Увеличение и уменьшение числа в 10, 100, 1000 раз',{forms:['x1000']})],syn:['сравнение','в 1000 раз'],L:[
+     {n:'Сравнение',d:'45 302 ◯ 45 320',p:F(['bigCmp'],12)},{n:'В 10, 100, 1000 раз',d:'',p:F(['x1000'],12)},{n:'Вперемешку',d:'',p:F(['bigCmp','x1000'],12)}]}]},
+  {part:1,s:'Величины',topics:[
+   {id:'g4-len',t:'Единицы длины',sub:['Величины. Единицы длины. Таблица единиц длины'],syn:['км','мм','длина','метр'],L:[
+     {n:'Метры, см, мм',d:'',p:U(['m2cm','cm2mm','mcm2cm','m2mm'])},{n:'Километры',d:'3 км 200 м = □ м',p:U(['km2m','kmm2m'])},{n:'Все единицы длины',d:'',p:U(['km2m','kmm2m','m2cm','mcm2cm','cm2mm','m2mm'])}]},
+   {id:'g4-area',t:'Единицы площади. Палетка',sub:[S_('Единицы площади. Квадратный километр',{kind:'forms',forms:['areaUnits4']}),S_('Квадратный миллиметр',{kind:'forms',forms:['areaUnits4']}),S_('Таблица единиц площади',{kind:'forms',forms:['areaUnits4']}),S_('Палетка',{kind:'grid',ask:'S',shape:'L',big:true})],syn:['площадь','кв км','палетка'],L:[
+     {n:'Палетка',d:'площадь по клеткам',p:G('S','L',6,true)},{n:'Единицы площади',d:'',p:F(['areaUnits4'],10)},{n:'Площадь и периметр',d:'',p:F(['areaUnits4','rectS','rectSb','rectP'],10)}]},
+   {id:'g4-mass',t:'Единицы массы: тонна, центнер',sub:['Единицы массы. Тонна. Центнер','Таблица единиц массы'],syn:['масса','тонна','центнер','кг'],L:[
+     {n:'Тонна и центнер',d:'3 т = □ ц',p:U(['t2c','c2kg','t2kg'])},{n:'Килограммы и граммы',d:'',p:U(['kg2g','kgg2g','tc2kg'])},{n:'Все единицы массы',d:'',p:U(['t2c','c2kg','t2kg','tc2kg','kgg2g'])}]},
+   {id:'g4-time',t:'Единицы времени: год, сутки, век',sub:[S_('Единицы времени. Год',{kind:'forms',forms:['yearUnits']}),S_('Время от 0 до 24 часов',{kind:'forms',forms:['time24']}),S_('Век',{kind:'forms',forms:['century']}),S_('Таблица единиц времени',{kind:'forms',forms:['yearUnits','century']})],syn:['время','век','сутки','часы'],L:[
+     {n:'Год, сутки, век',d:'',p:F(['yearUnits','century'],10)},{n:'Время от 0 до 24 часов',d:'',p:F(['time24'],8)},{n:'Все единицы времени',d:'',p:F(['yearUnits','century','time24'],12)}]}]},
+  {part:1,s:'Сложение и вычитание',topics:[
+   {id:'g4-addsub',t:'Сложение и вычитание многозначных чисел',sub:['Сложение и вычитание. Устные и письменные приёмы вычислений','Письменные приёмы вычитания'],syn:['столбик','многозначные'],L:[
+     {n:'Четырёхзначные',d:'столбик, 4 527 + 3 186',p:{kind:'column',ops:['+','-'],lo:2000,hi:9999,count:12,digits:4,column:true}},
+     {n:'Пятизначные',d:'столбик, 35 270 − 18 455',p:{kind:'column',ops:['+','-'],lo:20000,hi:99999,count:12,digits:4,column:true}},
+     {n:'С переходом через разряд',d:'60 004 − 27 368',p:{kind:'column',ops:['+','-'],lo:20000,hi:99999,count:12,digits:4,carry:'with',column:true}}]},
+   {id:'g4-eq',t:'Нахождение неизвестного компонента',sub:[S_('Нахождение неизвестного слагаемого',{forms:['eqAdd4']}),S_('Нахождение неизвестного уменьшаемого и вычитаемого',{forms:['eqSub4']}),S_('Нахождение неизвестного множителя, делимого и делителя',{forms:['eqMul4']})],syn:['уравнение','икс','x','неизвестное'],L:[
+     {n:'Слагаемое',d:'x + 2 345 = 5 000',p:F(['eqAdd4'],10)},{n:'Уменьшаемое и вычитаемое',d:'',p:F(['eqSub4','eqAdd4'],10)},{n:'Множитель, делимое, делитель',d:'',p:F(['eqMul4','eqAdd4','eqSub4'],12)}]},
+   {id:'g4-frac',t:'Нахождение нескольких долей целого',sub:['Нахождение нескольких долей целого'],syn:['доли','дроби'],L:[
+     {n:'Несколько долей',d:'3/4 от 80',p:F(['fracK4'],10)},{n:'Число по доле',d:'1/4 числа равна 15',p:F(['fracWhole'],10)},{n:'Вперемешку',d:'',p:F(['fracK4','fracWhole'],12)}]},
+   {id:'g4-val',t:'Сложение и вычитание величин',sub:['Сложение и вычитание величин'],syn:['величины','кг','см'],L:[
+     {n:'Сложение величин',d:'2 кг 300 г + 1 кг 800 г',p:F(['valAdd'],8)},{n:'Больше примеров',d:'',p:F(['valAdd'],10)},{n:'С умножением величин',d:'',p:F(['valAdd','valMul'],10)}]}]},
+  {part:1,s:'Умножение и деление',topics:[
+   {id:'g4-mulprops',t:'Свойства умножения',sub:[S_('Умножение и деление. Свойства умножения',{kind:'forms',forms:['groupMul']}),S_('Перестановка и группировка множителей (часть 2)',{kind:'forms',forms:['groupMul']}),S_('Умножение числа на произведение (часть 2)',{kind:'forms',forms:['numByProd']}),S_('Деление числа на произведение (часть 2)',{kind:'forms',forms:['divByProd']})],syn:['сочетательное','группировка','удобный способ'],L:[
+     {n:'Удобная группировка',d:'25 × 37 × 4',p:F(['groupMul'],8)},{n:'Число на произведение',d:'',p:F(['numByProd','divByProd'],10)},{n:'Вперемешку',d:'',p:F(['groupMul','numByProd','divByProd'],10)}]},
+   {id:'g4-mul1',t:'Письменное умножение на однозначное число',sub:['Письменные приёмы умножения',S_('Умножение величины на число',{kind:'forms',forms:['valMul']}),'Умножение и деление на однозначное число (продолжение, часть 2)'],syn:['столбик','умножение в столбик'],L:[
+     {n:'Трёхзначное число',d:'386 × 7',p:{kind:'column',ops:['×'],aLo:102,aHi:999,count:12}},{n:'Четырёхзначное число',d:'2 408 × 9',p:F(['colM1big'],12)},{n:'Умножение величин',d:'',p:F(['valMul','colM1big'],10)}]},
+   {id:'g4-mul0',t:'Умножение и деление чисел, оканчивающихся нулями',sub:[S_('Умножение чисел, запись которых оканчивается нулями',{forms:['mul0']}),S_('Умножение на числа, оканчивающиеся нулями (часть 2)',{forms:['mul0']}),S_('Умножение двух чисел, оканчивающихся нулями (часть 2)',{forms:['mul0']}),S_('Деление на числа, оканчивающиеся нулями (часть 2)',{forms:['div0']}),S_('Деление с остатком на 10, 100, 1 000 (часть 2)',{forms:['remDiv10']})],syn:['нули','круглые'],L:[
+     {n:'Умножение',d:'340 × 50',p:F(['mul0'],12)},{n:'Деление',d:'2 400 : 60',p:F(['div0'],12)},{n:'С остатком на 10, 100, 1 000',d:'',p:F(['remDiv10','mul0','div0'],12)}]},
+   {id:'g4-div1',t:'Письменное деление на однозначное число',sub:['Деление на однозначное число','Письменные приёмы деления'],syn:['деление уголком','уголком','столбик'],L:[
+     {n:'Деление на однозначное',d:'4 536 : 7',p:F(['d4x1'],10)},{n:'С нулями в частном',d:'',p:F(['d4x1z'],10)},{n:'Вперемешку',d:'',p:F(['d4x1','d4x1z'],12)}]}]},
+  {part:2,s:'Скорость, время, расстояние',topics:[
+   {id:'g4-move',t:'Скорость, время, расстояние',sub:[S_('Скорость. Единицы скорости',{tpls:['dist','speed']}),S_('Задачи-расчёты',{tpls:['dist','time','speed','meet']})],syn:['скорость','движение','км/ч','задачи'],L:[
+     {n:'Найти расстояние',d:'скорость × время',p:W(['dist'],0,4)},{n:'Найти время и скорость',d:'обратные задачи',p:W(['time','speed'],0,4)},{n:'Встречное движение',d:'и все типы',p:W(['meet','dist','time','speed'],0,4)}]}]},
+  {part:2,s:'Геометрические тела',topics:[
+   {id:'g4-solids',t:'Геометрические тела',sub:['Куб','Прямоугольный параллелепипед','Пирамида','Цилиндр. Конус'],syn:['тела','объёмные фигуры','грани'],L:[
+     {n:'Узнай тело',d:'',p:F(['solidKind'],6)},{n:'Грани, рёбра, вершины',d:'',p:F(['solidCount'],6)},{n:'Вперемешку',d:'',p:F(['solidKind','solidCount'],8)}]}]},
+  {part:2,s:'Умножение на двузначное и трёхзначное число',topics:[
+   {id:'g4-mul2',t:'Письменное умножение на двузначное и трёхзначное число',sub:[S_('Умножение на двузначное и трёхзначное число',{forms:['colM2','colM3']}),S_('Письменное умножение на двузначное число',{forms:['colM2']}),S_('Письменное умножение на трёхзначное число',{forms:['colM3']})],syn:['столбик','умножение в столбик'],L:[
+     {n:'На двузначное',d:'247 × 36',p:F(['colM2'],10)},{n:'На трёхзначное',d:'247 × 136',p:F(['colM3'],8)},{n:'Вперемешку',d:'',p:F(['colM2','colM3'],10)}]}]},
+  {part:2,s:'Деление на двузначное и трёхзначное число',topics:[
+   {id:'g4-div2',t:'Письменное деление на двузначное и трёхзначное число',sub:[S_('Деление на двузначное и трёхзначное число',{forms:['dBy2','dBy3']}),S_('Деление с остатком на двузначное число',{forms:['remBy2']}),S_('Письменное деление на трёхзначное число',{forms:['dBy3']})],syn:['деление уголком','уголком','остаток'],L:[
+     {n:'На двузначное',d:'1 768 : 26',p:F(['dBy2'],10)},{n:'С остатком',d:'',p:F(['remBy2','dBy2'],10)},{n:'На трёхзначное',d:'',p:F(['dBy3','dBy2'],10)}]}]}]
 };
 /* старые темы прототипа переезжают в новые: прогресс учеников сохраняется */
 const ID_MAP={'g1-sum10':'g1-add14','g1-compose':'g1-terms','g1-compare':'g1-signs','g1-nocarry':'g1-teen','g1-carry':'g1-addc','g1-word':'g1-task','g1-len':'g1-dm',
@@ -1255,10 +1360,12 @@ function exampleTopics(){return[
 /* ---------- состояние ---------- */
 const KEY='kletka-proto-v1';
 function demoState(){const d=demoState0();migrate(d);return d}
-function migrate(st){if(st.v===2)return st;const m=id=>ID_MAP[id]||id;
+const ID_MAP4={'g4-column':'g4-addsub','g4-mul':'g4-mul1','g4-order':'g4-rep1000','g4-units':'g4-mass','g4-fig':'g4-area'};
+function migrate(st){if((st.v||1)>=3)return st;
+  const maps=[];if((st.v||1)<2)maps.push(ID_MAP);maps.push(ID_MAP4);const m=id=>maps.reduce((x,mp)=>mp[x]||x,id);
   for(const s of st.students)s.current=m(s.current);for(const a of st.attempts)a.topicId=m(a.topicId);for(const h of st.assignments)h.topicId=m(h.topicId);
   for(const c of st.customTopics||[])for(const L of c.L||[])if(L.p&&L.p.parts)for(const pt of L.p.parts)pt.tid=m(pt.tid);
-  st.v=2;return st}
+  st.v=3;return st}
 function demoState0(){
   const now=Date.now(),d=86400000;
   return{
@@ -1506,7 +1613,7 @@ function viewStudent(){
       <div class="route-act"><button class="btn primary" id="r-new">+ Своя тема по русскому</button></div></section>`;
   }
   const grades=subj==='math'?[1,2,3,4]:[1,2,3,4].filter(g=>g===st.grade||mine(g).length);
-  let prog=`<div class="tools"><span class="hint">${subj==='math'?'Программа по учебнику Моро: 1–3 класс сверены, 4 класс пока свой. Откройте тему, чтобы дать задание или сделать её текущей.':'Ваши темы по русскому идут в маршруте по классам. Откройте тему, чтобы дать задание или сделать её текущей.'}</span><button class="btn small" id="newt">+ Своя тема</button></div>`;
+  let prog=`<div class="tools"><span class="hint">${subj==='math'?'Программа 1–4 класса по учебнику Моро. Откройте тему, чтобы дать задание или сделать её текущей.':'Ваши темы по русскому идут в маршруте по классам. Откройте тему, чтобы дать задание или сделать её текущей.'}</span><button class="btn small" id="newt">+ Своя тема</button></div>`;
   const cur=pos.i>=0?TOPICS[pos.tr[pos.i]]:null,cg=cur?cur.grade:st.grade,cp=cur?partOf(cur.id):1;
   const trI=id=>pos.tr.indexOf(id);
   const secRows=ts=>{const done=ts.filter(t=>pos.i>=0&&trI(t.id)>=0&&trI(t.id)<pos.i),rest=ts.filter(t=>!done.includes(t));
@@ -1607,7 +1714,7 @@ function exampleTopic(a,op,b){
       if(a%10+b%10===10)return['g2-coladd',{kind:'forms',forms:['colRound']}];
       return a%10+b%10>10?['g2-coladd',{kind:'column',ops:['+'],lo:30,hi:99,digits:2,carry:'with',column:true}]:['g2-coladd',{kind:'column',ops:['+'],lo:30,hi:99,digits:2,carry:'without',column:true}]}
     if(s2<=1000)return rt(a)&&rt(b)?['g3-oral1000']:['g3-col1000'];
-    return['g4-column']}
+    return['g4-addsub']}
   if(op==='-'){if(b>a)return null;if(a<=10)return['g1-sub10'];
     if(a>10&&a<=18&&t1(b)&&a%10<b)return['g1-subc',{from:[a]}];
     if(a<=20)return['g1-teen'];
@@ -1616,17 +1723,18 @@ function exampleTopic(a,op,b){
       if(rt(a))return['g2-oral',{forms:['u60m24']}];
       return a%10<b%10?['g2-colsub',{kind:'column',ops:['-'],lo:30,hi:99,digits:2,carry:'with',column:true}]:['g2-colsub',{kind:'column',ops:['-'],lo:30,hi:99,digits:2,carry:'without',column:true}]}
     if(a<=1000)return rt(a)&&rt(b)?['g3-oral1000']:['g3-col1000'];
-    return['g4-column']}
+    return['g4-addsub']}
   if(op==='×'){if(a<=1||b<=1)return['g3-zero'];if(a===10||b===10)return['g2-mul10'];
     if(a<=9&&b<=9){const k=Math.max(a,b);return['g2-table',{tab:[k,k]}]}
     if(a*b<=100&&Math.max(a,b)<=99)return rt(a)||rt(b)?['g3-extra',{kind:'forms',forms:['roundMul']}]:['g3-extra',{kind:'forms',forms:['m2x1','m1x2']}];
     if(a*b<1000)return a%100===0||b%100===0?['g3-oralmd']:['g3-colmul'];
-    return['g4-mul']}
-  if(b===0)return null;if(a===0||b===1||a===b)return['g3-zero'];if(a%b)return['g3-rem'];
+    if(a<10||b<10)return['g4-mul1'];if(a%10===0&&b%10===0)return['g4-mul0',{forms:['mul0']}];return['g4-mul2']}
+  if(b===0)return null;if(a===0||b===1||a===b)return['g3-zero'];
+  if(a%b){if([10,100,1000].includes(b)&&a>=1000)return['g4-mul0',{forms:['remDiv10']}];if(b>=10)return['g4-div2',{forms:['remBy2']}];return['g3-rem']}
   const q=a/b;if(b===10)return['g2-mul10'];if(b<=9&&q<=9)return['g2-table',{tab:[b,b]}];
   if(a<=99)return b>=10?(rt(a)&&rt(b)?['g3-extradiv',{kind:'forms',forms:['divRound']}]:['g3-extradiv',{kind:'forms',forms:['d2x2']}]):['g3-extradiv',{kind:'forms',forms:['d2x1']}];
   if(a<=999)return rt(a)&&b<=9?['g3-oralmd']:['g3-coldiv'];
-  return null}
+  if(b<10)return['g4-div1'];if(b%10===0)return['g4-mul0',{forms:['div0']}];return['g4-div2']}
 function parseExample(q){const m=String(q).replace(/\s+/g,'').match(/^(\d+)([+\-−×xх*:÷\/])(\d+)/i);if(!m)return null;
   const a=+m[1],b=+m[3],o=m[2],op=o==='+'?'+':/[-−]/.test(o)?'-':/[×xх*]/i.test(o)?'×':'÷';
   const r=exampleTopic(a,op,b);if(!r||!TOPICS[r[0]])return null;
@@ -1666,7 +1774,7 @@ function curParams(){const t=TOPICS[V.topicId];return{...t.L[V.level].p,...(V.ov
 const TPL=[['train','Тренировка'],['lesson','Урок'],['test','Проверочная'],['home','Домашка'],['own','Свой']];
 const TPL_HINT={train:'Одна тема, задания выбранного уровня.',lesson:'Разминка по прошлой теме, тема урока, задачи и бонус.',
   test:'Тема, задачи и величины. Подходит для контроля.',home:'Короче урока: тема, одна задача и повторение.',own:'Соберите лист из блоков: любые темы, уровни и количество.'};
-const WORD_OF={1:'g1-task',2:'g2-word',3:'g3-word',4:'g4-move'},EXTRA_OF={1:'g1-dm',2:'g2-rect',3:'g3-area',4:'g4-units'};
+const WORD_OF={1:'g1-task',2:'g2-word',3:'g3-word',4:'g4-move'},EXTRA_OF={1:'g1-dm',2:'g2-rect',3:'g3-area',4:'g4-area'};
 const TASKS=['задание','задания','заданий'];
 function tplBlocks(tpl,st,t,lvl){
   const tr=trackIds(t.subject),i=tr.indexOf(t.id),prev=i>0?tr[i-1]:null;
@@ -1709,7 +1817,7 @@ function viewTopic(){
   else items=generate(curParams(),V.seed);
   const lv=t.L.map((L,i)=>`<button class="lvl${i===V.level?' on':''}" data-l="${i}">
      <div class="lvl-top"><span class="lvl-mark">${[0,1,2].map(k=>`<i class="${k<=i?'f':''}"></i>`).join('')}</span><b>${LV[i]}: ${esc(L.n)}</b></div>
-     <span class="d">${esc(L.d)} · ${L.p.count} ${plural(L.p.count,TASKS)}</span></button>`).join('');
+     <span class="d">${L.d?esc(L.d)+' · ':''}${L.p.count} ${plural(L.p.count,TASKS)}</span></button>`).join('');
   const p=curParams();const tunable=tpl==='train'&&p.kind!=='order'&&!p.table&&!p.extra&&p.ops&&!p.aLo&&p.cmp!=='num';
   const tplSeg=fixed?'':`<div class="field"><span class="label">Вид листа</span><div class="seg tpl" id="tpl">${TPL.map(([k,l])=>`<button type="button" data-k="${k}" class="${k===tpl?'on':''}">${l}</button>`).join('')}</div>
     <span class="hint">${TPL_HINT[tpl]}</span></div>`;
@@ -2076,7 +2184,7 @@ function key(k){
   if(!P||P.lock||V.screen!=='player')return;
   if(k==='del')P.input=P.input.slice(0,-1);
   else if(k==='ok'){if(P.input)submit();return}
-  else if(P.input.length<7)P.input+=k;
+  else if(P.input.length<10)P.input+=k;
   P.fb=null;viewPlayer();
 }
 function submit(){
