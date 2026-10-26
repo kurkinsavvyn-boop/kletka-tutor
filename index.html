@@ -344,21 +344,30 @@ details.done .topic{opacity:.7}
 .sheet .sh-mini{--c:2.8cqw;padding:0 var(--c) !important;height:calc(var(--c) * 2);line-height:calc(var(--c) * 2);background-size:var(--c) var(--c);font-size:calc(var(--c) * .55);border-bottom-width:.15cqw}
 
 /* Клетка на весь лист */
-.sheet .sheet-in{--c:2.8cqw;gap:var(--c);background-color:#fff;background-image:linear-gradient(#c9dcf0 1px,transparent 1px),linear-gradient(90deg,#c9dcf0 1px,transparent 1px);background-size:var(--c) var(--c)}
-.sheet.bw .sheet-in{background-image:linear-gradient(#d4d4d4 1px,transparent 1px),linear-gradient(90deg,#d4d4d4 1px,transparent 1px)}
-.sheet .sh-items,.sheet .sh-head,.sheet .sh-mini{background:none !important;border:0 !important;border-radius:0 !important}
+.sheet{--grid:linear-gradient(#c9dcf0 1px,transparent 1px),linear-gradient(90deg,#c9dcf0 1px,transparent 1px)}
+.sheet.bw{--grid:linear-gradient(#d4d4d4 1px,transparent 1px),linear-gradient(90deg,#d4d4d4 1px,transparent 1px)}
+.sheet .sheet-in{--c:2.8cqw;gap:var(--c);background:transparent}
+/* клетка только там, где ребёнок пишет: под заданиями, в шапке с полями и в месте для решения задачи */
+.sheet .sh-items,.sheet .sh-head,.sheet .sh-mini,.sgrid,.wq2 .sol2,.wq2 .aline{background-color:#fff;background-image:var(--grid) !important;background-size:var(--c) var(--c) !important;background-position:0 0 !important}
+.sheet .sh-items,.sheet .sh-head,.sheet .sh-mini{border:0 !important;border-radius:0 !important;box-shadow:0 0 0 1px #c9dcf0}
 .sheet .sh-items{padding:0 !important}
-.sheet .sh-head{padding:0 !important}
+.sheet .sh-head{padding:0 var(--c) !important}
+/* текст и картинки — на белом */
+.sh-items>.heroG,.sh-items>.tailG,.sh-items>.scene2,.wq2{background:#fff}
+.sh-items>.heroG,.sh-items>.tailG{width:100% !important}
+.sh-items>.grp,.sgrid>.grp{background:#fff;line-height:calc(var(--c) * 2) !important;min-height:calc(var(--c) * 2);box-shadow:0 calc(var(--c) * -1) 0 #fff}
+.wq2 .tl{padding-bottom:var(--c)}
 .sh-items>.heroG,.sh-items>.tailG{grid-column:1/-1;display:flex;gap:calc(var(--c) * 2);align-items:stretch}
-.hA{position:relative;flex:none;min-height:calc(var(--c) * 13)}
+.hA{position:relative;flex:none}
 .hA .art{position:absolute;inset:0;width:100% !important;height:100% !important;object-fit:contain;object-position:center}
 .hR{flex:1;min-width:0;display:flex;flex-direction:column;gap:var(--c)}
 .hT{display:flex;flex-direction:column;gap:var(--c)}
-.hT .sh-title{line-height:1.1}
+.hT .sh-title{line-height:1.1;font-size:3.4cqw}
+.hT .bubble{font-size:2.3cqw;padding:1cqw 1.8cqw}
 .tailG{justify-content:space-between}
-.tB{flex:none;height:calc(var(--c) * 10);display:flex;justify-content:flex-end;align-items:flex-start}
-.tB img.art.pic{height:100%;width:auto}
-.tB img.art.pic.say{height:calc(var(--c) * 3);margin-top:var(--c)}
+.tB{flex:none;align-self:stretch;min-height:calc(var(--c) * 7);display:flex;justify-content:flex-end;align-items:center;position:relative}
+.tB img.art.pic{position:absolute;right:0;top:50%;transform:translateY(-50%);max-height:100%;max-width:100%;width:auto;height:auto}
+.tB img.art.pic.say{position:absolute;left:0;top:0;transform:none;height:calc(var(--c) * 3);max-width:40%}
 .sheet .sh-items,.sgrid{display:flex !important;flex-wrap:wrap;column-gap:calc(var(--c) * 2);row-gap:var(--c);align-items:flex-start;align-content:flex-start}
 .sh-items>.span,.sh-items>.grp,.sh-items>.selfcheck,.sh-items>.word,.sh-items>.scene2,.sgrid>.span,.sgrid>.grp,.sgrid>.word{flex:0 0 100%;width:100%}
 .sh-items>.it,.sgrid>.it{flex:none}
@@ -1351,9 +1360,11 @@ const FRAMES=['solid','dashed','double','dots','stripes'];
 const LEVELS=[['1','Сказка'],['2','Яркий'],['3','Спокойный'],['4','Строгий']];
 /* рисованные сюжеты: у темы до трёх наборов, набор выбирается по номеру варианта.
    top — сверху слева (смотрит вправо), bot — снизу справа (смотрит влево), char — самостоятельная картинка для «Яркого» */
+/* пропорции картинок (ширина / высота), чтобы заранее знать их высоту на листе */
+const ART_AR={"carlson-1-mid":1.724,"carlson-1-top":2.044,"carlson-2-mid":1.524,"carlson-2-top":2.032,"carlson-3-mid":1.608,"carlson-3-top":1.675,"cheburashka-1-mid":2.43,"cheburashka-1-top":1.379,"cheburashka-2-mid":2.468,"cheburashka-2-top":1.811,"cheburashka-3-mid":1.476,"cheburashka-3-top":1.85,"funtik-1-mid":1.455,"funtik-1-top":1.745,"funtik-2-mid":1.47,"funtik-2-top":2.231,"funtik-3-mid":1.699,"funtik-3-top":1.502,"leopold-1-mid":1.907,"leopold-1-top":2.086,"leopold-2-mid":2.379,"leopold-2-top":1.639,"leopold-3-mid":1.636,"leopold-3-top":2.487,"lion-1-mid":1.891,"lion-1-top":1.796,"lion-2-mid":1.754,"lion-2-top":2.237,"lion-3-mid":2.263,"lion-3-top":2.032,"pogodi-1-mid":1.747,"pogodi-1-top":1.737,"pogodi-2-mid":1.963,"pogodi-2-top":1.946,"pogodi-3-mid":2.233,"pogodi-3-top":1.675,"pooh-1-mid":2.437,"pooh-1-top":1.468,"pooh-2-mid":1.855,"pooh-2-top":1.902,"pooh-3-mid":1.99,"pooh-3-top":2.088,"prostokvashino-1-mid":0.851,"prostokvashino-1-top":0.726,"prostokvashino-2-mid":1.351,"prostokvashino-2-top":2.032,"prostokvashino-3-mid":1.942,"prostokvashino-3-top":1.474,"umka-1-mid":1.23,"umka-1-top":1.741,"umka-2-mid":1.898,"umka-2-top":1.852};
 const ART_SAY={'prostokvashino-1':'art/prostokvashino-1-say.webp'};
 const artSet=(t,k)=>{if(!t.art||!t.art.length)return null;const a=t.art[((k%t.art.length)+t.art.length)%t.art.length];
-  return{id:a,top:`art/${a}-top.webp`,bot:`art/${a}-mid.webp`,char:`art/${a}-bot.webp`,say:ART_SAY[a]||''}};
+  return{id:a,arTop:ART_AR[a+'-top']||0.8,arBot:ART_AR[a+'-mid']||1,top:`art/${a}-top.webp`,bot:`art/${a}-mid.webp`,char:`art/${a}-bot.webp`,say:ART_SAY[a]||''}};
 const charSVG=(id,cls)=>`<svg class="art ${cls||''}" viewBox="0 0 100 100" aria-hidden="true">${CHARS[id]()}</svg>`;
 /* рисованные картинки темы: сверху персонаж смотрит вправо, снизу влево */
 const artImg=(src,cls)=>`<img class="art pic ${cls||''}" src="${src}" alt="" aria-hidden="true">`;
@@ -1910,7 +1921,7 @@ function tokRow(str,it,showAns){
 const badgeH=i=>`<span class="cb"><i>${i+1}</i></span>`;
 /* задания с текстом и рисунками: каждая строка текста — в строке клеток, рисунки по высоте кратны клетке */
 function richItemHTML(it,i,showAns){
-  if(it.type==='word')return `<div class="it rich span">${badgeH(i)}<div class="rb"><p class="tl">${esc(it.q)}</p><div class="sol2"></div><div class="aline"><span>Ответ:</span><i>${showAns?esc(fmt(it.ans)):''}</i></div></div></div>`;
+  if(it.type==='word')return `<div class="it rich span wq2">${badgeH(i)}<div class="rb"><p class="tl">${esc(it.q)}</p><div class="sol2"></div><div class="aline"><span>Ответ:</span><i>${showAns?esc(fmt(it.ans)):''}</i></div></div></div>`;
   if(it.type==='grid')return `<div class="it rich">${badgeH(i)}<div class="rb">${gridSVG(it)}<span class="crow">${tokRow(`${it.ask} = □ ${gridUnit(it)}`,it,showAns)}</span></div></div>`;
   if(it.type==='ch')return `<div class="it rich${it.svg?'':' span'}">${badgeH(i)}<div class="rb"><p class="tl">${esc(it.q)}</p>${it.svg||''}<span class="opts2">${it.opts.map(o=>`<span class="ob${showAns&&o===it.ans?' on':''}">${esc(o)}</span>`).join('')}</span></div></div>`;
   if(it.type==='cmp')return `<div class="it rich">${badgeH(i)}<div class="rb"><span class="crow cwrap">${tokRow(`${it.left} ◯ ${it.right}`,it,showAns)}</span></div></div>`;
@@ -1929,10 +1940,7 @@ function snapCells(root){(root||document).querySelectorAll('.sheet').forEach(sh=
   sh.querySelectorAll('.rb > .fig,.rb > .gfig,.rb > .pair').forEach(el=>{el.style.height='';const h=el.getBoundingClientRect().height;if(h)el.style.height=(Math.ceil(h/c-0.02)*c)+'px'});
   sh.querySelectorAll('.sgrid > *,.hT,.tB,.sh-items > *').forEach(el=>{if(el.classList.contains('ci'))return;el.style.minHeight='';const h=el.getBoundingClientRect().height;el.style.minHeight=(Math.ceil(h/c-0.03)*c)+'px'});
   /* клетка на весь лист: сетка листа проходит через начало заданий, шапка встаёт на те же линии */
-  const inner=sh.querySelector('.sheet-in'),g=sh.querySelector('.sh-items'),hd=sh.querySelector('.sh-head,.sh-mini');if(!inner||!g)return;
-  g.style.marginTop='';if(hd){const d=(g.getBoundingClientRect().top-hd.getBoundingClientRect().top)/c;const fr=Math.ceil(d-0.02)-d;if(fr>0.01)g.style.marginTop=(fr*c)+'px'}
-  const S=inner.getBoundingClientRect(),G=g.getBoundingClientRect(),m=v=>((v%c)+c)%c;
-  inner.style.backgroundPosition=`${m(G.left-S.left)}px ${m(G.top-S.top)}px`})}
+})}
 function sheetParts(items,{topic,level,seed,studentName,answers,design}){
   const D=design&&!answers&&design.lv<4?design:null;
   const kind=items[0]&&items[0].type;
@@ -1989,21 +1997,27 @@ function sheetParts(items,{topic,level,seed,studentName,answers,design}){
     const sideFit=(pic,kk)=>{const w=avail-pic-2;if(w<6)return null;if(kk&&kk<=w)return{n:Math.floor((w+2)/(kk+2)),kw:kk,w,pic};return kk?null:{n:1,kw:w,w,pic}};
     const sg=(f,html)=>`<div class="sgrid" style="width:calc(var(--c) * ${f.w})">${html}</div>`;
     const bot=D.img&&D.img.bot?`${D.img.say?artImg(D.img.say,'say'):''}${artImg(D.img.bot)}`:'';
-    const kH=kAt(items.slice(0,8));let F=null;for(let pic=12;pic>=8&&!F;pic--)F=sideFit(pic,kH);
+    const kH=kAt(items.slice(0,8));const arT=D.img?D.img.arTop:1;
+    /* ширина картинки — такая, чтобы её высота была около 13 клеток */
+    const want=Math.max(8,Math.min(16,Math.round(13*arT)));
+    let F=null;for(let pic=want;pic>=8&&!F;pic--)F=sideFit(pic,kH);
     if(F){
-      const wP=F.pic;
+      const wP=F.pic,imgH=Math.round(wP/arT);
+      /* рядом с картинкой — столько заданий, сколько помещается по её высоте под названием */
+      const tLines=Math.ceil(String(title).length/Math.max(4,F.w*1.3)),bLines=Math.ceil(subText.length/Math.max(8,F.w*2.2));
+      const budget=imgH-(tLines*1.34+bLines*1.1+1.4+2);
       let used=0,col=0,rowH=0,M=0;
       const sideW=F.w;
       for(let i=0;i<items.length;i++){const it=items[i],g=mixed&&newGroup(it,i);
-        if(!isSpan(it)&&estW(it)>sideW)break;
+        if(isSpan(it)||estW(it)>sideW)break;
         if((g||isSpan(it))&&col){used+=rowH+1;col=0;rowH=0}
-        if(!col&&used>=9)break;
+        if(!col&&used>=budget)break;
         if(g)used+=2;
         if(isSpan(it)){used+=estH(it)+1;M++;continue}
         rowH=Math.max(rowH,estH(it));col++;M++;if(col===F.n){used+=rowH+1;col=0;rowH=0}}
       if(!M)M=0;
       const art=D.img?artImg(D.img.top):charSVG(D.char);
-      const headPiece=`<div class="heroG" style="width:calc(var(--c) * ${avail})"><div class="hA" style="width:calc(var(--c) * ${wP})">${art}</div><div class="hR"><div class="hT">${titleH}<div class="bubble">${subText}</div></div>${sg(F,pieces.slice(0,M).join(''))}</div></div>`;
+      const headPiece=`<div class="heroG" style="width:calc(var(--c) * ${avail})"><div class="hA" style="width:calc(var(--c) * ${wP});min-height:calc(var(--c) * ${imgH})">${art}</div><div class="hR"><div class="hT">${titleH}<div class="bubble">${subText}</div></div>${sg(F,pieces.slice(0,M).join(''))}</div></div>`;
       let rest=pieces.slice(M),tailPiece='';
       const kT=kAt(items.slice(-8));let F2=null;if(bot)for(let pic=13;pic>=8&&!F2;pic--)F2=sideFit(pic,kT);
       if(F2){let t=items.length,h=0,c2=0,rh=0;
