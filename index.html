@@ -13,6 +13,7 @@
   --ink:#1F2C55; --ink-2:#5B6888; --ink-3:#66718D;
   --pen:#D5402F; --pen-soft:#FBE6E2;
   --ink-soft:#E6ECF8;
+  --blue:#2D57C8; --blue-soft:#E8EEFC;
   --ok:#2C8A57; --ok-soft:#E1F2E8; --warn:#C98A12; --warn-soft:#FBF0D9; --bad:#D5402F; --bad-soft:#FBE6E2; --none:#B4BDD0;
   --sheet:#FFFFFF; --sheet-ink:#1A1F2E; --sheet-line:#C9D2E2; --sheet-pen:#D5402F;
   --f-ui:"Golos Text", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -22,13 +23,13 @@
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --paper:#11151F; --grid:#1A2130; --card:#171D2A; --line:#283247;
   --ink:#E4E9F5; --ink-2:#A3AECA; --ink-3:#8E9AB6;
-  --pen:#FF7863; --pen-soft:#3A1F1D; --ink-soft:#222B40;
+  --pen:#FF7863; --pen-soft:#3A1F1D; --ink-soft:#222B40; --blue:#8BA8FF; --blue-soft:#1D2742;
   --ok:#5CC98C; --ok-soft:#173326; --warn:#E8B04A; --warn-soft:#33290F; --bad:#FF7863; --bad-soft:#3A1F1D; --none:#4A5470;
   color-scheme:dark}}
 :root[data-theme="dark"]{
   --paper:#11151F; --grid:#1A2130; --card:#171D2A; --line:#283247;
   --ink:#E4E9F5; --ink-2:#A3AECA; --ink-3:#8E9AB6;
-  --pen:#FF7863; --pen-soft:#3A1F1D; --ink-soft:#222B40;
+  --pen:#FF7863; --pen-soft:#3A1F1D; --ink-soft:#222B40; --blue:#8BA8FF; --blue-soft:#1D2742;
   --ok:#5CC98C; --ok-soft:#173326; --warn:#E8B04A; --warn-soft:#33290F; --bad:#FF7863; --bad-soft:#3A1F1D; --none:#4A5470;
   color-scheme:dark}
 
@@ -211,6 +212,31 @@ a.btn{text-decoration:none}
 .bnum{width:22px;height:22px;border-radius:50%;background:var(--ink);color:var(--card);display:grid;place-items:center;font-size:12px;font-weight:700;flex:none}
 .bi{border:1px solid var(--line);background:var(--card);border-radius:8px;width:32px;height:34px;flex:none}
 .bi[disabled]{opacity:.35;cursor:default}
+
+/* Маршрут списком */
+.rlist{display:flex;flex-direction:column;gap:6px}
+.rl{display:grid;grid-template-columns:26px minmax(0,1fr) auto;align-items:center;gap:12px;text-align:left;border:1.5px solid var(--line);background:var(--card);border-radius:10px;padding:9px 12px}
+.rl:hover{border-color:var(--ink-2)}
+.rl-mark{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:13px;background:var(--ink-soft);color:var(--ink-3)}
+.rl-t{display:flex;flex-direction:column;font-weight:600;min-width:0;overflow-wrap:break-word;hyphens:auto}
+.rl-t small{font-weight:400;font-size:12.5px;color:var(--ink-2)}
+.rl-p{font-weight:700;font-variant-numeric:tabular-nums;text-align:right;display:flex;flex-direction:column;align-items:flex-end}
+.rl-p small{font-weight:500;font-size:11.5px;color:var(--ink-3)}
+.rl.prev{opacity:.6}
+.rl.prev:hover{opacity:1}
+.rl.prev .rl-mark.ok{background:var(--ok);color:var(--card)}
+.rl.prev .rl-mark.warn{background:var(--warn-soft);color:var(--warn)}
+.rl.prev .rl-mark.bad{background:var(--bad-soft);color:var(--bad)}
+.rl.cur{border:2px solid var(--pen);background:var(--pen-soft);padding:12px 14px}
+.rl.cur .rl-mark{background:var(--pen);color:var(--card)}
+.rl.cur .rl-t{font-size:16px}
+.rl.cur .rl-t small{color:var(--pen);font-weight:600}
+.rl.next{border-color:var(--blue-soft);background:var(--blue-soft)}
+.rl.next .rl-mark{background:var(--card);border:2px solid var(--blue)}
+.rl.next .rl-t small{color:var(--blue);font-weight:600}
+.rl.next:hover{border-color:var(--blue)}
+.rl-empty{padding:8px 12px;color:var(--ink-3);font-size:13.5px;border:1.5px dashed var(--line);border-radius:10px}
+.legend-note{margin:0;padding:0 18px 16px}
 
 /* Маршрут */
 .route{padding:16px 18px 18px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:12px}
@@ -745,12 +771,21 @@ function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 let V={screen:'students'};
 const newSeed=()=>1000+Math.floor(Math.random()*9000);
 
+/* усвоение темы: последние 3 работы, свежие весят больше (3:2:1), короткие работы меньше (вес × заданий/10, не больше 1);
+   работа на базовом уровне засчитывается не выше 80%, поэтому «освоено» (от 85%) требует среднего или сложного уровня;
+   меньше 6 решённых заданий — «мало данных» */
+const MIN_EVIDENCE=6;
 function mastery(sid,tid){
-  const a=S.attempts.filter(x=>x.studentId===sid&&x.topicId===tid).sort((x,y)=>y.date-x.date)[0];
-  if(!a)return{cls:'',pct:null};
-  const pct=Math.round(a.correct/a.total*100);
-  return{cls:pct>=85?'ok':pct>=60?'warn':'bad',pct};
+  const at=S.attempts.filter(x=>x.studentId===sid&&x.topicId===tid).sort((x,y)=>y.date-x.date).slice(0,3);
+  if(!at.length)return{cls:'',pct:null,n:0,low:false,at:[]};
+  const oneLevel=TOPICS[tid]&&TOPICS[tid].L.length===1;
+  let sw=0,sv=0,n=0;
+  at.forEach((a,i)=>{const w=[3,2,1][i]*Math.min(a.total,10)/10;const f=oneLevel?1:[0.8,1,1][Math.min(a.level||0,2)];
+    sv+=w*(a.correct/a.total)*f;sw+=w;n+=a.total});
+  const pct=Math.round(sv/sw*100);
+  return{cls:pct>=85?'ok':pct>=60?'warn':'bad',pct,n,low:n<MIN_EVIDENCE,at};
 }
+const mNote=m=>m.at.length?`по ${m.at.length} ${plural(m.at.length,['работе','работам','работам'])}: ${m.at.map(a=>a.correct+' из '+a.total+(TOPICS[a.topicId]&&TOPICS[a.topicId].L.length>1?' ('+LV[Math.min(a.level||0,2)].toLowerCase()+')':'')).join(', ')}`:'';
 const student=id=>S.students.find(s=>s.id===id);
 const initials=n=>n.split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase();
 const ago=t=>{const d=Math.floor((Date.now()-t)/86400000);return d<=0?'сегодня':d===1?'вчера':d<5?d+' дня назад':d+' дней назад'};
@@ -870,7 +905,7 @@ function viewStudents(){
     return `<button class="st" data-id="${s.id}">
       <div class="st-top"><div class="ava">${esc(initials(s.name))}</div><div><h3>${esc(s.name)}</h3><div class="grade">${gradeWord(s.grade)} · ${s.subjects.map(x=>SUBJ[x]).join(', ')}</div></div></div>
       <div class="st-now"><span class="label">Сейчас проходим</span><span class="t">${cur?esc(cur.t):'Тема не выбрана'}</span>${rus?`<span class="t2">Русский: ${esc(rus.t)}</span>`:''}</div>
-      <div class="st-foot">${m.pct!=null?`<span class="chip ${m.cls}">${m.pct}% в последней работе</span>`:'<span class="chip">ещё не решал эту тему</span>'}
+      <div class="st-foot">${m.pct!=null?`<span class="chip ${m.cls}">усвоение ${m.pct}%${m.low?', мало данных':''}</span>`:'<span class="chip">ещё не решал эту тему</span>'}
       ${hw?`<span class="chip warn">ждём домашку: ${hw}</span>`:''}${last?`<span class="chip">активность ${ago(last.date)}</span>`:''}</div>
     </button>`}).join('');
   app.innerHTML=`<div class="head"><div><h1>Ученики</h1><p>У каждого ученика свой маршрут по программе 1–4 класса.</p></div></div>
@@ -916,17 +951,21 @@ function viewStudent(){
   const pos=trackPos(st,subj);let route;
   if(pos.i>=0){
     const {tr,i}=pos;
-    const tile=(id,label,cls)=>{if(!id)return `<div class="rt empty ${cls}"><span class="label">${label}</span><span class="rt-t">${cls==='prev'?'Это первая тема':label==='Потом'?'':subj==='math'?'Дальше программы 1–4 класса пока нет':'Дальше тем нет, добавьте свою'}</span></div>`;
-      const t=TOPICS[id],m=mastery(st.id,id);
-      return `<button class="rt ${cls}" data-t="${id}"><span class="label">${label}</span><span class="rt-t">${esc(t.t)}</span><span class="rt-m"><i class="dot ${m.cls}"></i>${gradeWord(t.grade)}${m.pct!=null?' · '+m.pct+'%':''}</span></button>`};
+    const row=(id,kind,tag)=>{const t=TOPICS[id],m=mastery(st.id,id);
+      const mark=kind==='cur'?'▶':kind==='prev'?(m.cls==='ok'?'✓':m.cls?'!':'·'):'';
+      const mk=kind==='prev'?(m.cls==='ok'?'ok':m.cls?m.cls:''):'';
+      return `<button class="rl ${kind}" data-t="${id}"><span class="rl-mark ${mk}">${mark}</span>
+        <span class="rl-t">${esc(t.t)}<small>${tag?tag+' · ':''}${gradeWord(t.grade)}</small></span>
+        <span class="rl-p">${m.pct!=null?m.pct+'%':''}${m.pct!=null&&m.low?'<small>мало данных</small>':''}</span></button>`};
     const cur=TOPICS[tr[i]],ahead=cur.grade-st.grade,mc=mastery(st.id,cur.id);
     route=`<section class="route" aria-label="Маршрут ученика">
       <div class="route-head"><h2>Маршрут · ${SUBJ[subj]}</h2>${ahead>0?`<span class="chip ok">впереди школы на ${ahead} ${ahead===1?'класс':'класса'}</span>`:ahead<0?`<span class="chip warn">догоняем: тема ${gradeWord(cur.grade)}а</span>`:''}</div>
-      <div class="route-row">${tile(tr[i-1],'Пройдено','prev')}${tile(tr[i],'Сейчас','cur')}${tile(tr[i+1],'Дальше','next')}${tile(tr[i+2],'Потом','next')}</div>
+      <div class="rlist">${tr[i-2]?row(tr[i-2],'prev'):''}${tr[i-1]?row(tr[i-1],'prev'):'<div class="rl-empty">Это первая тема программы</div>'}${row(tr[i],'cur','сейчас')}
+        ${tr[i+1]?row(tr[i+1],'next','дальше'):`<div class="rl-empty">${subj==='math'?'Дальше программы 1–4 класса пока нет':'Дальше тем нет, добавьте свою'}</div>`}${tr[i+2]?row(tr[i+2],'next','потом'):''}</div>
       <div class="route-act"><button class="btn primary" id="r-task">Задание по текущей теме</button>
         <button class="btn" id="r-next"${tr[i+1]?'':' disabled'}>Тема пройдена, дальше →</button>
         <button class="btn pen" id="r-rev"${i>0?'':' disabled'}>Повторить пройденное</button></div>
-      ${tr[i+1]&&mc.pct!=null&&mc.pct<85?`<p class="hint" style="margin:0">По текущей теме последний результат ${mc.pct}%. Перейти дальше можно, но тему стоит закрепить.</p>`:''}
+      ${tr[i+1]&&mc.pct!=null&&mc.pct<85?`<p class="hint" style="margin:0">Усвоение текущей темы ${mc.pct}%. Перейти дальше можно, но тему стоит закрепить.</p>`:''}
     </section>`;
   }else{
     route=`<section class="route" aria-label="Маршрут ученика"><div class="route-head"><h2>Маршрут · ${SUBJ[subj]}</h2></div>
@@ -943,7 +982,8 @@ function viewStudent(){
     if(subj!=='math'&&g===st.grade)prog+=`<div class="locked">Генератор «Вставь букву» появится в следующей версии, его темы встанут в этот же маршрут.</div>`+
       RUS[g].map(sec=>`<div class="sec"><h3>${esc(sec.s)} · скоро</h3>${sec.topics.map(t=>`<button class="topic" disabled><span class="dot"></span><span class="tt">${esc(t)}</span></button>`).join('')}</div>`).join('');
   }
-  prog+=`<div class="legend"><span><i class="dot ok"></i>освоено, от 85%</span><span><i class="dot warn"></i>в работе</span><span><i class="dot bad"></i>западает, меньше 60%</span><span><i class="dot"></i>не решали</span></div>`;
+  prog+=`<div class="legend"><span><i class="dot ok"></i>освоено, от 85%</span><span><i class="dot warn"></i>в работе</span><span><i class="dot bad"></i>западает, меньше 60%</span><span><i class="dot"></i>не решали</span></div>
+    <p class="hint legend-note">Усвоение считается по трём последним работам: свежие и длинные весят больше. На базовом уровне — не выше 80%, поэтому «освоено» значит решено на среднем или сложном уровне.</p>`;
   const body=route+(subj==='math'?`<details class="fullprog" id="fp"${V.progOpen?' open':''}><summary>Вся программа 1–4 класса</summary>${prog}</details>`:prog);
   const atts=S.attempts.filter(a=>a.studentId===st.id&&TOPICS[a.topicId]).sort((a,b)=>b.date-a.date);
   const hws=S.assignments.filter(a=>a.studentId===st.id&&a.status==='выдано'&&TOPICS[a.topicId]);
@@ -960,7 +1000,7 @@ function viewStudent(){
     <button class="btn small ${V.confirmStDel?'pen':'quiet'}" id="delst">${V.confirmStDel?'Нажмите ещё раз: ученик и его работы удалятся':'Удалить ученика'}</button></div>
     <div class="cols"><div class="panel"><div class="tabs">${tabs}</div>${body}</div>${side}</div>`;
   app.querySelectorAll('.tab').forEach(b=>b.onclick=()=>go({subject:b.dataset.s,confirmStDel:false}));
-  app.querySelectorAll('.topic[data-t],.rt[data-t]').forEach(b=>b.onclick=()=>openTopic(b.dataset.t));
+  app.querySelectorAll('.topic[data-t],.rl[data-t]').forEach(b=>b.onclick=()=>openTopic(b.dataset.t));
   const $=id=>document.getElementById(id);
   if($('r-task'))$('r-task').onclick=()=>openTopic(pos.tr[pos.i]);
   if($('r-next'))$('r-next').onclick=()=>{st[CK(subj)]=pos.tr[pos.i+1];save();render()};
@@ -1040,7 +1080,7 @@ function viewTopic(){
     <button type="button" class="btn small quiet" id="to-own">Изменить состав</button>`;
   const total=items.length;
   app.innerHTML=`<div class="head"><div><span class="label">${gradeWord(t.grade)} · ${esc(t.section)}</span><h1>${esc(t.t)}</h1>
-    <p>${m.pct!=null?`Последняя работа: ${m.pct}%. `:''}${fixed?'Лист уже собран.':'Уровень подобран по прошлым результатам, лист уже собран.'}</p></div></div>
+    <p>${m.pct!=null?`Усвоение ${m.pct}%${m.low?' (мало данных)':''} — ${mNote(m)}. `:'Тему ещё не решали. '}${fixed?'Лист уже собран.':'Уровень подобран по прошлым результатам, лист уже собран.'}</p></div></div>
     <div class="topic-grid">
       <div class="levels">${tplSeg}
         ${tpl==='own'?'':(tpl==='train'?'':'<span class="label">Уровень темы</span>')+lv}
