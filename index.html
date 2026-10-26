@@ -322,7 +322,7 @@ details.done .topic{opacity:.7}
 .sheet .sh-items .it.rich{display:flex;align-items:flex-start;gap:0;white-space:normal;padding:0;font-size:inherit}
 .rb{display:flex;flex-direction:column;align-items:flex-start;min-width:0;flex:1}
 .tl{margin:0;font-size:calc(var(--c) * .62);line-height:var(--c)}
-.tw{display:inline-block;height:var(--c);line-height:var(--c);font-size:calc(var(--c) * .62);white-space:nowrap;padding:0 calc(var(--c) * .12);flex:none}
+.tw{display:inline-block;height:var(--c);line-height:var(--c);font-size:calc(var(--c) * .62);white-space:nowrap;padding:0 calc(var(--c) * .2);flex:none;text-align:center}
 .c .pn{position:absolute;right:-.08em;bottom:.05em;font-style:normal;font-size:.8em;line-height:1}
 .crow.cwrap{flex-wrap:wrap;row-gap:0}
 .sol2{height:calc(var(--c) * 2);width:100%}
@@ -340,6 +340,31 @@ details.done .topic{opacity:.7}
 .sheet .sh-head{display:grid;grid-template-columns:1fr auto;column-gap:calc(var(--c) * 2);row-gap:0;padding:var(--c) !important;background-size:var(--c) var(--c);--c:2.8cqw}
 .sheet .sh-head .fld{height:var(--c);line-height:var(--c);font-size:calc(var(--c) * .55);padding:0;border:0;min-width:0}
 .sheet .sh-mini{--c:2.8cqw;padding:0 var(--c) !important;height:calc(var(--c) * 2);line-height:calc(var(--c) * 2);background-size:var(--c) var(--c);font-size:calc(var(--c) * .55);border-bottom-width:.15cqw}
+
+/* Клетка на весь лист */
+.sheet .sheet-in{--c:2.8cqw;gap:var(--c);background-color:#fff;background-image:linear-gradient(#c9dcf0 1px,transparent 1px),linear-gradient(90deg,#c9dcf0 1px,transparent 1px);background-size:var(--c) var(--c)}
+.sheet.bw .sheet-in{background-image:linear-gradient(#d4d4d4 1px,transparent 1px),linear-gradient(90deg,#d4d4d4 1px,transparent 1px)}
+.sheet .sh-items,.sheet .sh-head,.sheet .sh-mini{background:none !important;border:0 !important;border-radius:0 !important}
+.sheet .sh-items{padding:0 !important}
+.sheet .sh-head{padding:0 !important}
+.sh-items>.heroG,.sh-items>.tailG{grid-column:1/-1;display:flex;gap:calc(var(--c) * 2);align-items:stretch}
+.hA{position:relative;flex:none;min-height:calc(var(--c) * 13)}
+.hA .art{position:absolute;inset:0;width:100% !important;height:100% !important;object-fit:contain;object-position:center top}
+.hR{flex:1;min-width:0;display:flex;flex-direction:column;gap:var(--c)}
+.hT{display:flex;flex-direction:column;gap:var(--c)}
+.hT .sh-title{line-height:1.1}
+.tailG{justify-content:space-between}
+.tB{flex:none;height:calc(var(--c) * 10);display:flex;justify-content:flex-end;align-items:flex-start}
+.tB img.art.pic{height:100%;width:auto}
+.tB img.art.pic.say{height:calc(var(--c) * 3);margin-top:var(--c)}
+.sheet .sh-items,.sgrid{display:flex !important;flex-wrap:wrap;column-gap:calc(var(--c) * 2);row-gap:var(--c);align-items:flex-start;align-content:flex-start}
+.sh-items>.span,.sh-items>.grp,.sh-items>.selfcheck,.sh-items>.word,.sh-items>.scene2,.sgrid>.span,.sgrid>.grp,.sgrid>.word{flex:0 0 100%;width:100%}
+.sh-items>.it,.sgrid>.it{flex:none}
+.sgrid>*{margin:0 !important}
+.sgrid>.span,.sgrid>.grp,.sgrid>.word{grid-column:1/-1}
+.sgrid>.grp{font-size:calc(var(--c) * .58);line-height:var(--c);border:0 !important;padding:0 !important;color:#4e5870}
+.sgrid>.grp .gico{width:var(--c);height:var(--c);vertical-align:top;margin:0 calc(var(--c) * .2) 0 0}
+.sh-items>.scene2{height:calc(var(--c) * 10) !important}
 
 /* Оформление листов */
 .art{display:block}
@@ -1868,8 +1893,8 @@ function tokRow(str,it,showAns){
     if(ch===':'&&!/[\d\s\u00a0)]/.test(prev)){run+=ch;continue}
     const isCell=/\d/.test(ch)||SIGNCH.includes(ch)||(ch==='x'&&it&&it.x);
     if(/[\s\u00a0]/.test(ch)){if(run)run+=' ';else sp=true;continue}
-    if(isCell){if(run){flush();out.push({gap:1})}else if(sp&&out.length&&out[out.length-1].w)out.push({gap:1});out.push({c:ch});sp=false}
-    else{if(!run&&sp&&out.length&&!out[out.length-1].w&&!out[out.length-1].gap)out.push({gap:1});run+=ch;sp=false}}
+    if(isCell){if(run)flush();out.push({c:ch});sp=false}
+    else{run+=ch;sp=false}}
   flush();
   const box=()=>{const R=noSp(it?fmt(it.ans):'');return `<span class="cbox">${[...R].map(x=>cc(showAns?x:'','a')).join('')}</span>`};
   return out.map(t=>t.w?`<span class="tw">${esc(t.w)}</span>`:t.gap?cc(''):t.c==='□'?box():t.c==='◯'?cc(showAns?it.ans:'','circ a'):t.p?`<span class="c">${t.c==='-'?'−':t.c}<i class="pn">${esc(t.p)}</i></span>`:cc(t.c==='-'?'−':t.c)).join('')}
@@ -1879,19 +1904,26 @@ function richItemHTML(it,i,showAns){
   if(it.type==='word')return `<div class="it rich span">${badgeH(i)}<div class="rb"><p class="tl">${esc(it.q)}</p><div class="sol2"></div><span class="crow">${tokRow('Ответ: □',it,showAns)}</span></div></div>`;
   if(it.type==='grid')return `<div class="it rich">${badgeH(i)}<div class="rb">${gridSVG(it)}<span class="crow">${tokRow(`${it.ask} = □ ${gridUnit(it)}`,it,showAns)}</span></div></div>`;
   if(it.type==='ch')return `<div class="it rich${it.svg?'':' span'}">${badgeH(i)}<div class="rb"><p class="tl">${esc(it.q)}</p>${it.svg||''}<span class="opts2">${it.opts.map(o=>`<span class="ob${showAns&&o===it.ans?' on':''}">${esc(o)}</span>`).join('')}</span></div></div>`;
-  if(it.type==='cmp')return `<div class="it rich span">${badgeH(i)}<div class="rb"><span class="crow cwrap">${tokRow(`${it.left} ◯ ${it.right}`,it,showAns)}</span></div></div>`;
+  if(it.type==='cmp')return `<div class="it rich">${badgeH(i)}<div class="rb"><span class="crow cwrap">${tokRow(`${it.left} ◯ ${it.right}`,it,showAns)}</span></div></div>`;
   if(it.type==='own'){const q=it.q.includes('□')?it.q:it.q+' = □';
-    return `<div class="it rich${it.svg?'':' span'}">${badgeH(i)}<div class="rb">${it.svg||''}<span class="crow cwrap">${tokRow(q,it,showAns)}</span></div></div>`}
-  return `<div class="it rich span">${badgeH(i)}<div class="rb"><span class="crow cwrap">${tokRow(plainQ(it),it,showAns)}</span></div></div>`}
+    return `<div class="it rich">${badgeH(i)}<div class="rb">${it.svg||''}<span class="crow cwrap">${tokRow(q,it,showAns)}</span></div></div>`}
+  return `<div class="it rich">${badgeH(i)}<div class="rb"><span class="crow cwrap">${tokRow(plainQ(it),it,showAns)}</span></div></div>`}
 /* высоты всех частей листа кратны клетке: тогда цифры каждого задания попадают в клетки */
 function snapCells(root){(root||document).querySelectorAll('.sheet').forEach(sh=>{const c=sh.clientWidth*CELL/100;if(!c)return;
   sh.querySelectorAll('.tw').forEach(el=>{el.style.width='';el.style.width=(Math.ceil(el.scrollWidth/c-0.02)*c)+'px'});
   /* задание с рисунком шире своей колонки занимает столько колонок, сколько нужно */
-  sh.querySelectorAll('.sh-items > .rich:not(.span)').forEach(el=>{el.style.gridColumn='';const w=el.getBoundingClientRect().width;if(!w)return;
-    const need=[...el.querySelectorAll('.rb > *')].reduce((m,x)=>Math.max(m,x.scrollWidth),0)+2*c;
-    if(need>w+1){const n=getComputedStyle(el.parentNode).gridTemplateColumns.split(' ').length;el.style.gridColumn=`span ${Math.min(n,Math.ceil((need+2*c)/(w+2*c)))}`}});
+  /* задания с текстом: ширина по содержимому, в одной части — одинаковая, чтобы шли ровными колонками */
+  const gw={},rich=[...sh.querySelectorAll('.rich:not(.span)')];
+  rich.forEach(el=>{el.style.width='';el.style.whiteSpace='nowrap';const need=[...el.querySelectorAll('.rb > *')].reduce((m,x)=>Math.max(m,x.scrollWidth),0)+2*c;el.style.whiteSpace='';
+    const w=Math.min(el.parentNode.clientWidth,Math.ceil(need/c-0.02)*c);const g=el.dataset.g;gw[g]=Math.max(gw[g]||0,w)});
+  rich.forEach(el=>{el.style.width=gw[el.dataset.g]+'px'});
   sh.querySelectorAll('.rb > .fig,.rb > .gfig,.rb > .pair').forEach(el=>{el.style.height='';const h=el.getBoundingClientRect().height;if(h)el.style.height=(Math.ceil(h/c-0.02)*c)+'px'});
-  sh.querySelectorAll('.sh-items > *').forEach(el=>{if(el.classList.contains('ci'))return;el.style.minHeight='';const h=el.getBoundingClientRect().height;el.style.minHeight=(Math.ceil(h/c-0.03)*c)+'px'})})}
+  sh.querySelectorAll('.sgrid > *,.hT,.tB,.sh-items > *').forEach(el=>{if(el.classList.contains('ci'))return;el.style.minHeight='';const h=el.getBoundingClientRect().height;el.style.minHeight=(Math.ceil(h/c-0.03)*c)+'px'});
+  /* клетка на весь лист: сетка листа проходит через начало заданий, шапка встаёт на те же линии */
+  const inner=sh.querySelector('.sheet-in'),g=sh.querySelector('.sh-items'),hd=sh.querySelector('.sh-head,.sh-mini');if(!inner||!g)return;
+  g.style.marginTop='';if(hd){const d=(g.getBoundingClientRect().top-hd.getBoundingClientRect().top)/c;const fr=Math.ceil(d-0.02)-d;if(fr>0.01)g.style.marginTop=(fr*c)+'px'}
+  const S=inner.getBoundingClientRect(),G=g.getBoundingClientRect(),m=v=>((v%c)+c)%c;
+  inner.style.backgroundPosition=`${m(G.left-S.left)}px ${m(G.top-S.top)}px`})}
 function sheetParts(items,{topic,level,seed,studentName,answers,design}){
   const D=design&&!answers&&design.lv<4?design:null;
   const kind=items[0]&&items[0].type;
@@ -1924,14 +1956,61 @@ function sheetParts(items,{topic,level,seed,studentName,answers,design}){
     :D.lv===2?`<div class="band"><div class="band-t">${titleH}<div class="sh-sub">${subText}</div></div><div class="band-art">${D.theme.img?artImg(D.theme.img.char):charSVG(D.char)}</div></div>${fields}`
     :`${fields}<div>${titleH}</div><div class="sh-sub">${subText}</div>`;
   const mini=`<div class="sh-mini">${D&&D.lv<=2?stkSVG(D.theme.stk[1],'gico'):''}<b>${esc(studentName||'')}</b><span>${answers?'Ключ · ':''}${esc(topic.t)} · продолжение</span></div>`;
+  /* задания идут строкой с переносом; ширина — по самому широкому заданию своей части, поэтому в части они встают ровными колонками */
+  const gid=[];items.forEach((it,i)=>gid.push(i&&!newGroup(it,i)?gid[i-1]:i));
+  const kOf={};items.forEach((it,i)=>{if(cellable(it))kOf[gid[i]]=Math.min(avail,Math.max(kOf[gid[i]]||0,cellWidth(it)))});
   /* заголовок части держится вместе со своим первым заданием */
   const pieces=items.map((it,i)=>{
     const tt=TOPICS[it.src]?TOPICS[it.src].t:'';
     const gi=D&&D.lv<=2?stkSVG(D.theme.stk[(it.blk||0)%D.theme.stk.length],'gico'):'';
     const grp=mixed&&newGroup(it,i)?`<div class="grp">${gi}<b>${esc(it.lbl?it.lbl+' · '+tt:tt)}</b> ${esc(instr(it))}</div>`:'';
-    if(cellable(it))return grp+`<div class="it ci">${cellItemHTML(it,i,answers)}</div>`;
-    return grp+richItemHTML(it,i,answers)});
-  if(D&&D.lv===1&&D.theme.img)pieces.push(`<div class="scene2">${D.theme.img.say?artImg(D.theme.img.say,'say'):''}${artImg(D.theme.img.bot)}</div>`);
+    if(cellable(it))return grp+`<div class="it ci" style="width:calc(var(--c) * ${kOf[gid[i]]})">${cellItemHTML(it,i,answers)}</div>`;
+    return grp+richItemHTML(it,i,answers).replace('<div class="it rich','<div data-g="'+gid[i]+'" class="it rich')});
+  /* «Сказка»: картинка слева сверху, справа название и сразу первые задания;
+     внизу справа вторая картинка, задания слева от неё. Всё на одной сетке клеток */
+  let heroIn=false;
+  if(D&&D.lv===1){
+    const estH=it=>{if(it.type==='col'){const r=colRows(it);return 3+(r.parts?r.parts+1:0)}return cellable(it)?1:it.type==='word'?6:it.type==='grid'?9:it.svg?6:it.type==='ch'?3:1};
+    const isSpan=it=>it.type==='word'||it.type==='ch'&&!it.svg;
+    /* примерная ширина задания в клетках: цифры и знаки по клетке, буквы примерно по полклетки */
+    const estW=it=>{if(cellable(it))return cellWidth(it);if(it.svg||it.type==='grid'||it.type==='ch')return 99;
+      const q=it.type==='own'?it.q:it.type==='cmp'?it.left+' ◯ '+it.right:plainQ(it);let w=2;for(const ch of String(q))w+=/[\d+−×:=<>()◯□-]/.test(ch)?1:/\s/.test(ch)?0.3:0.5;return Math.ceil(w)+ansLen(it)};
+    /* сколько колонок заданий помещается рядом с картинкой шириной pic клеток */
+    const kAt=list=>Math.max(0,...list.filter(cellable).map(cellWidth));
+    const sideFit=(pic,kk)=>{const w=avail-pic-2;if(w<6)return null;if(kk&&kk<=w)return{n:Math.floor((w+2)/(kk+2)),kw:kk};return kk?null:{n:1,kw:w}};
+    const sg=(f,html)=>`<div class="sgrid" style="width:calc(var(--c) * ${f.n*(f.kw+2)-2})">${html}</div>`;
+    const bot=D.theme.img&&D.theme.img.bot?`${D.theme.img.say?artImg(D.theme.img.say,'say'):''}${artImg(D.theme.img.bot)}`:'';
+    const kH=kAt(items.slice(0,8));let F=null;for(let pic=12;pic>=8&&!F;pic--)F=sideFit(pic,kH);
+    if(F){
+      const wP=avail-(F.n*(F.kw+2));
+      let used=0,col=0,rowH=0,M=0;
+      const sideW=F.n*(F.kw+2)-2;
+      for(let i=0;i<items.length;i++){const it=items[i],g=mixed&&newGroup(it,i);
+        if(!isSpan(it)&&estW(it)>sideW)break;
+        if((g||isSpan(it))&&col){used+=rowH+1;col=0;rowH=0}
+        if(!col&&used>=9)break;
+        if(g)used+=2;
+        if(isSpan(it)){used+=estH(it)+1;M++;continue}
+        rowH=Math.max(rowH,estH(it));col++;M++;if(col===F.n){used+=rowH+1;col=0;rowH=0}}
+      if(!M)M=0;
+      const art=D.theme.img?artImg(D.theme.img.top):charSVG(D.char);
+      const headPiece=`<div class="heroG" style="width:calc(var(--c) * ${avail})"><div class="hA" style="width:calc(var(--c) * ${wP})">${art}</div><div class="hR"><div class="hT">${titleH}<div class="bubble">${subText}</div></div>${sg(F,pieces.slice(0,M).join(''))}</div></div>`;
+      let rest=pieces.slice(M),tailPiece='';
+      const kT=kAt(items.slice(-8));let F2=null;if(bot)for(let pic=13;pic>=8&&!F2;pic--)F2=sideFit(pic,kT);
+      if(F2){let t=items.length,h=0,c2=0,rh=0;
+        const sideW2=F2.n*(F2.kw+2)-2;
+        while(t>M){const it=items[t-1];if(isSpan(it)||estW(it)>sideW2)break;
+          rh=Math.max(rh,estH(it));c2++;t--;
+          if(mixed&&newGroup(it,t)){t+=c2;c2=0;break}
+          if(c2===F2.n){if(h+rh>10){t+=c2;c2=0;break}h+=rh+1;c2=0;rh=0}}
+        t+=c2;
+        if(t<items.length){rest=pieces.slice(M,t);
+          tailPiece=`<div class="tailG" style="width:calc(var(--c) * ${avail})">${sg(F2,pieces.slice(t).join(''))}<div class="tB" style="width:calc(var(--c) * ${avail-(F2.n*(F2.kw+2))})">${bot}</div></div>`}
+        else tailPiece=`<div class="scene2">${bot}</div>`}
+      else if(bot)tailPiece=`<div class="scene2">${bot}</div>`;
+      pieces.splice(0,pieces.length,headPiece,...rest,...(tailPiece?[tailPiece]:[]));heroIn=true}
+    else if(bot)pieces.push(`<div class="scene2">${bot}</div>`);
+  }
   if(D&&D.lv===1)pieces.push(`<div class="selfcheck"><span>Как я справился?</span>${FACES.map(f=>`<svg class="art" viewBox="0 0 40 40" aria-hidden="true">${f}</svg>`).join('')}</div>`);
   const cls=D?`lv${D.lv} fr-${D.frame}${D.bw?' bw':''}`:'';
   const pal=D?(D.bw?['#555','#999','#f2f2f2','#777']:D.pal):null;
@@ -1940,7 +2019,7 @@ function sheetParts(items,{topic,level,seed,studentName,answers,design}){
     if(D.lv<=2){const slots=D.lv===1?[[6,3.5,9],[94,3.5,9],[6,97,9],[94,97,9],[3.6,36,6],[96.4,52,6],[3.6,70,6],[96.4,84,6]]:[[94,3.5,7],[6,97,7],[94,97,7]];
       h+=shuffle(r,slots).slice(0,D.lv===1?5:2).map(([x,y,z])=>stkSVG(pick(r,D.theme.stk),'deco-stk',`left:${x}%;top:${y}%;width:${z}cqw;height:${z}cqw;transform:translate(-50%,-50%) rotate(${ri(r,-18,18)}deg)`)).join('')}
     return `<div class="deco" aria-hidden="true">${h}</div>`};
-  return{head,mini,cols,gridStyle,pieces,cls,style,deco,footL:esc(topic.section),footR:`Проверить онлайн: код варианта ${seed}`};
+  return{head:heroIn?fields:head,mini,cols,gridStyle,pieces,cls,style,deco,footL:esc(topic.section),footR:`Проверить онлайн: код варианта ${seed}`};
 }
 function sheetHTML(items,o){
   const s=sheetParts(items,o);
