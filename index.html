@@ -148,9 +148,9 @@ h1,h2,h3{margin:0;text-wrap:balance}
 /* Лист A4 */
 .sheet-wrap{display:flex;flex-direction:column;gap:10px;min-width:0}
 .sheet-bar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
-.sheet{container-type:inline-size;background:var(--sheet);color:var(--sheet-ink);aspect-ratio:210/297;width:100%;max-width:100%;border-radius:4px;
-  box-shadow:0 1px 2px rgba(20,30,60,.08),0 10px 30px rgba(20,30,60,.10);overflow:hidden;font-family:var(--f-ui)}
-.sheet-in{padding:6cqw 7cqw;display:flex;flex-direction:column;gap:3.4cqw;height:100%}
+.sheet{container-type:inline-size;background:var(--sheet);color:var(--sheet-ink);width:100%;max-width:100%;border-radius:4px;
+  box-shadow:0 1px 2px rgba(20,30,60,.08),0 10px 30px rgba(20,30,60,.10);font-family:var(--f-ui)}
+.sheet-in{padding:6cqw 7cqw;display:flex;flex-direction:column;gap:3.4cqw;min-height:141.4cqw}
 .sh-head{display:grid;grid-template-columns:1fr auto;gap:1cqw 4cqw;font-size:2.3cqw;color:#4e5870}
 .sh-head .fld{border-bottom:.25cqw solid var(--sheet-line);padding-bottom:.6cqw;min-width:22cqw}
 .sh-head .fld b{color:var(--sheet-ink);font-weight:600}
@@ -162,6 +162,18 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .sh-items.c4{grid-template-columns:repeat(4,1fr)}
 .it{display:flex;align-items:center;gap:1.2cqw;white-space:nowrap}
 .sh-items.c1{grid-template-columns:1fr}
+.it.word{grid-column:1/-1;flex-direction:column;align-items:stretch;white-space:normal;font-size:2.9cqw;gap:1cqw;position:relative;padding-left:4.2cqw}
+.it.word .n{position:absolute;left:0;top:.4cqw}
+.it.word .wq{line-height:1.45}
+.it.word .sol{height:5cqw;background-image:linear-gradient(var(--sheet-line) .15cqw,transparent .15cqw);background-size:100% 3.5cqw;opacity:.7}
+.it.word .wa{display:flex;align-items:center;gap:1.2cqw;align-self:flex-end}
+.it.grid{flex-direction:column;align-items:flex-start;font-size:3cqw}
+.it.grid .n{align-self:flex-start}
+.gfig{width:100%;max-width:17cqw;height:auto}
+.gfig .gl line{stroke:#cfd7e6;stroke-width:.4}
+.gfig .gf rect{fill:#e3e9f4}
+.gfig .ge line{stroke:#1a1f2e;stroke-width:1.2;stroke-linecap:round}
+.ga{display:flex;align-items:center;gap:1cqw;white-space:nowrap}
 .grp{grid-column:1/-1;font-size:2.3cqw;color:#4e5870;border-bottom:.2cqw solid var(--sheet-line);padding-bottom:.6cqw;margin-top:1cqw}
 .grp b{color:var(--sheet-ink);font-weight:600;margin-right:1cqw}
 .it.own{white-space:normal;font-size:3.1cqw;align-items:baseline}
@@ -176,6 +188,21 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .col .r{grid-column:2;min-width:9cqw;height:5cqw;border:.3cqw dashed #b3bbcc;border-radius:.6cqw;color:var(--sheet-pen);font-weight:600;text-align:right;padding-right:.6cqw}
 .sh-foot{margin-top:auto;display:flex;justify-content:space-between;font-size:2cqw;color:#6b748c;border-top:.2cqw solid var(--sheet-line);padding-top:1.4cqw}
 .key-stamp{color:var(--sheet-pen);border:.35cqw solid var(--sheet-pen);border-radius:1cqw;padding:.3cqw 1.6cqw;font-weight:700;transform:rotate(-3deg);display:inline-block;font-size:2.6cqw}
+
+/* Виды листа */
+.seg.tpl{gap:4px}
+.seg.tpl button{padding:7px 11px;font-size:14px;min-width:0}
+.bsum{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+.bsum li{display:flex;flex-direction:column;font-size:14px}
+.bsum li span{color:var(--ink-2);font-size:13px}
+.blocks{display:flex;flex-direction:column;gap:8px}
+.brow{border:1px solid var(--line);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:8px;background:var(--card)}
+.brow-top,.brow-bot{display:flex;gap:6px;align-items:center;min-width:0}
+.brow select{flex:1;min-width:0;padding:7px 8px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);font:inherit;font-size:13.5px}
+.brow .b-cnt{width:58px;padding:7px 8px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);font:inherit}
+.bnum{width:22px;height:22px;border-radius:50%;background:var(--ink);color:var(--card);display:grid;place-items:center;font-size:12px;font-weight:700;flex:none}
+.bi{border:1px solid var(--line);background:var(--card);border-radius:8px;width:32px;height:34px;flex:none}
+.bi[disabled]{opacity:.35;cursor:default}
 
 /* Маршрут */
 .route{padding:16px 18px 18px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:12px}
@@ -253,6 +280,15 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .prog i{display:block;height:100%;background:var(--ink);transition:width .25s}
 .task{background:var(--card);border:1px solid var(--line);border-radius:16px;min-height:170px;display:grid;place-items:center;padding:20px;font-size:clamp(30px,7vw,44px);font-weight:700;font-variant-numeric:tabular-nums;text-align:center;position:relative}
 .task .q{display:flex;align-items:center;justify-content:center;gap:.3em;flex-wrap:wrap}
+.task.word,.task.grid{font-size:clamp(18px,4vw,22px);font-weight:500;padding-bottom:40px}
+.task.word .q,.task.grid .q{flex-direction:column;gap:14px}
+.task.word .wq{text-align:left;line-height:1.5;max-width:46ch}
+.task .wa{display:flex;align-items:center;gap:.4em;font-weight:700;font-size:1.3em}
+.task .gwrap{display:block;width:min(260px,70vw)}
+.task .gfig{max-width:100%;width:100%}
+.task .gfig .gl line{stroke:var(--line)}
+.task .gfig .gf rect{fill:var(--ink-soft)}
+.task .gfig .ge line{stroke:var(--ink)}
 .task .slot{display:inline-block;min-width:1.6em;padding:0 .2em;border:3px dashed var(--ink-3);border-radius:10px;color:var(--ink)}
 .task .slot.filled{border-style:solid;border-color:var(--ink)}
 .task .col{font-size:inherit;column-gap:.25em}
@@ -362,7 +398,14 @@ function generate(p,seed){
   const r=rng(seed);const items=[];const n=p.count;
   if(p.kind==='mix'){
     items.failed=0;
-    p.parts.forEach((pt,k)=>{const sub=generate({...pt.p,count:p.per},seed+k*7919);items.failed+=sub.failed||0;sub.forEach(x=>{x.src=pt.tid;items.push(x)})});
+    p.parts.forEach((pt,k)=>{const sub=generate({...pt.p,count:pt.count||p.per},seed+k*7919);items.failed+=sub.failed||0;
+      sub.forEach(x=>{x.src=pt.tid;x.blk=k;x.lbl=pt.label||'';items.push(x)})});
+    return items;
+  }
+  if(p.kind==='word'||p.kind==='units'||p.kind==='grid'){
+    const make=p.kind==='word'?wordItem:p.kind==='units'?unitItem:gridItem;const seen=new Set();items.failed=0;
+    for(let i=0;i<n;i++){let it;for(let k=0;k<12;k++){it=make(p,r);const key=it.q||it.left+it.right||it.cells.join(';')+it.ask;if(!seen.has(key)){seen.add(key);break}}
+      if(it.fail)items.failed++;items.push(it)}
     return items;
   }
   if(p.kind==='own'){
@@ -370,7 +413,12 @@ function generate(p,seed){
     return arr.slice(0,Math.min(n,arr.length)).map(x=>({type:'own',q:x.q,ans:x.ans}));
   }
   items.failed=0;
-  for(let i=0;i<n;i++){
+  /* одинаковые задания подряд и вразброс не нужны: повтор генерируется заново (до 40 попыток на лист) */
+  const seenA=new Set();let tries=0,fresh=false;
+  for(let i=0;i<=n;i++){
+    if(fresh){fresh=false;const key=JSON.stringify(items[i-1]);if(seenA.has(key)&&tries++<40){items.pop();i-=2;continue}seenA.add(key)}
+    if(i===n)break;
+    fresh=true;
     const t=n>1?i/(n-1):1;
     if(p.kind==='order'){items.push(orderItem(p,r));continue}
     if(p.kind==='compare'){
@@ -390,6 +438,109 @@ function generate(p,seed){
 }
 const sym=o=>o==='-'?'−':o;
 
+/* ---------- движок «Задачи»: проверенные шаблоны, в которые подставляются числа, имена и предметы ---------- */
+const plural=(n,[one,few,many])=>{const a=Math.abs(n)%100,b=a%10;if(a>10&&a<20)return many;if(b===1)return one;if(b>=2&&b<=4)return few;return many};
+const cnt=(n,forms)=>`${fmt(n)} ${plural(n,forms)}`;
+/* числа на 1 (21, 31…) требуют другого падежа в винительном: такие числа в условия не берём */
+const ok1=n=>n%10!==1||n%100===11;
+const cap=s=>s[0].toUpperCase()+s.slice(1);
+const KIDS=[{n:'Маша',gen:'Маши',g:'f'},{n:'Петя',gen:'Пети',g:'m'},{n:'Оля',gen:'Оли',g:'f'},{n:'Саша',gen:'Саши',g:'m'},{n:'Катя',gen:'Кати',g:'f'},
+  {n:'Миша',gen:'Миши',g:'m'},{n:'Лиза',gen:'Лизы',g:'f'},{n:'Дима',gen:'Димы',g:'m'},{n:'Аня',gen:'Ани',g:'f'},{n:'Ваня',gen:'Вани',g:'m'}];
+const THINGS=[['яблоко','яблока','яблок'],['конфета','конфеты','конфет'],['марка','марки','марок'],['карандаш','карандаша','карандашей'],
+  ['наклейка','наклейки','наклеек'],['ракушка','ракушки','ракушек'],['шишка','шишки','шишек'],['открытка','открытки','открыток'],['значок','значка','значков'],['орех','ореха','орехов']];
+const GOODS=[{f:['тетрадь','тетради','тетрадей'],one:'одна'},{f:['ручка','ручки','ручек'],one:'одна'},{f:['блокнот','блокнота','блокнотов'],one:'один'},{f:['альбом','альбома','альбомов'],one:'один'}];
+const RUB=['рубль','рубля','рублей'],RAZ=['раз','раза','раз'],BAGS=['пакет','пакета','пакетов'];
+const VEH=[{n:'Велосипедист',v:[10,20]},{n:'Автобус',v:[40,70]},{n:'Поезд',v:[60,90]},{n:'Мотоциклист',v:[40,80]},{n:'Грузовик',v:[40,60]}];
+const vb=(k,m,f)=>k.g==='f'?f:m;
+const two=r=>{const a=pick(r,KIDS);let b=pick(r,KIDS);while(b===a)b=pick(r,KIDS);return[a,b]};
+const tabN=(r,p)=>ri(r,(p.tab||[2,9])[0],(p.tab||[2,9])[1]);
+const WT={
+  sum(r,p){const k=pick(r,KIDS),o=pick(r,THINGS),a=ri(r,2,p.max-2),b=ri(r,2,p.max-a);if(!ok1(a)||!ok1(b))return;
+    return{q:`У ${k.gen} было ${cnt(a,o)}. ${vb(k,'Он','Она')} ${vb(k,'получил','получила')} ещё ${cnt(b,o)}. Сколько ${o[2]} стало у ${k.gen}?`,ans:a+b}},
+  rem(r,p){const k=pick(r,KIDS),o=pick(r,THINGS),a=ri(r,4,p.max),b=ri(r,2,a-2);if(!ok1(a)||!ok1(b))return;
+    return{q:`У ${k.gen} было ${cnt(a,o)}. ${vb(k,'Он','Она')} ${vb(k,'отдал','отдала')} другу ${cnt(b,o)}. Сколько ${o[2]} осталось у ${k.gen}?`,ans:a-b}},
+  more(r,p){const[k1,k2]=two(r),o=pick(r,THINGS),a=ri(r,2,p.max-2),b=ri(r,2,p.max-a);if(!ok1(a)||!ok1(b))return;
+    return{q:`У ${k1.gen} ${cnt(a,o)}, а у ${k2.gen} на ${cnt(b,o)} больше. Сколько ${o[2]} у ${k2.gen}?`,ans:a+b}},
+  less(r,p){const[k1,k2]=two(r),o=pick(r,THINGS),a=ri(r,4,p.max),b=ri(r,2,a-2);if(!ok1(a)||!ok1(b))return;
+    return{q:`У ${k1.gen} ${cnt(a,o)}, а у ${k2.gen} на ${cnt(b,o)} меньше. Сколько ${o[2]} у ${k2.gen}?`,ans:a-b}},
+  diff(r,p){const[k1,k2]=two(r),o=pick(r,THINGS),a=ri(r,4,p.max),b=ri(r,2,a-2);if(!ok1(a)||!ok1(b))return;
+    return{q:`У ${k1.gen} ${cnt(a,o)}, а у ${k2.gen} ${cnt(b,o)}. На сколько ${o[2]} у ${k1.gen} больше, чем у ${k2.gen}?`,ans:a-b}},
+  steps(r,p){const k=pick(r,KIDS),o=pick(r,THINGS),a=ri(r,3,p.max-3),b=ri(r,2,p.max-a),c=ri(r,2,a+b-1);if(!ok1(a)||!ok1(b)||!ok1(c))return;
+    return{q:`В коробке было ${cnt(a,o)}. ${k.n} ${vb(k,'положил','положила')} туда ещё ${cnt(b,o)}, а потом ${vb(k,'взял','взяла')} ${cnt(c,o)}. Сколько ${o[2]} стало в коробке?`,ans:a+b-c}},
+  together(r,p){const[k1,k2]=two(r),o=pick(r,THINGS),a=ri(r,2,Math.floor(p.max/2)-2),b=ri(r,2,p.max-2*a);if(!ok1(a)||!ok1(b)||2*a+b>p.max)return;
+    return{q:`У ${k1.gen} ${cnt(a,o)}, а у ${k2.gen} на ${cnt(b,o)} больше. Сколько ${o[2]} у них вместе?`,ans:2*a+b}},
+  groups(r,p){const o=pick(r,THINGS),a=tabN(r,p),b=ri(r,2,9);if(!ok1(b))return;
+    return{q:`В ${a} коробках лежит по ${cnt(b,o)}. Сколько всего ${o[2]} в коробках?`,ans:a*b}},
+  share(r,p){const o=pick(r,THINGS),k=tabN(r,p),q=ri(r,2,9),n=k*q;if(!ok1(n))return;
+    return{q:`${cap(cnt(n,o))} разложили поровну в ${cnt(k,BAGS)}. Сколько ${o[2]} в каждом пакете?`,ans:q}},
+  parts(r,p){const o=pick(r,THINGS),q=tabN(r,p),k=ri(r,2,9),n=k*q;if(!ok1(n)||!ok1(q))return;
+    return{q:`${cap(cnt(n,o))} разложили по ${cnt(q,o)} в каждый пакет. Сколько понадобилось пакетов?`,ans:k}},
+  times(r,p){const[k1,k2]=two(r),o=pick(r,THINGS),a=ri(r,2,9),m=tabN(r,p);if(!ok1(a))return;
+    return{q:`У ${k1.gen} ${cnt(a,o)}, а у ${k2.gen} в ${cnt(m,RAZ)} больше. Сколько ${o[2]} у ${k2.gen}?`,ans:a*m}},
+  fewer(r,p){const[k1,k2]=two(r),o=pick(r,THINGS),m=tabN(r,p),q=ri(r,2,9),a=m*q;if(!ok1(a))return;
+    return{q:`У ${k1.gen} ${cnt(a,o)}, а у ${k2.gen} в ${cnt(m,RAZ)} меньше. Сколько ${o[2]} у ${k2.gen}?`,ans:q}},
+  cost(r,p){const g=pick(r,GOODS),pr=ri(r,2,9)*5,n=ri(r,2,9);if(!ok1(pr))return;
+    return{q:`${cap(g.f[0])} стоит ${cnt(pr,RUB)}. Сколько рублей стоят ${cnt(n,g.f)}?`,ans:pr*n}},
+  price(r,p){const g=pick(r,GOODS),pr=ri(r,2,9)*5,n=ri(r,2,9),s=pr*n;if(!ok1(s)||!ok1(n))return;
+    return{q:`За ${cnt(n,g.f)} заплатили ${cnt(s,RUB)}. Сколько рублей стоит ${g.one} ${g.f[0]}?`,ans:pr}},
+  qty(r,p){const g=pick(r,GOODS),pr=ri(r,2,9)*5,n=ri(r,2,9),s=pr*n;if(!ok1(s))return;
+    return{q:`${cap(g.f[0])} стоит ${cnt(pr,RUB)}. Сколько ${g.f[2]} можно купить на ${cnt(s,RUB)}?`,ans:n}},
+  dist(r){const x=pick(r,VEH),v=ri(r,x.v[0]/5,x.v[1]/5)*5,t=ri(r,2,6);
+    return{q:`${x.n} ехал ${t} ч со скоростью ${v} км/ч. Какое расстояние он проехал? Ответ дай в километрах.`,ans:v*t}},
+  time(r){const x=pick(r,VEH),v=ri(r,x.v[0]/5,x.v[1]/5)*5,t=ri(r,2,6);
+    return{q:`${x.n} проехал ${v*t} км со скоростью ${v} км/ч. Сколько часов он был в пути?`,ans:t}},
+  speed(r){const x=pick(r,VEH),v=ri(r,x.v[0]/5,x.v[1]/5)*5,t=ri(r,2,6);
+    return{q:`${x.n} проехал ${v*t} км за ${t} ч. С какой скоростью он ехал? Ответ дай в км/ч.`,ans:v}},
+  meet(r){const v1=ri(r,2,4)*5,v2=ri(r,2,4)*5,t=ri(r,2,5);
+    return{q:`Два велосипедиста одновременно выехали навстречу друг другу из двух посёлков. Скорость одного ${v1} км/ч, другого ${v2} км/ч. Они встретились через ${t} ч. Какое расстояние между посёлками? Ответ дай в километрах.`,ans:(v1+v2)*t}}
+};
+function wordItem(p,r){for(let k=0;k<300;k++){const x=WT[pick(r,p.tpls)](r,p);if(x&&Number.isInteger(x.ans)&&x.ans>0)return{type:'word',q:x.q,ans:x.ans}}
+  return{type:'word',q:'У Пети было 5 яблок. Он съел 2 яблока. Сколько яблок осталось?',ans:3,fail:true}}
+
+/* ---------- движок «Величины» ---------- */
+const UT={
+  dm2cm:r=>{const d=ri(r,2,9);return{q:`${d} дм = □ см`,ans:d*10}},
+  cm2dm:r=>{const d=ri(r,2,9);return{q:`${d*10} см = □ дм`,ans:d}},
+  dmcm:r=>{const d=ri(r,1,9),c=ri(r,1,9);return{q:`${d} дм ${c} см = □ см`,ans:d*10+c}},
+  m2dm:r=>{const m=ri(r,2,9);return{q:`${m} м = □ дм`,ans:m*10}},
+  m2cm:r=>{const m=ri(r,2,9);return{q:`${m} м = □ см`,ans:m*100}},
+  cmpLen:r=>{const d=ri(r,2,9),c=r()<.25?d*10:ri(r,11,99);return{type:'cmp',left:`${d} дм`,right:`${c} см`,ans:d*10>c?'>':d*10<c?'<':'='}},
+  h2m:r=>{const h=ri(r,2,8);return{q:`${h} ч = □ мин`,ans:h*60}},
+  m2h:r=>{const h=ri(r,2,8);return{q:`${h*60} мин = □ ч`,ans:h}},
+  hm2m:r=>{const m=ri(r,1,11)*5;return{q:`1 ч ${m} мин = □ мин`,ans:60+m}},
+  min2s:r=>{const k=ri(r,2,9);return{q:`${k} мин = □ с`,ans:k*60}},
+  day2h:r=>{const d=ri(r,2,7);return{q:`${d} сут = □ ч`,ans:d*24}},
+  kg2g:r=>{const k=ri(r,2,9);return{q:`${k} кг = □ г`,ans:k*1000}},
+  kgg2g:r=>{const k=ri(r,1,9),g=ri(r,1,9)*100;return{q:`${k} кг ${g} г = □ г`,ans:k*1000+g}},
+  t2kg:r=>{const t=ri(r,2,9);return{q:`${t} т = □ кг`,ans:t*1000}},
+  km2m:r=>{const k=ri(r,2,9);return{q:`${k} км = □ м`,ans:k*1000}},
+  kmm2m:r=>{const k=ri(r,1,9),m=ri(r,1,9)*100;return{q:`${k} км ${m} м = □ м`,ans:k*1000+m}}
+};
+function unitItem(p,r){const x=UT[pick(r,p.sets)](r);return x.type==='cmp'?{...x,u:true}:{type:'own',u:true,q:x.q,ans:String(x.ans)}}
+
+/* ---------- движок «Фигуры на клетках»: периметр и площадь считаются по клеткам ---------- */
+function gridItem(p,r){
+  const w=ri(r,p.shape==='L'?3:2,p.big?7:5),h=ri(r,p.shape==='L'?3:2,p.big?5:4);
+  const cells=new Set();for(let x=0;x<w;x++)for(let y=0;y<h;y++)cells.add(x+','+y);
+  if(p.shape==='L'){const cw=ri(r,1,w-2),ch=ri(r,1,h-2);for(let x=w-cw;x<w;x++)for(let y=0;y<ch;y++)cells.delete(x+','+y)}
+  let per=0;for(const c of cells){const[x,y]=c.split(',').map(Number);for(const[dx,dy]of[[1,0],[-1,0],[0,1],[0,-1]])if(!cells.has((x+dx)+','+(y+dy)))per++}
+  const ask=p.ask==='PS'?pick(r,['P','S']):p.ask;
+  return{type:'grid',cells:[...cells],w,h,ask,ans:ask==='P'?per:cells.size};
+}
+function gridSVG(it){
+  const W=it.w+2,H=it.h+2,s=10,set=new Set(it.cells);let g='';
+  for(let x=0;x<=W;x++)g+=`<line x1="${x*s}" y1="0" x2="${x*s}" y2="${H*s}"/>`;
+  for(let y=0;y<=H;y++)g+=`<line x1="0" y1="${y*s}" x2="${W*s}" y2="${y*s}"/>`;
+  let f='',e='';
+  for(const c of it.cells){const[x,y]=c.split(',').map(Number);const X=(x+1)*s,Y=(y+1)*s;f+=`<rect x="${X}" y="${Y}" width="${s}" height="${s}"/>`;
+    if(!set.has(x+','+(y-1)))e+=`<line x1="${X}" y1="${Y}" x2="${X+s}" y2="${Y}"/>`;
+    if(!set.has(x+','+(y+1)))e+=`<line x1="${X}" y1="${Y+s}" x2="${X+s}" y2="${Y+s}"/>`;
+    if(!set.has((x-1)+','+y))e+=`<line x1="${X}" y1="${Y}" x2="${X}" y2="${Y+s}"/>`;
+    if(!set.has((x+1)+','+y))e+=`<line x1="${X+s}" y1="${Y}" x2="${X+s}" y2="${Y+s}"/>`}
+  return `<svg class="gfig" viewBox="-1 -1 ${W*s+2} ${H*s+2}" role="img" aria-label="Фигура из ${it.cells.length} клеток"><g class="gl">${g}</g><g class="gf">${f}</g><g class="ge">${e}</g></svg>`;
+}
+const gridUnit=it=>it.ask==='P'?'см':'кв. см';
+
 /* ---------- программа ---------- */
 const LV=['Базовый','Средний','Сложный'];
 const MATH={
@@ -399,7 +550,7 @@ const MATH={
      {n:'Сложение и вычитание',d:'Вперемешку, нарастает к концу листа',p:{kind:'examples',ops:['+','-'],lo:2,hi:10,count:15}},
      {n:'Пропуск в любом месте',d:'3 + □ = 7 и □ − 2 = 5',p:{kind:'examples',ops:['+','-'],lo:2,hi:10,count:15,missing:'any'}}]},
    {id:'g1-compose',t:'Состав числа',L:[
-     {n:'Числа до 5',d:'2 + □ = 5',p:{kind:'examples',ops:['+'],lo:2,hi:5,count:12,missing:'b',ramp:false}},
+     {n:'Числа до 5',d:'2 + □ = 5',p:{kind:'examples',ops:['+'],lo:2,hi:5,count:8,missing:'b',ramp:false}},
      {n:'Числа до 10',d:'4 + □ = 9',p:{kind:'examples',ops:['+'],lo:3,hi:10,count:15,missing:'ab'}},
      {n:'Состав через вычитание',d:'□ + 3 = 8 и 8 − □ = 3',p:{kind:'examples',ops:['+','-'],lo:3,hi:10,count:15,missing:'ab'}}]},
    {id:'g1-compare',t:'Сравнение чисел',L:[
@@ -477,6 +628,58 @@ const MATH={
      {n:'Скобки',d:'(56 + 24) ÷ 8',p:{kind:'order',patterns:['(a + b) × c','(a - b) ÷ c','a × (b - c)'],small:true,cap:300,count:10}},
      {n:'Три действия',d:'7 × 8 − 36 ÷ 4 + 5',p:{kind:'order',patterns:['a × b - c ÷ d','(a + b) × c - d','a ÷ b × c + d'],small:true,cap:300,count:10}}]}]}]
 };
+/* задачи и величины: новые движки встают в конец программы каждого класса */
+const W=(tpls,max,count,extra)=>({kind:'word',tpls,max,count,...(extra||{})});
+const U=(sets,count)=>({kind:'units',sets,count:count||9});
+const G=(ask,shape,count,big)=>({kind:'grid',ask,shape,count:count||6,big});
+MATH[1].push({s:'Задачи и величины',topics:[
+  {id:'g1-word',t:'Задачи в одно действие',L:[
+    {n:'Было, стало, осталось',d:'в пределах 10',p:W(['sum','rem'],10,4)},
+    {n:'Больше на, меньше на',d:'в пределах 20',p:W(['more','less'],20,4)},
+    {n:'Все типы',d:'и «на сколько больше», до 20',p:W(['sum','rem','more','less','diff'],20,5)}]},
+  {id:'g1-len',t:'Сантиметр и дециметр',L:[
+    {n:'Дециметры и сантиметры',d:'2 дм = □ см',p:U(['dm2cm','cm2dm'])},
+    {n:'Составные величины',d:'1 дм 5 см = □ см',p:U(['dmcm','dm2cm','cm2dm'])},
+    {n:'Сравнение длин',d:'2 дм ◯ 18 см',p:U(['cmpLen','dmcm'])}]}]});
+MATH[2].push({s:'Задачи и величины',topics:[
+  {id:'g2-word',t:'Текстовые задачи',L:[
+    {n:'В одно действие',d:'в пределах 100',p:W(['sum','rem','more','less','diff'],100,4)},
+    {n:'В два действия',d:'в пределах 100',p:W(['steps','together'],100,3)},
+    {n:'Смысл умножения и деления',d:'по 3 в 4 коробках',p:W(['groups','share'],100,4,{tab:[2,3]})}]},
+  {id:'g2-len',t:'Единицы длины',L:[
+    {n:'Дециметры и сантиметры',d:'4 дм 7 см = □ см',p:U(['dmcm','cm2dm'])},
+    {n:'Метры',d:'3 м = □ см',p:U(['m2dm','m2cm','dm2cm'])},
+    {n:'Сравнение длин',d:'5 дм ◯ 48 см',p:U(['cmpLen','dmcm','m2cm'])}]},
+  {id:'g2-perim',t:'Периметр',L:[
+    {n:'Прямоугольник на клетках',d:'сторона клетки 1 см',p:G('P','rect',6)},
+    {n:'Большие прямоугольники',d:'до 7 клеток в длину',p:G('P','rect',6,true)},
+    {n:'Фигуры из клеток',d:'прямоугольник без угла',p:G('P','L',6)}]}]});
+MATH[3].push({s:'Задачи и величины',topics:[
+  {id:'g3-word',t:'Задачи на умножение и деление',L:[
+    {n:'Поровну и по несколько',d:'табличные числа',p:W(['groups','share','parts'],100,4,{tab:[2,9]})},
+    {n:'В несколько раз',d:'больше и меньше в несколько раз',p:W(['times','fewer'],100,4,{tab:[2,9]})},
+    {n:'Цена, количество, стоимость',d:'покупки в рублях',p:W(['cost','price','qty'],100,4)}]},
+  {id:'g3-time',t:'Единицы времени',L:[
+    {n:'Часы и минуты',d:'2 ч = □ мин',p:U(['h2m','m2h'])},
+    {n:'Составные величины',d:'1 ч 15 мин = □ мин',p:U(['hm2m','min2s','h2m'])},
+    {n:'Сутки, часы, минуты',d:'3 сут = □ ч',p:U(['day2h','hm2m','m2h','min2s'])}]},
+  {id:'g3-area',t:'Площадь',L:[
+    {n:'Прямоугольник на клетках',d:'одна клетка 1 кв. см',p:G('S','rect',6)},
+    {n:'Периметр и площадь',d:'вперемешку',p:G('PS','rect',6,true)},
+    {n:'Фигуры из клеток',d:'прямоугольник без угла',p:G('S','L',6)}]}]});
+MATH[4].push({s:'Задачи и величины',topics:[
+  {id:'g4-move',t:'Задачи на движение',L:[
+    {n:'Найти расстояние',d:'скорость × время',p:W(['dist'],0,4)},
+    {n:'Найти время и скорость',d:'обратные задачи',p:W(['time','speed'],0,4)},
+    {n:'Встречное движение',d:'и все типы',p:W(['meet','dist','time','speed'],0,4)}]},
+  {id:'g4-units',t:'Единицы массы и длины',L:[
+    {n:'Килограммы и километры',d:'3 кг = □ г',p:U(['kg2g','km2m'])},
+    {n:'Составные величины',d:'2 кг 300 г = □ г',p:U(['kgg2g','kmm2m'])},
+    {n:'Все величины',d:'тонны, сутки и другие',p:U(['t2kg','kgg2g','kmm2m','day2h'])}]},
+  {id:'g4-fig',t:'Периметр и площадь фигур',L:[
+    {n:'Периметр и площадь',d:'прямоугольники',p:G('PS','rect',6,true)},
+    {n:'Периметр сложной фигуры',d:'прямоугольник без угла',p:G('P','L',6,true)},
+    {n:'Площадь сложной фигуры',d:'прямоугольник без угла',p:G('S','L',6,true)}]}]});
 const RUS={
  1:[{s:'Письмо и орфография',topics:['Сочетания жи–ши, ча–ща, чу–щу','Заглавная буква в именах','Перенос слов','Звонкие и глухие согласные']}],
  2:[{s:'Орфография',topics:['Безударные гласные в корне','Парные согласные на конце слова','Разделительный мягкий знак','Словарные слова 2 класса']}],
@@ -541,6 +744,8 @@ const gradeWord=g=>g+' класс';
 
 /* ---------- отрисовка листа ---------- */
 function itemHTML(it,showAns){
+  if(it.type==='word')return `<div class="wq">${esc(it.q)}</div><div class="sol"></div><div class="wa">Ответ: <span class="box">${showAns?fmt(it.ans):''}</span></div>`;
+  if(it.type==='grid')return `${gridSVG(it)}<span class="ga">${it.ask} = <span class="box">${showAns?it.ans:''}</span> ${gridUnit(it)}</span>`;
   if(it.type==='own'){const box=`<span class="box">${showAns?esc(it.ans):''}</span>`;
     return it.q.includes('□')?`<span>${esc(it.q).replace('□',box)}</span>`:`<span>${esc(it.q)} = ${box}</span>`}
   if(it.type==='col'){
@@ -553,6 +758,9 @@ function itemHTML(it,showAns){
 }
 function instr(it){
   if(!it)return'';
+  if(it.type==='word')return'Реши задачу.';
+  if(it.type==='grid')return it.ask==='P'?'Найди периметр фигуры. Сторона клетки 1 см.':'Найди площадь фигуры. Одна клетка 1 кв. см.';
+  if(it.u)return it.type==='cmp'?'Сравни величины: поставь знак >, < или =.':'Вырази в других единицах.';
   if(it.type==='cmp')return'Поставь знак >, < или = в кружок.';
   if(it.type==='col')return'Реши в столбик.';
   if(it.type==='expr')return'Найди значение выражения, соблюдай порядок действий.';
@@ -562,19 +770,21 @@ function instr(it){
 }
 function sheetHTML(items,{topic,level,seed,studentName,answers}){
   const kind=items[0]&&items[0].type;
-  const longOwn=kind==='own'&&items.some(x=>x.q.length>16);
+  const longOwn=kind==='own'&&items.some(x=>(x.q||'').length>16);
   const mixed=new Set(items.map(x=>x.type)).size>1||items.some(x=>x.src);
-  const cols=mixed?'c2':kind==='col'?'c4':kind==='expr'?'c2':kind==='own'?(longOwn?'c1':'c3'):'c3';
+  const cols=mixed?(items.some(x=>x.type==='expr')?'c2':'c3'):kind==='word'?'c1':kind==='col'?'c4':kind==='expr'?'c2':kind==='own'?(longOwn?'c1':'c3'):'c3';
   const title=answers?'Ответы':topic.t;
+  const lvl=topic.sheet||topic.review?esc(topic.L[0].n):LV[level].toLowerCase()+' уровень';
+  const newGroup=(it,i)=>{if(i===0)return true;const pr=items[i-1];return it.blk!=null?pr.blk!==it.blk:(pr.src!==it.src||pr.type!==it.type)};
   return `<div class="sheet${answers?' ans':''}"><div class="sheet-in">
     <div class="sh-head"><div class="fld">Имя: <b>${esc(studentName||'')}</b></div><div class="fld">Дата: </div>
-    <div class="fld">${gradeWord(topic.grade)} · ${LV[level].toLowerCase()} уровень</div><div class="fld">Вариант <b class="num">${seed}</b></div></div>
+    <div class="fld">${gradeWord(topic.grade)} · ${lvl}</div><div class="fld">Вариант <b class="num">${seed}</b></div></div>
     <div><div class="sh-title">${answers?'<span class="key-stamp">Ключ</span> ':''}${esc(title)}</div></div>
-    <div class="sh-sub">${answers?esc(topic.t):esc(topic.L[level].n)+'. '+(mixed?'Задания из нескольких пройденных тем, у каждой своё указание.':esc(instr(items[0])))}</div>
+    <div class="sh-sub">${answers?esc(topic.t):esc(topic.L[level].n)+'. '+(mixed?'Лист из нескольких частей, у каждой своё указание.':esc(instr(items[0])))}</div>
     <div class="sh-items ${cols}">${items.map((it,i)=>{
-      const head=mixed&&(i===0||items[i-1].src!==it.src||items[i-1].type!==it.type)
-        ?`<div class="grp"><b>${esc(TOPICS[it.src]?TOPICS[it.src].t:'')}</b> ${esc(instr(it))}</div>`:'';
-      return head+`<div class="it${it.type==='own'?' own':''}"><span class="n">${i+1}</span>${itemHTML(it,answers)}</div>`}).join('')}</div>
+      const tt=TOPICS[it.src]?TOPICS[it.src].t:'';
+      const head=mixed&&newGroup(it,i)?`<div class="grp"><b>${esc(it.lbl?it.lbl+' · '+tt:tt)}</b> ${esc(instr(it))}</div>`:'';
+      return head+`<div class="it${it.type==='own'?' own':''}${it.type==='word'?' word':''}${it.type==='grid'?' grid':''}"><span class="n">${i+1}</span>${itemHTML(it,answers)}</div>`}).join('')}</div>
     <div class="sh-foot"><span>${esc(topic.section)}</span><span>Проверить онлайн: код варианта ${seed}</span></div>
   </div></div>`;
 }
@@ -633,7 +843,7 @@ function viewStudents(){
 /* порядок тем: по математике встроенная программа 1–4 класса, свои темы встают в конец своего класса;
    по русскому пока только свои темы, по классам */
 function trackIds(subj='math'){const ids=[];for(const g of [1,2,3,4]){if(subj==='math')for(const sec of MATH[g])for(const t of sec.topics)ids.push(t.id);
-  for(const c of S.customTopics)if(c.subject===subj&&c.grade===g&&!c.review)ids.push(c.id)}return ids}
+  for(const c of S.customTopics)if(c.subject===subj&&c.grade===g&&!c.review&&!c.sheet)ids.push(c.id)}return ids}
 function trackPos(st,subj='math'){const tr=trackIds(subj);if(!tr.length)return{tr,i:-1};let i=tr.indexOf(curOf(st,subj));
   if(i<0){if(subj==='math')i=tr.indexOf(MATH[st.grade][0].topics[0].id);else{i=tr.findIndex(id=>TOPICS[id].grade>=st.grade);if(i<0)i=0}}
   return{tr,i}}
@@ -661,7 +871,7 @@ function viewStudent(){
   const tabs=st.subjects.map(x=>`<button class="tab${x===subj?' on':''}" data-s="${x}">${SUBJ[x]}</button>`).join('');
   const row=t=>{const m=mastery(st.id,t.id);
     return `<button class="topic" data-t="${t.id}"><span class="dot ${m.cls}"></span><span class="tt">${esc(t.t)}${t.custom?'<span class="mine">моя</span>':''}${curOf(st,t.subject)===t.id?'<span class="now">сейчас</span>':''}</span><span class="pct num">${m.pct!=null?m.pct+'%':''}</span></button>`};
-  const mine=g=>S.customTopics.filter(c=>c.subject===subj&&c.grade===g&&!c.review);
+  const mine=g=>S.customTopics.filter(c=>c.subject===subj&&c.grade===g&&!c.review&&!c.sheet);
   const pos=trackPos(st,subj);let route;
   if(pos.i>=0){
     const {tr,i}=pos;
@@ -721,40 +931,110 @@ function viewStudent(){
   app.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>{const h=S.assignments.find(x=>x.code===b.dataset.open);startPlayer(h)});
 }
 function openTopic(tid){const m=mastery(V.studentId,tid);const lv=m.cls==='ok'?2:m.cls==='bad'?0:1;
-  go({screen:'topic',topicId:tid,level:Math.min(lv,TOPICS[tid].L.length-1),seed:newSeed(),over:null,confirmDel:false})}
+  go({screen:'topic',topicId:tid,level:Math.min(lv,TOPICS[tid].L.length-1),seed:newSeed(),over:null,confirmDel:false,blocks:null})}
 
 function curParams(){const t=TOPICS[V.topicId];return{...t.L[V.level].p,...(V.over||{})}}
 
+/* ---------- виды листа: шаблоны из блоков ---------- */
+const TPL=[['train','Тренировка'],['lesson','Урок'],['test','Проверочная'],['home','Домашка'],['own','Свой']];
+const TPL_HINT={train:'Одна тема, задания выбранного уровня.',lesson:'Разминка по прошлой теме, тема урока, задачи и бонус.',
+  test:'Тема, задачи и величины. Подходит для контроля.',home:'Короче урока: тема, одна задача и повторение.',own:'Соберите лист из блоков: любые темы, уровни и количество.'};
+const WORD_OF={1:'g1-word',2:'g2-word',3:'g3-word',4:'g4-move'},EXTRA_OF={1:'g1-len',2:'g2-perim',3:'g3-area',4:'g4-units'};
+const TASKS=['задание','задания','заданий'];
+function tplBlocks(tpl,st,t,lvl){
+  const tr=trackIds(t.subject),i=tr.indexOf(t.id),prev=i>0?tr[i-1]:null;
+  const math=t.subject==='math',w=math?WORD_OF[t.grade]:null,x=math?EXTRA_OF[t.grade]:null;
+  const lv=(id,l)=>Math.min(l,TOPICS[id].L.length-1),own=Math.min(8,t.L[lvl].p.count);
+  let b=[];
+  if(tpl==='lesson')b=[prev&&{label:'Разминка',tid:prev,lv:lv(prev,0),count:4},{label:'Тема урока',tid:t.id,lv:lvl,count:own},
+    w&&w!==t.id&&{label:'Задачи',tid:w,lv:0,count:2},x&&x!==t.id&&{label:'Бонус',tid:x,lv:0,count:3}];
+  if(tpl==='test')b=[{label:'Тема',tid:t.id,lv:lv(t.id,1),count:own},w&&w!==t.id&&{label:'Задачи',tid:w,lv:1,count:2},
+    x&&x!==t.id&&{label:'Величины',tid:x,lv:1,count:3}];
+  if(tpl==='home')b=[{label:'Тема',tid:t.id,lv:lvl,count:Math.min(6,own)},w&&w!==t.id&&{label:'Задача',tid:w,lv:0,count:1},
+    prev&&{label:'Повторение',tid:prev,lv:lv(prev,0),count:3}];
+  return b.filter(Boolean);
+}
+function sheetTopic(name,blocks,t){
+  const parts=blocks.map(b=>({tid:b.tid,label:b.label||'',count:b.count,p:TOPICS[b.tid].L[b.lv].p}));
+  return{id:'sheet-preview',sheet:true,custom:true,subject:t.subject,grade:t.grade,section:'Лист «'+name+'»',t:t.t,
+    L:[{n:name,d:blocks.map(b=>b.label||TOPICS[b.tid].t).join(' · '),p:{kind:'mix',parts,count:parts.reduce((s,x)=>s+x.count,0)}}]};
+}
+const tplName=k=>TPL.find(x=>x[0]===k)[1];
+function currentBlocks(st,t){
+  if(V.tpl==='own'){if(!V.blocks)V.blocks=tplBlocks('lesson',st,t,V.level);return V.blocks}
+  return tplBlocks(V.tpl,st,t,V.level);
+}
+/* лист из шаблона сохраняется, только когда его печатают или выдают: тогда у результата есть своя запись */
+function materialize(){
+  const t=TOPICS[V.topicId];if(!V.tpl||V.tpl==='train'||t.review||t.sheet)return;
+  const st=student(V.studentId);const sh=sheetTopic(tplName(V.tpl),currentBlocks(st,t),t);
+  S.customTopics=S.customTopics.filter(c=>!(c.sheet&&c.forStudent===st.id&&!S.assignments.some(a=>a.topicId===c.id)));
+  sh.id='sheet-'+Date.now();sh.forStudent=st.id;sh.from=t.id;S.customTopics.push(sh);TOPICS=allTopics();save();
+  V.topicId=sh.id;V.level=0;
+}
+
 function viewTopic(){
   const st=student(V.studentId);const t=TOPICS[V.topicId];
-  const items=generate(curParams(),V.seed);
+  const fixed=t.review||t.sheet;const tpl=fixed?'train':(V.tpl||'train');
   const m=mastery(st.id,t.id);
+  let shown=t,shownLv=V.level,blocks=null,items;
+  if(tpl!=='train'){blocks=currentBlocks(st,t);shown=sheetTopic(tplName(tpl),blocks,t);shownLv=0;items=generate(shown.L[0].p,V.seed)}
+  else items=generate(curParams(),V.seed);
   const lv=t.L.map((L,i)=>`<button class="lvl${i===V.level?' on':''}" data-l="${i}">
      <div class="lvl-top"><span class="lvl-mark">${[0,1,2].map(k=>`<i class="${k<=i?'f':''}"></i>`).join('')}</span><b>${LV[i]}: ${esc(L.n)}</b></div>
-     <span class="d">${esc(L.d)} · ${L.p.count} заданий</span></button>`).join('');
-  const p=curParams();const tunable=p.kind!=='order'&&!p.table&&!p.extra&&p.ops&&!p.aLo&&p.cmp!=='num';
+     <span class="d">${esc(L.d)} · ${L.p.count} ${plural(L.p.count,TASKS)}</span></button>`).join('');
+  const p=curParams();const tunable=tpl==='train'&&p.kind!=='order'&&!p.table&&!p.extra&&p.ops&&!p.aLo&&p.cmp!=='num';
+  const tplSeg=fixed?'':`<div class="field"><span class="label">Вид листа</span><div class="seg tpl" id="tpl">${TPL.map(([k,l])=>`<button type="button" data-k="${k}" class="${k===tpl?'on':''}">${l}</button>`).join('')}</div>
+    <span class="hint">${TPL_HINT[tpl]}</span></div>`;
+  const opts=sel=>[1,2,3,4].map(g=>{const ids=trackIds(t.subject).filter(id=>TOPICS[id].grade===g);return ids.length?`<optgroup label="${gradeWord(g)}">${ids.map(id=>`<option value="${id}"${id===sel?' selected':''}>${esc(TOPICS[id].t)}</option>`).join('')}</optgroup>`:''}).join('');
+  let blocksHTML='';
+  if(tpl==='own')blocksHTML=`<div class="blocks">${blocks.map((b,i)=>`<div class="brow" data-i="${i}">
+      <div class="brow-top"><span class="bnum">${i+1}</span><select class="b-tid" aria-label="Тема блока ${i+1}">${opts(b.tid)}</select></div>
+      <div class="brow-bot"><select class="b-lv" aria-label="Уровень блока ${i+1}">${TOPICS[b.tid].L.map((L,k)=>`<option value="${k}"${k===b.lv?' selected':''}>${TOPICS[b.tid].L.length>1?LV[k]+': ':''}${esc(L.n)}</option>`).join('')}</select>
+        <input class="b-cnt" type="number" min="1" max="20" value="${b.count}" aria-label="Сколько заданий в блоке ${i+1}">
+        <button type="button" class="bi b-up" aria-label="Поднять блок"${i?'':' disabled'}>↑</button><button type="button" class="bi b-dn" aria-label="Опустить блок"${i<blocks.length-1?'':' disabled'}>↓</button><button type="button" class="bi b-rm" aria-label="Удалить блок"${blocks.length>1?'':' disabled'}>✕</button></div></div>`).join('')}
+    ${blocks.length<6?'<button type="button" class="btn small quiet" id="b-add">+ Блок</button>':''}</div>`;
+  else if(tpl!=='train')blocksHTML=`<ol class="bsum">${blocks.map(b=>`<li><b>${esc(b.label)}</b><span>${esc(TOPICS[b.tid].t)} · ${b.count} ${plural(b.count,TASKS)}</span></li>`).join('')}</ol>
+    <button type="button" class="btn small quiet" id="to-own">Изменить состав</button>`;
+  const total=items.length;
   app.innerHTML=`<div class="head"><div><span class="label">${gradeWord(t.grade)} · ${esc(t.section)}</span><h1>${esc(t.t)}</h1>
-    <p>${m.pct!=null?`Последняя работа: ${m.pct}%. `:''}Уровень подобран по прошлым результатам, лист уже собран.</p></div></div>
+    <p>${m.pct!=null?`Последняя работа: ${m.pct}%. `:''}${fixed?'Лист уже собран.':'Уровень подобран по прошлым результатам, лист уже собран.'}</p></div></div>
     <div class="topic-grid">
-      <div class="levels">${lv}
+      <div class="levels">${tplSeg}
+        ${tpl==='own'?'':(tpl==='train'?'':'<span class="label">Уровень темы</span>')+lv}
+        ${blocksHTML}
         <div class="actions"><button class="btn primary" id="link">Ссылка ученику</button><button class="btn" id="print">Печать</button></div>
         <button class="btn quiet" id="again">Другой вариант</button>
         ${tunable?`<details class="tune"><summary>Настроить точнее</summary>
           <div class="tune-row"><label for="lo">Числа от</label><input id="lo" type="number" value="${p.lo}"><label for="hi">до</label><input id="hi" type="number" value="${p.hi}"></div>
           <div class="tune-row"><label for="cnt">Сколько заданий</label><input id="cnt" type="number" min="4" max="24" value="${p.count}"><button class="btn small" id="apply">Применить</button></div></details>`:''}
-        <p class="hint">Печатный лист и онлайн-версия по ссылке совпадают задание в задание: вариант ${V.seed}.</p>
-        <div class="actions">${t.review?'<span class="hint">Сначала берутся темы с худшим результатом, потом последние пройденные. Результат запишется в каждую из этих тем.</span>':curOf(st,t.subject)===t.id?'<span class="hint">Это текущая тема ученика.</span>':'<button class="btn small quiet" id="setcur">Сделать текущей темой</button>'}
-          ${t.custom&&!t.review?`<button class="btn small ${V.confirmDel?'pen':'quiet'}" id="del">${V.confirmDel?'Нажмите ещё раз, чтобы удалить':'Удалить тему'}</button>`:''}</div>
+        <p class="hint">${tpl!=='train'?`На листе ${total} ${plural(total,TASKS)}. `:''}Печатный лист и онлайн-версия по ссылке совпадают задание в задание: вариант ${V.seed}.</p>
+        <div class="actions">${fixed?`<span class="hint">${t.review?'Сначала берутся темы с худшим результатом, потом последние пройденные. ':''}Результат запишется в каждую тему листа отдельно.</span>`:curOf(st,t.subject)===t.id?'<span class="hint">Это текущая тема ученика.</span>':'<button class="btn small quiet" id="setcur">Сделать текущей темой</button>'}
+          ${t.custom&&!fixed?`<button class="btn small ${V.confirmDel?'pen':'quiet'}" id="del">${V.confirmDel?'Нажмите ещё раз, чтобы удалить':'Удалить тему'}</button>`:''}</div>
       </div>
       <div class="sheet-wrap"><div class="sheet-bar"><span class="label">Предпросмотр листа A4</span><span class="hint">ключ с ответами печатается вторым листом</span></div>
-        ${sheetHTML(items,{topic:t,level:V.level,seed:V.seed,studentName:st.name})}</div>
+        ${sheetHTML(items,{topic:shown,level:shownLv,seed:V.seed,studentName:st.name})}</div>
     </div>`;
+  const $=id=>document.getElementById(id);
   app.querySelectorAll('.lvl').forEach(b=>b.onclick=()=>go({level:+b.dataset.l,seed:newSeed(),over:null}));
-  document.getElementById('again').onclick=()=>{V.seed=newSeed();render()};
-  document.getElementById('print').onclick=()=>go({screen:'print'});
-  document.getElementById('link').onclick=linkModal;
-  const sc=document.getElementById('setcur');if(sc)sc.onclick=()=>{st[CK(t.subject)]=t.id;save();render()};
-  const dl=document.getElementById('del');
+  if($('tpl'))$('tpl').querySelectorAll('button').forEach(b=>b.onclick=()=>{const k=b.dataset.k;
+    if(k==='own'&&tpl!=='own')V.blocks=(tpl==='train'?tplBlocks('lesson',st,t,V.level):blocks).map(x=>({...x}));
+    go({tpl:k,seed:newSeed()})});
+  if($('to-own'))$('to-own').onclick=()=>{V.blocks=blocks.map(x=>({...x}));go({tpl:'own'})};
+  app.querySelectorAll('.brow').forEach(row=>{const i=+row.dataset.i,b=V.blocks[i];
+    row.querySelector('.b-tid').onchange=e=>{b.tid=e.target.value;b.lv=Math.min(b.lv,TOPICS[b.tid].L.length-1);b.label='';render()};
+    row.querySelector('.b-lv').onchange=e=>{b.lv=+e.target.value;render()};
+    row.querySelector('.b-cnt').onchange=e=>{b.count=Math.max(1,Math.min(20,parseInt(e.target.value,10)||1));render()};
+    row.querySelector('.b-up').onclick=()=>{[V.blocks[i-1],V.blocks[i]]=[V.blocks[i],V.blocks[i-1]];render()};
+    row.querySelector('.b-dn').onclick=()=>{[V.blocks[i+1],V.blocks[i]]=[V.blocks[i],V.blocks[i+1]];render()};
+    row.querySelector('.b-rm').onclick=()=>{V.blocks.splice(i,1);render()};
+  });
+  if($('b-add'))$('b-add').onclick=()=>{V.blocks.push({tid:t.id,lv:Math.min(V.level,t.L.length-1),count:4,label:''});render()};
+  $('again').onclick=()=>{V.seed=newSeed();render()};
+  $('print').onclick=()=>{materialize();go({screen:'print'})};
+  $('link').onclick=()=>{materialize();render();linkModal()};
+  const sc=$('setcur');if(sc)sc.onclick=()=>{st[CK(t.subject)]=t.id;save();render()};
+  const dl=$('del');
   if(dl)dl.onclick=()=>{
     if(!V.confirmDel){V.confirmDel=true;render();return}
     S.customTopics=S.customTopics.filter(c=>c.id!==t.id);
@@ -762,15 +1042,15 @@ function viewTopic(){
     S.attempts=S.attempts.filter(a=>a.topicId!==t.id);S.assignments=S.assignments.filter(a=>a.topicId!==t.id);
     TOPICS=allTopics();save();go({screen:'student',topicId:null,confirmDel:false,subject:t.subject});
   };
-  const ap=document.getElementById('apply');
-  if(ap)ap.onclick=()=>{const lo=+document.getElementById('lo').value,hi=+document.getElementById('hi').value,c=+document.getElementById('cnt').value;
+  const ap=$('apply');
+  if(ap)ap.onclick=()=>{const lo=+$('lo').value,hi=+$('hi').value,c=+$('cnt').value;
     if(!(hi>lo&&lo>=0&&c>=4&&c<=24))return;V.over={lo,hi,count:c};V.seed=newSeed();render()};
 }
 
 function viewPrint(){
   const st=student(V.studentId);const t=TOPICS[V.topicId];const items=generate(curParams(),V.seed);
   const o={topic:t,level:V.level,seed:V.seed,studentName:st.name};
-  app.innerHTML=`<div class="head"><div><h1>Печать</h1><p>${esc(t.t)} · ${LV[V.level].toLowerCase()} уровень · вариант ${V.seed}</p></div>
+  app.innerHTML=`<div class="head"><div><h1>Печать</h1><p>${esc(t.t)} · ${t.sheet||t.review?esc(t.L[0].n):LV[V.level].toLowerCase()+' уровень'} · вариант ${V.seed}</p></div>
     <button class="btn" id="back">← К теме</button></div>
     <div class="note">В рабочей версии здесь будет кнопка «Скачать PDF». В прототипе показаны оба листа в том виде, в каком они уйдут на принтер: задание и ключ для вас.</div>
     <div class="print-pages">${sheetHTML(items,o)}${sheetHTML(items,{...o,answers:true})}</div>`;
@@ -953,6 +1233,9 @@ const isNumAns=it=>/^\d+$/.test(String(it.ans));
 const textMode=it=>it.type==='own'&&!isNumAns(it);
 const norm=s=>String(s).trim().toLowerCase().replace(/ё/g,'е').replace(/\s+/g,' ');
 function qText(it){
+  const sl=()=>`<span class="slot${P.input?' filled':''}">${esc(P.input)||'?'}</span>`;
+  if(it.type==='word')return `<span class="wq">${esc(it.q)}</span><span class="wa">Ответ: ${sl()}</span>`;
+  if(it.type==='grid')return `<span class="gwrap">${gridSVG(it)}</span><span class="wa">${it.ask} = ${sl()} ${gridUnit(it)}</span>`;
   if(it.type==='own'){const slot=`<span class="slot${P.input?' filled':''}">${esc(P.input)||'?'}</span>`;
     return it.q.includes('□')?`<span>${esc(it.q).replace('□',slot)}</span>`:`<span>${esc(it.q)} =</span>${slot}`}
   if(it.type==='cmp')return `${it.left} <span class="slot${P.input?' filled':''}">${P.input||'?'}</span> ${it.right}`;
@@ -962,6 +1245,8 @@ function qText(it){
   return `${it.miss==='a'?slot:fmt(it.a)} ${sym(it.op)} ${it.miss==='b'?slot:fmt(it.b)} = ${it.miss==='res'?slot:fmt(it.res)}`;
 }
 function plainQ(it){
+  if(it.type==='word')return it.q.length>70?it.q.slice(0,67)+'…':it.q;
+  if(it.type==='grid')return (it.ask==='P'?'Периметр':'Площадь')+` фигуры из ${it.cells.length} клеток`;
   if(it.type==='own')return it.q.includes('□')?it.q:it.q+' = □';
   if(it.type==='cmp')return `${it.left} ◯ ${it.right}`;
   if(it.type==='expr')return `${it.q} = □`;
@@ -982,7 +1267,7 @@ function viewPlayer(){
       <div class="score num"><span>${P.score}<small>очки</small></span><span>${P.streak}<small>подряд</small></span></div></div>
     <div class="prog"><i style="width:${P.i/P.items.length*100}%"></i></div>
     <p class="pl-instr">${esc(instr(it))}</p>
-    <div class="task${it.type==='own'&&it.q.length>16?' long':''}" aria-live="polite"><div class="q">${qText(it)}</div>${P.fb?`<div class="fb ${P.fb.ok?'ok':'bad'}">${P.fb.ok?'Верно! +10':'Правильный ответ: '+esc(P.fb.ans)}</div>`:''}</div>
+    <div class="task${it.type==='own'&&it.q.length>16?' long':''}${it.type==='word'?' word':''}${it.type==='grid'?' grid':''}" aria-live="polite"><div class="q">${qText(it)}</div>${P.fb?`<div class="fb ${P.fb.ok?'ok':'bad'}">${P.fb.ok?'Верно! +10':'Правильный ответ: '+esc(P.fb.ans)}</div>`:''}</div>
     ${pad}
     <div style="text-align:center"><button class="btn small quiet" id="stop">Закончить досрочно</button></div></div>`;
   app.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>key(b.dataset.k));
@@ -1009,7 +1294,7 @@ function submit(){
 function finish(){
   if(!P)return;
   const a={id:'a'+Date.now(),studentId:P.h.studentId,topicId:P.t.id,level:P.h.level,correct:P.correct,total:P.items.length,answered:P.i,time:Math.round((Date.now()-P.start)/1000),date:Date.now(),mistakes:P.mistakes};
-  if(P.t.review){
+  if(P.t.review||P.t.sheet){
     const by={};for(const x of P.log){by[x.src]=by[x.src]||{c:0,n:0};by[x.src].n++;if(x.ok)by[x.src].c++}
     Object.keys(by).forEach((src,k)=>S.attempts.push({id:a.id+'-'+k,studentId:a.studentId,topicId:src,level:Math.min(1,TOPICS[src].L.length-1),
       correct:by[src].c,total:by[src].n,time:a.time,date:a.date,mistakes:P.mistakes.filter(m=>m.src===src),via:'review'}));
