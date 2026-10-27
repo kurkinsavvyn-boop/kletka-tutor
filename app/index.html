@@ -542,7 +542,7 @@ img.art.pic{object-fit:contain;display:block}
 /* Печать */
 .print-pages{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,420px),1fr));gap:22px;margin-bottom:26px}
 .pr-h{font-size:16px;font-weight:600;margin:0 0 12px}
-.pg-measure{position:absolute;left:-9999px;top:0;width:600px;visibility:hidden}
+.pg-measure,#printHost{position:absolute;left:-10000px;top:0;width:210mm;visibility:hidden}
 .sheet.page{aspect-ratio:210/297;overflow:hidden}
 .sheet.page .sheet-in{height:100%;min-height:0}
 .sh-mini{display:flex;justify-content:space-between;gap:2cqw;font-size:2.3cqw;color:#4e5870;border-bottom:.25cqw solid var(--sheet-line);padding-bottom:1cqw}
@@ -938,6 +938,20 @@ button.mchip:hover{background:rgba(255,255,255,.24)}
 .st-notes{display:flex;flex-direction:column;gap:4px;margin:-6px 0 16px;padding:0 4px;color:var(--ink-2);font-size:14px}
 .st-notes p{margin:0}.st-notes b{color:var(--ink);font-weight:600;margin-right:6px}
 .st-foot2{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px;color:var(--ink-2)}
+
+/* ---------- печать листов: каждая страница — ровно лист А4 ---------- */
+.pr-act{display:flex;gap:8px;flex-wrap:wrap}
+.pr-hint{margin:-8px 0 18px}
+@page{size:A4 portrait;margin:0}
+@media print{
+  html,body{background:#fff!important;margin:0;padding:0!important}
+  body>*:not(#printHost){display:none!important}
+  #printHost{position:static;visibility:visible;width:210mm}
+  #printHost .sheet.page{width:210mm!important;height:297mm!important;max-width:none!important;aspect-ratio:auto;border-radius:0;box-shadow:none!important;
+    break-after:page;page-break-after:always;break-inside:avoid;margin:0!important}
+  #printHost .sheet.page:last-child{break-after:auto;page-break-after:auto}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+}
 </style>
 
 <header class="top"><div class="top-in">
@@ -3125,8 +3139,8 @@ function viewPrint(){
   const st=student(V.studentId);const t=TOPICS[V.topicId];const items=generate(curParams(),V.seed);
   const o={topic:t,level:V.level,seed:V.seed,studentName:st.name,design:resolveDesign(st,V.seed)};
   app.innerHTML=`<div class="head"><div><h1>Печать</h1><p>${esc(t.t)} · ${t.sheet||t.review?esc(t.L[0].n):LV[V.level].toLowerCase()+' уровень'} · вариант ${V.seed}</p></div>
-    <button class="btn" id="back">← К теме</button></div>
-    <div class="note">В рабочей версии здесь будет кнопка «Скачать PDF». Если задания не помещаются на один лист A4, они переносятся на следующий, задание не разрывается.</div>
+    <div class="pr-act"><button class="btn quiet" id="back">← К теме</button><button class="btn" id="prKey">Печать ключа</button><button class="btn primary" id="prGo">Печать</button></div></div>
+    <p class="hint pr-hint">Каждая страница — отдельный лист А4, задание не разрывается. Чтобы получить PDF, в окне печати выберите «Сохранить как PDF».</p>
     <h2 class="pr-h" id="pr-h1">Задание</h2><div class="print-pages" id="pr-tasks"></div>
     <h2 class="pr-h" id="pr-h2">Ключ для вас</h2><div class="print-pages" id="pr-keys"></div>`;
   const lay=()=>{if(V.screen!=='print')return;
@@ -3134,7 +3148,20 @@ function viewPrint(){
     document.getElementById('pr-h1').textContent=`Задание · ${pagesWord(a)}`;document.getElementById('pr-h2').textContent=`Ключ для вас · ${pagesWord(b)}`};
   lay();if(document.fonts&&document.fonts.ready)document.fonts.ready.then(lay);
   document.getElementById('back').onclick=()=>{unmaterialize();go({screen:'topic'})};
+  document.getElementById('prGo').onclick=()=>printPages(items,o);
+  document.getElementById('prKey').onclick=()=>printPages(items,{...o,answers:true});
 }
+/* печать: листы раскладываются заново ровно по ширине А4 (на экране часть заданий другого размера),
+   на бумагу идёт только этот невидимый набор страниц */
+async function printPages(items,o){
+  let host=document.getElementById('printHost');if(host)host.remove();
+  host=document.createElement('div');host.id='printHost';document.body.appendChild(host);
+  paginate(host,items,o);
+  await Promise.all([...host.querySelectorAll('img')].map(im=>im.complete?0:new Promise(r=>{im.onload=im.onerror=r})));
+  if(document.fonts&&document.fonts.ready)await document.fonts.ready;
+  paginate(host,items,o);
+  const done=()=>{host.remove();removeEventListener('afterprint',done)};
+  addEventListener('afterprint',done);window.print()}
 
 /* ---------- конструктор своей темы ---------- */
 const KINDS=[['examples','Примеры','7 + 5 = □'],['window','Окошки','7 + □ = 12'],['compare','Сравнение','7 + 5 ◯ 11'],['column','Столбик','47 + 38 в столбик'],['eq','Уравнения','x + 5 = 12']];
