@@ -2278,6 +2278,7 @@ function viewStudent(){
       <div class="rlist">${tr[i-2]?row(tr[i-2],'prev'):''}${tr[i-1]?row(tr[i-1],'prev'):'<div class="rl-empty">Это первая тема программы</div>'}${row(tr[i],'cur','сейчас')}
         ${tr[i+1]?row(tr[i+1],'next','дальше'):`<div class="rl-empty">${subj==='math'?'Дальше программы 1–4 класса пока нет':'Дальше тем нет, добавьте свою'}</div>`}${tr[i+2]?row(tr[i+2],'next next2','потом'):''}</div>
       <div class="route-act"><button class="btn primary" id="r-task">Создать задание</button>
+        ${i>0?'<button class="btn" id="r-rev">Повторить пройденное</button>':''}
         ${tr[i+1]?'<button class="btn link" id="r-next">Тема пройдена →</button>':''}</div>
     </section>`;
   }else{
@@ -2318,7 +2319,7 @@ function viewStudent(){
   const canRev=pos.i>0;
   app.innerHTML=`<div class="sthead"><div class="sth-t"><h1>${esc(st.name)}</h1><span>${gradeWord(st.grade)}</span>${nWait?`<button class="wait-chip red" id="works2">ждём выполнения ${nWait} ${plural(nWait,['домашки','домашек','домашек'])}</button>`:''}</div>
       <div class="more"><button class="more-btn" id="more" aria-label="Ещё действия" aria-expanded="${V.menu?'true':'false'}">⋯</button>
-        ${V.menu?`<div class="more-pop"><button class="edit" id="works">Работы и домашки${nDone?` · ${nDone}`:''}</button>${canRev?'<button class="edit" id="r-rev">Повторить пройденное</button>':''}<button class="edit" id="newt">+ Своя тема</button><button class="edit" id="edst">Редактировать</button><button class="${V.confirmStDel?'danger':''}" id="delst">${V.confirmStDel?'Нажмите ещё раз: ученик и все его работы удалятся':'Удалить ученика'}</button></div>`:''}</div></div>
+        ${V.menu?`<div class="more-pop"><button class="edit" id="works">Работы и домашки${nDone?` · ${nDone}`:''}</button><button class="edit" id="newt">+ Своя тема</button><button class="edit" id="edst">Редактировать</button><button class="${V.confirmStDel?'danger':''}" id="delst">${V.confirmStDel?'Нажмите ещё раз: ученик и все его работы удалятся':'Удалить ученика'}</button></div>`:''}</div></div>
     <div class="panel">${st.subjects.length>1?`<div class="tabs">${tabs}</div>`:''}${body}</div>`;
   app.querySelectorAll('.tab').forEach(b=>b.onclick=()=>go({subject:b.dataset.s,confirmStDel:false}));
   app.querySelectorAll('.topic[data-t],.rl[data-t]').forEach(b=>b.onclick=()=>openTopic(b.dataset.t));
