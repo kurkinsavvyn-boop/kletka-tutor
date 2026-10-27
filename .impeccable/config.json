@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "cramped-padding",
+        "value": "*",
+        "files": [
+          "index.html"
+        ],
+        "createdAt": "2026-10-27T01:09:44.381Z",
+        "reason": "Claude: .sheet has calc(var(--cell)*3) ≈72px padding on all sides; static detector does not resolve calc()"
+      }
+    ]
+  }
+}

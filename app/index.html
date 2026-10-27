@@ -682,16 +682,81 @@ button.wait-chip:hover{filter:brightness(.96)}
 .sh-items>.pfill{flex:0 0 100%;display:flex;justify-content:flex-end;background:#fff}
 .sh-items>.pfill.left{justify-content:flex-start}
 .pfill img.art.pic{height:100%;width:auto;max-width:60%;object-fit:contain}
+
+/* ---------- аккаунт в шапке ---------- */
+.acct{margin-left:auto;display:flex;align-items:center;gap:10px}
+.sync{font-size:13px;color:var(--ink-3)}
+.sync[data-s="err"]{color:var(--pen)}
+.acct-btn{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:7px 12px;font-weight:600;font-size:14px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.acct-btn:hover{border-color:var(--ink)}
+.pop-mail{margin:4px 12px 6px;font-size:13px;color:var(--ink-2);overflow-wrap:anywhere}
+.demo-tag{font-size:13px;font-weight:700;color:var(--pen);background:var(--pen-soft);padding:3px 9px;border-radius:99px}
+
+/* ---------- вход: лист в клетку на синем поле ---------- */
+body.authbg{background:#1F2C55}
+body.authbg .top{background:transparent;border-bottom:0}
+body.authbg .logo{color:#fff}
+body.authbg .logo i{border-color:#fff}
+body.authbg .logo i b{border-color:#fff}
+.auth{min-height:calc(100svh - 140px);display:grid;place-items:center;padding:12px 0 40px}
+.auth-card{position:relative;width:min(460px,100%);background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Cpath d='M24 0V24M0 24H24' fill='none' stroke='%23DCE7F5' stroke-width='1'/%3E%3C/svg%3E");
+  padding:44px 36px 32px 60px;display:flex;flex-direction:column;gap:16px;color:#1A2242}
+.auth-card::before{content:"";position:absolute;top:0;bottom:0;left:34px;width:3px;background:var(--pen)}
+.auth-card h1{font-family:var(--f-disp);font-size:34px;letter-spacing:-.02em;line-height:1.05}
+.auth-sub{margin:-6px 0 4px;color:var(--ink-2);font-size:15px}
+.auth-card .field input{width:100%;padding:12px 14px;border:1.5px solid #C9D2E2;border-radius:0;font:inherit;font-size:16px;background:#fff;color:#1A2242}
+.auth-card .field input:focus{border-color:#1A2242;outline:none}
+.auth-card form{display:flex;flex-direction:column;gap:14px}
+.btn.wide{width:100%;min-height:52px;font-size:17px}
+.auth-err{margin:0;color:var(--pen);font-weight:600;font-size:14px;min-height:0}
+.auth-err:empty{display:none}
+.auth-sw{margin:0;font-size:15px;color:var(--ink-2)}
+.auth-sw .btn.link{padding:0 2px;color:#1A2242;text-decoration:underline}
+.demo-l{align-self:flex-start;padding:0!important;font-size:14px}
+.oauth{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.btn.oa{min-height:48px;border:1.5px solid #1A2242;background:#fff;color:#1A2242;font-size:15px}
+.btn.oa:hover{background:#F3F6FB}
+.btn.oa-vk{background:#0077FF;border-color:#0077FF;color:#fff}
+.btn.oa-yandex{background:#FC3F1D;border-color:#FC3F1D;color:#fff}
+.btn.oa-apple{background:#000;border-color:#000;color:#fff}
+.or{display:flex;align-items:center;gap:10px;color:var(--ink-3);font-size:13px}
+.or::before,.or::after{content:"";flex:1;height:1px;background:#C9D2E2}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.amsg{width:100%;font:inherit;font-size:15px;line-height:1.5;padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;background:var(--paper);color:var(--ink);resize:vertical}
+.empty-first{background:var(--card);border:1.5px dashed var(--line);border-radius:14px;padding:22px;margin-bottom:16px;display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.empty-first h2{font-family:var(--f-disp);font-size:20px}
+.empty-first p{margin:0;color:var(--ink-2)}
+
+/* ---------- кабинет ученика ---------- */
+body.cabinet .top{display:none}
+.cab{max-width:720px;margin:0 auto;padding-top:12px}
+.cab-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:8px}
+.cab-head h1{font-family:var(--f-disp);font-size:clamp(28px,6vw,40px);letter-spacing:-.02em;line-height:1.05}
+.cab-head p{margin:6px 0 0;color:var(--ink-2)}
+.cab-h{font-family:var(--f-disp);font-size:19px;margin:28px 0 12px}
+.ctasks{display:flex;flex-direction:column;gap:10px}
+.ctask{display:flex;align-items:center;gap:14px;text-align:left;background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:10px 14px 10px 10px;font:inherit;color:var(--ink);transition:transform .15s,border-color .15s}
+.ctask:not(.done):hover{border-color:var(--ink);transform:translateY(-1px)}
+.ctask.done{opacity:.75;cursor:default}
+.ct-pic{width:84px;height:84px;flex:none;border-radius:12px;background:var(--blue-soft);display:grid;place-items:center;overflow:hidden}
+.ct-pic img{max-width:90%;max-height:90%;object-fit:contain}
+.ct-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.ct-t b{font-size:16px}
+.ct-t small{color:var(--ink-2);font-size:14px}
+.ct-score{font-weight:800;font-size:18px;color:var(--ok)}
+.ctask .btn{pointer-events:none}
+@media (max-width:520px){.auth-card{padding:36px 20px 26px 40px}.auth-card::before{left:20px}.oauth{grid-template-columns:1fr}.two{grid-template-columns:1fr}}
 </style>
 
 <header class="top"><div class="top-in">
   <button class="logo" id="home" aria-label="К списку учеников"><i><b></b><b></b><b></b><b></b></i>Клетка</button>
   <nav class="crumbs" id="crumbs" aria-label="Где вы"></nav>
-  <div class="steps" id="steps" aria-label="Задание за 3 клика"></div>
+  <div class="acct" id="steps"></div>
 </div></header>
 <main class="wrap" id="app" lang="ru"></main>
 <div id="modal-root"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/pocketbase@0.28.1/dist/pocketbase.umd.js"></script>
 <script>
 /* ---------- генератор случайных чисел с seed ---------- */
 function rng(seed){let a=seed>>>0;return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
@@ -699,7 +764,7 @@ const ri=(r,lo,hi)=>lo+Math.floor(r()*(hi-lo+1));
 const pick=(r,arr)=>arr[Math.floor(r()*arr.length)];
 const fmt=n=>typeof n==='number'?(Math.abs(n)>=10000?n.toLocaleString('ru-RU'):String(n)):n;
 const TR={а:'a',б:'b',в:'v',г:'g',д:'d',е:'e',ё:'e',ж:'zh',з:'z',и:'i',й:'y',к:'k',л:'l',м:'m',н:'n',о:'o',п:'p',р:'r',с:'s',т:'t',у:'u',ф:'f',х:'h',ц:'ts',ч:'ch',ш:'sh',щ:'sch',ъ:'',ы:'y',ь:'',э:'e',ю:'yu',я:'ya'};
-const translit=s=>s.toLowerCase().split('').map(c=>TR[c]??c).join('').replace(/[^a-z0-9]/g,'')||'UCHENIK';
+const translit=s=>s.toLowerCase().split('').map(c=>TR[c]??c).join('').replace(/[^a-z0-9]/g,'')||'uchenik';
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 /* ---------- движок «Арифметика» ---------- */
@@ -1420,7 +1485,7 @@ const LEVELS=[['1','Сказка'],['2','Яркий'],['3','Спокойный']
 /* пропорции картинок (ширина / высота), чтобы заранее знать их высоту на листе */
 const ART_AR={"bremen-1-mid":2.386,"bremen-1-top":2.048,"bremen-2-mid":2.444,"bremen-2-top":1.822,"bremen-3-mid":2.659,"bremen-3-top":1.878,"carlson-1-mid":1.724,"carlson-1-top":2.044,"carlson-2-mid":1.524,"carlson-2-top":2.032,"carlson-3-mid":1.608,"carlson-3-top":1.675,"cheburashka-1-mid":2.43,"cheburashka-1-top":1.379,"cheburashka-2-mid":2.468,"cheburashka-2-top":1.811,"cheburashka-3-mid":1.476,"cheburashka-3-top":1.85,"dino-1-mid":1.882,"dino-1-top":2.033,"dino-2-mid":1.767,"dino-2-top":2.224,"dino-3-mid":2.031,"dino-3-top":1.741,"fairy-1-mid":1.828,"fairy-1-top":2.43,"fairy-2-mid":1.793,"fairy-2-top":1.853,"fairy-3-mid":1.853,"fairy-3-top":1.855,"football-1-mid":1.938,"football-1-top":1.946,"football-2-mid":1.718,"football-2-top":1.595,"football-3-mid":1.599,"football-3-top":2.019,"forest-1-mid":1.924,"forest-1-top":2.379,"forest-2-mid":1.503,"forest-2-top":1.747,"forest-3-mid":1.803,"forest-3-top":1.757,"funtik-1-mid":1.455,"funtik-1-top":1.745,"funtik-2-mid":1.47,"funtik-2-top":2.231,"funtik-3-mid":1.699,"funtik-3-top":1.502,"gav-1-mid":2.016,"gav-1-top":1.947,"gav-2-mid":1.845,"gav-2-top":2.213,"hedgehog-2-mid":2.028,"hedgehog-2-top":1.957,"hedgehog-3-mid":1.874,"hedgehog-3-top":1.979,"knight-1-mid":2.048,"knight-1-top":1.635,"knight-2-mid":1.456,"knight-2-top":2.218,"knight-3-mid":1.847,"knight-3-top":1.786,"leopold-1-mid":1.907,"leopold-1-top":2.086,"leopold-2-mid":2.379,"leopold-2-top":1.639,"leopold-3-mid":1.636,"leopold-3-top":2.487,"lion-1-mid":1.891,"lion-1-top":1.796,"lion-2-mid":1.754,"lion-2-top":2.237,"lion-3-mid":2.263,"lion-3-top":2.032,"pirates-1-mid":2.137,"pirates-1-top":1.873,"pirates-2-mid":1.903,"pirates-2-top":1.726,"pirates-3-mid":1.638,"pirates-3-top":1.802,"pogodi-1-mid":1.747,"pogodi-1-top":1.737,"pogodi-2-mid":1.963,"pogodi-2-top":1.946,"pogodi-3-mid":2.233,"pogodi-3-top":1.675,"pooh-1-mid":2.437,"pooh-1-top":1.468,"pooh-2-mid":1.855,"pooh-2-top":1.902,"pooh-3-mid":1.99,"pooh-3-top":2.088,"prostokvashino-1-mid":0.851,"prostokvashino-1-top":0.726,"prostokvashino-2-mid":1.351,"prostokvashino-2-top":2.032,"prostokvashino-3-mid":1.942,"prostokvashino-3-top":1.474,"race-1-mid":2.212,"race-1-top":1.998,"race-2-mid":1.813,"race-2-top":1.675,"race-3-mid":1.578,"race-3-top":1.985,"sea-1-mid":1.471,"sea-1-top":2.333,"sea-2-mid":1.434,"sea-2-top":2.13,"sea-3-mid":1.77,"sea-3-top":1.673,"space-1-mid":1.209,"space-1-top":1.946,"space-2-mid":1.734,"space-2-top":1.881,"space-3-mid":2.094,"space-3-top":1.773,"umka-1-mid":1.23,"umka-1-top":1.741,"umka-2-mid":1.898,"umka-2-top":1.852,"umka-3-mid":1.58,"umka-3-top":1.527,"winter-1-mid":1.68,"winter-1-top":1.878,"winter-2-mid":1.56,"winter-2-top":1.959,"winter-3-mid":2.241,"winter-3-top":2.103};
 /* сервис живёт в /app/, картинки общие с главной страницей — в /art/ */
-const ART_BASE=/\/app\/(index\.html)?$/.test(location.pathname)?'../art/':'art/';
+const ART_BASE=/\/(app|u)\/(index\.html)?$/.test(location.pathname)?'../art/':'art/';
 const ART_SAY={'prostokvashino-1':ART_BASE+'prostokvashino-1-say.webp'};
 const artList=t=>t.art?Object.keys(ART_AR).filter(k=>k.startsWith(t.art+'-')&&/^[a-z]+-\d+-top$/.test(k)).map(k=>k.slice(0,-4)).sort():[];
 const artSet=(t,k)=>{const L=artList(t);if(!L.length)return null;const a=L[((k%L.length)+L.length)%L.length];
@@ -1869,14 +1934,19 @@ function demoState0(){
   };
 }
 let S;
-try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}
-if(!S||!S.students)S=demoState();
-if(!S.customTopics)S.customTopics=exampleTopics();
-migrate(S);
-/* сюжет по умолчанию — «Любой»: один раз переводим на него всех учеников; оформление остаётся одним из четырёх */
-if(S.designAny!==2){for(const st of S.students){const d=st.design||{};st.design={lv:+d.lv||2,theme:'random',bw:!!d.bw}}S.designAny=2}
+/* старые версии данных приводятся к текущей; сюжет по умолчанию — «Любой», оформление — одно из четырёх */
+function prepState(s){if(!s||!Array.isArray(s.students))return null;
+  if(!s.customTopics)s.customTopics=exampleTopics();if(!s.attempts)s.attempts=[];if(!s.assignments)s.assignments=[];migrate(s);
+  if(s.designAny!==2){for(const st of s.students){const d=st.design||{};st.design={lv:+d.lv||2,theme:'random',bw:!!d.bw}}s.designAny=2}
+  return s}
+const emptyState=()=>prepState({v:3,students:[],attempts:[],assignments:[],customTopics:exampleTopics()});
+function loadLocal(key,fallback){let s=null;try{s=JSON.parse(localStorage.getItem(key))}catch(e){}return prepState(s)||fallback()}
+/* у каждого репетитора свой ключ в браузере (копия на случай без связи), у демо — старый */
+let KEY_NOW=KEY;
+function setState(s){S=s;TOPICS=allTopics()}
+S=emptyState();
 TOPICS=allTopics();
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function save(){S.savedAt=Date.now();try{localStorage.setItem(KEY_NOW,JSON.stringify(S))}catch(e){}if(ACC.user)queuePush()}
 
 let V={screen:'students'};
 const newSeed=()=>1000+Math.floor(Math.random()*9000);
@@ -2169,6 +2239,229 @@ function paginate(host,items,o){
 }
 const pagesWord=n=>`${n} ${plural(n,['страница','страницы','страниц'])}`;
 
+/* ---------- аккаунты: у каждого репетитора своя среда на сервере, ученики привязаны к своему репетитору ---------- */
+const API=/^(localhost|127\.0\.0\.1)$/.test(location.hostname)?'http://127.0.0.1:8090':'https://153-76-170-187.sslip.io';
+const HAS_PB=typeof PocketBase==='function';
+/* вход репетитора и вход ученика хранятся раздельно, чтобы не мешать друг другу в одном браузере */
+function pbClient(storeKey){if(!HAS_PB)return null;const Store=new PocketBase(API).authStore.constructor;const c=new PocketBase(API,new Store(storeKey));c.autoCancellation(false);return c}
+const pbT=pbClient('kletka_tutor_auth');
+const pbS=pbClient('kletka_student_auth');
+const ACC={user:null,wsId:null,sync:'ok',demo:false};
+/* кабинет ученика лежит рядом с сервисом: /app/ → /u/ */
+const CAB_URL=()=>/\/app\/(index\.html)?$/.test(location.pathname)?new URL('../u/',location.href.split('#')[0]).href:SITE+'u/';
+
+/* сохранение среды репетитора: копия в браузере сразу, на сервер — через секунду после последнего изменения */
+let pushT=null,pushing=false,pushAgain=false;
+const SYNC_TXT={wait:'Сохраняю…',ok:'Сохранено',err:'Нет связи, сохраню позже'};
+function setSync(st){ACC.sync=st;const el=document.getElementById('syncSt');if(el){el.textContent=SYNC_TXT[st];el.dataset.s=st}}
+function queuePush(){setSync('wait');clearTimeout(pushT);pushT=setTimeout(pushNow,900)}
+async function pushNow(){
+  if(!ACC.user)return;if(pushing){pushAgain=true;return}pushing=true;
+  try{
+    if(ACC.wsId)await pbT.collection('workspaces').update(ACC.wsId,{data:S});
+    else{const r=await pbT.collection('workspaces').create({owner:ACC.user.id,data:S});ACC.wsId=r.id}
+    setSync('ok');
+  }catch(e){setSync('err')}
+  finally{pushing=false;if(pushAgain){pushAgain=false;pushNow()}}
+}
+addEventListener('online',()=>{if(ACC.user&&ACC.sync==='err')pushNow()});
+
+async function startTutor(){
+  ACC.user=pbT.authStore.record;ACC.demo=false;ACC.wsId=null;sessionStorage.removeItem('kletka-demo');
+  KEY_NOW='kletka-ws-'+ACC.user.id;
+  setState(loadLocal(KEY_NOW,emptyState));
+  go({screen:'students',studentId:null,topicId:null,menu:false,acctMenu:false});
+  try{
+    const r=await pbT.collection('workspaces').getFirstListItem(pbT.filter('owner = {:id}',{id:ACC.user.id}));
+    ACC.wsId=r.id;const srv=prepState(r.data);
+    if(srv&&(srv.savedAt||0)>=(S.savedAt||0)){setState(srv);try{localStorage.setItem(KEY_NOW,JSON.stringify(S))}catch(e){}}
+    else pushNow();
+  }catch(e){if(e&&e.status===404)await pushNow();else setSync('err')}
+  syncResults(true);render();
+}
+function startDemo(){
+  ACC.user=null;ACC.demo=true;sessionStorage.setItem('kletka-demo','1');KEY_NOW=KEY;
+  setState(loadLocal(KEY,demoState));go({screen:'students',studentId:null,topicId:null});
+}
+function logout(){
+  if(pbT)pbT.authStore.clear();ACC.user=null;ACC.wsId=null;ACC.demo=false;sessionStorage.removeItem('kletka-demo');
+  setState(emptyState());go({screen:'auth',authMode:'login',acctMenu:false});
+}
+/* при возвращении на вкладку забираем свежую среду (если правили с другого устройства) и сданные работы */
+addEventListener('focus',async()=>{
+  if(!ACC.user||pushing||ACC.sync==='wait')return;
+  try{const r=await pbT.collection('workspaces').getOne(ACC.wsId);const srv=prepState(r.data);
+    if(srv&&(srv.savedAt||0)>(S.savedAt||0)&&!['player'].includes(V.screen)){setState(srv);try{localStorage.setItem(KEY_NOW,JSON.stringify(S))}catch(e){}render()}}catch(e){}
+  syncResults(true);
+});
+
+/* сданные в кабинете работы попадают в карточку ученика */
+let lastSync=0;
+async function syncResults(force){
+  if(!ACC.user||(!force&&Date.now()-lastSync<20000))return;lastSync=Date.now();
+  try{
+    const list=await pbT.collection('assignments').getFullList({filter:pbT.filter('tutor = {:id} && status = "done"',{id:ACC.user.id}),fields:'id,code,result'});
+    let n=0;
+    for(const r of list){const h=S.assignments.find(a=>a.code===r.code);
+      if(h&&h.status!=='сдано'&&r.result){const d=r.result;recordResult(h,{correct:d.k,total:d.n,answered:d.a,time:d.tm,log:d.l||[],mistakes:d.m||[]});n++}}
+    if(n&&['students','student','works','work'].includes(V.screen))render();
+  }catch(e){}
+}
+
+/* ---------- аккаунт ученика: логин и пароль создаются при добавлении ---------- */
+const firstName=st=>st.first||st.name.split(/\s+/)[0];
+const genLogin=st=>(translit(firstName(st)).slice(0,10)||'uchenik')+'-'+(1000+Math.floor(Math.random()*9000));
+const genPin=()=>String(100000+Math.floor(Math.random()*900000));
+async function ensureAccount(st){
+  if(!ACC.user)return null;if(st.acc&&st.acc.id)return st.acc;
+  for(let k=0;k<6;k++){
+    const login=genLogin(st),pin=genPin();
+    try{
+      const r=await pbT.collection('students').create({tutor:ACC.user.id,login,password:pin,passwordConfirm:pin,
+        name:firstName(st),surname:st.last||st.name.split(/\s+/).slice(1).join(' '),grade:st.grade,tutorName:ACC.user.name||'',localId:st.id});
+      st.acc={id:r.id,login,pin};save();return st.acc;
+    }catch(e){if(!(e&&e.status===400))throw e}
+  }
+  throw new Error('login');
+}
+function accessText(st){const a=st.acc;
+  return `Привет, ${firstName(st)}! Твои задания теперь здесь:\n${CAB_URL()}#${a.login}\n\nЛогин: ${a.login}\nПароль: ${a.pin}`}
+async function accessModal(st,fresh){
+  if(!ACC.user){modal(`<h2>Кабинет ученика</h2><p style="margin:0">Кабинет ученика работает в аккаунте репетитора. Зарегистрируйтесь — ученики из демо при этом не переносятся.</p>
+    <div class="modal-actions"><button class="btn quiet" id="cl">Закрыть</button><button class="btn primary" id="sg">Зарегистрироваться</button></div>`,()=>{
+      document.getElementById('cl').onclick=close;document.getElementById('sg').onclick=()=>{close();go({screen:'auth',authMode:'signup'})}});return}
+  modal(`<h2>${fresh?'Ученик добавлен':'Доступ для ученика'}</h2><p class="hint" style="margin:0">Создаём вход для ученика…</p>`);
+  try{await ensureAccount(st)}catch(e){
+    modal(`<h2>${fresh?'Ученик добавлен':'Доступ для ученика'}</h2><p style="margin:0">Нет связи с сервером, поэтому логин и пароль пока не созданы. Задания ученику можно делать уже сейчас, а доступ откройте позже: меню ⋯ → «Доступ для ученика».</p>
+      <div class="modal-actions"><button class="btn primary" id="cl">Понятно</button></div>`,()=>{document.getElementById('cl').onclick=close});return}
+  const draw=()=>modal(`<h2>${fresh?'Ученик добавлен':'Доступ для ученика'}</h2>
+    <p style="margin:0">Отправьте это сообщение ученику или родителям — в мессенджер или по SMS. Задания можно создавать уже сейчас, даже если ученик ещё не входил.</p>
+    <textarea id="amsg" class="amsg" readonly rows="6">${esc(accessText(st))}</textarea>
+    <div class="modal-actions"><button class="btn quiet" id="np">Новый пароль</button><button class="btn quiet" id="cl">Готово</button><button class="btn primary" id="cp">Скопировать сообщение</button></div>`,()=>{
+      document.getElementById('cl').onclick=close;
+      const cp=document.getElementById('cp');cp.onclick=()=>copyText(document.getElementById('amsg'),cp,'Скопировано');
+      const np=document.getElementById('np');np.onclick=async()=>{np.disabled=true;np.textContent='Меняем…';const pin=genPin();
+        try{await pbT.collection('students').update(st.acc.id,{password:pin,passwordConfirm:pin});st.acc.pin=pin;save();draw()}
+        catch(e){np.disabled=false;np.textContent='Не вышло, ещё раз'}};
+    });
+  draw();
+}
+function copyText(el,btn,okText){const ok=()=>{btn.textContent=okText};
+  if(navigator.clipboard)navigator.clipboard.writeText(el.value).then(ok,()=>{el.select()});else{el.select();try{document.execCommand('copy');ok()}catch(e){}}}
+
+/* ---------- экран входа репетитора ---------- */
+const OAUTH_NAMES={vk:'VK ID',yandex:'Яндекс ID',google:'Google',apple:'Apple'};
+let OAUTH=null;
+async function loadOAuth(){if(OAUTH||!pbT)return;try{const m=await pbT.collection('users').listAuthMethods();OAUTH=(m.oauth2&&m.oauth2.enabled?m.oauth2.providers:[])||[]}catch(e){OAUTH=[]}
+  if(V.screen==='auth')render()}
+function authErr(e,signup){const d=e&&e.response&&e.response.data||{};
+  if(!e||e.status===0)return'Нет связи с сервером. Проверьте интернет и попробуйте ещё раз.';
+  if(signup&&d.email&&/unique|exists/i.test(d.email.code+d.email.message))return'Эта почта уже зарегистрирована. Войдите.';
+  if(d.email)return'Проверьте адрес почты.';
+  if(d.password)return'Пароль — не короче 8 символов.';
+  return signup?'Не получилось зарегистрироваться. Попробуйте ещё раз.':'Неверная почта или пароль.'}
+function viewAuth(){
+  const su=V.authMode==='signup';
+  if(OAUTH===null)loadOAuth();
+  const prov=(OAUTH||[]).filter(p=>OAUTH_NAMES[p.name]);
+  app.innerHTML=`<div class="auth"><div class="auth-card">
+    <h1>${su?'Регистрация':'Вход'}</h1>
+    <p class="auth-sub">${su?'Кабинет репетитора: ученики, задания и результаты в одном месте.':'Кабинет репетитора.'}</p>
+    ${prov.length?`<div class="oauth">${prov.map(p=>`<button type="button" class="btn oa oa-${p.name}" data-p="${p.name}">${esc(OAUTH_NAMES[p.name])}</button>`).join('')}</div><div class="or"><span>или по почте</span></div>`:''}
+    <form id="af" novalidate>
+      ${su?'<div class="field"><label class="label" for="an">Имя</label><input id="an" type="text" autocomplete="name" placeholder="Как к вам обращаться"></div>':''}
+      <div class="field"><label class="label" for="ae">Почта</label><input id="ae" type="email" autocomplete="email" inputmode="email" required></div>
+      <div class="field"><label class="label" for="ap">Пароль</label><input id="ap" type="password" autocomplete="${su?'new-password':'current-password'}" minlength="8" required aria-describedby="aph"><span class="hint" id="aph">${su?'Не короче 8 символов':''}</span></div>
+      <p class="auth-err" id="aerr" role="alert"></p>
+      <button class="btn primary wide" id="ago" type="submit">${su?'Зарегистрироваться':'Войти'}</button>
+    </form>
+    <p class="auth-sw">${su?'Уже есть аккаунт? <button type="button" class="btn link" id="sw">Войти</button>':'Нет аккаунта? <button type="button" class="btn link" id="sw">Зарегистрироваться</button>'}</p>
+    <button type="button" class="btn link demo-l" id="demo">Посмотреть без регистрации</button>
+  </div></div>`;
+  const $=id=>document.getElementById(id),err=$('aerr');
+  $('sw').onclick=()=>go({screen:'auth',authMode:su?'login':'signup'});
+  $('demo').onclick=startDemo;
+  app.querySelectorAll('[data-p]').forEach(b=>b.onclick=async()=>{err.textContent='';b.disabled=true;
+    try{await pbT.collection('users').authWithOAuth2({provider:b.dataset.p});await startTutor()}
+    catch(e){err.textContent='Вход через '+OAUTH_NAMES[b.dataset.p]+' не удался. Попробуйте ещё раз.';b.disabled=false}});
+  $('af').onsubmit=async e=>{e.preventDefault();err.textContent='';
+    const email=$('ae').value.trim(),pw=$('ap').value,name=su?$('an').value.trim():'';
+    if(!/^\S+@\S+\.\S+$/.test(email)){err.textContent='Проверьте адрес почты.';return}
+    if(pw.length<8){err.textContent='Пароль — не короче 8 символов.';return}
+    if(!pbT){err.textContent='Нет связи с сервером. Проверьте интернет и обновите страницу.';return}
+    const btn=$('ago');btn.disabled=true;btn.textContent=su?'Регистрируем…':'Входим…';
+    try{
+      if(su)await pbT.collection('users').create({email,password:pw,passwordConfirm:pw,name});
+      await pbT.collection('users').authWithPassword(email,pw);await startTutor();
+    }catch(x){err.textContent=authErr(x,su);btn.disabled=false;btn.textContent=su?'Зарегистрироваться':'Войти'}
+  };
+  ($(su?'an':'ae')).focus();
+}
+
+/* ---------- кабинет ученика: отдельная ссылка, без названия сервиса ---------- */
+const CABINET=/\/u\/(index\.html)?$/.test(location.pathname);
+const CAB={items:null,err:'',me:null};
+async function loadCab(){
+  try{CAB.me=pbS.authStore.record;
+    CAB.items=await pbS.collection('assignments').getFullList({sort:'-created',fields:'id,code,title,payload,status,result,created'});CAB.err=''}
+  catch(e){if(e&&(e.status===401||e.status===403)){pbS.authStore.clear();V={screen:'cablogin'}}else CAB.err='Нет связи. Проверь интернет.'}
+  flushCab();render();
+}
+function viewCabLogin(){
+  const pre=decodeURIComponent((location.hash||'').slice(1)).replace(/[^a-z0-9-]/gi,'').toLowerCase();
+  app.innerHTML=`<div class="auth cab-auth"><div class="auth-card">
+    <h1>Мои задания</h1>
+    <form id="cf" novalidate>
+      <div class="field"><label class="label" for="cl1">Логин</label><input id="cl1" type="text" autocomplete="username" autocapitalize="off" spellcheck="false" value="${esc(pre)}"></div>
+      <div class="field"><label class="label" for="cp1">Пароль</label><input id="cp1" type="password" inputmode="numeric" autocomplete="current-password"></div>
+      <p class="auth-err" id="cerr" role="alert"></p>
+      <button class="btn primary wide" id="cgo" type="submit">Войти</button>
+    </form>
+    <p class="hint" style="margin:0">Логин и пароль прислал твой репетитор.</p>
+  </div></div>`;
+  const $=id=>document.getElementById(id);
+  $('cf').onsubmit=async e=>{e.preventDefault();const login=$('cl1').value.trim().toLowerCase(),pin=$('cp1').value.trim(),err=$('cerr');err.textContent='';
+    if(!login||!pin){err.textContent='Впиши логин и пароль.';return}
+    if(!pbS){err.textContent='Нет связи. Проверь интернет и обнови страницу.';return}
+    const b=$('cgo');b.disabled=true;b.textContent='Входим…';
+    try{await pbS.collection('students').authWithPassword(login,pin);V={screen:'cab'};render();loadCab()}
+    catch(x){err.textContent=x&&x.status===0?'Нет связи. Проверь интернет.':'Неверный логин или пароль.';b.disabled=false;b.textContent='Войти'}};
+  ($(pre?'cp1':'cl1')).focus();
+}
+function viewCab(){
+  const me=CAB.me||pbS.authStore.record||{};
+  if(CAB.items===null){app.innerHTML=`<div class="cab"><p class="hint">Загружаем задания…</p></div>`;return}
+  const pick=(seed)=>{const L=THEMES.filter(t=>artList(t).length);const t=L[seed%L.length];return artSet(t,seed)};
+  const card=r=>{const d=r.payload||{},done=r.status==='done',res=r.result||{};const a=pick(d.s||7);
+    return `<button class="ctask${done?' done':''}" data-id="${r.id}"${done?' disabled':''}>
+      <span class="ct-pic">${a?`<img src="${a.char}" alt="" loading="lazy">`:''}</span>
+      <span class="ct-t"><b>${esc(r.title||d.t||'Задание')}</b><small>${done?`Сделано · ${res.k} из ${res.n}`:`Новое · ${ago(Date.parse(r.created))}`}</small></span>
+      ${done?`<span class="ct-score num">${Math.round(res.k/res.n*100)}%</span>`:'<span class="btn primary small">Решать</span>'}</button>`};
+  const fresh=CAB.items.filter(r=>r.status!=='done'),done=CAB.items.filter(r=>r.status==='done');
+  app.innerHTML=`<div class="cab">
+    <div class="cab-head"><div><h1>Привет, ${esc(me.name||'')}!</h1>${me.tutorName?`<p>Твой репетитор: ${esc(me.tutorName)}</p>`:''}</div>
+      <button class="btn link" id="cout">Выйти</button></div>
+    ${CAB.err?`<p class="auth-err">${esc(CAB.err)}</p>`:''}
+    <h2 class="cab-h">${fresh.length?'Новые задания':'Новых заданий нет'}</h2>
+    ${fresh.length?`<div class="ctasks">${fresh.map(card).join('')}</div>`:'<p class="hint">Когда репетитор пришлёт задание, оно появится здесь.</p>'}
+    ${done.length?`<h2 class="cab-h">Сделано</h2><div class="ctasks">${done.map(card).join('')}</div>`:''}
+  </div>`;
+  app.querySelectorAll('.ctask[data-id]:not(.done)').forEach(b=>b.onclick=()=>startCab(CAB.items.find(r=>r.id===b.dataset.id)));
+  document.getElementById('cout').onclick=()=>{pbS.authStore.clear();CAB.items=null;V={screen:'cablogin'};render()};
+}
+function startCab(r){const d=r.payload;
+  P={h:{code:d.c,level:0},t:{t:d.t,grade:d.g,sheet:d.mix},name:d.n,remote:true,cab:r.id,items:generate(d.p,d.s),i:0,input:'',correct:0,streak:0,score:0,mistakes:[],log:[],start:Date.now(),fb:null,lock:false};
+  V={screen:'player'};render();window.scrollTo({top:0});
+}
+/* результат уходит репетитору; без связи — ждёт в браузере и уходит при следующем входе */
+const CAB_PENDING='kletka-cab-pending';
+async function sendCab(id,res){
+  try{await pbS.collection('assignments').update(id,{status:'done',result:res});return true}
+  catch(e){try{const q=JSON.parse(localStorage.getItem(CAB_PENDING)||'[]');q.push({id,res});localStorage.setItem(CAB_PENDING,JSON.stringify(q))}catch(x){}return false}
+}
+async function flushCab(){let q=[];try{q=JSON.parse(localStorage.getItem(CAB_PENDING)||'[]')}catch(e){}
+  if(!q.length)return;localStorage.removeItem(CAB_PENDING);for(const x of q)await sendCab(x.id,x.res)}
+
 /* ---------- экраны ---------- */
 const app=document.getElementById('app');
 /* каждый экран — отдельный шаг в истории браузера: «Назад» возвращает на прошлый экран, а не уводит с сайта */
@@ -2183,8 +2476,22 @@ window.addEventListener('popstate',e=>{if(STUDENT_MODE||!e.state||!e.state.V)ret
   if(V.topicId&&!TOPICS[V.topicId]&&['topic','print'].includes(V.screen))V={...V,screen:'student'};
   render();popping=false});
 
+function acctHTML(){
+  if(CABINET||['auth','cablogin','cab','player','done','badlink'].includes(V.screen))return'';
+  if(ACC.user)return `<span class="sync" id="syncSt" data-s="${ACC.sync}">${SYNC_TXT[ACC.sync]}</span>
+    <div class="more"><button class="acct-btn" id="acctBtn" aria-expanded="${V.acctMenu?'true':'false'}">${esc(ACC.user.name||ACC.user.email||'Аккаунт')}</button>
+    ${V.acctMenu?`<div class="more-pop"><p class="pop-mail">${esc(ACC.user.email||'')}</p><button class="edit" id="logout">Выйти</button></div>`:''}</div>`;
+  if(ACC.demo)return `<span class="demo-tag">Демо</span><button class="btn small primary" id="toSignup">Зарегистрироваться</button>`;
+  return'';
+}
+function bindAcct(){const $=id=>document.getElementById(id);
+  if($('acctBtn'))$('acctBtn').onclick=()=>{V.acctMenu=!V.acctMenu;crumbs()};
+  if($('logout'))$('logout').onclick=logout;
+  if($('toSignup'))$('toSignup').onclick=()=>go({screen:'auth',authMode:'signup'});
+}
 function crumbs(){
   const c=document.getElementById('crumbs');const parts=[];
+  if(CABINET||['auth','cablogin','cab'].includes(V.screen)){c.innerHTML='';document.getElementById('steps').innerHTML='';return}
   const st=V.studentId&&student(V.studentId);
   if(V.screen==='students'){parts.push('<span class="cur">Ученики</span>')}
   else{parts.push('<button data-go="students">Ученики</button>')}
@@ -2198,16 +2505,18 @@ function crumbs(){
   if(['player','done'].includes(V.screen)){parts.length=0;parts.push('<span class="cur">Экран ученика</span>')}
   c.innerHTML=parts.join(' ');
   c.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>go({screen:b.dataset.go}));
-  const steps=document.getElementById('steps');steps.innerHTML='';return;
+  const steps=document.getElementById('steps');steps.innerHTML=acctHTML();bindAcct();return;
   const n={students:0,student:1,topic:2,print:3}[V.screen];
   if(n===undefined){steps.innerHTML='';return}
   steps.innerHTML=['Ученик','Тема','Печать или ссылка'].map((s,i)=>`<span class="${i<n?'done':i===n?'on':''}">${i+1}. ${s}</span>`).join('');
 }
 
 function render(){
+  document.body.classList.toggle('authbg',['auth','cablogin'].includes(V.screen));
   crumbs();
+  if(ACC.user)syncResults();
   requestAnimationFrame(()=>snapCells(app));
-  ({students:viewStudents,student:viewStudent,topic:viewTopic,print:viewPrint,player:viewPlayer,done:viewDone,builder:viewBuilder,works:viewWorks,work:viewWork,gallery:viewGallery,
+  ({auth:viewAuth,cablogin:viewCabLogin,cab:viewCab,students:viewStudents,student:viewStudent,topic:viewTopic,print:viewPrint,player:viewPlayer,done:viewDone,builder:viewBuilder,works:viewWorks,work:viewWork,gallery:viewGallery,
     badlink:()=>{app.innerHTML='<div class="player"><div class="panel finish"><h1 style="font-size:22px">Ссылка не открывается</h1><p style="margin:0">Похоже, она скопирована не целиком. Попроси репетитора прислать её ещё раз.</p></div></div>'}})[V.screen]();
 }
 
@@ -2225,12 +2534,17 @@ function viewStudents(){
       <div class="st-top"><div><h3>${esc(s.name)}</h3><div class="grade">${gradeWord(s.grade)}</div></div>${hw?`<span class="wait-chip">ждём ${hw}</span>`:''}</div>
       <div class="st-now"><span class="t">${cur?esc(cur.t):'Тема не выбрана'}</span>${m.pct!=null?`<span class="pct num">${m.pct}%</span>`:''}</div>
     </button>`}).join('');
+  /* в новом аккаунте можно забрать учеников, которые были в этом браузере до регистрации */
+  let old=null;if(ACC.user&&!S.students.length){try{old=prepState(JSON.parse(localStorage.getItem(KEY)))}catch(e){}if(old&&!old.students.length)old=null}
   app.innerHTML=`<div class="head"><div><h1>Ученики</h1></div></div>
+    ${!S.students.length?`<div class="empty-first"><h2>Добавьте первого ученика</h2><p>Имя, фамилия и класс — «Клетка» выстроит темы по программе и создаст ученику вход в кабинет.</p>
+      ${old?`<button class="btn" id="imp">Перенести учеников из этого браузера (${old.students.length})</button>`:''}</div>`:''}
     <div class="students">${cards}<button class="add-card" id="add">+ Добавить ученика</button></div>
-    <div class="foot"><span>Прототип. Данные хранятся только в этом браузере.</span><button id="reset">Вернуть демо-данные</button></div>`;
+    ${ACC.demo?'<div class="foot"><span>Демо. Данные хранятся только в этом браузере.</span><button id="reset">Вернуть демо-данные</button></div>':''}`;
   app.querySelectorAll('.st').forEach(b=>b.onclick=()=>go({screen:'student',studentId:b.dataset.id,subject:'math',confirmStDel:false}));
   document.getElementById('add').onclick=addStudentModal;
-  document.getElementById('reset').onclick=()=>{S=demoState();TOPICS=allTopics();save();render()};
+  if(document.getElementById('reset'))document.getElementById('reset').onclick=()=>{setState(demoState());save();render()};
+  if(document.getElementById('imp'))document.getElementById('imp').onclick=()=>{for(const st of old.students)delete st.acc;setState(old);save();render()};
 }
 
 /* порядок тем: по математике встроенная программа 1–4 класса, свои темы встают в конец своего класса;
@@ -2253,6 +2567,7 @@ function makeReview(st,subj='math'){
   rv.forStudent=st.id;S.customTopics.push(rv);TOPICS=allTopics();save();openTopic(rv.id);
 }
 function deleteStudent(st){
+  if(ACC.user&&st.acc&&st.acc.id)pbT.collection('students').delete(st.acc.id).catch(()=>{});
   S.students=S.students.filter(s=>s.id!==st.id);
   S.attempts=S.attempts.filter(a=>a.studentId!==st.id);
   S.assignments=S.assignments.filter(a=>a.studentId!==st.id);
@@ -2321,7 +2636,7 @@ function viewStudent(){
   const canRev=pos.i>0;
   app.innerHTML=`<div class="sthead"><div class="sth-t"><h1>${esc(st.name)}</h1><span>${gradeWord(st.grade)}</span>${nWait?`<button class="wait-chip red" id="works2">ждём выполнения ${nWait} ${plural(nWait,['домашки','домашек','домашек'])}</button>`:''}</div>
       <div class="more"><button class="more-btn" id="more" aria-label="Ещё действия" aria-expanded="${V.menu?'true':'false'}">⋯</button>
-        ${V.menu?`<div class="more-pop"><button class="edit" id="works">Работы и домашки${nDone?` · ${nDone}`:''}</button><button class="edit" id="newt">+ Своя тема</button><button class="edit" id="edst">Редактировать</button><button class="${V.confirmStDel?'danger':''}" id="delst">${V.confirmStDel?'Нажмите ещё раз: ученик и все его работы удалятся':'Удалить ученика'}</button></div>`:''}</div></div>
+        ${V.menu?`<div class="more-pop"><button class="edit" id="works">Работы и домашки${nDone?` · ${nDone}`:''}</button>${ACC.demo?'':'<button class="edit" id="stacc">Доступ для ученика</button>'}<button class="edit" id="newt">+ Своя тема</button><button class="edit" id="edst">Редактировать</button><button class="${V.confirmStDel?'danger':''}" id="delst">${V.confirmStDel?'Нажмите ещё раз: ученик и все его работы удалятся':'Удалить ученика'}</button></div>`:''}</div></div>
     <div class="panel">${st.subjects.length>1?`<div class="tabs">${tabs}</div>`:''}${body}</div>`;
   app.querySelectorAll('.tab').forEach(b=>b.onclick=()=>go({subject:b.dataset.s,confirmStDel:false}));
   app.querySelectorAll('.topic[data-t],.rl[data-t]').forEach(b=>b.onclick=()=>openTopic(b.dataset.t));
@@ -2334,6 +2649,7 @@ function viewStudent(){
   $('qbtn').onclick=()=>{V.qOpen=!V.qOpen;if(!V.qOpen)V.q='';render();if(V.qOpen&&$('tq'))$('tq').focus()};
   const tq=$('tq');if(tq){tq.oninput=()=>{V.q=tq.value;showSearch(st,subj)}}showSearch(st,subj);
   if($('newt'))$('newt').onclick=()=>{V.menu=false;openBuilder()};
+  if($('stacc'))$('stacc').onclick=()=>{V.menu=false;render();accessModal(st,false)};
   $('more').onclick=()=>{V.menu=!V.menu;V.confirmStDel=false;render()};
   if($('edst'))$('edst').onclick=()=>{V.menu=false;render();editStudentModal(st)};
   if($('delst'))$('delst').onclick=()=>{if(!V.confirmStDel){V.confirmStDel=true;render();return}V.menu=false;deleteStudent(st)};
@@ -2716,8 +3032,9 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&mroot.innerHTML)clo
 const SITE='https://kurkinsavvyn-boop.github.io/kletka-tutor/';
 const b64e=o=>{const b=new TextEncoder().encode(JSON.stringify(o));let x='';b.forEach(c=>x+=String.fromCharCode(c));return btoa(x).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')};
 const b64d=str=>{const t=str.replace(/-/g,'+').replace(/_/g,'/');const bin=atob(t);return JSON.parse(new TextDecoder().decode(Uint8Array.from(bin,c=>c.charCodeAt(0))))};
-function hwLink(h){const t=TOPICS[h.topicId];
-  return SITE+'app/#hw='+b64e({v:1,c:h.code,n:student(h.studentId).name,t:t.t,g:t.grade,mix:!!(t.review||t.sheet),p:{...t.L[h.level].p,...(h.over||{})},s:h.seed})}
+function hwPayload(h){const t=TOPICS[h.topicId];
+  return{v:1,c:h.code,n:student(h.studentId).name,t:t.t,g:t.grade,mix:!!(t.review||t.sheet),p:{...t.L[h.level].p,...(h.over||{})},s:h.seed}}
+function hwLink(h){return SITE+'app/#hw='+b64e(hwPayload(h))}
 /* результат записывается одинаково и с экрана ученика в этом браузере, и из кода результата */
 function recordResult(h,r){
   const t=TOPICS[h.topicId];const base={studentId:h.studentId,time:r.time,date:Date.now()};const id='a'+Date.now();
@@ -2749,17 +3066,34 @@ function linkModal(){
   const code=translit(st.name.split(' ')[0]).toUpperCase().slice(0,6)+'-'+V.seed;
   let h=S.assignments.find(a=>a.code===code);
   if(!h){h={code,studentId:st.id,topicId:t.id,level:V.level,seed:V.seed,over:V.over,date:Date.now(),status:'выдано'};S.assignments.unshift(h);save()}
+  if(ACC.user)return sendToCabinet(st,h);
+  linkFallback(st,h,'');
+}
+/* в аккаунте домашка уходит прямо в кабинет ученика */
+async function sendToCabinet(st,h){
+  modal(`<h2>Отправляем задание…</h2><p class="hint" style="margin:0">${esc(st.name)}</p>`);
+  try{
+    const acc=await ensureAccount(st);
+    if(!h.rid){const r=await pbT.collection('assignments').create({tutor:ACC.user.id,student:acc.id,code:h.code,title:TOPICS[h.topicId].t,payload:hwPayload(h),status:'issued'});h.rid=r.id;save()}
+  }catch(e){return linkFallback(st,h,'Нет связи с сервером, поэтому задание не ушло в кабинет. Можно отправить его ссылкой.')}
+  modal(`<h2>Задание в кабинете</h2>
+    <p style="margin:0">${esc(firstName(st))} увидит его в разделе «Мои задания». Когда ученик решит, результат появится здесь сам.</p>
+    <div class="modal-actions"><button class="btn quiet" id="acc">Доступ ученика</button><button class="btn quiet" id="cl">Готово</button><button class="btn primary" id="as">Решить здесь как ученик</button></div>`,()=>{
+    document.getElementById('cl').onclick=close;
+    document.getElementById('acc').onclick=()=>accessModal(st,false);
+    document.getElementById('as').onclick=()=>{close();startPlayer(h)};
+  });
+}
+function linkFallback(st,h,note){
   const url=hwLink(h);
-  modal(`<h2>Домашка ${esc(code)}</h2>
-    <p style="margin:0;color:var(--ink-2)">Отправьте ссылку ученику: ${esc(st.name)} откроет её на телефоне или компьютере, регистрация не нужна.</p>
+  modal(`<h2>Домашка ${esc(h.code)}</h2>
+    <p style="margin:0;color:var(--ink-2)">${note?esc(note):`Отправьте ссылку ученику: ${esc(st.name)} откроет её на телефоне или компьютере.`}</p>
     <div class="linkbox"><input id="lnk" type="text" readonly value="${url}"><button class="btn small" id="cp">Скопировать</button></div>
-    <p class="hint" style="margin:0">После решения ученик получит код результата. Попросите прислать его вам и вставьте в карточке ученика: «Внести результат». В рабочей версии результат будет приходить сам.</p>
-    <div class="modal-actions"><a class="btn quiet" href="${url}" target="_blank" rel="noopener">Открыть ссылку</a><button class="btn quiet" id="cl">Готово</button><button class="btn primary" id="as">Решить здесь как ученик</button></div>`,()=>{
+    <p class="hint" style="margin:0">После решения ученик получит код результата. Попросите прислать его и вставьте в карточке ученика: «Внести результат».${ACC.demo?' В аккаунте задания уходят прямо в кабинет ученика, а результат приходит сам.':''}</p>
+    <div class="modal-actions"><button class="btn quiet" id="cl">Готово</button><button class="btn primary" id="as">Решить здесь как ученик</button></div>`,()=>{
     document.getElementById('cl').onclick=close;
     document.getElementById('as').onclick=()=>{close();startPlayer(h)};
-    const cp=document.getElementById('cp');cp.onclick=()=>{const i=document.getElementById('lnk');
-      const ok=()=>{cp.textContent='Скопировано'};
-      if(navigator.clipboard)navigator.clipboard.writeText(i.value).then(ok,()=>{i.select()});else i.select()};
+    const cp=document.getElementById('cp');cp.onclick=()=>copyText(document.getElementById('lnk'),cp,'Скопировано');
   });
 }
 
@@ -2779,7 +3113,8 @@ function editStudentModal(st){
       const subjects=[...document.querySelectorAll('[data-subj]')].filter(c=>c.checked).map(c=>c.dataset.subj);
       if(!name){document.getElementById('eerr').textContent='Введите имя ученика.';return}
       if(!subjects.length){document.getElementById('eerr').textContent='Оставьте хотя бы один предмет.';return}
-      st.name=name;st.grade=grade;st.subjects=subjects;save();close();
+      st.name=name;st.first=name.split(/\s+/)[0];st.last=name.split(/\s+/).slice(1).join(' ');st.grade=grade;st.subjects=subjects;save();close();
+      if(ACC.user&&st.acc&&st.acc.id)pbT.collection('students').update(st.acc.id,{name:st.first,surname:st.last,grade}).catch(()=>{});
       go({screen:'student',studentId:st.id,subject:subjects.includes(V.subject)?V.subject:subjects[0]});
     };
   });
@@ -2787,7 +3122,8 @@ function editStudentModal(st){
 function addStudentModal(){
   let grade=2;const subj=new Set(['math']);
   modal(`<h2>Новый ученик</h2>
-    <div class="field"><label for="nm" class="label">Имя и фамилия</label><input id="nm" type="text" placeholder="Например, Соня Петрова" autocomplete="off"></div>
+    <div class="two"><div class="field"><label for="nm" class="label">Имя</label><input id="nm" type="text" placeholder="Соня" autocomplete="off"></div>
+      <div class="field"><label for="nm2" class="label">Фамилия</label><input id="nm2" type="text" placeholder="Петрова" autocomplete="off"></div></div>
     <div class="field"><span class="label">Класс в школе</span><div class="seg" id="gr">${[1,2,3,4].map(g=>`<button data-g="${g}" class="${g===grade?'on':''}">${g}</button>`).join('')}</div></div>
     <div class="field"><label class="label" for="st-start">С какой темы начать математику</label><select id="st-start"></select>
       <span class="hint">Если ученик сильнее программы, выберите тему старшего класса. Маршрут пойдёт от неё.</span></div>
@@ -2808,15 +3144,16 @@ function addStudentModal(){
     document.querySelectorAll('#gr button').forEach(b=>b.onclick=()=>{grade=+b.dataset.g;document.querySelectorAll('#gr button').forEach(x=>x.classList.toggle('on',x===b));fillStart()});
     document.getElementById('cl').onclick=close;
     document.getElementById('ok').onclick=()=>{
-      const name=document.getElementById('nm').value.trim();
+      const first=document.getElementById('nm').value.trim(),last=document.getElementById('nm2').value.trim(),name=(first+' '+last).trim();
       const subjects=[document.getElementById('sm').checked&&'math',document.getElementById('sr').checked&&'rus'].filter(Boolean);
-      if(!name){document.getElementById('err').textContent='Введите имя ученика.';return}
+      if(!first){document.getElementById('err').textContent='Введите имя ученика.';return}
       if(!subjects.length){document.getElementById('err').textContent='Отметьте хотя бы один предмет.';return}
       const id='s'+Date.now();
-      const ns={id,name,grade,subjects,current:document.getElementById('st-start').value};
+      const ns={id,name,first,last,grade,subjects,current:document.getElementById('st-start').value};
       if(subjects.includes('rus')&&trackIds('rus').length)ns.currentRus=document.getElementById('st-start-rus').value;
       S.students.push(ns);save();close();
       go({screen:'student',studentId:id,subject:subjects[0]});
+      if(ACC.user)accessModal(ns,true);
     };
   });
 }
@@ -2897,13 +3234,21 @@ function submit(){
 function finish(){
   if(!P)return;
   const r={correct:P.correct,total:P.items.length,answered:P.i,time:Math.round((Date.now()-P.start)/1000),log:P.log,mistakes:P.mistakes};
-  if(P.remote){P.rcode='KL-'+b64e({v:1,c:P.h.code,k:r.correct,n:r.total,a:r.answered,tm:r.time,l:r.log,m:r.mistakes.slice(0,30)})}
+  if(P.cab){P.sent=null;sendCab(P.cab,{k:r.correct,n:r.total,a:r.answered,tm:r.time,l:r.log,m:r.mistakes.slice(0,30)}).then(ok=>{P.sent=ok;if(V.screen==='done')render()})}
+  else if(P.remote){P.rcode='KL-'+b64e({v:1,c:P.h.code,k:r.correct,n:r.total,a:r.answered,tm:r.time,l:r.log,m:r.mistakes.slice(0,30)})}
   else{const h=S.assignments.find(x=>x.code===P.h.code);if(h)recordResult(h,r)}
   P.result=r;go({screen:'done'});
 }
 function viewDone(){
   const a=P.result;const pct=Math.round(a.correct/a.total*100);
   const word=pct>=85?'Отлично!':pct>=60?'Хорошо, есть над чем поработать':'Давай потренируемся ещё';
+  if(P.cab){
+    app.innerHTML=`<div class="player"><div class="panel finish"><span class="label">${esc(P.t.t)}</span><div class="big num">${a.correct} из ${a.total}</div>
+      <p style="margin:0;font-size:18px;font-weight:600">${word}</p>
+      <span class="sent">${P.sent===null?'Отправляем результат…':P.sent?'✓ Результат отправлен репетитору':'Нет связи: результат отправится сам, когда появится интернет'}</span>
+      <p class="hint" style="margin:0">Время: ${Math.floor(a.time/60)} мин ${a.time%60} с. Очки: ${P.score}.</p></div>
+      <button class="btn primary" id="tocab">К моим заданиям</button></div>`;
+    document.getElementById('tocab').onclick=()=>{P=null;CAB.items=null;V={screen:'cab'};render();loadCab()};return}
   app.innerHTML=`<div class="player">${P.remote?'':'<div class="demo-bar">Экран ученика</div>'}
     <div class="panel finish"><span class="label">${esc(P.t.t)}</span><div class="big num">${a.correct} из ${a.total}</div>
       <p style="margin:0;font-size:18px;font-weight:600">${word}</p>${P.remote?'':'<span class="sent">✓ Результат записан в карточку ученика</span>'}
@@ -2929,9 +3274,20 @@ let STUDENT_MODE=false;
     P={h:{code:d.c,level:0},t:{t:d.t,grade:d.g,sheet:d.mix},name:d.n,remote:true,items:generate(d.p,d.s),i:0,input:'',correct:0,streak:0,score:0,mistakes:[],log:[],start:Date.now(),fb:null,lock:false};
     V={screen:'player'};document.title=d.t+' · Клетка'}
   catch(e){V={screen:'badlink'}}}}
-document.getElementById('home').onclick=()=>{if(!STUDENT_MODE)go({screen:'students'})};
-render();
-if(!STUDENT_MODE)try{history.replaceState({V:JSON.parse(JSON.stringify(V))},'')}catch(e){}
+document.getElementById('home').onclick=()=>{if(!STUDENT_MODE&&(ACC.user||ACC.demo))go({screen:'students'})};
+if(CABINET){
+  STUDENT_MODE=true;document.body.classList.add('cabinet');document.title='Мои задания';
+  if(pbS&&pbS.authStore.isValid&&pbS.authStore.record&&pbS.authStore.record.collectionName==='students'){V={screen:'cab'};render();loadCab()}
+  else{V={screen:'cablogin'};render()}
+}else if(!STUDENT_MODE){
+  const hash=location.hash;
+  if(hash==='#student')location.replace('../u/');
+  if(pbT&&pbT.authStore.isValid&&pbT.authStore.record&&pbT.authStore.record.collectionName==='users'){
+    startTutor();pbT.collection('users').authRefresh().then(()=>{ACC.user=pbT.authStore.record;crumbs()}).catch(e=>{if(e&&e.status===401)logout()});
+  }else if(sessionStorage.getItem('kletka-demo')&&hash!=='#signup'&&hash!=='#login')startDemo();
+  else{V={screen:'auth',authMode:hash==='#signup'?'signup':'login'};render()}
+  try{history.replaceState({V:JSON.parse(JSON.stringify(V))},'')}catch(e){}
+}else render();
 </script>
 
 </html>

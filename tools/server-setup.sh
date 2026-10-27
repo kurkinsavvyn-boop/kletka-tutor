@@ -4,7 +4,7 @@
 # Запуск на сервере от root:  sh server-setup.sh api.example.ru
 set -eu
 DOMAIN="${1:?укажите домен API, например kurkinsavvyn.fvds.ru}"
-PB_VERSION="${PB_VERSION:-0.30.0}"
+PB_VERSION="${PB_VERSION:-0.40.5}"
 
 echo "== обновления"
 export DEBIAN_FRONTEND=noninteractive
