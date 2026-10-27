@@ -2178,20 +2178,21 @@ function sheetParts(items,{topic,level,seed,studentName,answers,design}){
     }
     const n=items.length,img=D.img;
     const blocks=[];
-    if(img&&big){
-      /* большой лист: по картинке в начале каждой следующей страницы A4 (примерно; остальное добирает печать) */
-      const CAP1=D.lv===1?37:24,CAP=38,heroH=headPiece?Math.round(Math.max(8,(D.img.arTop?1:1)*13))+1:0;
-      const posY=i=>heroH+startY[i]-startY[M];
-      const order=D.lv===1?[[img.bot,img.arBot,false,say],[img.char,img.arBot,true],[img.top,img.arTop,true]]:[[img.char,img.arBot,true],[img.bot,img.arBot,false,say],[img.top,img.arTop,true]];
-      let lo=M;
-      for(let pg=1,b=CAP1;pg<12;pg++,b+=CAP){
-        if(posY(n)<=b+6)break;
-        let hi=lo;while(hi<n&&posY(hi)<b+9)hi++;
-        const [src,ar,left,extra]=order[(pg-1)%order.length];
-        const blk=sideBlock(lo,hi,src,ar||1,left,extra);if(blk){blocks.push({t:blk.t,hi,html:blk.html});lo=hi}}
+    /* «Сказка»: на уроке и проверочной три картинки — в начале, в середине (справа) и в конце (слева);
+       на обычном листе — вторая в конце. «Яркий»: картинка в шапке, на большом листе ещё одна в конце */
+    if(img&&D.lv===1&&big){
+      const end=sideBlock(M,n,img.char,img.arBot||1,true),tEnd=end?end.t:n;
+      const midAt=Math.max(M+1,Math.round((M+tEnd)/2));
+      const mid=midAt<tEnd?sideBlock(M,midAt,img.bot,img.arBot||1,false,say):null;
+      blocks.push(mid?{t:mid.t,hi:midAt,html:mid.html}:{t:midAt,hi:midAt,html:alone(img.bot,say)});
+      blocks.push(end?{t:end.t,hi:n,html:end.html}:{t:n,hi:n,html:alone(img.char)});
     }else if(img&&D.lv===1){
       const blk=sideBlock(M,n,img.bot,img.arBot||1,false,say);
-      blocks.push(blk?{t:blk.t,hi:n,html:blk.html}:{t:n,hi:n,html:alone(img.bot,say)})}
+      blocks.push(blk?{t:blk.t,hi:n,html:blk.html}:{t:n,hi:n,html:alone(img.bot,say)});
+    }else if(img&&D.lv===2&&big){
+      const blk=sideBlock(0,n,img.top,img.arTop||1,true);
+      blocks.push(blk?{t:blk.t,hi:n,html:blk.html}:{t:n,hi:n,html:alone(img.top)});
+    }
     if(heroIn||blocks.length){
       const out=headPiece?[headPiece]:[];let at=M;
       for(const b of blocks){out.push(...pieces.slice(at,b.t),b.html);at=b.hi}
