@@ -3,6 +3,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Клетка для репетитора</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1F2C55">
+<link rel="apple-touch-icon" id="ati" href="../icons/app-180.png">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=Unbounded:wght@600;700&display=swap">
@@ -3276,7 +3279,8 @@ let STUDENT_MODE=false;
   catch(e){V={screen:'badlink'}}}}
 document.getElementById('home').onclick=()=>{if(!STUDENT_MODE&&(ACC.user||ACC.demo))go({screen:'students'})};
 if(CABINET){
-  STUDENT_MODE=true;document.body.classList.add('cabinet');document.title='Мои задания';
+  STUDENT_MODE=true;document.body.classList.add('cabinet');document.title='Мои задания';document.getElementById('ati').href='../icons/u-180.png';
+  addEventListener('focus',()=>{if(V.screen==='cab'&&pbS.authStore.isValid)loadCab()});
   if(pbS&&pbS.authStore.isValid&&pbS.authStore.record&&pbS.authStore.record.collectionName==='students'){V={screen:'cab'};render();loadCab()}
   else{V={screen:'cablogin'};render()}
 }else if(!STUDENT_MODE){

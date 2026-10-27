@@ -1,0 +1,1 @@
+{"name": "Клетка", "short_name": "Клетка", "start_url": "./", "scope": "./", "display": "standalone", "background_color": "#F7F9FC", "theme_color": "#1F2C55", "lang": "ru", "icons": [{"src": "../icons/app-192.png", "sizes": "192x192", "type": "image/png"}, {"src": "../icons/app-512.png", "sizes": "512x512", "type": "image/png"}]}
