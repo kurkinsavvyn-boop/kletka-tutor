@@ -749,6 +749,195 @@ body.cabinet .top{display:none}
 .ct-score{font-weight:800;font-size:18px;color:var(--ok)}
 .ctask .btn{pointer-events:none}
 @media (max-width:520px){.auth-card{padding:36px 20px 26px 40px}.auth-card::before{left:20px}.oauth{grid-template-columns:1fr}.two{grid-template-columns:1fr}}
+
+/* ---------- меню разделов ---------- */
+.sidenav{display:none}
+body.shell .sidenav{display:flex;flex-direction:column;gap:18px;position:fixed;z-index:6;left:0;top:0;bottom:0;width:216px;background:var(--card);border-right:1px solid var(--line);
+  padding:calc(14px + env(safe-area-inset-top,0px)) 12px 16px max(12px,env(safe-area-inset-left,0px))}
+body.shell{padding-left:216px}
+body.shell .top .logo{display:none}
+.side-logo{display:flex;align-items:center;gap:9px;font-family:var(--f-disp);font-weight:700;font-size:18px;background:none;border:0;padding:6px 10px;color:var(--ink)}
+.side-logo i{width:18px;height:18px;border:2px solid var(--ink);display:grid;grid-template:1fr 1fr/1fr 1fr;border-radius:3px;overflow:hidden}
+.side-logo i b{border-right:1px solid var(--ink);border-bottom:1px solid var(--ink)}
+.side-logo i b:nth-child(4){background:var(--pen)}
+.nav{display:flex;flex-direction:column;gap:2px;flex:1}
+.nav button{display:flex;align-items:center;gap:12px;border:0;background:none;border-radius:10px;padding:10px 12px;font-weight:600;color:var(--ink-2);text-align:left;position:relative}
+.nav button:hover{background:var(--ink-soft);color:var(--ink)}
+.nav button.on{background:var(--ink);color:var(--card)}
+.nav button[data-s="profile"]{margin-top:auto}
+.nav em{margin-left:auto;font-style:normal;font-size:12px;font-weight:700;background:var(--pen);color:#fff;border-radius:99px;min-width:20px;height:20px;display:grid;place-items:center;padding:0 6px}
+@media (max-width:760px){
+  body.shell{padding-left:0;padding-bottom:calc(66px + env(safe-area-inset-bottom,0px))}
+  body.shell .top .logo{display:flex}
+  body.shell .sidenav{top:auto;right:0;width:auto;flex-direction:row;padding:4px 4px calc(4px + env(safe-area-inset-bottom,0px));border-right:0;border-top:1px solid var(--line)}
+  .side-logo{display:none!important}
+  .nav{flex-direction:row;gap:0}
+  .nav button{flex:1;flex-direction:column;gap:2px;padding:6px 0;font-size:10px;letter-spacing:-.02em;font-weight:600;min-width:0;justify-content:center;text-align:center}
+  .frow .chip{display:none}
+  body.sec .crumbs{display:none}
+
+  .nav button span{overflow:hidden;text-overflow:ellipsis;max-width:100%;white-space:nowrap}
+  .nav button.on{background:none;color:var(--pen)}
+  .nav button[data-s="profile"]{margin-top:0}
+  .nav em{position:absolute;top:2px;left:calc(50% + 6px);margin:0;min-width:16px;height:16px;font-size:10px;padding:0 4px}
+}
+@media print{.sidenav,.top,.toast{display:none!important}body.shell{padding:0}}
+.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:30;background:var(--ink);color:var(--card);font-weight:600;
+  padding:10px 18px;border-radius:12px;box-shadow:0 8px 24px rgba(20,30,60,.25);transition:opacity .4s;max-width:calc(100% - 32px);text-align:center}
+.toast.out{opacity:0}
+@media (min-width:761px){.toast{bottom:28px}}
+
+/* общие кусочки разделов */
+.ph{font-family:var(--f-disp);font-size:16px;font-weight:600;display:flex;align-items:center;gap:8px;margin:0 0 10px}
+.ph span{font-family:var(--f-ui);font-size:13px;font-weight:700;color:var(--card);background:var(--ink);border-radius:99px;padding:0 8px;line-height:20px}
+.ph span:empty{display:none}
+.sub-h{font-size:13px;font-weight:600;color:var(--ink-3);text-transform:uppercase;letter-spacing:.06em;margin:14px 0 6px}
+.field input[type=number],.field input[type=date],.field input[type=time],.field input[type=password],.field input[type=email],.field textarea,.mv input,.wslot select,.wslot input{
+  padding:10px 12px;border:1px solid var(--line);border-radius:9px;font:inherit;background:var(--card);color:var(--ink);min-width:0;max-width:100%}
+.field textarea{resize:vertical}
+.chk{display:flex;gap:9px;align-items:center}
+.ibtn{border:1px solid var(--line);background:var(--card);border-radius:8px;min-width:34px;height:34px;display:inline-grid;place-items:center;color:var(--ink-2);padding:0 8px;font-size:13px;font-weight:700}
+.ibtn:hover{border-color:var(--ink);color:var(--ink)}
+.ibtn.on{background:var(--bad);border-color:var(--bad);color:#fff}
+.ibtn svg{width:17px;height:17px}
+.btn.quiet.pen{color:var(--pen)}
+.big-empty{flex-direction:row;align-items:center;gap:22px;padding:26px}
+.big-empty>div{display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.e-art{width:120px;height:120px;object-fit:contain;flex:none}
+@media (max-width:560px){.big-empty{flex-direction:column;align-items:flex-start}.e-art{width:96px;height:96px}}
+
+/* Сегодня */
+.today{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:16px;align-items:start}
+.tcol{display:flex;flex-direction:column;gap:16px}
+.tpanel{padding:16px 18px;display:flex;flex-direction:column;gap:4px}
+.lrow{display:flex;align-items:center;gap:10px;border-radius:10px}
+.lrow-m{flex:1;min-width:0;display:flex;align-items:center;gap:14px;border:0;background:none;text-align:left;padding:10px 8px;border-radius:10px}
+.lrow-m:hover{background:var(--ink-soft)}
+.lr-time{font-family:var(--f-disp);font-weight:600;font-size:17px;min-width:56px}
+.lr-t{display:flex;flex-direction:column;min-width:0}
+.lr-t small{color:var(--ink-2);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lrow.done .lr-time{color:var(--ok)}
+.lrow.cancel{opacity:.55}.lrow.cancel b{text-decoration:line-through}
+.lrow.miss .lr-time{color:var(--warn)}
+.mini{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;column-gap:10px;row-gap:1px;border:0;background:none;text-align:left;padding:9px 8px;border-radius:10px;width:100%}
+.mini:not(.static):hover{background:var(--ink-soft)}
+.mini b{font-weight:600}
+.mini small{color:var(--ink-2);font-size:13px;grid-column:1;grid-row:2;min-width:0}
+@media (max-width:900px){.today{grid-template-columns:minmax(0,1fr)}}
+
+/* Расписание */
+.wnav{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.wr{font-weight:600;padding:0 6px;white-space:nowrap}
+.week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}
+.wday{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px;display:flex;flex-direction:column;gap:6px;min-height:180px}
+.wday h3{font-size:13px;font-weight:600;color:var(--ink-2);display:flex;gap:6px;align-items:baseline;padding:2px 4px 4px}
+.wday h3 b{font-family:var(--f-disp);font-size:17px;color:var(--ink)}
+.wday.today{border-color:var(--pen);box-shadow:inset 0 3px 0 var(--pen)}
+.wday.today h3 b{color:var(--pen)}
+.wday.past{background:color-mix(in srgb,var(--card) 70%,var(--paper))}
+.les{display:flex;flex-direction:column;align-items:flex-start;gap:0;border:0;border-left:3px solid var(--blue);background:var(--blue-soft);border-radius:8px;padding:6px 8px;text-align:left;min-width:0}
+.les span{font-weight:700;font-size:13px}
+.les b{font-weight:600;font-size:13.5px;line-height:1.25;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.les small{font-size:11.5px;color:var(--ink-2)}
+.les:hover{filter:brightness(.97)}
+.les.done{border-left-color:var(--ok);background:var(--ok-soft)}
+.les.miss{border-left-color:var(--warn);background:var(--warn-soft)}
+.les.cancel{border-left-color:var(--none);background:var(--ink-soft);opacity:.7}.les.cancel b{text-decoration:line-through}
+.wadd{margin-top:auto;border:1px dashed var(--line);background:none;border-radius:8px;color:var(--ink-3);font-size:18px;line-height:1;padding:6px;opacity:.6}
+.wadd:hover{opacity:1;border-color:var(--ink);color:var(--ink)}
+.les-when{margin:-6px 0 0;color:var(--ink-2)}
+.mv{display:flex;gap:8px;flex-wrap:wrap}
+.slots{display:flex;flex-direction:column;gap:8px}
+.slots:empty{display:none}
+.wslot{display:flex;gap:8px;align-items:center}
+.wslot select{flex:1}
+@media (max-width:900px){.week{grid-template-columns:minmax(0,1fr)}.wday{min-height:0;flex-direction:row;flex-wrap:wrap;align-items:center}
+  .wday h3{width:64px;padding:0}.les{flex-direction:row;gap:8px;align-items:baseline}.wadd{margin:0 0 0 auto;padding:4px 10px}}
+
+/* Финансы */
+.kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:16px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;display:flex;flex-direction:column;gap:2px}
+.kpi span{color:var(--ink-2);font-size:14px;font-weight:600}
+.kpi b{font-family:var(--f-disp);font-size:clamp(20px,2.6vw,26px);font-weight:600}
+.kpi small{color:var(--ink-3);font-size:13px}
+.kpi.bad b{color:var(--bad)}
+.fpanel{padding:16px 18px;margin-bottom:16px}
+.mbars{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;height:180px;align-items:end}
+.mbar{display:flex;flex-direction:column;align-items:stretch;justify-content:flex-end;height:100%;gap:4px;text-align:center}
+.mbar i{display:block;background:var(--ink-soft);border-radius:6px 6px 2px 2px;min-height:2px}
+.mbar.on i{background:var(--ink)}
+.bv{font-size:12px;font-weight:600;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bl{font-size:13px;color:var(--ink-2)}
+.mbar.on .bl{color:var(--ink);font-weight:700}
+.ftable{display:flex;flex-direction:column}
+.frw{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,.8fr) minmax(0,1.3fr) minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 4px;border-top:1px solid var(--line)}
+.frw.fh{border-top:0;color:var(--ink-3);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;padding-top:0}
+.frw .btn.link{padding:0;color:var(--ink);font-weight:600;text-align:left}
+.fact{display:flex;gap:6px;justify-content:flex-end}
+.pay{display:grid;grid-template-columns:90px minmax(0,1fr) minmax(0,1.2fr) auto auto;gap:10px;align-items:center;padding:9px 4px;border-top:1px solid var(--line)}
+.pay:first-of-type{border-top:0}
+.pay small{color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pay-a{font-weight:700;color:var(--ok)}
+@media (max-width:760px){.kpis{grid-template-columns:minmax(0,1fr);gap:8px}.kpi{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;column-gap:10px;padding:10px 14px}
+  .kpi b{font-size:19px;grid-column:2;grid-row:1/3}.kpi small{grid-column:1}
+  .mbars{gap:6px;height:150px}.bv{font-size:10px}
+  .frw{grid-template-columns:minmax(0,1fr) auto;row-gap:4px}.frw.fh{display:none}.frw>span:nth-child(2),.frw>span:nth-child(3){grid-column:1;font-size:13px;color:var(--ink-2)}
+  .frw>span:nth-child(4){grid-row:1;grid-column:2}.fact{grid-column:1/-1;justify-content:flex-start}
+  .pay{grid-template-columns:minmax(0,1fr) auto auto}.pay>span:first-child{grid-column:1/-1;font-size:13px;color:var(--ink-3)}.pay small{grid-column:1;grid-row:3}}
+
+/* Материалы */
+.tc{font-size:12px;color:var(--ink-3);font-weight:700;margin-left:2px}
+.fchips{display:flex;gap:6px;flex-wrap:wrap;padding:12px 16px 0}
+.fchips button{border:1px solid var(--line);background:var(--card);border-radius:99px;padding:5px 12px;font-size:14px;font-weight:600;color:var(--ink-2)}
+.fchips button.on{background:var(--ink);border-color:var(--ink);color:var(--card)}
+.mbody{padding:16px;display:flex;flex-direction:column;gap:12px}
+.mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.mcard{border:1px solid var(--line);border-radius:12px;display:flex;flex-direction:column;background:var(--card)}
+.mc-main{border:0;background:none;text-align:left;padding:14px 14px 8px;display:flex;flex-direction:column;gap:3px;border-radius:12px 12px 0 0}
+.mc-main:hover{background:var(--ink-soft)}
+.mc-k{font-size:12px;font-weight:700;color:var(--pen);text-transform:uppercase;letter-spacing:.05em}
+.mc-main small{color:var(--ink-2);font-size:13px}
+.mc-act{display:flex;gap:6px;align-items:center;justify-content:flex-end;padding:0 10px 10px}
+.mc-act .chip{margin-right:auto}
+.drop{display:flex;flex-direction:column;align-items:center;gap:4px;border:1.5px dashed var(--line);border-radius:12px;padding:20px;text-align:center;cursor:pointer;color:var(--ink-2)}
+.drop b{color:var(--ink);font-size:16px}
+.drop:hover,.drop.over{border-color:var(--ink);background:var(--ink-soft)}
+.drop input{position:absolute;width:1px;height:1px;opacity:0}
+.drop:focus-within{outline:2px solid var(--pen);outline-offset:2px}
+.flist{display:flex;flex-direction:column}
+.frow{display:flex;align-items:center;gap:8px;border-top:1px solid var(--line);padding:6px 0}
+.frow:first-child{border-top:0}
+.fr-main{flex:1;min-width:0;display:flex;align-items:center;gap:12px;border:0;background:none;text-align:left;padding:6px;border-radius:10px}
+.fr-main:hover{background:var(--ink-soft)}
+.fr-t{display:flex;flex-direction:column;min-width:0}
+.fr-t b{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fr-t small{color:var(--ink-2);font-size:13px}
+.fk{flex:none;width:42px;height:42px;border-radius:9px;display:grid;place-items:center;font-size:11px;font-weight:800;background:var(--ink-soft);color:var(--ink)}
+.fk-PDF{background:var(--pen-soft);color:var(--pen)}.fk-IMG{background:var(--ok-soft);color:var(--ok)}.fk-DOC{background:var(--blue-soft);color:var(--blue)}.fk-XLS{background:var(--ok-soft);color:var(--ok)}.fk-PPT{background:var(--warn-soft);color:var(--warn)}
+.picks{display:flex;flex-direction:column;gap:6px;max-height:50vh;overflow:auto}
+.pick{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1px solid var(--line);background:var(--card);border-radius:10px;padding:12px 14px;text-align:left}
+.pick:hover,.pick.on{border-color:var(--ink)}
+.pick small{color:var(--ink-2)}
+
+/* Профиль */
+.pgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+.ppanel{padding:18px;display:flex;flex-direction:column;gap:12px}
+.ppanel p{margin:0;color:var(--ink-2)}
+.pwf{display:flex;flex-direction:column;gap:12px}
+.pact{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.field input[type=text],.field input[type=number],.field input[type=password]{width:100%}
+@media (max-width:820px){.pgrid{grid-template-columns:minmax(0,1fr)}}
+
+/* карточка ученика: занятия и деньги */
+.sth-l{display:flex;flex-direction:column;gap:10px;min-width:0}
+.sth-meta{display:flex;gap:6px;flex-wrap:wrap}
+.mchip{border:0;background:rgba(255,255,255,.14);color:var(--card);font-size:13px;font-weight:600;padding:4px 10px;border-radius:99px;white-space:nowrap}
+button.mchip:hover{background:rgba(255,255,255,.24)}
+.mchip.bad{background:var(--pen);color:#fff}
+.mchip.ok{background:#2C9B5A;color:#fff}
+.st-notes{display:flex;flex-direction:column;gap:4px;margin:-6px 0 16px;padding:0 4px;color:var(--ink-2);font-size:14px}
+.st-notes p{margin:0}.st-notes b{color:var(--ink);font-weight:600;margin-right:6px}
+.st-foot2{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px;color:var(--ink-2)}
 </style>
 
 <header class="top"><div class="top-in">
@@ -756,6 +945,7 @@ body.cabinet .top{display:none}
   <nav class="crumbs" id="crumbs" aria-label="Где вы"></nav>
   <div class="acct" id="steps"></div>
 </div></header>
+<aside class="sidenav" id="sidenav"></aside>
 <main class="wrap" id="app" lang="ru"></main>
 <div id="modal-root"></div>
 
@@ -1909,7 +2099,15 @@ function exampleTopics(){return[
 
 /* ---------- состояние ---------- */
 const KEY='kletka-proto-v1';
-function demoState(){const d=demoState0();migrate(d);return d}
+function demoState(){const d=demoState0();migrate(d);const now=Date.now(),since=monday(now)-5*7*DAY;
+  /* в демо у учеников есть дни занятий, цены и оплаты, чтобы расписание и финансы были не пустыми */
+  const plan={s1:[[0,'16:00'],[3,'16:00']],s2:[[1,'17:30']],s3:[[2,'15:00'],[4,'15:00']],s4:[[5,'11:00']]},price={s1:1200,s2:1500,s3:1000,s4:1800};
+  for(const st of d.students){st.price=price[st.id];st.prices=[{from:0,p:st.price}];st.dur=60;st.slots=plan[st.id].map(([wd,t],i)=>({id:'w'+i,wd,t,since}))}
+  d.students[0].goal='Уверенно считать в столбик к концу четверти';d.students[0].contact='Мама: +7 900 000-00-00';
+  d.lessons=[];d.saved=[];d.profile={price:1200,dur:60};
+  d.payments=[['s1',9600,62,'Абонемент на 8 занятий'],['s3',8000,70,''],['s2',6000,50,''],['s1',9600,30,'Абонемент на 8 занятий'],['s3',6000,25,''],['s2',4500,20,''],['s4',3600,10,'']]
+    .map(([sid,amount,ago,note],i)=>({id:'p'+i,sid,amount,date:now-ago*DAY,note}));
+  return d}
 const ID_MAP4={'g4-column':'g4-addsub','g4-mul':'g4-mul1','g4-order':'g4-rep1000','g4-units':'g4-mass','g4-fig':'g4-area'};
 function migrate(st){if((st.v||1)>=3)return st;
   const maps=[];if((st.v||1)<2)maps.push(ID_MAP);maps.push(ID_MAP4);const m=id=>maps.reduce((x,mp)=>mp[x]||x,id);
@@ -1939,7 +2137,7 @@ function demoState0(){
 let S;
 /* старые версии данных приводятся к текущей; сюжет по умолчанию — «Любой», оформление — одно из четырёх */
 function prepState(s){if(!s||!Array.isArray(s.students))return null;
-  if(!s.customTopics)s.customTopics=exampleTopics();if(!s.attempts)s.attempts=[];if(!s.assignments)s.assignments=[];migrate(s);
+  if(!s.customTopics)s.customTopics=exampleTopics();if(!s.attempts)s.attempts=[];if(!s.assignments)s.assignments=[];for(const k of ['lessons','payments','saved'])if(!Array.isArray(s[k]))s[k]=[];if(!s.profile)s.profile={};migrate(s);
   if(s.designAny!==2){for(const st of s.students){const d=st.design||{};st.design={lv:+d.lv||2,theme:'random',bw:!!d.bw}}s.designAny=2}
   return s}
 const emptyState=()=>prepState({v:3,students:[],attempts:[],assignments:[],customTopics:exampleTopics()});
@@ -2274,7 +2472,7 @@ async function startTutor(){
   ACC.user=pbT.authStore.record;ACC.demo=false;ACC.wsId=null;sessionStorage.removeItem('kletka-demo');
   KEY_NOW='kletka-ws-'+ACC.user.id;
   setState(loadLocal(KEY_NOW,emptyState));
-  go({screen:'students',studentId:null,topicId:null,menu:false,acctMenu:false});
+  go({screen:'today',studentId:null,topicId:null,menu:false,acctMenu:false});
   try{
     const r=await pbT.collection('workspaces').getFirstListItem(pbT.filter('owner = {:id}',{id:ACC.user.id}));
     ACC.wsId=r.id;const srv=prepState(r.data);
@@ -2285,10 +2483,10 @@ async function startTutor(){
 }
 function startDemo(){
   ACC.user=null;ACC.demo=true;sessionStorage.setItem('kletka-demo','1');KEY_NOW=KEY;
-  setState(loadLocal(KEY,demoState));go({screen:'students',studentId:null,topicId:null});
+  setState(loadLocal(KEY,demoState));go({screen:'today',studentId:null,topicId:null});
 }
 function logout(){
-  if(pbT)pbT.authStore.clear();ACC.user=null;ACC.wsId=null;ACC.demo=false;sessionStorage.removeItem('kletka-demo');
+  if(pbT)pbT.authStore.clear();ACC.user=null;ACC.wsId=null;ACC.demo=false;FILES=null;sessionStorage.removeItem('kletka-demo');
   setState(emptyState());go({screen:'auth',authMode:'login',acctMenu:false});
 }
 /* при возвращении на вкладку забираем свежую среду (если правили с другого устройства) и сданные работы */
@@ -2484,18 +2682,21 @@ function acctHTML(){
   if(CABINET||['auth','cablogin','cab','player','done','badlink'].includes(V.screen))return'';
   if(ACC.user)return `<span class="sync" id="syncSt" data-s="${ACC.sync}">${SYNC_TXT[ACC.sync]}</span>
     <div class="more"><button class="acct-btn" id="acctBtn" aria-expanded="${V.acctMenu?'true':'false'}">${esc(ACC.user.name||ACC.user.email||'Аккаунт')}</button>
-    ${V.acctMenu?`<div class="more-pop"><p class="pop-mail">${esc(ACC.user.email||'')}</p><button class="edit" id="logout">Выйти</button></div>`:''}</div>`;
+    ${V.acctMenu?`<div class="more-pop"><p class="pop-mail">${esc(ACC.user.email||'')}</p><button class="edit" id="toProf">Профиль и пароль</button><button class="edit" id="logout">Выйти</button></div>`:''}</div>`;
   if(ACC.demo)return `<span class="demo-tag">Демо</span><button class="btn small primary" id="toSignup">Зарегистрироваться</button>`;
   return'';
 }
 function bindAcct(){const $=id=>document.getElementById(id);
   if($('acctBtn'))$('acctBtn').onclick=()=>{V.acctMenu=!V.acctMenu;crumbs()};
   if($('logout'))$('logout').onclick=logout;
+  if($('toProf'))$('toProf').onclick=()=>go({screen:'profile',acctMenu:false});
   if($('toSignup'))$('toSignup').onclick=()=>go({screen:'auth',authMode:'signup'});
 }
 function crumbs(){
   const c=document.getElementById('crumbs');const parts=[];
   if(CABINET||['auth','cablogin','cab'].includes(V.screen)){c.innerHTML='';document.getElementById('steps').innerHTML='';return}
+  const steps0=document.getElementById('steps');
+  if(SEC_T[V.screen]){c.innerHTML=`<span class="cur">${SEC_T[V.screen]}</span>`;steps0.innerHTML=acctHTML();bindAcct();return}
   const st=V.studentId&&student(V.studentId);
   if(V.screen==='students'){parts.push('<span class="cur">Ученики</span>')}
   else{parts.push('<button data-go="students">Ученики</button>')}
@@ -2517,10 +2718,10 @@ function crumbs(){
 
 function render(){
   document.body.classList.toggle('authbg',['auth','cablogin'].includes(V.screen));
-  crumbs();
+  crumbs();renderSide();
   if(ACC.user)syncResults();
   requestAnimationFrame(()=>snapCells(app));
-  ({auth:viewAuth,cablogin:viewCabLogin,cab:viewCab,students:viewStudents,student:viewStudent,topic:viewTopic,print:viewPrint,player:viewPlayer,done:viewDone,builder:viewBuilder,works:viewWorks,work:viewWork,gallery:viewGallery,
+  ({auth:viewAuth,cablogin:viewCabLogin,cab:viewCab,today:viewToday,schedule:viewSchedule,finance:viewFinance,materials:viewMaterials,profile:viewProfile,students:viewStudents,student:viewStudent,topic:viewTopic,print:viewPrint,player:viewPlayer,done:viewDone,builder:viewBuilder,works:viewWorks,work:viewWork,gallery:viewGallery,
     badlink:()=>{app.innerHTML='<div class="player"><div class="panel finish"><h1 style="font-size:22px">Ссылка не открывается</h1><p style="margin:0">Похоже, она скопирована не целиком. Попроси репетитора прислать её ещё раз.</p></div></div>'}})[V.screen]();
 }
 
@@ -2537,6 +2738,7 @@ function viewStudents(){
     return `<button class="st" data-id="${s.id}">
       <div class="st-top"><div><h3>${esc(s.name)}</h3><div class="grade">${gradeWord(s.grade)}</div></div>${hw?`<span class="wait-chip">ждём ${hw}</span>`:''}</div>
       <div class="st-now"><span class="t">${cur?esc(cur.t):'Тема не выбрана'}</span>${m.pct!=null?`<span class="pct num">${m.pct}%</span>`:''}</div>
+      ${(()=>{const nx=nextLesson(s.id),b=money(s).bal;return nx||b<0?`<div class="st-foot2">${nx?`<span>${whenTxt(nx.at)}</span>`:'<span></span>'}${b<0?`<span class="chip bad num">долг ${rub(-b)}</span>`:''}</div>`:''})()}
     </button>`}).join('');
   /* в новом аккаунте можно забрать учеников, которые были в этом браузере до регистрации */
   let old=null;if(ACC.user&&!S.students.length){try{old=prepState(JSON.parse(localStorage.getItem(KEY)))}catch(e){}if(old&&!old.students.length)old=null}
@@ -2575,6 +2777,7 @@ function deleteStudent(st){
   S.students=S.students.filter(s=>s.id!==st.id);
   S.attempts=S.attempts.filter(a=>a.studentId!==st.id);
   S.assignments=S.assignments.filter(a=>a.studentId!==st.id);
+  S.lessons=S.lessons.filter(l=>l.sid!==st.id);S.payments=S.payments.filter(p=>p.sid!==st.id);
   S.customTopics=S.customTopics.filter(c=>c.forStudent!==st.id);
   TOPICS=allTopics();save();go({screen:'students',studentId:null,confirmStDel:false});
 }
@@ -2638,9 +2841,13 @@ function viewStudent(){
   const nWait=S.assignments.filter(a=>a.studentId===st.id&&a.status==='выдано'&&TOPICS[a.topicId]).length;
   const nDone=S.assignments.filter(a=>a.studentId===st.id&&a.status==='сдано').length+S.attempts.filter(a=>a.studentId===st.id&&!a.hw&&!a.via).length;
   const canRev=pos.i>0;
-  app.innerHTML=`<div class="sthead"><div class="sth-t"><h1>${esc(st.name)}</h1><span>${gradeWord(st.grade)}</span>${nWait?`<button class="wait-chip red" id="works2">ждём выполнения ${nWait} ${plural(nWait,['домашки','домашек','домашек'])}</button>`:''}</div>
+  const nxL=nextLesson(st.id),bt=balTxt(st),sl=slotsTxt(st);
+  const meta=`<div class="sth-meta"><button class="mchip" id="mNext">${nxL?'Занятие '+whenTxt(nxL.at):sl?esc(sl):'Дни занятий не заданы'}</button>
+    ${st.price?`<span class="mchip">${rub(st.price)} · ${st.dur||60} мин</span>`:''}<button class="mchip ${bt.cls}" id="mBal">${st.price||S.payments.some(p=>p.sid===st.id)?bt.t:'Указать цену'}</button></div>`;
+  app.innerHTML=`<div class="sthead"><div class="sth-l"><div class="sth-t"><h1>${esc(st.name)}</h1><span>${gradeWord(st.grade)}</span>${nWait?`<button class="wait-chip red" id="works2">ждём выполнения ${nWait} ${plural(nWait,['домашки','домашек','домашек'])}</button>`:''}</div>${meta}</div>
       <div class="more"><button class="more-btn" id="more" aria-label="Ещё действия" aria-expanded="${V.menu?'true':'false'}">⋯</button>
-        ${V.menu?`<div class="more-pop"><button class="edit" id="works">Работы и домашки${nDone?` · ${nDone}`:''}</button>${ACC.demo?'':'<button class="edit" id="stacc">Доступ для ученика</button>'}<button class="edit" id="newt">+ Своя тема</button><button class="edit" id="edst">Редактировать</button><button class="${V.confirmStDel?'danger':''}" id="delst">${V.confirmStDel?'Нажмите ещё раз: ученик и все его работы удалятся':'Удалить ученика'}</button></div>`:''}</div></div>
+        ${V.menu?`<div class="more-pop"><button class="edit" id="works">Работы и домашки${nDone?` · ${nDone}`:''}</button>${ACC.demo?'':'<button class="edit" id="stacc">Доступ для ученика</button>'}<button class="edit" id="newt">+ Своя тема</button><button class="edit" id="mpay">Внести оплату</button><button class="edit" id="mrem">Напомнить об оплате</button><button class="edit" id="edst">Редактировать</button><button class="${V.confirmStDel?'danger':''}" id="delst">${V.confirmStDel?'Нажмите ещё раз: ученик и все его работы удалятся':'Удалить ученика'}</button></div>`:''}</div></div>
+    ${st.goal||st.note||st.contact?`<div class="st-notes">${st.goal?`<p><b>Цель</b> ${esc(st.goal)}</p>`:''}${st.contact?`<p><b>Связь</b> ${esc(st.contact)}</p>`:''}${st.note?`<p><b>Заметка</b> ${esc(st.note)}</p>`:''}</div>`:''}
     <div class="panel">${st.subjects.length>1?`<div class="tabs">${tabs}</div>`:''}${body}</div>`;
   app.querySelectorAll('.tab').forEach(b=>b.onclick=()=>go({subject:b.dataset.s,confirmStDel:false}));
   app.querySelectorAll('.topic[data-t],.rl[data-t]').forEach(b=>b.onclick=()=>openTopic(b.dataset.t));
@@ -2659,6 +2866,10 @@ function viewStudent(){
   if($('delst'))$('delst').onclick=()=>{if(!V.confirmStDel){V.confirmStDel=true;render();return}V.menu=false;deleteStudent(st)};
   if($('works'))$('works').onclick=()=>go({screen:'works',menu:false});
   if($('works2'))$('works2').onclick=()=>go({screen:'works',menu:false});
+  $('mNext').onclick=()=>{if(nxL)lessonModal(nxL);else editStudentModal(st)};
+  $('mBal').onclick=()=>{if(st.price||S.payments.some(p=>p.sid===st.id))payModal(st);else editStudentModal(st)};
+  if($('mpay'))$('mpay').onclick=()=>{V.menu=false;render();payModal(st)};
+  if($('mrem'))$('mrem').onclick=()=>{V.menu=false;render();remindModal(st)};
 }
 
 /* ---------- работы и домашки ученика ---------- */
@@ -2765,8 +2976,8 @@ function showSearch(st,subj){
     openTopicSub(r.tid,r.over||(sb&&sb.p)||null,sb?(sb.n||sb):(r.ex?'похожие на '+r.ex:null))});
 }
 function openTopicSub(tid,over,name){openTopic(tid);if(over){V.over=over;V.subName=name||'выбранный вид';V.seed=newSeed();render()}}
-function openTopic(tid){const m=mastery(V.studentId,tid);const lv=m.cls==='ok'?2:m.cls==='bad'?0:1;
-  go({screen:'topic',topicId:tid,level:Math.min(lv,TOPICS[tid].L.length-1),seed:newSeed(),over:null,subName:null,confirmDel:false,blocks:null})}
+function openTopic(tid,extra){const m=mastery(V.studentId,tid);const lv=m.cls==='ok'?2:m.cls==='bad'?0:1;
+  go({screen:'topic',topicId:tid,level:Math.min(lv,TOPICS[tid].L.length-1),seed:newSeed(),over:null,subName:null,confirmDel:false,blocks:null,...(extra||{})})}
 
 function curParams(){const t=TOPICS[V.topicId];return{...t.L[V.level].p,...(V.over||{})}}
 
@@ -2838,7 +3049,7 @@ function viewTopic(){
     <div class="topic-grid">
       <div class="levels">${tplSeg}${tpl==='own'?'':lv}
         ${blocksHTML}${designBox(st,V.seed)}
-        <div class="actions"><button class="btn primary" id="print">Печать</button><button class="btn" id="link">Ссылка ученику</button></div>
+        <div class="actions"><button class="btn primary" id="print">Печать</button><button class="btn" id="link">Ссылка ученику</button><button class="btn link" id="tomat">Сохранить в материалы</button></div>
         <details class="fold"><summary>Ещё</summary>
           ${tunable?`<div class="tune-row"><label for="lo">Числа от</label><input id="lo" type="number" value="${p.lo}"><label for="hi">до</label><input id="hi" type="number" value="${p.hi}"></div>
           <div class="tune-row"><label for="cnt">Заданий</label><input id="cnt" type="number" min="4" max="24" value="${p.count}"><button class="btn small" id="apply">Применить</button></div>`:''}
@@ -2875,6 +3086,7 @@ function viewTopic(){
     for(let k=0;k<30;k++){const nx=resolveDesign(st,s2);if(!cur.img||!nx.img||nx.theme.id!==cur.theme.id||nx.img.id!==cur.img.id)break;s2=newSeed()}
     V.seed=s2;render()};
   $('print').onclick=()=>{materialize();go({screen:'print'})};
+  $('tomat').onclick=()=>saveSheetModal(st,t,tpl,blocks);
   $('link').onclick=()=>{materialize();linkModal();unmaterialize();render()};
   const sc=$('setcur');if(sc)sc.onclick=()=>{st[CK(t.subject)]=t.id;save();render()};
   const dl=$('del');
@@ -3025,6 +3237,440 @@ function viewBuilder(){
   refresh();$('b-name').focus();
 }
 
+/* ---------- разделы репетитора: меню слева, сегодня, расписание, финансы, материалы, профиль ---------- */
+const DAY=86400000;
+const pad2=n=>String(n).padStart(2,'0');
+const dkey=t=>{const d=new Date(t);return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate())};
+const atOf=(k,tm)=>{const[y,m,d]=k.split('-').map(Number),[h,mi]=(tm||'00:00').split(':').map(Number);return new Date(y,m-1,d,h,mi).getTime()};
+const dayStart=t=>{const d=new Date(t);d.setHours(0,0,0,0);return d.getTime()};
+const addDays=(t,n)=>{const d=new Date(t);d.setDate(d.getDate()+n);return d.getTime()};
+const monday=t=>addDays(dayStart(t),-((new Date(t).getDay()+6)%7));
+const monthStart=t=>{const d=new Date(t);return new Date(d.getFullYear(),d.getMonth(),1).getTime()};
+const addMonths=(t,n)=>{const d=new Date(t);return new Date(d.getFullYear(),d.getMonth()+n,1).getTime()};
+const WD=['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+const WDL=['понедельник','вторник','среда','четверг','пятница','суббота','воскресенье'];
+const MONN=['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+const MONG=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+const wdOf=t=>(new Date(t).getDay()+6)%7;
+const hm=t=>{const d=new Date(t);return pad2(d.getHours())+':'+pad2(d.getMinutes())};
+const dayTxt=t=>{const d=new Date(t);return d.getDate()+' '+MONG[d.getMonth()]};
+const whenTxt=t=>{const d0=dayStart(Date.now()),d=dayStart(t);return (d===d0?'сегодня':d===addDays(d0,1)?'завтра':WD[wdOf(t)].toLowerCase()+', '+dayTxt(t))+', '+hm(t)};
+const rub=n=>Math.round(n).toLocaleString('ru-RU')+' ₽';
+const LESSONS=['занятие','занятия','занятий'];
+
+/* цена занятия меняется только для следующих занятий: прошлые считаются по старой */
+function priceAt(st,at){const ps=st.prices||[];if(!ps.length)return st.price||0;let p=ps[0].p;for(const x of ps)if(x.from<=at)p=x.p;return p}
+function setPrice(st,p){p=Math.max(0,Math.round(+p||0));if(p===(st.price||0)&&(st.prices||[]).length)return;
+  st.prices=st.prices||[];st.prices.push({from:st.prices.length?Date.now():0,p});st.price=p}
+
+/* занятия: дни недели ученика дают занятия сами, в S.lessons лежат только отмеченные, перенесённые и разовые */
+function lessonsIn(a,b,sid){
+  const real=S.lessons.filter(l=>(!sid||l.sid===sid)&&student(l.sid));
+  const taken=new Set(real.map(l=>l.slot).filter(Boolean));
+  const out=real.filter(l=>l.at>=a&&l.at<b);
+  for(const st of S.students){if(sid&&st.id!==sid)continue;
+    for(const sl of st.slots||[]){
+      let d=dayStart(Math.max(a,sl.since||0));d=addDays(d,(sl.wd-wdOf(d)+7)%7);
+      for(;d<b;d=addDays(d,7)){const k=dkey(d),at=atOf(k,sl.t);
+        if(sl.until&&at>=sl.until)break;if(at<(sl.since||0)||at<a||at>=b)continue;
+        const key=st.id+'|'+sl.id+'|'+k;if(taken.has(key))continue;
+        out.push({id:'v:'+key,slot:key,sid:st.id,at,dur:st.dur||60,status:'plan',virtual:true})}}}
+  return out.sort((x,y)=>x.at-y.at)}
+/* прошедшее занятие считается проведённым само: отмечать нужно только отмену и пропуск */
+const lstat=l=>l.status&&l.status!=='plan'?l.status:(l.at+(l.dur||60)*60000<=Date.now()?'done':'plan');
+const charged=l=>['done','miss'].includes(lstat(l));
+const lprice=l=>l.price!=null?l.price:priceAt(student(l.sid),l.at);
+const LST={plan:'по плану',done:'проведено',miss:'пропуск, оплачивается',cancel:'отменено'};
+function realize(l){if(!l.virtual)return S.lessons.find(x=>x.id===l.id)||l;
+  const r={id:'l'+Date.now()+Math.floor(Math.random()*1000),slot:l.slot,sid:l.sid,at:l.at,dur:l.dur,status:'plan'};S.lessons.push(r);return r}
+function money(st,a=0,b=Date.now()+90*DAY){
+  const ls=lessonsIn(a,b,st.id).filter(charged);const ch=ls.reduce((s,l)=>s+lprice(l),0);
+  const pd=S.payments.filter(p=>p.sid===st.id&&p.date>=a&&p.date<b).reduce((s,p)=>s+p.amount,0);
+  return{n:ls.length,charged:ch,paid:pd,bal:pd-ch}}
+function balTxt(st){const b=money(st).bal;if(b<0)return{cls:'bad',t:'долг '+rub(-b)};
+  if(b>0){const n=st.price?Math.floor(b/st.price):0;return{cls:'ok',t:n?`оплачено вперёд ${n} ${plural(n,LESSONS)}`:'аванс '+rub(b)}}
+  return{cls:'',t:'без долга'}}
+const nextLesson=sid=>lessonsIn(Date.now(),Date.now()+60*DAY,sid).find(l=>lstat(l)==='plan');
+const slotsTxt=st=>(st.slots||[]).filter(s=>!s.until).sort((a,b)=>a.wd-b.wd||a.t.localeCompare(b.t)).map(s=>WD[s.wd]+' '+s.t).join(', ');
+
+/* меню разделов: слева на компьютере, внизу на телефоне */
+const IC={
+  today:'<path d="M4 7h16v13H4zM4 11h16M9 3v5M15 3v5"/>',
+  students:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.3-5.5 6.5-5.5s5.7 1.9 6.5 5.5M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.8c1.9.7 3.1 2.4 3.5 5.2"/>',
+  schedule:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3.5 2"/>',
+  materials:'<path d="M3.5 6.5a2 2 0 0 1 2-2h4l2 2.5h7a2 2 0 0 1 2 2v8.5a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/>',
+  finance:'<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h4"/>',
+  profile:'<circle cx="12" cy="8.5" r="4"/><path d="M4.5 20.5c1.1-4 3.9-6 7.5-6s6.4 2 7.5 6"/>'};
+const icon=k=>`<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[k]}</svg>`;
+const NAV=[['today','Сегодня'],['students','Ученики'],['schedule','Расписание'],['materials','Материалы'],['finance','Финансы'],['profile','Профиль']];
+const SEC_T={today:'Сегодня',schedule:'Расписание',materials:'Мои материалы',finance:'Финансы',profile:'Профиль'};
+const sectionOf=s=>SEC_T[s]?s:'students';
+const shellOn=()=>!CABINET&&!STUDENT_MODE&&(ACC.user||ACC.demo)&&!['auth','cablogin','cab','player','done','badlink'].includes(V.screen);
+function renderSide(){
+  const el=document.getElementById('sidenav');const on=shellOn();document.body.classList.toggle('shell',!!on);document.body.classList.toggle('sec',!!SEC_T[V.screen]);
+  if(!on){el.innerHTML='';return}
+  const sec=sectionOf(V.screen);
+  const left=lessonsIn(Date.now(),addDays(dayStart(Date.now()),1)).filter(l=>lstat(l)==='plan').length;
+  el.innerHTML=`<button class="side-logo" data-s="today" aria-label="Сегодня"><i><b></b><b></b><b></b><b></b></i>Клетка</button>
+    <nav class="nav" aria-label="Разделы">${NAV.map(([k,n])=>`<button data-s="${k}" class="${k===sec?'on':''}"${k===sec?' aria-current="page"':''}>${icon(k)}<span>${n}</span>${k==='today'&&left?`<em>${left}</em>`:''}</button>`).join('')}</nav>`;
+  el.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>go({screen:b.dataset.s,menu:false,acctMenu:false,confirmDel:false,confirmStDel:false}));
+}
+function toast(msg){const t=document.createElement('div');t.className='toast';t.setAttribute('role','status');t.textContent=msg;document.body.appendChild(t);
+  setTimeout(()=>t.classList.add('out'),2200);setTimeout(()=>t.remove(),2700)}
+const emptyArt=a=>`<img class="e-art" src="${ART_BASE}${a}-bot.webp" alt="" aria-hidden="true">`;
+const val=id=>{const e=document.getElementById(id);return e?e.value.trim():''};
+
+/* ---------- Сегодня ---------- */
+function viewToday(){
+  const now=Date.now(),d0=dayStart(now);
+  const today=lessonsIn(d0,addDays(d0,1)),tom=lessonsIn(addDays(d0,1),addDays(d0,2));
+  const wait=S.assignments.filter(a=>a.status==='выдано'&&TOPICS[a.topicId]&&student(a.studentId)).sort((a,b)=>b.date-a.date);
+  const doneH=S.assignments.filter(a=>a.status==='сдано'&&a.result&&a.result.date>now-7*DAY&&TOPICS[a.topicId]&&student(a.studentId)).sort((a,b)=>b.result.date-a.result.date);
+  const debts=S.students.map(st=>({st,b:money(st).bal})).filter(x=>x.b<0).sort((a,b)=>a.b-b.b);
+  const lrow=l=>{const st=student(l.sid),s=lstat(l),cur=TOPICS[curOf(st,st.subjects[0])];
+    return `<div class="lrow ${s}"><button class="lrow-m" data-l="${esc(l.id)}"><span class="lr-time num">${hm(l.at)}</span>
+      <span class="lr-t"><b>${esc(st.name)}</b><small>${cur?esc(cur.t):gradeWord(st.grade)}${s!=='plan'?' · '+LST[s]:''}</small></span></button>
+      ${s==='cancel'?'':`<button class="btn small" data-sheet="${st.id}">Лист к уроку</button>`}</div>`};
+  if(!S.students.length){app.innerHTML=`<div class="head"><div><h1>Сегодня</h1><p>${WDL[wdOf(now)]}, ${dayTxt(now)}</p></div></div>
+    <div class="empty-first big-empty">${emptyArt('prostokvashino-1')}<div><h2>Начните с ученика</h2><p>Добавьте ученика, укажите дни занятий и стоимость. Здесь появятся занятия на сегодня, домашки и оплаты.</p>
+    <button class="btn primary" id="addSt">+ Добавить ученика</button></div></div>`;
+    document.getElementById('addSt').onclick=addStudentModal;return}
+  const nx=today.length?null:lessonsIn(now,now+30*DAY).find(l=>lstat(l)==='plan');
+  app.innerHTML=`<div class="head"><div><h1>Сегодня</h1><p>${WDL[wdOf(now)]}, ${dayTxt(now)}</p></div><button class="btn" id="addL">+ Занятие</button></div>
+    <div class="today">
+      <section class="panel tpanel"><h2 class="ph">Занятия <span>${today.filter(l=>lstat(l)!=='cancel').length||''}</span></h2>
+        ${today.length?today.map(lrow).join(''):`<p class="empty">Сегодня занятий нет.${nx?` Ближайшее: ${whenTxt(nx.at)}, ${esc(student(nx.sid).name)}.`:''}</p>`}
+        ${tom.length?`<h3 class="sub-h">Завтра</h3>${tom.map(lrow).join('')}`:''}
+        ${S.students.some(s=>(s.slots||[]).length)?'':'<p class="hint">Дни занятий задаются в карточке ученика: ⋯ → Редактировать. Тогда занятия появляются сами каждую неделю.</p>'}
+      </section>
+      <div class="tcol">
+        <section class="panel tpanel"><h2 class="ph">Ждём домашки <span>${wait.length||''}</span></h2>
+          ${wait.length?wait.slice(0,8).map(h=>`<button class="mini" data-w="${h.studentId}"><b>${esc(student(h.studentId).name)}</b><small>${esc(TOPICS[h.topicId].t)} · ${ago(h.date)}</small></button>`).join(''):'<p class="empty">Все домашки сданы.</p>'}</section>
+        ${doneH.length?`<section class="panel tpanel"><h2 class="ph">Сдали за неделю</h2>${doneH.slice(0,6).map(h=>`<button class="mini" data-wk="${esc(h.code)}" data-sid="${h.studentId}"><b>${esc(student(h.studentId).name)}</b><small>${esc(TOPICS[h.topicId].t)}</small>${resChip(h.result.correct,h.result.total)}</button>`).join('')}</section>`:''}
+        <section class="panel tpanel"><h2 class="ph">Оплаты</h2>
+          ${debts.length?debts.map(x=>`<div class="mini static"><b>${esc(x.st.name)}</b><span class="chip bad num">${rub(-x.b)}</span><button class="btn small quiet" data-rem="${x.st.id}">Напомнить</button></div>`).join(''):'<p class="empty">Долгов нет.</p>'}
+          <button class="btn link" id="toFin">Все финансы →</button></section>
+      </div>
+    </div>`;
+  const all=[...today,...tom];
+  app.querySelectorAll('[data-l]').forEach(b=>b.onclick=()=>lessonModal(all.find(l=>l.id===b.dataset.l)));
+  app.querySelectorAll('[data-sheet]').forEach(b=>b.onclick=()=>lessonSheet(b.dataset.sheet));
+  app.querySelectorAll('[data-w]').forEach(b=>b.onclick=()=>go({screen:'works',studentId:b.dataset.w}));
+  app.querySelectorAll('[data-wk]').forEach(b=>b.onclick=()=>go({screen:'work',studentId:b.dataset.sid,code:b.dataset.wk}));
+  app.querySelectorAll('[data-rem]').forEach(b=>b.onclick=()=>remindModal(student(b.dataset.rem)));
+  document.getElementById('addL').onclick=()=>addLessonModal({});
+  document.getElementById('toFin').onclick=()=>go({screen:'finance'});
+}
+/* лист к уроку: текущая тема ученика, вид листа «Урок» */
+function lessonSheet(sid){const st=student(sid);const subj=st.subjects[0];const pos=trackPos(st,subj);
+  if(pos.i<0){go({screen:'student',studentId:sid,subject:subj});return}
+  V.studentId=sid;V.subject=subj;close();openTopic(pos.tr[pos.i],{tpl:'lesson'})}
+
+/* ---------- Расписание ---------- */
+function viewSchedule(){
+  const w0=V.week||monday(Date.now()),w1=addDays(w0,7),d0=dayStart(Date.now());
+  const ls=lessonsIn(w0,w1);
+  const days=[0,1,2,3,4,5,6].map(i=>{const d=addDays(w0,i);return{d,k:dkey(d),ls:ls.filter(l=>dayStart(l.at)===d)}});
+  const live=ls.filter(l=>lstat(l)!=='cancel'),sum=live.reduce((s,l)=>s+lprice(l),0);
+  const range=`${new Date(w0).getDate()} ${MONG[new Date(w0).getMonth()]} – ${new Date(addDays(w0,6)).getDate()} ${MONG[new Date(addDays(w0,6)).getMonth()]}`;
+  app.innerHTML=`<div class="head"><div><h1>Расписание</h1><p>${live.length?`${live.length} ${plural(live.length,LESSONS)} за неделю${sum?' · '+rub(sum):''}`:'На этой неделе занятий нет'}</p></div>
+    <div class="wnav"><button class="btn small quiet" id="wPrev" aria-label="Прошлая неделя">‹</button><span class="wr num">${range}</span><button class="btn small quiet" id="wNext" aria-label="Следующая неделя">›</button>
+      ${w0!==monday(Date.now())?'<button class="btn small quiet" id="wNow">Эта неделя</button>':''}<button class="btn small primary" id="addL">+ Занятие</button></div></div>
+    ${S.students.length&&!S.students.some(s=>(s.slots||[]).length)?'<div class="note">Укажите ученикам дни занятий: ⋯ → Редактировать в карточке ученика. Занятия будут появляться сами каждую неделю, а прошедшие — сами считаться проведёнными.</div>':''}
+    <div class="week">${days.map(x=>`<section class="wday${x.d===d0?' today':''}${x.d<d0?' past':''}"><h3><span>${WD[wdOf(x.d)]}</span> <b class="num">${new Date(x.d).getDate()}</b></h3>
+      ${x.ls.map(l=>{const st=student(l.sid),s=lstat(l);return `<button class="les ${s}" data-l="${esc(l.id)}"><span class="num">${hm(l.at)}</span><b>${esc(st.name)}</b>${s!=='plan'?`<small>${LST[s]}</small>`:''}</button>`}).join('')}
+      <button class="wadd" data-d="${x.k}" aria-label="Добавить занятие ${WDL[wdOf(x.d)]}">+</button></section>`).join('')}</div>`;
+  const $=id=>document.getElementById(id);
+  $('wPrev').onclick=()=>go({week:addDays(w0,-7)});$('wNext').onclick=()=>go({week:w1});if($('wNow'))$('wNow').onclick=()=>go({week:null});
+  $('addL').onclick=()=>addLessonModal({});
+  app.querySelectorAll('[data-l]').forEach(b=>b.onclick=()=>lessonModal(ls.find(l=>l.id===b.dataset.l)));
+  app.querySelectorAll('.wadd').forEach(b=>b.onclick=()=>addLessonModal({day:b.dataset.d}));
+}
+function lessonModal(l0){
+  let l=l0;const st=student(l.sid);
+  const draw=()=>{const s=lstat(l),pr=lprice(l);
+    modal(`<h2>${esc(st.name)}</h2>
+    <p class="les-when">${WDL[wdOf(l.at)]}, ${dayTxt(l.at)} · <span class="num">${hm(l.at)}–${hm(l.at+(l.dur||60)*60000)}</span> · ${pr?rub(pr):'цена не указана'}</p>
+    <div class="field"><span class="label">Как прошло</span><div class="seg" id="lst">${[['done','Проведено'],['miss','Пропуск с оплатой'],['cancel','Отменено']].map(([k,n])=>`<button data-k="${k}" class="${k===s?'on':''}">${n}</button>`).join('')}</div>
+      <span class="hint">${s==='plan'?'Когда занятие пройдёт, оно само станет проведённым. Отмечать нужно только отмену или пропуск.':'Проведённые занятия и пропуски с оплатой списываются с баланса ученика.'}</span></div>
+    <div class="field"><span class="label">Перенести</span><div class="mv"><input type="date" id="mvD" value="${dkey(l.at)}" aria-label="Дата"><input type="time" id="mvT" value="${hm(l.at)}" aria-label="Время"><button class="btn small" id="mv">Перенести</button></div></div>
+    <div class="field"><label class="label" for="lnote">Заметка к занятию</label><textarea id="lnote" rows="2" placeholder="Что прошли, что задать">${esc(l.note||'')}</textarea></div>
+    <div class="modal-actions">${!l.virtual&&!l.slot?'<button class="btn quiet pen" id="ldel">Удалить</button>':''}<button class="btn quiet" id="lcard">Карточка ученика</button>${s==='cancel'?'':'<button class="btn quiet" id="lsheet">Лист к уроку</button>'}<button class="btn primary" id="cl">Готово</button></div>`,()=>{
+      const $=id=>document.getElementById(id);
+      const keepNote=()=>{const n=$('lnote').value.trim();if(n!==(l.note||'')){l=realize(l);l.note=n;save()}};
+      document.querySelectorAll('#lst [data-k]').forEach(b=>b.onclick=()=>{keepNote();l=realize(l);l.status=b.dataset.k===lstat(l)&&l.status===b.dataset.k?'plan':b.dataset.k;save();render();draw()});
+      $('mv').onclick=()=>{const at=atOf($('mvD').value||dkey(l.at),$('mvT').value||hm(l.at));keepNote();l=realize(l);l.at=at;if(l.status==='cancel')l.status='plan';save();close();render();toast('Занятие перенесено: '+whenTxt(at))};
+      $('cl').onclick=()=>{keepNote();close();render()};
+      $('lcard').onclick=()=>{keepNote();close();go({screen:'student',studentId:st.id,subject:st.subjects[0]})};
+      if($('lsheet'))$('lsheet').onclick=()=>{keepNote();lessonSheet(st.id)};
+      if($('ldel'))$('ldel').onclick=()=>{S.lessons=S.lessons.filter(x=>x.id!==l.id);save();close();render()};
+    })};
+  draw();
+}
+function addLessonModal(pre){
+  if(!S.students.length){modal(`<h2>Сначала ученик</h2><p style="margin:0">Занятие привязывается к ученику. Добавьте ученика, и у него можно будет указать дни занятий.</p>
+    <div class="modal-actions"><button class="btn quiet" id="cl">Закрыть</button><button class="btn primary" id="ok">+ Добавить ученика</button></div>`,()=>{
+    document.getElementById('cl').onclick=close;document.getElementById('ok').onclick=()=>{close();addStudentModal()}});return}
+  const day=pre.day||dkey(Date.now());
+  modal(`<h2>Новое занятие</h2>
+    <div class="field"><label class="label" for="lsid">Ученик</label><select id="lsid">${S.students.map(s=>`<option value="${s.id}"${s.id===(pre.sid||V.studentId)?' selected':''}>${esc(s.name)}</option>`).join('')}</select></div>
+    <div class="two"><div class="field"><label class="label" for="ldt">Дата</label><input type="date" id="ldt" value="${day}"></div>
+      <div class="field"><label class="label" for="ltm">Время</label><input type="time" id="ltm" value="16:00"></div></div>
+    <label class="chk"><input type="checkbox" id="lrep" checked> Каждую неделю в этот день и время</label>
+    <div class="modal-actions"><button class="btn quiet" id="cl">Отмена</button><button class="btn primary" id="ok">Добавить</button></div>`,()=>{
+    document.getElementById('cl').onclick=close;
+    document.getElementById('ok').onclick=()=>{const st=student(val('lsid')),k=val('ldt')||day,t=val('ltm')||'16:00',at=atOf(k,t);
+      if(document.getElementById('lrep').checked){st.slots=st.slots||[];st.slots.push({id:'w'+Date.now(),wd:wdOf(at),t,since:Math.min(at,Date.now())})}
+      else S.lessons.push({id:'l'+Date.now(),sid:st.id,at,dur:st.dur||60,status:'plan'});
+      save();close();if(V.screen==='schedule')V.week=monday(at);render();toast('Занятие добавлено: '+whenTxt(at))};
+  });
+}
+/* дни занятий в карточке ученика */
+function slotRows(slots){return slots.map((s,i)=>`<div class="wslot" data-i="${i}"><select class="sl-wd" aria-label="День недели">${WD.map((w,k)=>`<option value="${k}"${k===s.wd?' selected':''}>${WDL[k]}</option>`).join('')}</select>
+  <input class="sl-t" type="time" value="${s.t}" aria-label="Время"><button type="button" class="ibtn sl-rm" aria-label="Убрать день">✕</button></div>`).join('')}
+function slotEditor(st){const act=(st&&st.slots||[]).filter(s=>!s.until).map(s=>({...s}));
+  return{html:`<div class="field"><span class="label">Дни занятий</span><div class="slots" id="slots">${slotRows(act)}</div>
+    <button type="button" class="btn small quiet" id="sl-add">+ День</button></div>`,
+  bind(){const box=document.getElementById('slots');
+    const pull=()=>box.querySelectorAll('.wslot').forEach(r=>{const s=act[+r.dataset.i];s.wd=+r.querySelector('.sl-wd').value;s.t=r.querySelector('.sl-t').value||s.t});
+    const redraw=()=>{box.innerHTML=slotRows(act);box.querySelectorAll('.sl-rm').forEach(b=>b.onclick=()=>{pull();act.splice(+b.closest('.wslot').dataset.i,1);redraw()})};
+    redraw();document.getElementById('sl-add').onclick=()=>{pull();const last=act[act.length-1];act.push({wd:last?(last.wd+3)%7:0,t:last?last.t:'16:00'});redraw()};
+    this.read=()=>{pull();return act}}}}
+/* старые дни заканчиваются сейчас (прошлые занятия остаются в истории), новые начинаются сейчас */
+function applySlots(st,next){const now=Date.now();st.slots=st.slots||[];
+  const same=(a,b)=>a.wd===b.wd&&a.t===b.t;
+  for(const s of st.slots.filter(s=>!s.until))if(!next.some(n=>n.id===s.id&&same(n,s)))s.until=now;
+  st.slots=st.slots.filter(s=>!(s.until&&(s.since||0)>=s.until));
+  next.forEach((n,i)=>{const old=st.slots.find(s=>s.id===n.id&&!s.until);if(!old||!same(old,n))st.slots.push({id:'w'+now+i,wd:n.wd,t:n.t,since:now})})}
+
+/* ---------- Финансы ---------- */
+function viewFinance(){
+  const m0=V.month||monthStart(Date.now()),m1=addMonths(m0,1),md=new Date(m0);
+  if(!S.students.length){app.innerHTML=`<div class="head"><div><h1>Финансы</h1></div></div>
+    <div class="empty-first big-empty">${emptyArt('carlson-1')}<div><h2>Здесь будут деньги</h2><p>Укажите ученику стоимость занятия и дни занятий. Проведённые занятия спишутся с его баланса сами, а вы будете отмечать только оплаты.</p>
+    <button class="btn primary" id="addSt">+ Добавить ученика</button></div></div>`;document.getElementById('addSt').onclick=addStudentModal;return}
+  const rows=S.students.map(st=>({st,m:money(st,m0,m1),all:money(st)}));
+  const pays=S.payments.filter(p=>p.date>=m0&&p.date<m1&&student(p.sid)).sort((a,b)=>b.date-a.date);
+  const got=pays.reduce((s,p)=>s+p.amount,0),nL=rows.reduce((s,r)=>s+r.m.n,0),chg=rows.reduce((s,r)=>s+r.m.charged,0);
+  const debt=rows.filter(r=>r.all.bal<0),debtSum=debt.reduce((s,r)=>s-r.all.bal,0);
+  /* доход за полгода: столбик на месяц, подписи прямо на столбиках */
+  const hist=[5,4,3,2,1,0].map(k=>{const a=addMonths(m0,-k),b=addMonths(a,1);return{a,v:S.payments.filter(p=>p.date>=a&&p.date<b).reduce((s,p)=>s+p.amount,0)}});
+  const mx=Math.max(1,...hist.map(h=>h.v));
+  const chart=`<div class="mbars" role="img" aria-label="Получено по месяцам">${hist.map(h=>`<div class="mbar${h.a===m0?' on':''}"><span class="bv num">${h.v?rub(h.v):''}</span><i style="height:${Math.max(2,Math.round(h.v/mx*100))}%"></i><span class="bl">${MONN[new Date(h.a).getMonth()].slice(0,3)}</span></div>`).join('')}</div>`;
+  app.innerHTML=`<div class="head"><div><h1>Финансы</h1><p>Проведённые занятия списываются с баланса сами. Отмечайте оплаты.</p></div>
+    <div class="wnav"><button class="btn small quiet" id="mPrev" aria-label="Прошлый месяц">‹</button><span class="wr">${MONN[md.getMonth()]} ${md.getFullYear()}</span><button class="btn small quiet" id="mNext" aria-label="Следующий месяц">›</button><button class="btn small primary" id="addP">+ Оплата</button></div></div>
+    <div class="kpis"><div class="kpi"><span>Получено</span><b class="num">${rub(got)}</b><small>${pays.length} ${plural(pays.length,['оплата','оплаты','оплат'])}</small></div>
+      <div class="kpi"><span>Проведено</span><b class="num">${nL} ${plural(nL,LESSONS)}</b><small>на ${rub(chg)}</small></div>
+      <div class="kpi ${debtSum?'bad':''}"><span>Должны сейчас</span><b class="num">${rub(debtSum)}</b><small>${debt.length?debt.length+' '+plural(debt.length,['ученик','ученика','учеников']):'долгов нет'}</small></div></div>
+    <section class="panel fpanel"><h2 class="ph">Получено по месяцам</h2>${chart}</section>
+    <section class="panel fpanel"><h2 class="ph">Ученики</h2><div class="ftable" role="table">
+      <div class="frw fh" role="row"><span role="columnheader">Ученик</span><span role="columnheader">Занятие</span><span role="columnheader">За месяц</span><span role="columnheader">Баланс</span><span></span></div>
+      ${rows.map(({st,m,all})=>`<div class="frw" role="row"><span role="cell"><button class="btn link" data-st="${st.id}">${esc(st.name)}</button></span>
+        <span role="cell" class="num">${st.price?rub(st.price):'<button class="btn link" data-ed="'+st.id+'">указать цену</button>'}</span>
+        <span role="cell" class="num">${m.n} ${plural(m.n,LESSONS)}${m.paid?' · оплачено '+rub(m.paid):''}</span>
+        <span role="cell"><span class="chip num ${all.bal<0?'bad':all.bal>0?'ok':''}">${all.bal<0?'долг '+rub(-all.bal):all.bal>0?'+'+rub(all.bal):'0 ₽'}</span></span>
+        <span role="cell" class="fact"><button class="btn small" data-pay="${st.id}">+ Оплата</button>${all.bal<0?`<button class="btn small quiet" data-rem="${st.id}">Напомнить</button>`:''}</span></div>`).join('')}</div></section>
+    <section class="panel fpanel"><h2 class="ph">Оплаты за ${MONN[md.getMonth()].toLowerCase()}</h2>
+      ${pays.length?pays.map(p=>`<div class="pay"><span class="num">${dayTxt(p.date)}</span><b>${esc(student(p.sid).name)}</b><small>${esc(p.note||'')}</small><span class="num pay-a">${rub(p.amount)}</span>
+        <button class="ibtn${V.delPay===p.id?' on':''}" data-dp="${p.id}" aria-label="Удалить оплату">${V.delPay===p.id?'Удалить?':'✕'}</button></div>`).join(''):'<p class="empty">Оплат в этом месяце нет.</p>'}</section>`;
+  const $=id=>document.getElementById(id);
+  $('mPrev').onclick=()=>go({month:addMonths(m0,-1),delPay:null});$('mNext').onclick=()=>go({month:m1,delPay:null});
+  $('addP').onclick=()=>payModal(null);
+  app.querySelectorAll('[data-pay]').forEach(b=>b.onclick=()=>payModal(student(b.dataset.pay)));
+  app.querySelectorAll('[data-rem]').forEach(b=>b.onclick=()=>remindModal(student(b.dataset.rem)));
+  app.querySelectorAll('[data-st]').forEach(b=>b.onclick=()=>go({screen:'student',studentId:b.dataset.st,subject:student(b.dataset.st).subjects[0]}));
+  app.querySelectorAll('[data-ed]').forEach(b=>b.onclick=()=>editStudentModal(student(b.dataset.ed)));
+  app.querySelectorAll('[data-dp]').forEach(b=>b.onclick=()=>{if(V.delPay!==b.dataset.dp){V.delPay=b.dataset.dp;render();return}
+    S.payments=S.payments.filter(p=>p.id!==b.dataset.dp);V.delPay=null;save();render()});
+}
+/* оплата: разовая или абонементом на несколько занятий вперёд */
+function payModal(st){
+  if(!S.students.length)return addLessonModal({});
+  let cur=st||S.students[0];
+  modal(`<h2>Оплата</h2>
+    <div class="field"><label class="label" for="psid">Ученик</label><select id="psid">${S.students.map(s=>`<option value="${s.id}"${s.id===cur.id?' selected':''}>${esc(s.name)}</option>`).join('')}</select></div>
+    <div class="field"><span class="label">Сколько занятий</span><div class="seg" id="pq"></div></div>
+    <div class="two"><div class="field"><label class="label" for="pam">Сумма, ₽</label><input type="number" id="pam" min="0" step="100" inputmode="numeric"></div>
+      <div class="field"><label class="label" for="pdt">Дата</label><input type="date" id="pdt" value="${dkey(Date.now())}"></div></div>
+    <div class="field"><label class="label" for="pnt">Комментарий</label><input type="text" id="pnt" placeholder="Например: абонемент на 8 занятий"></div>
+    <p class="hint" id="pinfo" style="margin:0"></p>
+    <div class="modal-actions"><button class="btn quiet" id="cl">Отмена</button><button class="btn primary" id="ok">Внести</button></div>`,()=>{
+    const $=id=>document.getElementById(id);
+    const fill=()=>{cur=student($('psid').value);const p=cur.price||0,b=money(cur).bal;
+      $('pq').innerHTML=p?[1,4,8].map(n=>`<button type="button" data-n="${n}">${n} · ${rub(n*p)}</button>`).join('')+(b<0?`<button type="button" data-debt="1">Долг · ${rub(-b)}</button>`:''):'<span class="hint">Цена занятия не указана — введите сумму.</span>';
+      $('pinfo').textContent=b<0?`Сейчас долг ${rub(-b)}.`:b>0?`Сейчас на балансе ${rub(b)}.`:'';
+      $('pq').querySelectorAll('button').forEach(x=>x.onclick=()=>{$('pq').querySelectorAll('button').forEach(y=>y.classList.toggle('on',y===x));
+        if(x.dataset.debt){$('pam').value=-money(cur).bal;$('pnt').value='Оплата долга'}else{const n=+x.dataset.n;$('pam').value=n*p;$('pnt').value=n>1?`Абонемент на ${n} ${plural(n,LESSONS)}`:''}})};
+    fill();$('psid').onchange=fill;$('cl').onclick=close;
+    $('ok').onclick=()=>{const a=Math.round(+$('pam').value||0);if(a<=0){$('pinfo').textContent='Введите сумму.';$('pam').focus();return}
+      S.payments.push({id:'p'+Date.now(),sid:cur.id,amount:a,date:atOf(val('pdt')||dkey(Date.now()),'12:00'),note:val('pnt')});save();close();render();toast('Оплата внесена: '+rub(a))};
+  });
+}
+function remindText(st){const b=money(st).bal,f=firstName(st),n=st.price?Math.round(-b/st.price):0;
+  return b<0?`Здравствуйте! Напоминаю об оплате занятий ${f}: ${n?n+' '+plural(n,LESSONS)+', ':''}${rub(-b)}. Спасибо!`
+    :`Здравствуйте! Занятия ${f} оплачены${b>0?`, на балансе ${rub(b)}`:''}. Следующую оплату можно внести заранее: ${st.price?rub(st.price*4)+' за 4 занятия':''}.`}
+function remindModal(st){
+  modal(`<h2>Напомнить об оплате</h2><p style="margin:0">Скопируйте и отправьте родителям${st.contact?': '+esc(st.contact):''}.</p>
+    <textarea id="rmsg" class="amsg" rows="4">${esc(remindText(st))}</textarea>
+    <div class="modal-actions"><button class="btn quiet" id="cl">Закрыть</button><button class="btn primary" id="cp">Скопировать</button></div>`,()=>{
+    document.getElementById('cl').onclick=close;const cp=document.getElementById('cp');cp.onclick=()=>copyText(document.getElementById('rmsg'),cp,'Скопировано')});
+}
+
+/* ---------- Мои материалы: сохранённые листы, свои темы и свои файлы ---------- */
+let FILES=null,FILES_ERR='';
+async function loadFiles(){if(!ACC.user)return;
+  try{FILES=await pbT.collection('files').getFullList({sort:'-created'});FILES_ERR=''}catch(e){FILES=FILES||[];FILES_ERR='Файлы не загрузились. Проверьте интернет.'}
+  if(V.screen==='materials')render()}
+async function uploadFiles(list){
+  const box=document.getElementById('upSt');
+  for(const f of list){
+    if(f.size>25e6){toast('Больше 25 МБ: '+f.name);continue}
+    if(box)box.textContent='Загружаю '+f.name+'…';
+    const fd=new FormData();fd.append('owner',ACC.user.id);fd.append('file',f);fd.append('name',f.name.slice(0,200));fd.append('folder',V.mfolder&&V.mfolder!=='*'?V.mfolder:'');
+    try{const r=await pbT.collection('files').create(fd);FILES=[r,...(FILES||[])]}catch(e){toast('Не загрузился: '+f.name)}}
+  render()}
+async function openFile(r){const w=window.open('about:blank','_blank');
+  try{const token=await pbT.files.getToken();const url=pbT.files.getURL(r,r.file,{token});if(w)w.location.href=url;else location.href=url}
+  catch(e){if(w)w.close();toast('Не удалось открыть файл')}}
+const fileKind=n=>{const x=(n.split('.').pop()||'').toLowerCase();return /^(png|jpe?g|webp|gif|heic)$/.test(x)?'IMG':x==='pdf'?'PDF':/^(docx?|odt|rtf)$/.test(x)?'DOC':/^(pptx?|key)$/.test(x)?'PPT':/^(xlsx?|csv)$/.test(x)?'XLS':'FILE'};
+const fsize=b=>b>1e6?(b/1e6).toFixed(1).replace('.',',')+' МБ':Math.max(1,Math.round(b/1e3))+' КБ';
+function folders(){return [...new Set([...S.saved.map(m=>m.folder),...(FILES||[]).map(f=>f.folder)].filter(Boolean))].sort((a,b)=>a.localeCompare(b,'ru'))}
+function pickStudent(title,cb,pre){
+  if(!S.students.length){toast('Сначала добавьте ученика');return}
+  if(S.students.length===1)return cb(S.students[0]);
+  modal(`<h2>${esc(title)}</h2><div class="picks">${S.students.map(s=>`<button class="pick${s.id===pre?' on':''}" data-id="${s.id}"><b>${esc(s.name)}</b><small>${gradeWord(s.grade)}</small></button>`).join('')}</div>
+    <div class="modal-actions"><button class="btn quiet" id="cl">Отмена</button></div>`,()=>{
+    document.getElementById('cl').onclick=close;document.querySelectorAll('.pick').forEach(b=>b.onclick=()=>{close();cb(student(b.dataset.id))})});
+}
+function folderModal(cur,cb){const fs=folders();
+  modal(`<h2>В папку</h2>
+    ${fs.length?`<div class="seg" id="fseg"><button type="button" data-f="" class="${!cur?'on':''}">Без папки</button>${fs.map(f=>`<button type="button" data-f="${esc(f)}" class="${f===cur?'on':''}">${esc(f)}</button>`).join('')}</div>`:''}
+    <div class="field"><label class="label" for="fnew">${fs.length?'Или новая папка':'Название папки'}</label><input type="text" id="fnew" maxlength="80" placeholder="Например: 2 класс, контрольные"></div>
+    <div class="modal-actions"><button class="btn quiet" id="cl">Отмена</button><button class="btn primary" id="ok">Готово</button></div>`,()=>{
+    let pick=cur||'';document.querySelectorAll('#fseg button').forEach(b=>b.onclick=()=>{pick=b.dataset.f;document.querySelectorAll('#fseg button').forEach(x=>x.classList.toggle('on',x===b))});
+    document.getElementById('cl').onclick=close;document.getElementById('ok').onclick=()=>{const f=val('fnew')||pick;close();cb(f)}});
+}
+/* сохранить лист с экрана темы: тот же вариант, тот же состав */
+function saveSheetModal(st,t,tpl,blocks){
+  const kind=tpl!=='train'?tplName(tpl):t.sheet||t.review?t.L[0].n:LV[V.level]+' уровень';
+  const def=t.t+' · '+kind;
+  modal(`<h2>В мои материалы</h2>
+    <div class="field"><label class="label" for="mnm">Название</label><input type="text" id="mnm" maxlength="120" value="${esc(def)}"></div>
+    ${folders().length?`<div class="field"><span class="label">Папка</span><div class="seg" id="fseg"><button type="button" data-f="" class="on">Без папки</button>${folders().map(f=>`<button type="button" data-f="${esc(f)}">${esc(f)}</button>`).join('')}</div></div>`:''}
+    <p class="hint" style="margin:0">Сохранится этот вариант листа. Его можно будет распечатать или выдать любому ученику.</p>
+    <div class="modal-actions"><button class="btn quiet" id="cl">Отмена</button><button class="btn primary" id="ok">Сохранить</button></div>`,()=>{
+    let folder='';document.querySelectorAll('#fseg button').forEach(b=>b.onclick=()=>{folder=b.dataset.f;document.querySelectorAll('#fseg button').forEach(x=>x.classList.toggle('on',x===b))});
+    document.getElementById('cl').onclick=close;
+    document.getElementById('ok').onclick=()=>{
+      const m={id:'m'+Date.now(),name:val('mnm')||def,folder,date:Date.now(),sid:st.id,grade:t.grade,kind,seed:V.seed};
+      if(tpl!=='train')m.sheet=sheetTopic(tplName(tpl),blocks,t);
+      else if(t.review||t.sheet)m.sheet=JSON.parse(JSON.stringify(t));
+      else Object.assign(m,{topicId:t.id,level:V.level,over:V.over||null,subName:V.subName||null});
+      S.saved.unshift(m);save();close();toast('Сохранено в «Мои материалы»')};
+  });
+}
+function openSaved(m){
+  pickStudent('Для кого лист?',st=>{
+    if(m.sheet){const sh={...JSON.parse(JSON.stringify(m.sheet)),id:'sheet-'+Date.now(),sheet:true,custom:true,forStudent:st.id};delete sh.review;sh.sheet=true;
+      S.customTopics.push(sh);TOPICS=allTopics();save();
+      go({screen:'topic',studentId:st.id,subject:sh.subject||'math',topicId:sh.id,level:0,seed:m.seed,over:null,subName:null,tpl:'train',blocks:null,confirmDel:false})}
+    else{if(!TOPICS[m.topicId]){toast('Тема этого листа удалена');return}
+      go({screen:'topic',studentId:st.id,subject:TOPICS[m.topicId].subject,topicId:m.topicId,level:Math.min(m.level||0,TOPICS[m.topicId].L.length-1),seed:m.seed,over:m.over,subName:m.subName,tpl:'train',blocks:null,confirmDel:false})}
+  },m.sid);
+}
+function viewMaterials(){
+  const tab=V.mtab||'sheets',fl=V.mfolder||'*';
+  if(tab==='files'&&ACC.user&&FILES===null)loadFiles();
+  const inF=x=>fl==='*'||(x.folder||'')===fl;
+  const mine=S.customTopics.filter(c=>!c.review&&!c.sheet);
+  const sv=S.saved.filter(inF),fs=(FILES||[]).filter(inF);
+  const fchips=folders();
+  const card=m=>{const st=student(m.sid);return `<div class="mcard"><button class="mc-main" data-open="${m.id}"><span class="mc-k">${esc(m.kind||'Лист')}</span><b>${esc(m.name)}</b>
+      <small>${m.grade?gradeWord(m.grade)+' · ':''}${st?'для '+esc(st.name)+' · ':''}${ago(m.date)}</small></button>
+      <div class="mc-act">${m.folder?`<span class="chip">${esc(m.folder)}</span>`:''}<button class="ibtn" data-mf="${m.id}" aria-label="В папку">${icon('materials')}</button><button class="ibtn${V.delM===m.id?' on':''}" data-md="${m.id}" aria-label="Удалить">${V.delM===m.id?'Удалить?':'✕'}</button></div></div>`};
+  let body='';
+  if(tab==='sheets')body=sv.length?`<div class="mgrid">${sv.map(card).join('')}</div>`
+    :`<div class="empty-first big-empty">${emptyArt('cheburashka-1')}<div><h2>${fl==='*'?'Сохранённых листов пока нет':'В этой папке листов нет'}</h2><p>Откройте тему ученика и нажмите «В материалы» — лист сохранится вместе с вариантом, и его можно будет выдать любому ученику.</p></div></div>`;
+  if(tab==='files'){
+    if(!ACC.user)body=`<div class="empty-first"><h2>Свои файлы — в аккаунте</h2><p>Загружайте PDF, картинки и документы к урокам. Это работает после регистрации: файлы хранятся на сервере и видны только вам.</p><button class="btn primary" id="toSignup2">Зарегистрироваться</button></div>`;
+    else body=`<label class="drop" id="drop"><input type="file" id="fin" multiple accept=".pdf,.png,.jpg,.jpeg,.webp,.gif,.heic,.doc,.docx,.odt,.rtf,.ppt,.pptx,.xls,.xlsx,.csv,.txt"><b>Загрузить файлы</b><span id="upSt">PDF, картинки, документы до 25 МБ. Можно перетащить сюда.</span></label>
+      ${FILES_ERR?`<p class="hint" style="color:var(--pen)">${FILES_ERR}</p>`:''}
+      ${FILES===null?'<p class="empty">Загружаю…</p>':fs.length?`<div class="flist">${fs.map(f=>`<div class="frow"><button class="fr-main" data-fo="${f.id}"><span class="fk fk-${fileKind(f.name||f.file)}">${fileKind(f.name||f.file)}</span><span class="fr-t"><b>${esc(f.name||f.file)}</b><small>${ago(new Date(f.created.replace(' ','T')).getTime())}</small></span></button>
+        ${f.folder?`<span class="chip">${esc(f.folder)}</span>`:''}<button class="ibtn" data-ff="${f.id}" aria-label="В папку">${icon('materials')}</button><button class="ibtn${V.delF===f.id?' on':''}" data-fd="${f.id}" aria-label="Удалить">${V.delF===f.id?'Удалить?':'✕'}</button></div>`).join('')}</div>`:'<p class="empty">Файлов пока нет.</p>'}`}
+  if(tab==='topics')body=`${mine.length?`<div class="flist">${mine.map(c=>`<div class="frow"><button class="fr-main" data-tp="${c.id}"><span class="fk">${c.grade}</span><span class="fr-t"><b>${esc(c.t)}</b><small>${SUBJ[c.subject]||''} · ${gradeWord(c.grade)} · ${c.L.length} ${plural(c.L.length,['уровень','уровня','уровней'])}</small></span></button></div>`).join('')}</div>`:'<p class="empty">Своих тем пока нет.</p>'}
+    <button class="btn" id="newTopic">+ Своя тема</button><p class="hint">Своя тема встаёт в маршрут ученика того класса, для которого её сделали.</p>`;
+  app.innerHTML=`<div class="head"><div><h1>Мои материалы</h1><p>Сохранённые листы, свои темы и файлы к урокам.</p></div></div>
+    <div class="panel"><div class="tabs">${[['sheets','Листы',S.saved.length],['files','Файлы',FILES?FILES.length:''],['topics','Свои темы',mine.length]].map(([k,n,c])=>`<button class="tab${k===tab?' on':''}" data-tab="${k}">${n}${c?` <span class="tc">${c}</span>`:''}</button>`).join('')}</div>
+      ${tab!=='topics'&&fchips.length?`<div class="fchips"><button class="${fl==='*'?'on':''}" data-fl="*">Все</button>${fchips.map(f=>`<button class="${f===fl?'on':''}" data-fl="${esc(f)}">${esc(f)}</button>`).join('')}</div>`:''}
+      <div class="mbody">${body}</div></div>`;
+  const $=id=>document.getElementById(id);
+  app.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>go({mtab:b.dataset.tab,delM:null,delF:null}));
+  app.querySelectorAll('[data-fl]').forEach(b=>b.onclick=()=>go({mfolder:b.dataset.fl}));
+  app.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>openSaved(S.saved.find(m=>m.id===b.dataset.open)));
+  app.querySelectorAll('[data-mf]').forEach(b=>b.onclick=()=>{const m=S.saved.find(x=>x.id===b.dataset.mf);folderModal(m.folder,f=>{m.folder=f;save();render()})});
+  app.querySelectorAll('[data-md]').forEach(b=>b.onclick=()=>{if(V.delM!==b.dataset.md){V.delM=b.dataset.md;render();return}S.saved=S.saved.filter(m=>m.id!==b.dataset.md);V.delM=null;save();render()});
+  app.querySelectorAll('[data-fo]').forEach(b=>b.onclick=()=>openFile(FILES.find(f=>f.id===b.dataset.fo)));
+  app.querySelectorAll('[data-ff]').forEach(b=>b.onclick=()=>{const f=FILES.find(x=>x.id===b.dataset.ff);folderModal(f.folder,async v=>{try{const r=await pbT.collection('files').update(f.id,{folder:v});Object.assign(f,r)}catch(e){toast('Нет связи с сервером')}render()})});
+  app.querySelectorAll('[data-fd]').forEach(b=>b.onclick=async()=>{if(V.delF!==b.dataset.fd){V.delF=b.dataset.fd;render();return}
+    try{await pbT.collection('files').delete(b.dataset.fd);FILES=FILES.filter(f=>f.id!==b.dataset.fd)}catch(e){toast('Нет связи с сервером')}V.delF=null;render()});
+  app.querySelectorAll('[data-tp]').forEach(b=>b.onclick=()=>{const c=TOPICS[b.dataset.tp];pickStudent('Для кого тема?',st=>{V.studentId=st.id;V.subject=c.subject;openTopic(c.id)},c.forStudent)});
+  if($('newTopic'))$('newTopic').onclick=()=>pickStudent('Для какого ученика тема?',st=>{V.studentId=st.id;V.subject=st.subjects[0];openBuilder()});
+  if($('toSignup2'))$('toSignup2').onclick=()=>go({screen:'auth',authMode:'signup'});
+  const fin=$('fin');if(fin){fin.onchange=()=>uploadFiles([...fin.files]);
+    const dr=$('drop');dr.ondragover=e=>{e.preventDefault();dr.classList.add('over')};dr.ondragleave=()=>dr.classList.remove('over');
+    dr.ondrop=e=>{e.preventDefault();dr.classList.remove('over');uploadFiles([...e.dataTransfer.files])}}
+}
+
+/* ---------- Профиль ---------- */
+function viewProfile(){
+  const P0=S.profile||{};
+  if(!ACC.user){app.innerHTML=`<div class="head"><div><h1>Профиль</h1><p>Вы в демо: данные хранятся только в этом браузере.</p></div></div>
+    <div class="pgrid"><section class="panel ppanel"><h2 class="ph">Свой аккаунт</h2><p>После регистрации появятся кабинеты учеников, свои файлы и сохранение на сервере: данные не пропадут при смене браузера или телефона.</p>
+      <div class="pact"><button class="btn primary" id="toSignup2">Зарегистрироваться</button><button class="btn quiet" id="toLogin">Войти</button></div></section>
+      <section class="panel ppanel"><h2 class="ph">Демо-данные</h2><p>Вернуть учеников, занятия и оплаты из примера.</p><div class="pact"><button class="btn quiet" id="reset">Вернуть демо-данные</button></div></section></div>`;
+    document.getElementById('toSignup2').onclick=()=>go({screen:'auth',authMode:'signup'});document.getElementById('toLogin').onclick=()=>go({screen:'auth',authMode:'login'});
+    document.getElementById('reset').onclick=()=>{setState(demoState());save();toast('Демо-данные возвращены');render()};return}
+  const u=ACC.user;
+  app.innerHTML=`<div class="head"><div><h1>Профиль</h1><p>${esc(u.email||'')}</p></div></div>
+    <div class="pgrid">
+      <section class="panel ppanel"><h2 class="ph">Как вас зовут</h2>
+        <div class="field"><label class="label" for="pfn">Имя и фамилия</label><input type="text" id="pfn" maxlength="120" value="${esc(u.name||'')}" autocomplete="name"></div>
+        <p class="hint" style="margin:0">Имя видят ученики в своём кабинете.</p>
+        <div class="pact"><button class="btn primary" id="pSave">Сохранить</button><span class="hint" id="pSt"></span></div></section>
+      <section class="panel ppanel"><h2 class="ph">Занятия по умолчанию</h2>
+        <div class="two"><div class="field"><label class="label" for="ppr">Стоимость, ₽</label><input type="number" id="ppr" min="0" step="100" value="${P0.price||''}" placeholder="1200"></div>
+          <div class="field"><label class="label" for="pdu">Длительность, мин</label><input type="number" id="pdu" min="15" step="5" value="${P0.dur||60}"></div></div>
+        <p class="hint" style="margin:0">Подставляется новым ученикам. У каждого ученика можно поменять в карточке.</p>
+        <div class="pact"><button class="btn" id="pDef">Сохранить</button></div></section>
+      <section class="panel ppanel"><h2 class="ph">Пароль</h2>
+        <form id="pwf" class="pwf"><input type="email" value="${esc(u.email||'')}" autocomplete="username" hidden>
+          <div class="field"><label class="label" for="pw0">Текущий пароль</label><input type="password" id="pw0" autocomplete="current-password" required></div>
+          <div class="two"><div class="field"><label class="label" for="pw1">Новый пароль</label><input type="password" id="pw1" autocomplete="new-password" minlength="8" required></div>
+            <div class="field"><label class="label" for="pw2">Ещё раз</label><input type="password" id="pw2" autocomplete="new-password" minlength="8" required></div></div>
+          <div class="pact"><button class="btn" id="pwOk">Сменить пароль</button><span class="hint" id="pwSt"></span></div></form></section>
+      <section class="panel ppanel"><h2 class="ph">Аккаунт</h2>
+        <p>Учеников: ${S.students.length} · листов в материалах: ${S.saved.length}</p>
+        <div class="pact"><button class="btn quiet" id="pExp">Скачать копию данных</button><button class="btn quiet" id="pOut">Выйти</button></div>
+        <div class="pact"><button class="btn quiet pen" id="pDel">${V.confirmAcc?'Нажмите ещё раз: аккаунт, ученики и файлы удалятся навсегда':'Удалить аккаунт'}</button></div></section>
+    </div>`;
+  const $=id=>document.getElementById(id);
+  $('pSave').onclick=async()=>{const name=val('pfn');$('pSt').textContent='Сохраняю…';
+    try{const r=await pbT.collection('users').update(u.id,{name});pbT.authStore.save(pbT.authStore.token,r);ACC.user=r;$('pSt').textContent='Сохранено';crumbs()}
+    catch(e){$('pSt').textContent='Нет связи с сервером'}};
+  $('pDef').onclick=()=>{S.profile={...P0,price:Math.max(0,+val('ppr')||0),dur:Math.max(15,+val('pdu')||60)};save();toast('Сохранено')};
+  $('pwf').onsubmit=async e=>{e.preventDefault();const o=$('pw0').value,a=$('pw1').value,b=$('pw2').value,stt=$('pwSt');
+    if(a.length<8){stt.textContent='Новый пароль — от 8 символов';return}if(a!==b){stt.textContent='Пароли не совпадают';return}
+    stt.textContent='Меняю…';$('pwOk').disabled=true;
+    try{await pbT.collection('users').update(u.id,{oldPassword:o,password:a,passwordConfirm:b});await pbT.collection('users').authWithPassword(u.email,a);
+      ACC.user=pbT.authStore.record;$('pwf').reset();stt.textContent='Пароль изменён'}
+    catch(err){const d=err&&err.response&&err.response.data||{};stt.textContent=d.oldPassword?'Текущий пароль не подходит':err&&err.status===0?'Нет связи с сервером':'Не получилось сменить пароль'}
+    finally{$('pwOk').disabled=false}};
+  $('pExp').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(S,null,1)],{type:'application/json'}));a.download='kletka-'+dkey(Date.now())+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000)};
+  $('pOut').onclick=logout;
+  $('pDel').onclick=async()=>{if(!V.confirmAcc){V.confirmAcc=true;render();return}
+    try{await pbT.collection('users').delete(u.id);try{localStorage.removeItem(KEY_NOW)}catch(e){}V.confirmAcc=false;logout()}catch(e){toast('Не получилось удалить аккаунт: нет связи')}};
+}
+
 /* ---------- модалки ---------- */
 const mroot=document.getElementById('modal-root');
 function modal(html,bind){mroot.innerHTML=`<div class="veil" id="veil"><div class="modal" role="dialog" aria-modal="true">${html}</div></div>`;
@@ -3101,30 +3747,44 @@ function linkFallback(st,h,note){
   });
 }
 
+/* стоимость и длительность занятия, общие для добавления и правки ученика */
+const durOpts=d=>[30,45,60,90,120].concat([30,45,60,90,120].includes(d)?[]:[d]).sort((x,y)=>x-y).map(m=>`<option value="${m}"${m===d?' selected':''}>${m} мин</option>`).join('');
+const priceRow=(price,dur)=>`<div class="two"><div class="field"><label for="spr" class="label">Стоимость занятия, ₽</label><input id="spr" type="number" min="0" step="100" inputmode="numeric" value="${price||''}" placeholder="1200"></div>
+  <div class="field"><label for="sdu" class="label">Длительность</label><select id="sdu">${durOpts(dur||60)}</select></div></div>`;
 function editStudentModal(st){
-  let grade=st.grade;
+  let grade=st.grade;const se=slotEditor(st);
   modal(`<h2>Ученик</h2>
-    <div class="field"><label for="enm" class="label">Имя и фамилия</label><input id="enm" type="text" autocomplete="off" value="${esc(st.name)}"></div>
+    <div class="two"><div class="field"><label for="enm" class="label">Имя</label><input id="enm" type="text" autocomplete="off" value="${esc(firstName(st))}"></div>
+      <div class="field"><label for="enm2" class="label">Фамилия</label><input id="enm2" type="text" autocomplete="off" value="${esc(st.last!=null?st.last:st.name.split(/\s+/).slice(1).join(' '))}"></div></div>
     <div class="field"><span class="label">Класс в школе</span><div class="seg" id="egr">${[1,2,3,4].map(g=>`<button data-g="${g}" class="${g===grade?'on':''}">${g}</button>`).join('')}</div></div>
+    ${priceRow(st.price,st.dur)}
+    <p class="hint" style="margin:-6px 0 0">Новая цена действует для следующих занятий, прошлые остаются по старой.</p>
+    ${se.html}
+    <div class="field"><label for="egoal" class="label">Цель занятий</label><input id="egoal" type="text" maxlength="200" value="${esc(st.goal||'')}" placeholder="Например: подтянуть таблицу умножения"></div>
+    <div class="field"><label for="ecnt" class="label">Связь с родителями</label><input id="ecnt" type="text" maxlength="200" value="${esc(st.contact||'')}" placeholder="Мама, телефон или ник в мессенджере"></div>
+    <div class="field"><label for="enote" class="label">Заметка для себя</label><textarea id="enote" rows="2" maxlength="1000" placeholder="Видите только вы">${esc(st.note||'')}</textarea></div>
     <div class="field"><span class="label">Предметы</span><div class="checks">${Object.entries(SUBJ).map(([k,l])=>`<label><input type="checkbox" data-subj="${k}" ${st.subjects.includes(k)?'checked':''}> ${l}</label>`).join('')}</div>
       <span class="hint">Если убрать предмет, его результаты сохранятся и вернутся, когда предмет снова включат.</span></div>
     <p class="hint" id="eerr" style="margin:0;color:var(--pen)"></p>
     <div class="modal-actions"><button class="btn quiet" id="cl">Отмена</button><button class="btn primary" id="ok">Сохранить</button></div>`,()=>{
+    se.bind();
     document.querySelectorAll('#egr button').forEach(b=>b.onclick=()=>{grade=+b.dataset.g;document.querySelectorAll('#egr button').forEach(x=>x.classList.toggle('on',x===b))});
     document.getElementById('cl').onclick=close;
     document.getElementById('ok').onclick=()=>{
-      const name=document.getElementById('enm').value.trim();
+      const first=val('enm'),last=val('enm2'),name=(first+' '+last).trim();
       const subjects=[...document.querySelectorAll('[data-subj]')].filter(c=>c.checked).map(c=>c.dataset.subj);
-      if(!name){document.getElementById('eerr').textContent='Введите имя ученика.';return}
+      if(!first){document.getElementById('eerr').textContent='Введите имя ученика.';return}
       if(!subjects.length){document.getElementById('eerr').textContent='Оставьте хотя бы один предмет.';return}
-      st.name=name;st.first=name.split(/\s+/)[0];st.last=name.split(/\s+/).slice(1).join(' ');st.grade=grade;st.subjects=subjects;save();close();
+      st.name=name;st.first=first;st.last=last;st.grade=grade;st.subjects=subjects;
+      setPrice(st,val('spr'));st.dur=+val('sdu')||60;applySlots(st,se.read());
+      st.goal=val('egoal');st.contact=val('ecnt');st.note=val('enote');save();close();
       if(ACC.user&&st.acc&&st.acc.id)pbT.collection('students').update(st.acc.id,{name:st.first,surname:st.last,grade}).catch(()=>{});
-      go({screen:'student',studentId:st.id,subject:subjects.includes(V.subject)?V.subject:subjects[0]});
+      if(V.screen==='student'||V.screen==='students')go({screen:'student',studentId:st.id,subject:subjects.includes(V.subject)?V.subject:subjects[0]});else render();
     };
   });
 }
 function addStudentModal(){
-  let grade=2;const subj=new Set(['math']);
+  let grade=2;const subj=new Set(['math']);const se=slotEditor(null);
   modal(`<h2>Новый ученик</h2>
     <div class="two"><div class="field"><label for="nm" class="label">Имя</label><input id="nm" type="text" placeholder="Соня" autocomplete="off"></div>
       <div class="field"><label for="nm2" class="label">Фамилия</label><input id="nm2" type="text" placeholder="Петрова" autocomplete="off"></div></div>
@@ -3134,6 +3794,8 @@ function addStudentModal(){
     <div class="field" id="rus-start-f" hidden><label class="label" for="st-start-rus">С какой темы начать русский</label><select id="st-start-rus"></select></div>
     <div class="field"><span class="label">Предметы</span><div class="checks">
       <label><input type="checkbox" id="sm" checked> Математика</label><label><input type="checkbox" id="sr"> Русский язык</label></div></div>
+    ${priceRow((S.profile||{}).price,(S.profile||{}).dur)}
+    ${se.html}
     <p class="hint" id="err" style="margin:0"></p>
     <div class="modal-actions"><button class="btn quiet" id="cl">Отмена</button><button class="btn primary" id="ok">Добавить</button></div>`,()=>{
     const fillStart=()=>{const sel=document.getElementById('st-start');
@@ -3143,7 +3805,7 @@ function addStudentModal(){
       document.getElementById('rus-start-f').hidden=!(rt.length&&document.getElementById('sr').checked);
       rs.innerHTML=rt.map(id=>`<option value="${id}">${gradeWord(TOPICS[id].grade)} · ${esc(TOPICS[id].t)}</option>`).join('');
       const d=rt.find(id=>TOPICS[id].grade>=grade);if(d)rs.value=d};
-    fillStart();
+    fillStart();se.bind();
     document.getElementById('sr').onchange=fillStart;
     document.querySelectorAll('#gr button').forEach(b=>b.onclick=()=>{grade=+b.dataset.g;document.querySelectorAll('#gr button').forEach(x=>x.classList.toggle('on',x===b));fillStart()});
     document.getElementById('cl').onclick=close;
@@ -3153,7 +3815,8 @@ function addStudentModal(){
       if(!first){document.getElementById('err').textContent='Введите имя ученика.';return}
       if(!subjects.length){document.getElementById('err').textContent='Отметьте хотя бы один предмет.';return}
       const id='s'+Date.now();
-      const ns={id,name,first,last,grade,subjects,current:document.getElementById('st-start').value};
+      const ns={id,name,first,last,grade,subjects,current:document.getElementById('st-start').value,dur:+val('sdu')||60,slots:[]};
+      setPrice(ns,val('spr'));applySlots(ns,se.read());
       if(subjects.includes('rus')&&trackIds('rus').length)ns.currentRus=document.getElementById('st-start-rus').value;
       S.students.push(ns);save();close();
       go({screen:'student',studentId:id,subject:subjects[0]});
@@ -3278,7 +3941,7 @@ let STUDENT_MODE=false;
     P={h:{code:d.c,level:0},t:{t:d.t,grade:d.g,sheet:d.mix},name:d.n,remote:true,items:generate(d.p,d.s),i:0,input:'',correct:0,streak:0,score:0,mistakes:[],log:[],start:Date.now(),fb:null,lock:false};
     V={screen:'player'};document.title=d.t+' · Клетка'}
   catch(e){V={screen:'badlink'}}}}
-document.getElementById('home').onclick=()=>{if(!STUDENT_MODE&&(ACC.user||ACC.demo))go({screen:'students'})};
+document.getElementById('home').onclick=()=>{if(!STUDENT_MODE&&(ACC.user||ACC.demo))go({screen:'today'})};
 if(CABINET){
   STUDENT_MODE=true;document.body.classList.add('cabinet');document.title='Мои задания';document.getElementById('ati').href='../icons/u-180.png';
   addEventListener('focus',()=>{if(V.screen==='cab'&&pbS.authStore.isValid)loadCab()});
