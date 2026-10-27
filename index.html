@@ -656,6 +656,32 @@ button.wait-chip:hover{filter:brightness(.96)}
 .bsum{margin:0;padding-left:18px;font-size:14px;color:var(--ink-2)}
 .bsum li span{margin-left:6px}
 .sheet-bar{margin-bottom:8px}
+
+/* экран ученика: акцентная плашка, цвета тем, все темы под лупой */
+.sthead{background:var(--ink);color:var(--card);border-radius:14px;padding:16px 18px;align-items:center}
+.sthead .sth-t h1{color:var(--card)}
+.sthead .sth-t span{color:var(--card);opacity:.75}
+.sthead .more-btn{background:transparent;border-color:rgba(255,255,255,.35);color:var(--card)}
+.wait-chip.red{background:var(--pen);color:#fff;opacity:1 !important}
+.route-head h2{font-size:18px;font-weight:700;color:var(--ink);text-transform:none;letter-spacing:0;font-family:var(--f-disp)}
+.rl.prev{opacity:.75}
+.rl.prev .rl-mark,.rl.prev .rl-mark.ok{background:#2C9B5A;color:#fff;border:0}
+.rl.cur{background:var(--pen-soft)}
+.rl.cur .rl-mark{background:var(--pen);color:#fff}
+.rl.next .rl-mark{background:#8FCBF2;border:0}
+.rl.next.next2 .rl-mark{background:#2D57C8}
+.allt{border-top:1px solid var(--line);padding:14px 18px}
+.allt-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.allt-t{border:0;background:none;padding:4px 0;font-family:var(--f-disp);font-weight:700;font-size:18px;color:var(--ink);display:flex;gap:8px;align-items:center}
+.allt-t span{font-size:14px;color:var(--ink-2)}
+.qbtn{width:40px;height:40px;border-radius:10px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);display:grid;place-items:center}
+.qbtn.on,.qbtn:hover{border-color:var(--ink)}
+.allt .search{padding:12px 0 0}
+.allt #pmain{margin:6px -18px -14px}
+
+.sh-items>.pfill{flex:0 0 100%;display:flex;justify-content:flex-end;background:#fff}
+.sh-items>.pfill.left{justify-content:flex-start}
+.pfill img.art.pic{height:100%;width:auto;max-width:60%;object-fit:contain}
 </style>
 
 <header class="top"><div class="top-in">
@@ -2033,10 +2059,11 @@ function sheetParts(items,{topic,level,seed,studentName,answers,design}){
     const sideFit=(pic,kk)=>{const w=avail-pic-2;if(w<6)return null;if(kk&&kk<=w)return{n:Math.floor((w+2)/(kk+2)),kw:kk,w,pic};return kk?null:{n:1,kw:w,w,pic}};
     const sg=(f,html)=>`<div class="sgrid" style="width:calc(var(--c) * ${f.w})">${html}</div>`;
     /* большой лист — примерно больше полутора страниц: на нём картинок больше */
-    let tot=0;{let col=0,rh=0;const close=()=>{if(col){tot+=rh+1;col=0;rh=0}};
-      items.forEach((it,i)=>{const g=mixed&&newGroup(it,i);if(g||isSpan(it))close();if(g)tot+=2;
+    /* примерная высота листа в клетках: где начинается каждое задание */
+    const startY=[];let tot=0;{let col=0,rh=0;const close=()=>{if(col){tot+=rh+1;col=0;rh=0}};
+      items.forEach((it,i)=>{const g=mixed&&newGroup(it,i);if(g||isSpan(it))close();if(g)tot+=2;startY[i]=tot+(col?0:0);
         if(isSpan(it)){tot+=estH(it)+1;return}const kk=kOf[gid[i]]||k,n=Math.max(1,Math.floor((avail+2)/(kk+2)));
-        rh=Math.max(rh,estH(it));if(++col>=n)close()});close()}
+        rh=Math.max(rh,estH(it));if(++col>=n)close()});close();startY[items.length]=tot}
     const big=tot>34||(mixed&&items.length>=12);
     /* блок «картинка сбоку, задания рядом»: берёт задания с конца отрезка [lo, hi), сколько поместится по высоте картинки */
     const sideBlock=(lo,hi,src,ar,left,extra)=>{if(!src||hi<=lo)return null;
@@ -2075,19 +2102,25 @@ function sheetParts(items,{topic,level,seed,studentName,answers,design}){
         heroIn=true}
     }
     const n=items.length,img=D.img;
-    /* «Сказка»: на большом листе вторая картинка в середине, третья в конце; на обычном — вторая в конце.
-       «Яркий»: картинка в шапке, на большом листе ещё одна в конце */
-    let mid=null,end=null,midAt=n,midPiece='',endPiece='';
-    if(img&&D.lv===1&&big){
-      end=sideBlock(M,n,img.char,img.arBot||1,true);const tEnd=end?end.t:n;
-      midAt=Math.round((M+tEnd)/2);mid=sideBlock(M,midAt,img.bot,img.arBot||1,false,say);
-      endPiece=end?end.html:alone(img.char);midPiece=mid?mid.html:alone(img.bot,say);
-      if(!end)end={t:n};if(!mid)mid={t:midAt}}
-    else if(img&&D.lv===1){end=sideBlock(M,n,img.bot,img.arBot||1,false,say);endPiece=end?end.html:alone(img.bot,say);if(!end)end={t:n}}
-    else if(img&&D.lv===2&&big){end=sideBlock(0,n,img.top,img.arTop||1,true);endPiece=end?end.html:alone(img.top);if(!end)end={t:n}}
-    if(heroIn||midPiece||endPiece){
-      const tEnd=end?end.t:n,tMid=mid?mid.t:tEnd,hiMid=mid?midAt:tEnd;
-      pieces.splice(0,pieces.length,...(headPiece?[headPiece]:[]),...pieces.slice(M,tMid),...(midPiece?[midPiece]:[]),...pieces.slice(hiMid,tEnd),...(endPiece?[endPiece]:[]))}
+    const blocks=[];
+    if(img&&big){
+      /* большой лист: по картинке в начале каждой следующей страницы A4 (примерно; остальное добирает печать) */
+      const CAP1=D.lv===1?37:24,CAP=38,heroH=headPiece?Math.round(Math.max(8,(D.img.arTop?1:1)*13))+1:0;
+      const posY=i=>heroH+startY[i]-startY[M];
+      const order=D.lv===1?[[img.bot,img.arBot,false,say],[img.char,img.arBot,true],[img.top,img.arTop,true]]:[[img.char,img.arBot,true],[img.bot,img.arBot,false,say],[img.top,img.arTop,true]];
+      let lo=M;
+      for(let pg=1,b=CAP1;pg<12;pg++,b+=CAP){
+        if(posY(n)<=b+6)break;
+        let hi=lo;while(hi<n&&posY(hi)<b+9)hi++;
+        const [src,ar,left,extra]=order[(pg-1)%order.length];
+        const blk=sideBlock(lo,hi,src,ar||1,left,extra);if(blk){blocks.push({t:blk.t,hi,html:blk.html});lo=hi}}
+    }else if(img&&D.lv===1){
+      const blk=sideBlock(M,n,img.bot,img.arBot||1,false,say);
+      blocks.push(blk?{t:blk.t,hi:n,html:blk.html}:{t:n,hi:n,html:alone(img.bot,say)})}
+    if(heroIn||blocks.length){
+      const out=headPiece?[headPiece]:[];let at=M;
+      for(const b of blocks){out.push(...pieces.slice(at,b.t),b.html);at=b.hi}
+      out.push(...pieces.slice(at));pieces.splice(0,pieces.length,...out)}
   }
   const cls=D?`lv${D.lv} fr-${D.frame}${D.bw?' bw':''}`:'';
   const pal=D?(D.bw?['#555','#999','#f2f2f2','#777']:D.pal):null;
@@ -2096,7 +2129,9 @@ function sheetParts(items,{topic,level,seed,studentName,answers,design}){
     if(D.lv<=2){const slots=D.lv===1?[[6,3.5,9],[94,3.5,9],[6,97,9],[94,97,9],[3.6,36,6],[96.4,52,6],[3.6,70,6],[96.4,84,6]]:[[94,3.5,7],[6,97,7],[94,97,7]];
       h+=shuffle(r,slots).slice(0,D.lv===1?5:2).map(([x,y,z])=>stkSVG(pick(r,D.theme.stk),'deco-stk',`left:${x}%;top:${y}%;width:${z}cqw;height:${z}cqw;transform:translate(-50%,-50%) rotate(${ri(r,-18,18)}deg)`)).join('')}
     return `<div class="deco" aria-hidden="true">${h}</div>`};
-  return{head:heroIn?fields:head,mini,cols,gridStyle,pieces,cls,style,deco,footL:esc(topic.section),footR:`Проверить онлайн: код варианта ${seed}`};
+  /* картинки для пустых мест внизу печатных страниц */
+  const pics=D&&D.img&&D.lv<=2?[D.img.bot,D.img.char,D.img.top].filter(Boolean):[];
+  return{head:heroIn?fields:head,pics,mini,cols,gridStyle,pieces,cls,style,deco,footL:esc(topic.section),footR:`Проверить онлайн: код варианта ${seed}`};
 }
 function sheetHTML(items,o){
   const s=sheetParts(items,o);
@@ -2113,12 +2148,20 @@ function paginate(host,items,o){
     host.appendChild(d);return d};
   let page=newPage(true);
   const over=pg=>{const inner=pg.querySelector('.sheet-in');return inner.scrollHeight>pg.clientHeight+1};
+  /* на каждой печатной странице — картинка: если её нет, она встаёт в свободное место внизу страницы */
+  let fk=0;
+  const fill=pg=>{if(!s.pics.length||pg.querySelector('img.pic'))return;
+    const grid=pg.querySelector('.sh-items'),foot=pg.querySelector('.sh-foot'),c=pg.clientWidth*CELL/100;
+    const n=Math.min(14,Math.floor((foot.getBoundingClientRect().top-grid.getBoundingClientRect().bottom)/c)-2);if(n<6)return;
+    grid.insertAdjacentHTML('beforeend',`<div class="pfill${fk%2?' left':''}" style="height:calc(var(--c) * ${n})">${artImg(s.pics[fk%s.pics.length])}</div>`);fk++;
+    if(over(pg))grid.lastElementChild.remove()};
   for(const html of s.pieces){
     let grid=page.querySelector('.sh-items');const before=grid.children.length;
     grid.insertAdjacentHTML('beforeend',html);snapCells(page.parentNode);
     if(over(page)&&before>0){const n=grid.children.length-before;for(let k=0;k<n;k++)grid.lastElementChild.remove();
-      page=newPage(false);page.querySelector('.sh-items').insertAdjacentHTML('beforeend',html);snapCells(page.parentNode)}
+      fill(page);page=newPage(false);page.querySelector('.sh-items').insertAdjacentHTML('beforeend',html);snapCells(page.parentNode)}
   }
+  fill(page);
   const pages=[...host.children];pages.forEach((pg,k)=>pg.querySelector('.pg').textContent=`Страница ${k+1} из ${pages.length} · ${s.footR}`);
   return pages.length;
 }
@@ -2224,26 +2267,26 @@ function viewStudent(){
   if(pos.i>=0){
     const {tr,i}=pos;
     const row=(id,kind,tag)=>{const t=TOPICS[id],m=mastery(st.id,id);
-      const mark=kind==='cur'?'▶':kind==='prev'?(m.cls==='ok'?'✓':m.cls?'!':'·'):'';
-      const mk=kind==='prev'?(m.cls==='ok'?'ok':m.cls?m.cls:''):'';
+      const mark=kind==='cur'?'▶':kind==='prev'?'✓':'';
+      const mk=kind==='prev'?'ok':'';
       return `<button class="rl ${kind}" data-t="${id}"><span class="rl-mark ${mk}">${mark}</span>
         <span class="rl-t">${esc(t.t)}${t.grade!==st.grade?`<small>${gradeWord(t.grade)}</small>`:''}</span>
         <span class="rl-p">${m.pct!=null?m.pct+'%':''}${m.pct!=null&&m.low?'<small>мало данных</small>':''}</span></button>`};
     const cur=TOPICS[tr[i]],ahead=cur.grade-st.grade,mc=mastery(st.id,cur.id);
     route=`<section class="route" aria-label="Маршрут ученика">
-      <div class="route-head"><h2>Маршрут</h2></div>
+      <div class="route-head"><h2>Темы</h2></div>
       <div class="rlist">${tr[i-2]?row(tr[i-2],'prev'):''}${tr[i-1]?row(tr[i-1],'prev'):'<div class="rl-empty">Это первая тема программы</div>'}${row(tr[i],'cur','сейчас')}
-        ${tr[i+1]?row(tr[i+1],'next','дальше'):`<div class="rl-empty">${subj==='math'?'Дальше программы 1–4 класса пока нет':'Дальше тем нет, добавьте свою'}</div>`}${tr[i+2]?row(tr[i+2],'next','потом'):''}</div>
-      <div class="route-act"><button class="btn primary" id="r-task">Задание</button>
+        ${tr[i+1]?row(tr[i+1],'next','дальше'):`<div class="rl-empty">${subj==='math'?'Дальше программы 1–4 класса пока нет':'Дальше тем нет, добавьте свою'}</div>`}${tr[i+2]?row(tr[i+2],'next next2','потом'):''}</div>
+      <div class="route-act"><button class="btn primary" id="r-task">Создать задание</button>
         ${tr[i+1]?'<button class="btn link" id="r-next">Тема пройдена →</button>':''}</div>
     </section>`;
   }else{
-    route=`<section class="route" aria-label="Маршрут ученика"><div class="route-head"><h2>Маршрут · ${SUBJ[subj]}</h2></div>
+    route=`<section class="route" aria-label="Темы ученика"><div class="route-head"><h2>Темы</h2></div>
       <p class="empty" style="margin:0">Тем пока нет.</p>
       <div class="route-act"><button class="btn primary" id="r-new">+ Своя тема по русскому</button></div></section>`;
   }
   const grades=subj==='math'?[1,2,3,4]:[1,2,3,4].filter(g=>g===st.grade||mine(g).length);
-  let prog=`<div class="tools"><h2>Все темы</h2></div>`;
+  let prog='';
   const cur=pos.i>=0?TOPICS[pos.tr[pos.i]]:null,cg=cur?cur.grade:st.grade,cp=cur?partOf(cur.id):1;
   const trI=id=>pos.tr.indexOf(id);
   const secRows=ts=>{const done=ts.filter(t=>pos.i>=0&&trI(t.id)>=0&&trI(t.id)<pos.i),rest=ts.filter(t=>!done.includes(t));
@@ -2264,12 +2307,16 @@ function viewStudent(){
       RUS[g].map(sec=>`<div class="sec"><h3>${esc(sec.s)} · скоро</h3>${sec.topics.map(t=>`<button class="topic" disabled><span class="dot"></span><span class="tt">${esc(t)}</span></button>`).join('')}</div>`).join('');
   }
   prog+=`<div class="legend"><span><i class="dot ok"></i>освоено</span><span><i class="dot warn"></i>в работе</span><span><i class="dot bad"></i>западает</span></div>`;
-  const body=`<div class="search"><input id="tq" type="search" autocomplete="off" aria-label="Найти тему" placeholder="Найти тему или пример: 37 + 48" value="${esc(V.q||'')}"></div>
-    <div id="sres" class="sres" hidden></div><div id="pmain">${route}${prog}</div>`;
+  const LUPA='<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M15.5 15.5 L21 21" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>';
+  const body=`${route}<section class="allt">
+      <div class="allt-head"><button class="allt-t" id="allt" aria-expanded="${V.allOpen?'true':'false'}">Все темы <span aria-hidden="true">${V.allOpen?'▴':'▾'}</span></button>
+        <button class="qbtn${V.qOpen?' on':''}" id="qbtn" aria-label="Найти тему">${LUPA}</button></div>
+      ${V.qOpen?`<div class="search"><input id="tq" type="search" autocomplete="off" aria-label="Найти тему" placeholder="Тема или пример: 37 + 48" value="${esc(V.q||'')}"></div>`:''}
+      <div id="sres" class="sres" hidden></div><div id="pmain"${V.allOpen?'':' hidden'}>${prog}</div></section>`;
   const nWait=S.assignments.filter(a=>a.studentId===st.id&&a.status==='выдано'&&TOPICS[a.topicId]).length;
   const nDone=S.assignments.filter(a=>a.studentId===st.id&&a.status==='сдано').length+S.attempts.filter(a=>a.studentId===st.id&&!a.hw&&!a.via).length;
   const canRev=pos.i>0;
-  app.innerHTML=`<div class="sthead"><div class="sth-t"><h1>${esc(st.name)}</h1><span>${gradeWord(st.grade)}</span>${nWait?`<button class="wait-chip" id="works2">ждём ${nWait} ${plural(nWait,['домашку','домашки','домашек'])}</button>`:''}</div>
+  app.innerHTML=`<div class="sthead"><div class="sth-t"><h1>${esc(st.name)}</h1><span>${gradeWord(st.grade)}</span>${nWait?`<button class="wait-chip red" id="works2">ждём выполнения ${nWait} ${plural(nWait,['домашки','домашек','домашек'])}</button>`:''}</div>
       <div class="more"><button class="more-btn" id="more" aria-label="Ещё действия" aria-expanded="${V.menu?'true':'false'}">⋯</button>
         ${V.menu?`<div class="more-pop"><button class="edit" id="works">Работы и домашки${nDone?` · ${nDone}`:''}</button>${canRev?'<button class="edit" id="r-rev">Повторить пройденное</button>':''}<button class="edit" id="newt">+ Своя тема</button><button class="edit" id="edst">Редактировать</button><button class="${V.confirmStDel?'danger':''}" id="delst">${V.confirmStDel?'Нажмите ещё раз: ученик и все его работы удалятся':'Удалить ученика'}</button></div>`:''}</div></div>
     <div class="panel">${st.subjects.length>1?`<div class="tabs">${tabs}</div>`:''}${body}</div>`;
@@ -2280,7 +2327,9 @@ function viewStudent(){
   if($('r-next'))$('r-next').onclick=()=>{st[CK(subj)]=pos.tr[pos.i+1];save();render()};
   if($('r-rev'))$('r-rev').onclick=()=>{V.menu=false;makeReview(st,subj)};
   if($('r-new'))$('r-new').onclick=openBuilder;
-  const tq=$('tq');tq.oninput=()=>{V.q=tq.value;showSearch(st,subj)};showSearch(st,subj);
+  $('allt').onclick=()=>{V.allOpen=!V.allOpen;render()};
+  $('qbtn').onclick=()=>{V.qOpen=!V.qOpen;if(!V.qOpen)V.q='';render();if(V.qOpen&&$('tq'))$('tq').focus()};
+  const tq=$('tq');if(tq){tq.oninput=()=>{V.q=tq.value;showSearch(st,subj)}}showSearch(st,subj);
   if($('newt'))$('newt').onclick=()=>{V.menu=false;openBuilder()};
   $('more').onclick=()=>{V.menu=!V.menu;V.confirmStDel=false;render()};
   if($('edst'))$('edst').onclick=()=>{V.menu=false;render();editStudentModal(st)};
@@ -2383,7 +2432,7 @@ function searchTopics(q,subj){
   return out.sort((a,b)=>b.score-a.score).slice(0,15)}
 function showSearch(st,subj){
   const box=document.getElementById('sres'),main=document.getElementById('pmain');if(!box)return;
-  const q=(V.q||'').trim();if(!q){box.hidden=true;main.hidden=false;return}
+  const q=(V.q||'').trim();if(!q){box.hidden=true;main.hidden=!V.allOpen;return}
   const res=searchTopics(q,subj);main.hidden=true;box.hidden=false;
   box.innerHTML=res.length?res.map((r,k)=>{const t=TOPICS[r.tid],sb=r.si>=0?t.sub[r.si]:null;
     return `<button class="sr" data-k="${k}"><span class="sr-t">${r.ex?`<span class="chip ok">по примеру ${esc(r.ex)}</span> `:''}${esc(sb?(sb.n||sb):t.t)}</span>
@@ -2433,8 +2482,10 @@ function materialize(){
   const st=student(V.studentId);const sh=sheetTopic(tplName(V.tpl),currentBlocks(st,t),t);
   S.customTopics=S.customTopics.filter(c=>!(c.sheet&&c.forStudent===st.id&&!S.assignments.some(a=>a.topicId===c.id)));
   sh.id='sheet-'+Date.now();sh.forStudent=st.id;sh.from=t.id;S.customTopics.push(sh);TOPICS=allTopics();save();
-  V.topicId=sh.id;V.level=0;
+  /* сохранённый лист нужен только для выдачи и печати; потом возвращаемся к теме с её выбором листа и уровня */
+  V.backTo={topicId:t.id,level:V.level,tpl:V.tpl};V.topicId=sh.id;V.level=0;
 }
+function unmaterialize(){if(V.backTo){Object.assign(V,V.backTo);V.backTo=null}}
 
 function viewTopic(){
   const st=student(V.studentId);const t=TOPICS[V.topicId];
@@ -2501,7 +2552,7 @@ function viewTopic(){
     for(let k=0;k<30;k++){const nx=resolveDesign(st,s2);if(!cur.img||!nx.img||nx.theme.id!==cur.theme.id||nx.img.id!==cur.img.id)break;s2=newSeed()}
     V.seed=s2;render()};
   $('print').onclick=()=>{materialize();go({screen:'print'})};
-  $('link').onclick=()=>{materialize();render();linkModal()};
+  $('link').onclick=()=>{materialize();linkModal();unmaterialize();render()};
   const sc=$('setcur');if(sc)sc.onclick=()=>{st[CK(t.subject)]=t.id;save();render()};
   const dl=$('del');
   if(dl)dl.onclick=()=>{
@@ -2547,7 +2598,7 @@ function viewPrint(){
     const a=paginate(document.getElementById('pr-tasks'),items,o),b=paginate(document.getElementById('pr-keys'),items,{...o,answers:true});
     document.getElementById('pr-h1').textContent=`Задание · ${pagesWord(a)}`;document.getElementById('pr-h2').textContent=`Ключ для вас · ${pagesWord(b)}`};
   lay();if(document.fonts&&document.fonts.ready)document.fonts.ready.then(lay);
-  document.getElementById('back').onclick=()=>go({screen:'topic'});
+  document.getElementById('back').onclick=()=>{unmaterialize();go({screen:'topic'})};
 }
 
 /* ---------- конструктор своей темы ---------- */
