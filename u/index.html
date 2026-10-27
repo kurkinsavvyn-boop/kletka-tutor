@@ -2591,6 +2591,18 @@ const RB={
 с холодн(ым|ом) ветром:с каким?
 на летн(ей|ой) поляне:на какой?
 по высок(ой|ей) траве:по какой?`,
+ dsp:`Мама сказала(:|,) «Пора обедать».
+Папа спросил(:|,) «Ты сделал уроки?»
+Учитель объявил(:|,) «Завтра экскурсия».
+Мальчик крикнул(:|,) «Смотрите, радуга!»
+Бабушка попросила(:|,) «Принеси воды».
+Девочка ответила(:|,) «Я уже готова».
+«Пора обедать»(,|.) — сказала мама.
+«Завтра экскурсия»(,|.) — объявил учитель.
+«Я уже готова»(,|.) — ответила девочка.
+«Принеси воды»(,|.) — попросила бабушка.
+«Идёт снег»(,|.) — сказал брат.
+«Мы победили»(,|.) — обрадовались ребята.`,
  vend:`он стро(ит|ет):II спр.
 ты кле(ишь|ешь):II спр.
 они нос(ят|ут):II спр.
@@ -2627,7 +2639,7 @@ function insItems(p,r){
   if(p.check)pool=pool.filter(x=>x.chk);
   const seen=new Set();pool=shuffle(r,pool).filter(x=>{const k=insWord(x);if(seen.has(k))return false;seen.add(k);return true});
   return pool.slice(0,p.count).map(x=>({type:'ins',w:x.w,ans:x.ans,tag:x.tag,opts:shuffle(r,[x.ans,x.bad]),chk:p.check?x.chk:'',none:p.groups.some(g=>RB[g].includes('_')),phr:/\s/.test(x.w)}))}
-const INSHINT={caps:['Вставь букву: заглавную или строчную.'],endp:['Поставь в конце предложения точку или вопросительный знак.'],
+const INSHINT={dsp:['Вставь пропущенный знак препинания при прямой речи.'],caps:['Вставь букву: заглавную или строчную.'],endp:['Поставь в конце предложения точку или вопросительный знак.'],
   pad:['Вставь окончание существительного.','Вставь окончание. Запиши падеж и склонение.'],padj:['Вставь окончание прилагательного. Задай вопрос от существительного.','Вставь окончание. Запиши вопрос.'],
   vend:['Вставь личное окончание глагола.','Вставь окончание. Запиши спряжение.']};
 const insInstr=it=>INSHINT[it.tag]?INSHINT[it.tag][it.chk&&INSHINT[it.tag][1]?1:0]:it.phr?(it.chk?'Вставь т или ть. Запиши вопрос к глаголу.':'Вставь т или ть.')
@@ -2637,6 +2649,9 @@ const insInstr=it=>INSHINT[it.tag]?INSHINT[it.tag][it.chk&&INSHINT[it.tag][1]?1:
 /* темы русского по учебнику Канакиной и Горецкого («Школа России»); soon — генератора пока нет */
 const R_=(n,d,groups,count,check)=>({n,d,p:{kind:'ins',groups,count,check:!!check}});
 const T_=(n,d,p)=>({n,d,p});
+const PRONF=`у (я):у меня|ко (я):ко мне|обо (я):обо мне|с (ты):с тобой|у (ты):у тебя|к (ты):к тебе|о (он):о нём|к (он):к нему|у (он):у него|с (она):с ней|о (она):о ней|у (она):у неё|к (мы):к нам|с (вы):с вами|о (они):о них|у (они):у них|для (мы):для нас|без (вы):без вас`;
+const ODN=`В саду росли [яблони], [груши] и [сливы].|Дети [бегали], [прыгали] и [смеялись].|На лугу цвели [ромашки] и [колокольчики].|Осенью листья [желтеют] и [опадают].|В лесу живут [зайцы], [лисы], [волки].|Мы [читали], [рисовали] и [пели].|Небо было [синее] и [чистое].|Кот [потянулся] и [зевнул].|На столе лежали [книги] и [тетради].|Ветер [шумел] и [гнул] деревья.|Ребята [катались] на санках и [лепили] снеговика.|В корзине были [грибы] и [ягоды].`;
+const SLOV={'словосочетание':`красный мяч|читать книгу|лесная тропинка|играть в мяч|новый дом|писать письмо|тёплый день|идти по дороге|весёлый щенок|смотреть в окно`,'не словосочетание':`кот и пёс|дети играют|в лесу|солнце светит|мама и папа|под столом|птицы поют|на полке`};
 const SO=(set,count,extra)=>({kind:'sort',set,count,...(extra||{})}),SP=(what,count,min,max,extra)=>({kind:'split',what,count,min,max,...(extra||{})}),
   CHS=(what,count)=>({kind:'chs',what,count});
 const SOON=t=>({id:'rs-'+t.replace(/[^а-яё]/gi,'').slice(0,18),t,soon:true});
@@ -2719,7 +2734,7 @@ const RUSP={
    {id:'r2-prep',t:'Предлоги',rule:RULE.prep,syn:['предлог','раздельно'],L:[T_('10 сочетаний','',CHS('prep',10)),T_('Все сочетания','',CHS('prep',16))]}]}],
  3:[
   {part:1,s:'Текст. Предложение. Словосочетание',topics:[{id:'r3-purp',t:'Виды предложений по цели',rule:RULE.purpose,syn:['виды предложений','повествовательное','вопросительное','побудительное'],L:[T_('9 предложений','',SO('purpose',9)),T_('15 предложений','',SO('purpose',15)),T_('Все предложения','',SO('purpose',24))]},
-   {id:'r3-snt',t:'Главные члены предложения',rule:RULE.snt,syn:['подлежащее','сказуемое','основа'],L:[T_('10 предложений','',{kind:'snt',count:10}),T_('14 предложений','',{kind:'snt',count:14}),T_('Все предложения','',{kind:'snt',count:18})]},SOON('Словосочетание')]},
+   {id:'r3-snt',t:'Главные члены предложения',rule:RULE.snt,syn:['подлежащее','сказуемое','основа'],L:[T_('10 предложений','',{kind:'snt',count:10}),T_('14 предложений','',{kind:'snt',count:14}),T_('Все предложения','',{kind:'snt',count:18})]},{id:'r3-slov',t:'Словосочетание',syn:['словосочетание'],rule:['Словосочетание — два слова, связанных по смыслу и грамматически: от главного слова к зависимому можно задать вопрос.','мяч (какой?) красный; читать (что?) книгу'],L:[T_('10 сочетаний','',SO('slov',10)),T_('Все сочетания','',SO('slov',18))]}]},
   {part:1,s:'Слово в языке и речи',topics:[{id:'r3-lex',t:'Синонимы и антонимы',rule:RULE.synant,syn:['синонимы','антонимы','лексическое значение'],L:[T_('Синонимы','',CHS('syn',14)),T_('Антонимы','',CHS('ant',14)),T_('Антонимы, все слова','',CHS('ant',24))]},
    {id:'r3-pos',t:'Части речи. Имя числительное',rule:RULE.pos,syn:['части речи','числительное'],L:[T_('12 слов','',SO('pos4',12)),T_('20 слов','',SO('pos4',20)),T_('28 слов','',SO('pos4',28))]}]},
   {part:1,s:'Состав слова',topics:[{id:'r3-mor',t:'Состав слова',rule:RULE.mor,syn:['состав слова','корень','приставка','суффикс','окончание','разбор'],L:[T_('Найди корень','',{kind:'mor',ask:'root',count:12}),T_('Разбор по составу','все части слова',{kind:'mor',ask:'all',count:10}),T_('Больше слов','',{kind:'mor',ask:'all',count:16})]},
@@ -2739,12 +2754,12 @@ const RUSP={
    {id:'r3-verb',t:'Глагол: время и род',rule:RULE.verb,syn:['глагол','время','прошедшее','будущее','род'],L:[T_('Время глагола','',SO('vtense',12)),T_('Род в прошедшем времени','',SO('vpast',12)),T_('Время, больше слов','',SO('vtense',21))]},
    {id:'r3-ne',t:'НЕ с глаголами',rule:RULE.ne,syn:['не с глаголами','раздельно'],L:[T_('10 слов','',CHS('ne',10)),T_('Все слова','',CHS('ne',19))]}]}],
  4:[
-  {part:1,s:'Предложение',topics:[SOON('Однородные члены предложения'),{id:'r4-cx',t:'Простые и сложные предложения',rule:RULE.cx,syn:['сложное','простое','основа'],L:[T_('8 предложений','',SO('complex',8)),T_('Все предложения','',SO('complex',16))]},SOON('Прямая речь')]},
+  {part:1,s:'Предложение',topics:[{id:'r4-odn',t:'Однородные члены предложения',syn:['однородные'],rule:['Однородные члены отвечают на один вопрос и относятся к одному слову. Между ними ставят запятые или союзы и, а, но.','В саду росли яблони, груши и сливы.'],L:[T_('8 предложений','',{kind:'snt',odn:true,count:8}),T_('Все предложения','',{kind:'snt',odn:true,count:12})]},{id:'r4-cx',t:'Простые и сложные предложения',rule:RULE.cx,syn:['сложное','простое','основа'],L:[T_('8 предложений','',SO('complex',8)),T_('Все предложения','',SO('complex',16))]},{id:'r4-dsp',t:'Предложения с прямой речью',syn:['прямая речь','кавычки'],rule:['Если слова автора стоят перед прямой речью, после них ставится двоеточие. Если прямая речь первая — после неё запятая и тире.','Мама сказала: «Пора обедать». «Пора обедать», — сказала мама.'],L:[R_('8 предложений','',['dsp'],8),R_('Все предложения','',['dsp'],12)]}]},
   {part:1,s:'Слово в языке и речи',topics:[{id:'r4-pos',t:'Части речи. Наречие',rule:RULE.pos,syn:['наречие','части речи'],L:[T_('12 слов','',SO('pos5',12)),T_('20 слов','',SO('pos5',20)),T_('28 слов','',SO('pos5',28))]},
    {id:'r4-slovar',t:'Словарные слова 4 класса',rule:RULE.slovar,syn:['словарные','непроверяемые'],L:[R_('12 слов','',['slovar4'],12),R_('Все слова','',['slovar4'],20),R_('С 3 классом','',['slovar4','slovar3'],24)]}]},
   {part:1,s:'Имя существительное',topics:[{id:'r4-decl',t:'Три склонения существительных',rule:RULE.decl,syn:['склонение','склонения'],L:[T_('12 слов','',SO('decl',12)),T_('18 слов','',SO('decl',18)),T_('24 слова','',SO('decl',24))]},
    {id:'r4-pad',t:'Безударные падежные окончания',rule:RULE.pad,syn:['падежные окончания','окончания существительных'],L:[R_('Вставь окончание','',['pad'],12),R_('Больше слов','',['pad'],18),R_('С падежом и склонением','',['pad'],12,true)]}]},
-  {part:2,s:'Имя прилагательное и местоимение',topics:[{id:'r4-padj',t:'Падежные окончания прилагательных',rule:RULE.padj,syn:['окончания прилагательных'],L:[R_('Вставь окончание','',['padj'],12),R_('Все сочетания','',['padj'],18),R_('С вопросом','',['padj'],12,true)]},SOON('Личные местоимения: склонение')]},
+  {part:2,s:'Имя прилагательное и местоимение',topics:[{id:'r4-padj',t:'Падежные окончания прилагательных',rule:RULE.padj,syn:['окончания прилагательных'],L:[R_('Вставь окончание','',['padj'],12),R_('Все сочетания','',['padj'],18),R_('С вопросом','',['padj'],12,true)]},{id:'r4-pron',t:'Личные местоимения: склонение',syn:['местоимения','склонение местоимений'],rule:['Личные местоимения изменяются по падежам. После предлогов у местоимений 3-го лица появляется н.','у него, к нему, с ней, о них'],L:[T_('10 сочетаний','',SP('pronf',10)),T_('Все сочетания','',SP('pronf',18))]}]},
   {part:2,s:'Глагол',topics:[{id:'r4-conj',t:'Спряжение глагола',rule:RULE.conj,syn:['спряжение','I спряжение','II спряжение'],L:[T_('12 глаголов','',SO('conj',12)),T_('20 глаголов','',SO('conj',20)),T_('Все глаголы','',SO('conj',30))]},
    {id:'r4-vend',t:'Безударные личные окончания глаголов',rule:RULE.vend,syn:['личные окончания','окончания глаголов'],L:[R_('Вставь окончание','',['vend'],12),R_('Все глаголы','',['vend'],22),R_('Со спряжением','',['vend'],12,true)]},
    {id:'r4-tsya',t:'-тся и -ться в глаголах',rule:RULE.tsya,syn:['тся','ться','глагол'],L:[R_('Т или ТЬ','',['tsya'],10),R_('Все предложения','',['tsya'],16),R_('С вопросом к глаголу','',['tsya'],12,true)]},
@@ -2831,6 +2846,7 @@ const SORTS={
   vnum:{cols:['ед. ч.','мн. ч.'],hint:'Распредели глаголы: единственное или множественное число.',gen:()=>byCols(VNUM)},
   pron:{cols:['1-е лицо','2-е лицо','3-е лицо'],hint:'Распредели личные местоимения по лицам.',gen:()=>byCols(PRON)},
   purpose:{cols:['повеств.','вопрос.','побуд.'],hint:'Распредели предложения по цели высказывания: повествовательные, вопросительные, побудительные.',gen:()=>byCols(PURP)},
+  slov:{cols:['словосочетание','не словосочетание'],hint:'Распредели: где словосочетание, а где нет (это предложение, слова с предлогом или однородные слова).',gen:()=>byCols(SLOV)},
   complex:{cols:['простое','сложное'],hint:'Распредели предложения: простые и сложные.',gen:()=>byCols(CMPLX)}};
 function sortItems(p,r){const S0=SORTS[p.set];let pool=S0.gen();
   if(p.filter==='syl12')pool=pool.filter(x=>sylN(x.w)<=2);
@@ -2853,6 +2869,7 @@ function splitItems(p,r){const out=[];
   if(p.what==='str'){const ws=shuffle(r,stressWords().filter(w=>{const s=sylN(w.replace(ACUTE,''));return s>=p.min&&s<=p.max})).slice(0,p.count);
     return ws.map(sw=>{const w=sw.replace(ACUTE,''),n=sylN(w);const vars=Array.from({length:n},(_,i)=>stressVar(w,i));
       return{type:'line',w,ans:sw,key:sw,opts:vars.slice(0,4),noLine:true,hint:'Поставь в словах ударение.',hintOn:'Где ударение?'}})}
+  if(p.what==='pronf')return shuffle(r,PRONF.split('|')).slice(0,p.count).map(x=>{const [a,b]=x.split(':');return{type:'line',w:a,ans:b,key:b,hint:'Поставь местоимение в нужную форму.',hintOn:'Поставь местоимение в нужную форму.'}});
   if(p.what==='plur')return shuffle(r,PLUR.split('|')).slice(0,p.count).map(x=>{const [a,b]=x.split(' ');return{type:'line',w:a,ans:b,key:b,hint:'Запиши слово во множественном числе.',hintOn:'Запиши во множественном числе.'}});
   if(p.what==='abc'){for(let k=0;k<p.count;k++){const ws=[];const used=new Set();
       for(const n of shuffle(r,NOUNS)){if(ws.length>=p.n)break;if(used.has(n.w[0]))continue;used.add(n.w[0]);ws.push(n.w)}
@@ -2889,7 +2906,11 @@ function chItems(p,r){const out=[];const pairs=s=>s.split('|').map(x=>x.split(' 
 
 /* главные члены предложения: [подлежащее] {сказуемое} */
 const SNT=`Маленький [котёнок] {спит} на окне.|[Солнце] {светит} ярко.|Утром [дети] {пошли} в школу.|В саду {цветут} [розы].|[Птицы] {улетели} на юг.|Высоко в небе {летит} [самолёт].|[Мама] {испекла} пирог.|На ветке {сидит} [снегирь].|[Ветер] {качает} деревья.|[Ребята] {катаются} на коньках.|Весной {тает} [снег].|[Собака] громко {лает}.|[Бабушка] {вяжет} тёплые носки.|По небу {плывут} [облака].|[Ёжик] {нашёл} гриб.|Ночью {выпал} [снег].|[Река] {течёт} медленно.|[Мальчик] {читает} книгу.`;
-function sntItems(p,r){return shuffle(r,SNT.split('|')).slice(0,p.count).map((s,k)=>{const words=s.replace(/[.]/g,'').split(' ');
+function odnItems(p,r){return shuffle(r,ODN.split('|')).slice(0,p.count).map(s=>{const hom=[...s.matchAll(/\[(.+?)\]/g)].map(m=>m[1]),plain=s.replace(/[\[\]]/g,'');
+  const others=plain.replace(/[.,]/g,'').split(' ').filter(w=>w.length>2&&!hom.includes(w));const ans=hom.join(', ');
+  const wrong1=[hom[0],pick(r,others)].join(', '),wrong2=[...hom.slice(1),pick(r,others)].join(', ');
+  return{type:'snt',s,odn:true,ans,opts:uniq(shuffle(r,[ans,wrong1,wrong2])),q:plain,hint:'Подчеркни однородные члены предложения.',hintOn:'Найди однородные члены.'}})}
+function sntItems(p,r){if(p.odn)return odnItems(p,r);return shuffle(r,SNT.split('|')).slice(0,p.count).map((s,k)=>{const words=s.replace(/[.]/g,'').split(' ');
   const subj=words.find(w=>w[0]==='[').slice(1,-1),pred=words.find(w=>w[0]==='{').slice(1,-1),ask=k%2?'pred':'subj',ans=ask==='subj'?subj:pred;
   const plain=words.map(w=>w.replace(/[\[\]{}]/g,''));
   const opts=shuffle(r,[ans,...shuffle(r,plain.filter(w=>w!==ans&&w.length>2)).slice(0,2)]);
@@ -3082,7 +3103,7 @@ function insHTML(it,showAns){const [a,b]=it.w.split('□');
   return `<span class="iw">${esc(a)}<span class="ib" style="min-width:calc(var(--c) * ${(.35+.45*Math.max(...it.opts.map(x=>x.length))).toFixed(2)})">${showAns?esc(it.ans):''}</span>${esc(b)}</span>${it.chk?`<span class="ichk">${showAns?esc(it.chk):''}</span>`:''}`}
 /* задания с текстом и рисунками: каждая строка текста — в строке клеток, рисунки по высоте кратны клетке */
 function morHTML(it,showAns){return `<span class="mw">${showAns?it.parts.map(x=>`<span class="m${x.r}${x.t?'':' m0'}">${esc(x.t)}</span>`).join(''):esc(it.w)}</span>`}
-function sntHTML(it,showAns){return esc(it.s).replace(/\[(.+?)\]/,showAns?'<span class="u1">$1</span>':'$1').replace(/\{(.+?)\}/,showAns?'<span class="u2">$1</span>':'$1')}
+function sntHTML(it,showAns){if(it.odn)return esc(it.s).replace(/\[(.+?)\]/g,showAns?'<span class="u1">$1</span>':'$1');return esc(it.s).replace(/\[(.+?)\]/,showAns?'<span class="u1">$1</span>':'$1').replace(/\{(.+?)\}/,showAns?'<span class="u2">$1</span>':'$1')}
 function sortTable(group,showAns){const cols=group[0].cols,rows=Math.max(...cols.map(c=>group.filter(x=>x.ans===c).length))+(showAns?0:1);
   return `<div class="it rich span stab"><div class="stab-g" style="grid-template-columns:repeat(${cols.length},1fr)">${cols.map(c=>{const ws=group.filter(x=>x.ans===c);
     return `<div class="stc"><b>${esc(c)}</b>${Array.from({length:rows},(_,k)=>`<i>${showAns&&ws[k]?esc(ws[k].w):''}</i>`).join('')}</div>`}).join('')}</div></div>`}
