@@ -356,6 +356,20 @@ details.done .topic{opacity:.7}
 .sheet .sh-items,.sheet .sh-head,.sheet .sh-mini{border:0 !important;border-radius:0 !important;box-shadow:0 0 0 1px #c9dcf0}
 .sheet .sh-items{padding:0 !important}
 .sheet .sh-head{padding:0 var(--c) !important}
+/* русский: лист в линейку, слово с окошком для буквы, правило в рамке */
+.sheet.ru{--grid:linear-gradient(#c9dcf0 1px,transparent 1px)}
+.sheet.ru.bw{--grid:linear-gradient(#d4d4d4 1px,transparent 1px)}
+.it.ins .rb{flex-direction:row;align-items:flex-end;gap:calc(var(--c) * .6);flex-wrap:wrap}
+.iw{height:var(--c);line-height:var(--c);font-size:calc(var(--c) * .82);white-space:nowrap;padding-left:calc(var(--c) * .25)}
+.ib{display:inline-block;min-width:calc(var(--c) * .78);height:calc(var(--c) * .86);vertical-align:-.16em;margin:0 .04em;border:.25cqw solid #7d88a3;border-radius:.4cqw;background:#fff;text-align:center;line-height:calc(var(--c) * .8);font-weight:700;color:var(--sheet-pen)}
+.ib.w2{min-width:calc(var(--c) * 1.2)}
+.ichk{display:inline-block;min-width:calc(var(--c) * 7);height:calc(var(--c) * .85);border-bottom:.25cqw solid #7d88a3;font-size:calc(var(--c) * .62);line-height:calc(var(--c) * .85);color:var(--sheet-pen);font-weight:600;padding:0 calc(var(--c) * .2)}
+.sh-rule{display:flex;flex-wrap:wrap;gap:.4cqw 1.4cqw;align-items:baseline;border:.3cqw solid var(--p2,#9fb3d9);border-radius:1.2cqw;padding:1.4cqw 2cqw;background:#fff;font-size:2.3cqw;line-height:1.4;color:#2b3245}
+.sh-rule b{font-size:1.9cqw;text-transform:uppercase;letter-spacing:.06em;color:var(--p1,#3b5bab)}
+.sh-rule span{flex:1 1 60cqw}
+.sh-rule i{flex-basis:100%;font-style:normal;color:#4e5870}
+.sh-rule i::before{content:"Пример: ";font-weight:600}
+.topic.soon{opacity:.55;cursor:default}
 /* текст и картинки — на белом */
 .sh-items>.heroG,.sh-items>.tailG,.sh-items>.scene2,.wq2{background:#fff}
 .sh-items>.heroG,.sh-items>.tailG{width:100% !important}
@@ -1049,6 +1063,7 @@ function generate(p,seed){
       if(it.fail)items.failed++;items.push(it)}
     return items;
   }
+  if(p.kind==='ins')return insItems(p,r);
   if(p.kind==='own'){
     const arr=p.list.slice();for(let i=arr.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]]}
     return arr.slice(0,Math.min(n,arr.length)).map(x=>({type:'own',q:x.q,ans:x.ans}));
@@ -2093,14 +2108,472 @@ const MATH={
 const ID_MAP={'g1-sum10':'g1-add14','g1-compose':'g1-terms','g1-compare':'g1-signs','g1-nocarry':'g1-teen','g1-carry':'g1-addc','g1-word':'g1-task','g1-len':'g1-dm',
   'g2-tens':'g2-num100','g2-add':'g2-oral','g2-column':'g2-coladd','g2-mult23':'g2-table','g2-perim':'g2-rect','g3-div':'g3-table','g3-order':'g2-order2','g3-column':'g3-col1000','g3-word':'g3-word'};
 
-const RUS={
- 1:[{s:'Письмо и орфография',topics:['Сочетания жи–ши, ча–ща, чу–щу','Заглавная буква в именах','Перенос слов','Звонкие и глухие согласные']}],
- 2:[{s:'Орфография',topics:['Безударные гласные в корне','Парные согласные на конце слова','Разделительный мягкий знак','Словарные слова 2 класса']}],
- 3:[{s:'Состав слова и части речи',topics:['Корень, приставка, суффикс','Непроизносимые согласные','Род и число имён существительных','Словарные слова 3 класса']}],
- 4:[{s:'Части речи',topics:['Падежи имён существительных','Безударные окончания существительных','Спряжение глаголов','Словарные слова 4 класса']}]
+/* банк слов: (верная|неверная) буква, после двоеточия проверочное слово или подсказка; ' — ударение, _ — буква не нужна.
+   каждое слово проверено русским словарём: верное написание существует, неверное — нет (кроме -тся/-ться: там решает вопрос) */
+const RB={
+ oa:`в(о|а)да:во'ды
+тр(а|о)ва:тра'вы
+г(о|а)ра:го'ры
+с(о|а)ва:со'вы
+к(о|а)за:ко'зы
+н(о|а)ра:но'ры
+сл(о|а)ны:сло'н
+ст(о|а)лы:сто'л
+в(о|а)лна:во'лны
+гр(о|а)за:гро'зы
+кр(о|а)ты:кро'т
+м(о|а)ря:мо'ре
+зв(о|а)нок:зво'н
+гл(а|о)за:гла'з
+ч(а|о)сы:ча'с
+м(о|а)ряк:мо'ре
+хв(о|а)сты:хво'ст
+к(о|а)рмушка:ко'рм
+с(о|а)сновый:со'сны
+м(о|а)рской:мо'ре
+тр(а|о)винка:тра'вы
+дв(о|а)ры:дво'р`,
+ ei:`р(е|и)ка:ре'ки
+зв(е|и)зда:звёзды
+в(е|и)сна:вёсны
+цв(е|и)ты:цве'т
+с(е|и)стра:сёстры
+гн(е|и)здо:гнёзда
+з(е|и)мля:зе'мли
+сн(е|и)га:сне'г
+з(и|е)ма:зи'мы
+кр(и|е)чать:кри'к
+гр(и|е)бы:гри'б
+л(и|е)сты:ли'ст
+стр(е|и)ла:стре'лы
+в(е|и)терок:ве'тер
+св(е|и)тлячок:све'т
+л(е|и)сник:ле'с
+ст(е|и)на:сте'ны
+ч(и|е)жи:чи'ж
+з(е|и)лёный:зе'лень
+в(е|и)сёлый:ве'село
+п(и|е)сать:пи'шет
+д(е|и)ревья:де'рево
+сл(е|и)ды:сле'д
+м(е|и)тель:мёл`,
+ ya:`м(я|и)чи:мя'ч
+р(я|и)ды:ря'д
+п(я|е)тно:пя'тна
+т(я|е)нуть:тя'нет
+гр(я|е)зный:гря'зь
+гл(я|е)деть:гля'дя
+пл(я|е)сать:пля'ска`,
+ pair:`ду(б|п):дубы'
+зу(б|п):зу'бы
+хле(б|п):хле'бы
+гри(б|п):грибы'
+су(п|б):су'пы
+сне(г|к):снега'
+сапо(г|к):сапоги'
+фла(г|к):фла'ги
+моро(з|с):моро'зы
+гла(з|с):глаза'
+но(с|з):носы'
+са(д|т):сады'
+го(д|т):го'ды
+лё(д|т):льды'
+мё(д|т):медо'вый
+гвоз(д|т)ь:гво'зди
+но(ж|ш):ножи'
+ё(ж|ш):ежи'
+малы(ш|ж):малыши'
+шала(ш|ж):шалаши'
+рука(в|ф):рукава'
+остро(в|ф):острова'
+ло(ж|ш)ка:ло'жечка
+кни(ж|ш)ка:кни'жечка
+берё(з|с)ка:берёза
+ска(з|с)ка:сказа'ть
+шу(б|п)ка:шу'ба
+ры(б|п)ка:ры'ба
+кру(ж|ш)ка:кру'жечка
+сла(д|т)кий:сла'док
+ни(з|с)кий:ни'зок
+ре(з|с)кий:ре'зок`,
+ pair_end:`ду(б|п):дубы'
+зу(б|п):зу'бы
+хле(б|п):хле'бы
+гри(б|п):грибы'
+сне(г|к):снега'
+сапо(г|к):сапоги'
+фла(г|к):фла'ги
+моро(з|с):моро'зы
+гла(з|с):глаза'
+са(д|т):сады'
+но(ж|ш):ножи'
+ё(ж|ш):ежи'
+малы(ш|ж):малыши'
+шала(ш|ж):шалаши'
+рука(в|ф):рукава'
+остро(в|ф):острова'
+су(п|б):су'пы
+но(с|з):носы'
+го(д|т):го'ды`,
+ zhi:`ж(и|ы)раф
+ш(и|ы)на
+лыж(и|ы)
+малыш(и|ы)
+еж(и|ы)
+уж(и|ы)н
+пруж(и|ы)на
+ж(и|ы)знь
+ш(и|ы)ло
+маш(и|ы)на
+камыш(и|ы)
+карандаш(и|ы)
+ж(и|ы)вот
+ш(и|ы)повник
+снеж(и|ы)нка
+ч(а|я)шка
+туч(а|я)
+рощ(а|я)
+щ(а|я)вель
+ч(а|я)йка
+площ(а|я)дь
+задач(а|я)
+свеч(а|я)
+дач(а|я)
+пищ(а|я)
+чащ(а|я)
+ч(у|ю)до
+щ(у|ю)ка
+ч(у|ю)лок
+ч(у|ю)гун
+ч(у|ю)ткий
+крич(у|ю)
+ищ(у|ю)
+щ(у|ю)пальце
+ч(у|ю)ть`,
+ chk:`доч(_|ь)ка
+ноч(_|ь)ка
+реч(_|ь)ка
+точ(_|ь)ка
+руч(_|ь)ка
+удоч(_|ь)ка
+бабоч(_|ь)ка
+молоч(_|ь)ный
+ноч(_|ь)ной
+соч(_|ь)ный
+точ(_|ь)но
+мощ(_|ь)ный
+помощ(_|ь)ник
+каменщ(_|ь)ик
+скуч(_|ь)но`,
+ soft:`кон(ь|_)ки
+пал(ь|_)то
+пис(ь|_)мо
+ден(ь|_)ки
+мал(ь|_)чик
+пал(ь|_)цы
+кол(ь|_)цо
+кон(ь|_)
+ден(ь|_)
+пен(ь|_)
+сол(ь|_)
+тетрад(ь|_)
+лос(ь|_)
+гус(ь|_)
+рыс(ь|_)
+ел(ь|_)
+рул(ь|_)
+дожд(ь|_)
+ос(ь|_)`,
+ sep_soft:`вороб(ь|_)и
+лист(ь|_)я
+в(ь|_)юга
+руч(ь|_)и
+друз(ь|_)я
+пер(ь|_)я
+брат(ь|_)я
+солов(ь|_)и
+ул(ь|_)и
+бел(ь|_)ё
+крыл(ь|_)я
+дерев(ь|_)я
+мурав(ь|_)и`,
+ sep:`под(ъ|ь)езд
+об(ъ|ь)явление
+с(ъ|ь)ел
+об(ъ|ь)езд
+в(ъ|ь)езд
+раз(ъ|ь)езд
+об(ъ|ь)ём
+от(ъ|ь)езд
+под(ъ|ь)ём
+с(ъ|ь)ехал
+с(ъ|ь)ёжился
+об(ъ|ь)яснение
+в(ь|ъ)юга
+сем(ь|ъ)я
+руч(ь|ъ)и
+лист(ь|ъ)я
+друз(ь|ъ)я
+пер(ь|ъ)я
+плат(ь|ъ)е
+солов(ь|ъ)и
+вороб(ь|ъ)и
+бел(ь|ъ)ё
+крыл(ь|ъ)я
+мурав(ь|ъ)и`,
+ silent:`со(л|_)нце:со'лнышко
+сер(д|_)це:серде'чко
+звёз(д|_)ный:звезда'
+чес(т|_)ный:че'сть
+праз(д|_)ник:пра'здновать
+поз(д|_)ний:по'здно
+лес(т|_)ница:ле'сенка
+радос(т|_)ный:ра'дость
+грус(т|_)ный:гру'сть
+мес(т|_)ный:ме'сто
+извес(т|_)ный:изве'стие
+гиган(т|_)ский:гига'нт
+шелес(т|_)еть:ше'лест
+ненас(т|_)ный:нена'стье
+опас(_|т)ный:опа'сен
+прекрас(_|т)ный:прекра'сен
+ужас(_|т)ный:у'жас
+интерес(_|т)ный:интере'с
+чудес(_|т)ный:чудеса'
+вкус(_|т)ный:вку'с`,
+ double:`кла(сс|с)
+ка(сс|с)а
+гру(пп|п)а
+а(лл|л)ея
+ва(нн|н)а
+гри(пп|п)
+су(бб|б)ота
+програ(мм|м)а
+кро(сс|с)
+хо(кк|к)ей
+ко(лл|л)екция
+ко(лл|л)ектив
+килогра(мм|м)
+жу(жж|ж)ать
+ра(сс|с)тояние`,
+ shs3:`ноч(ь|_):ж. р.
+доч(ь|_):ж. р.
+мыш(ь|_):ж. р.
+рож(ь|_):ж. р.
+печ(ь|_):ж. р.
+реч(ь|_):ж. р.
+помощ(ь|_):ж. р.
+вещ(ь|_):ж. р.
+тиш(ь|_):ж. р.
+глуш(ь|_):ж. р.
+мелоч(ь|_):ж. р.
+дич(ь|_):ж. р.
+мяч(_|ь):м. р.
+врач(_|ь):м. р.
+ёрш(_|ь):м. р.
+камыш(_|ь):м. р.
+ключ(_|ь):м. р.
+плащ(_|ь):м. р.
+нож(_|ь):м. р.
+луч(_|ь):м. р.
+товарищ(_|ь):м. р.
+шалаш(_|ь):м. р.
+ковш(_|ь):м. р.
+малыш(_|ь):м. р.`,
+ shs4:`бере(чь|ч):неопр. ф.
+стри(чь|ч):неопр. ф.
+пе(чь|ч):неопр. ф.
+мо(чь|ч):неопр. ф.
+пише(шь|ш):2 л.
+читае(шь|ш):2 л.
+рисуе(шь|ш):2 л.
+ноч(ь|_):сущ., ж. р.
+мыш(ь|_):сущ., ж. р.
+мелоч(ь|_):сущ., ж. р.
+мяч(_|ь):сущ., м. р.
+врач(_|ь):сущ., м. р.
+камыш(_|ь):сущ., м. р.
+ключ(_|ь):сущ., м. р.
+плащ(_|ь):сущ., м. р.`,
+ tsya:`Мальчик умывае(т|ть)ся.:что делает?
+Пора умыва(ть|т)ся.:что делать?
+Птица учи(т|ть)ся летать.:что делает?
+Нужно учи(ть|т)ся.:что делать?
+Река разливае(т|ть)ся.:что делает?
+Дети будут купа(ть|т)ся.:что делать?
+Кошка умывае(т|ть)ся лапкой.:что делает?
+Мы любим ката(ть|т)ся на санках.:что делать?
+Солнце поднимае(т|ть)ся.:что делает?
+Не надо торопи(ть|т)ся.:что делать?
+Мама улыбае(т|ть)ся.:что делает?
+Хочется улыба(ть|т)ся.:что делать?
+Дверь открывае(т|ть)ся.:что делает?
+Пора собира(ть|т)ся в школу.:что делать?
+Снег кружи(т|ть)ся.:что делает?
+Надо одева(ть|т)ся теплее.:что делать?
+Щенок резви(т|ть)ся.:что делает?
+Он не смог удержа(ть|т)ся.:что сделать?`,
+ slovar2:`в(о|а)рона
+к(о|а)рова
+м(о|а)локо
+с(о|а)бака
+п(е|а)нал
+т(е|и)традь
+к(а|о)рандаш
+з(а|е)яц
+л(и|е)сица
+м(е|и)дведь
+м(о|а)рковь
+ог(у|о)рец
+п(о|а)суда
+р(е|и)бята
+с(о|а)рока
+б(е|и)рёза
+в(о|а)робей
+д(е|и)ревня
+уч(е|и)ник
+п(е|и)тух
+м(а|о)шина
+п(а|о)льто
+я(б|п)локо`,
+ slovar3:`б(и|е)блиотека
+в(о|а)кзал
+в(е|и)лосипед
+г(о|а)род
+д(е|и)журный
+к(а|о)ртофель
+к(а|о)пуста
+кв(а|о)ртира
+к(о|а)нёк
+л(е|и)стница
+л(я|е)гушка
+м(а|о)газин
+м(а|о)лина
+м(о|а)роз
+м(о|а)лоток
+н(а|о)род
+об(е|и)зьяна
+о(в|ф)ощи
+ог(о|а)род
+од(е|и)жда
+п(е|и)сок
+п(ш|щ)еница
+р(а|о)стение
+р(и|е)сунок
+р(я|е)бина
+с(о|а)лдат
+с(о|а)лома
+т(о|а)пор
+тр(а|о)мвай
+ур(о|а)жай`,
+ slovar4:`а(пп|п)етит
+б(а|о)гаж
+б(е|и)седа
+бил(е|и)т
+г(о|а)ризонт
+д(и|е)ректор
+з(д|_)равствуй
+к(а|о)лендарь
+к(а|о)никулы
+к(о|а)рабль
+к(о|а)смонавт
+к(о|а)стюм
+к(а|о)стрюля
+пу(т|д)ешествие
+п(е|и)йзаж
+п(о|а)беда
+пр(а|о)вительство
+р(а|о)сстояние
+с(е|и)годня
+т(е|и)лефон
+т(е|и)перь
+тр(о|а)ллейбус
+ф(у|о)тбол`,
 };
+/* ---------- русский язык: «Вставь букву» ---------- */
+const ACUTE='́';
+const stress=s=>s.replace(/'/g,ACUTE);
+function bankOf(tag){return RB[tag].split('\n').map(line=>{const k=line.lastIndexOf(':'),hasChk=k>0&&!/\)/.test(line.slice(k));
+  const w=hasChk?line.slice(0,k):line,chk=hasChk?line.slice(k+1):'';const m=w.match(/\(([^|]*)\|([^)]*)\)/);
+  const nn=x=>x==='_'?'—':x;
+  return{tag,w:w.slice(0,m.index)+'□'+w.slice(m.index+m[0].length),ans:nn(m[1]),bad:nn(m[2]),chk:stress(chk)}})}
+const insWord=it=>it.w.replace('□',it.ans==='—'?'':it.ans);
+function insItems(p,r){
+  let pool=[];for(const g of p.groups)pool.push(...bankOf(g));
+  if(p.check)pool=pool.filter(x=>x.chk);
+  const seen=new Set();pool=shuffle(r,pool).filter(x=>{const k=insWord(x);if(seen.has(k))return false;seen.add(k);return true});
+  return pool.slice(0,p.count).map(x=>({type:'ins',w:x.w,ans:x.ans,opts:shuffle(r,[x.ans,x.bad]),chk:p.check?x.chk:'',none:p.groups.some(g=>RB[g].includes('_')),phr:/\s/.test(x.w)}))}
+const insInstr=it=>it.phr?(it.chk?'Вставь т или ть. Запиши вопрос к глаголу.':'Вставь т или ть.')
+  :it.chk?(/р\.|ф\.|л\./.test(it.chk)?'Вставь букву, где нужно. Запиши, какое это слово.':'Вставь букву и запиши проверочное слово.')
+  :it.none?'Вставь букву, где она нужна. Где не нужна — поставь прочерк.':'Вставь пропущенную букву.';
+
+/* темы русского по учебнику Канакиной и Горецкого («Школа России»); soon — генератора пока нет */
+const R_=(n,d,groups,count,check)=>({n,d,p:{kind:'ins',groups,count,check:!!check}});
+const SOON=t=>({id:'rs-'+t.replace(/[^а-яё]/gi,'').slice(0,18),t,soon:true});
+const RULE={
+  zhi:['ЖИ–ШИ пиши с буквой И. ЧА–ЩА пиши с буквой А. ЧУ–ЩУ пиши с буквой У.','лыжи, машина, чашка, роща, чудо, щука'],
+  chk:['Сочетания ЧК, ЧН, ЧТ, ЩН пишутся без мягкого знака.','дочка, ночной, мощный'],
+  soft:['Мягкий знак показывает мягкость согласного. В сочетаниях ЧК, ЧН мягкий знак не пишется.','конь, пальто, но: дочка, ночной'],
+  pair:['Парный согласный на конце слова и перед согласным проверяй: измени слово так, чтобы после согласного стоял гласный.','дуб — дубы, ложка — ложечка'],
+  unstr:['Безударную гласную в корне проверяй ударением: измени слово или подбери однокоренное, чтобы гласная стала ударной.','вода — во́ды, звезда — звёзды, мячи — мяч'],
+  slovar:['Эти слова не проверяются: их написание нужно запомнить. Если сомневаешься, смотри в словарь.','ворона, корова, карандаш'],
+  sepSoft:['Разделительный мягкий знак пишется в корне и окончании перед е, ё, ю, я, и.','вьюга, листья, ручьи'],
+  sep:['Ъ пишется после приставки на согласный перед е, ё, ю, я. Ь — в корне и в окончании.','подъезд, объявление; вьюга, ручьи'],
+  silent:['Непроизносимый согласный проверяй: подбери слово, где этот звук слышен. Если звука нет и в проверочном слове — буквы нет.','солнце — солнышко, честный — честь; вкусный — вкус'],
+  double:['Слова с удвоенными согласными нужно запомнить.','класс, касса, группа, суббота'],
+  shs3:['У существительных женского рода на конце после шипящих пишется ь. У мужского рода — не пишется.','ночь, мышь (ж. р.); мяч, врач (м. р.)'],
+  shs4:['Ь после шипящих пишется в неопределённой форме глагола, во 2-м лице и у существительных ж. р. У существительных м. р. — не пишется.','беречь, пишешь, ночь; но: мяч'],
+  tsya:['Задай к глаголу вопрос. Что делает? — пиши -тся. Что делать? — пиши -ться.','умывается (что делает?), умываться (что делать?)']};
+const RUSP={
+ 1:[
+  {part:1,s:'Слово, слог, ударение',topics:[SOON('Слово и слог'),SOON('Перенос слов'),SOON('Ударение')]},
+  {part:1,s:'Звуки и буквы',topics:[SOON('Гласные и согласные звуки'),SOON('Твёрдые и мягкие согласные'),
+   {id:'r1-soft',t:'Мягкий знак',rule:RULE.soft,syn:['ь','мягкость'],L:[R_('Пиши ь или нет','конь, пальто',['soft'],12),R_('Ь и сочетания ЧК, ЧН','кон□ки, доч□ка',['soft','chk'],14),R_('Все трудные места','ь, ЧК–ЧН, ЖИ–ШИ',['soft','chk','zhi'],18)]},
+   {id:'r1-pair',t:'Звонкие и глухие согласные на конце слова',rule:RULE.pair,syn:['парные','звонкие','глухие'],L:[R_('На конце слова','ду□ — дубы',['pair_end'],12),R_('На конце и в середине','лож□ка',['pair'],16),R_('С проверочным словом','запиши проверку',['pair_end'],12,true)]},
+   {id:'r1-zhi',t:'Сочетания ЖИ–ШИ, ЧА–ЩА, ЧУ–ЩУ',rule:RULE.zhi,syn:['жи','ши','ча','ща','чу','щу','шипящие'],L:[R_('Вставь гласную','12 слов',['zhi'],12),R_('Больше слов','18 слов',['zhi'],18),R_('Вместе с ЧК, ЧН','лыж□, доч□ка',['zhi','chk'],18)]},
+   {id:'r1-chk',t:'Сочетания ЧК, ЧН, ЧТ',rule:RULE.chk,syn:['чк','чн','чт','щн'],L:[R_('Пиши без ь','доч□ка',['chk'],10),R_('Где нужен ь','доч□ка, кон□ки',['chk','soft'],14),R_('Все трудные места','ЧК–ЧН, ь, ЖИ–ШИ',['chk','soft','zhi'],18)]},
+   SOON('Заглавная буква в словах')]},
+  {part:1,s:'Наша речь',topics:[SOON('Текст, предложение, диалог')]}],
+ 2:[
+  {part:1,s:'Текст и предложение',topics:[SOON('Текст. Части текста'),SOON('Предложение. Члены предложения')]},
+  {part:1,s:'Слова, слова, слова',topics:[SOON('Синонимы и антонимы'),SOON('Однокоренные слова. Корень'),SOON('Слог, ударение, перенос')]},
+  {part:1,s:'Звуки и буквы',topics:[SOON('Алфавит'),
+   {id:'r2-unstr',t:'Безударные гласные в корне',rule:RULE.unstr,syn:['безударная','проверочное','слово','проверка','гласные','о','а','е','и'],L:[R_('О или А','в□да — воды',['oa'],12),R_('О, А, Е, И, Я','все гласные',['oa','ei','ya'],16),R_('С проверочным словом','вставь и запиши проверку',['oa','ei','ya'],12,true)]},
+   {id:'r2-slovar',t:'Словарные слова 2 класса',rule:RULE.slovar,syn:['словарные','непроверяемые'],L:[R_('12 слов','в□рона, к□рова',['slovar2'],12),R_('16 слов','',['slovar2'],16),R_('Все слова','',['slovar2'],23)]},
+   {id:'r2-soft',t:'Мягкий знак',rule:RULE.soft,syn:['ь','мягкость'],L:[R_('Пиши ь или нет','',['soft'],12),R_('Ь и сочетания ЧК, ЧН','',['soft','chk'],14),R_('С разделительным ь','',['soft','chk','sep_soft'],18)]}]},
+  {part:2,s:'Звуки и буквы',topics:[
+   {id:'r2-zhi',t:'Правописание сочетаний с шипящими',rule:RULE.zhi,syn:['жи','ши','ча','ща','чу','щу','чк','чн'],L:[R_('ЖИ–ШИ, ЧА–ЩА, ЧУ–ЩУ','',['zhi'],14),R_('Вместе с ЧК, ЧН, ЩН','',['zhi','chk'],18),R_('Все трудные места','шипящие и ь',['zhi','chk','soft'],20)]},
+   {id:'r2-pair',t:'Парные звонкие и глухие согласные',rule:RULE.pair,syn:['парные','звонкие','глухие','проверочное'],L:[R_('На конце слова','',['pair_end'],12),R_('На конце и в середине','',['pair'],16),R_('С проверочным словом','',['pair'],12,true)]},
+   {id:'r2-sep',t:'Разделительный мягкий знак',rule:RULE.sepSoft,syn:['разделительный','ь'],L:[R_('Где нужен ь','',['sep_soft','chk'],12),R_('Больше слов','',['sep_soft','chk'],16),R_('С мягким знаком мягкости','',['sep_soft','soft','chk'],20)]}]},
+  {part:2,s:'Части речи',topics:[SOON('Имя существительное'),SOON('Глагол'),SOON('Имя прилагательное'),SOON('Местоимение'),SOON('Предлоги')]}],
+ 3:[
+  {part:1,s:'Текст. Предложение. Словосочетание',topics:[SOON('Виды предложений'),SOON('Главные и второстепенные члены'),SOON('Словосочетание')]},
+  {part:1,s:'Слово в языке и речи',topics:[SOON('Лексическое значение слова'),SOON('Части речи. Имя числительное')]},
+  {part:1,s:'Состав слова',topics:[SOON('Корень, окончание, приставка, суффикс')]},
+  {part:1,s:'Правописание частей слова',topics:[
+   {id:'r3-unstr',t:'Безударные гласные в корне',rule:RULE.unstr,syn:['безударная','проверочное','слово','проверка','гласные'],L:[R_('Все гласные','',['oa','ei','ya'],16),R_('С проверочным словом','',['oa','ei','ya'],12,true),R_('Вместе со словарными','',['oa','ei','ya','slovar3'],20)]},
+   {id:'r3-pair',t:'Парные согласные в корне',rule:RULE.pair,syn:['парные','звонкие','глухие'],L:[R_('На конце и в середине','',['pair'],16),R_('С проверочным словом','',['pair'],12,true),R_('Парные и непроизносимые','',['pair','silent'],20)]},
+   {id:'r3-silent',t:'Непроизносимые согласные',rule:RULE.silent,syn:['непроизносимые','солнце','праздник'],L:[R_('Вставь букву','',['silent'],12),R_('С проверочным словом','',['silent'],12,true),R_('Непроизносимые и парные','',['silent','pair'],20)]},
+   {id:'r3-double',t:'Удвоенные согласные',rule:RULE.double,syn:['удвоенные','двойные','сс','лл'],L:[R_('Вставь букву','',['double'],12),R_('Все слова','',['double'],15),R_('Вместе со словарными','',['double','slovar3'],20)]},
+   {id:'r3-sep',t:'Разделительные Ъ и Ь',rule:RULE.sep,syn:['разделительный','твёрдый','ъ','ь'],L:[R_('Ъ или Ь','',['sep'],12),R_('Больше слов','',['sep'],18),R_('Все слова','',['sep'],24)]},
+   {id:'r3-slovar',t:'Словарные слова 3 класса',rule:RULE.slovar,syn:['словарные','непроверяемые'],L:[R_('12 слов','',['slovar3'],12),R_('20 слов','',['slovar3'],20),R_('С прошлым годом','',['slovar3','slovar2'],24)]}]},
+  {part:2,s:'Имя существительное',topics:[SOON('Число и род существительных'),
+   {id:'r3-shs',t:'Мягкий знак после шипящих у существительных',rule:RULE.shs3,syn:['шипящие','ь','род','ночь','мяч'],L:[R_('Ь или нет','',['shs3'],12),R_('Больше слов','',['shs3'],18),R_('С родом','запиши род',['shs3'],14,true)]},
+   SOON('Падеж существительных')]},
+  {part:2,s:'Имя прилагательное, местоимение, глагол',topics:[SOON('Имя прилагательное: род, число, падеж'),SOON('Личные местоимения'),SOON('Глагол: время, род'),SOON('НЕ с глаголами')]}],
+ 4:[
+  {part:1,s:'Предложение',topics:[SOON('Однородные члены предложения'),SOON('Простые и сложные предложения'),SOON('Прямая речь')]},
+  {part:1,s:'Слово в языке и речи',topics:[SOON('Наречие'),
+   {id:'r4-slovar',t:'Словарные слова 4 класса',rule:RULE.slovar,syn:['словарные','непроверяемые'],L:[R_('12 слов','',['slovar4'],12),R_('Все слова','',['slovar4'],20),R_('С 3 классом','',['slovar4','slovar3'],24)]}]},
+  {part:1,s:'Имя существительное',topics:[SOON('Три склонения существительных'),SOON('Безударные падежные окончания')]},
+  {part:2,s:'Имя прилагательное и местоимение',topics:[SOON('Падежные окончания прилагательных'),SOON('Личные местоимения: склонение')]},
+  {part:2,s:'Глагол',topics:[SOON('Спряжение глагола'),SOON('Безударные личные окончания'),
+   {id:'r4-tsya',t:'-тся и -ться в глаголах',rule:RULE.tsya,syn:['тся','ться','глагол'],L:[R_('Т или ТЬ','',['tsya'],10),R_('Все предложения','',['tsya'],16),R_('С вопросом к глаголу','',['tsya'],12,true)]},
+   {id:'r4-shs',t:'Мягкий знак после шипящих',rule:RULE.shs4,syn:['шипящие','ь','пишешь','беречь'],L:[R_('Ь или нет','',['shs4'],12),R_('Глаголы и существительные','',['shs4','shs3'],18),R_('С пояснением','',['shs4'],12,true)]}]}]
+};
+const PROG={math:MATH,rus:RUSP};
 const SUBJ={math:'Математика',rus:'Русский язык'};
-function allTopics(){const m={};for(const g in MATH)for(const sec of MATH[g])for(const t of sec.topics)m[t.id]={...t,grade:+g,section:sec.s,subject:'math'};
+function allTopics(){const m={};for(const subj in PROG)for(const g in PROG[subj])for(const sec of PROG[subj][g])for(const t of sec.topics)if(!t.soon)m[t.id]={...t,grade:+g,section:sec.s,subject:subj};
   for(const c of (S&&S.customTopics)||[])m[c.id]=c;return m}
 let TOPICS={};
 const MY='Мои темы';
@@ -2133,7 +2606,7 @@ function demoState0(){
   const now=Date.now(),d=86400000;
   return{
     students:[
-      {id:'s1',name:'Маша Котова',grade:2,subjects:['math','rus'],current:'g2-add',currentRus:'c-slovar'},
+      {id:'s1',name:'Маша Котова',grade:2,subjects:['math','rus'],current:'g2-add',currentRus:'r2-unstr'},
       {id:'s2',name:'Тимур Ахмедов',grade:3,subjects:['math'],current:'g3-table'},
       {id:'s3',name:'Алиса Лебедева',grade:1,subjects:['math','rus'],current:'g1-carry'},
       {id:'s4',name:'Егор Смирнов',grade:4,subjects:['math'],current:'g4-mul'}],
@@ -2189,6 +2662,7 @@ const gradeWord=g=>g+' класс';
 
 /* ---------- отрисовка листа ---------- */
 function itemHTML(it,showAns){
+  if(it.type==='ins')return insHTML(it,showAns);
   if(it.type==='word')return `<div class="wq">${esc(it.q)}</div><div class="sol"></div><div class="wa">Ответ: <span class="box">${showAns?fmt(it.ans):''}</span></div>`;
   if(it.type==='grid')return `${gridSVG(it)}<span class="ga">${it.ask} = <span class="box">${showAns?it.ans:''}</span> ${gridUnit(it)}</span>`;
   if(it.type==='ch')return `<div class="chq">${esc(it.q)}</div>${it.svg}<div class="opts">${it.opts.map(o=>`<span class="opt${showAns&&o===it.ans?' on':''}">${esc(o)}</span>`).join('')}</div>`;
@@ -2204,6 +2678,7 @@ function itemHTML(it,showAns){
 }
 function instr(it){
   if(!it)return'';
+  if(it.type==='ins')return insInstr(it);
   if(it.type==='word')return'Реши задачу.';
   if(it.type==='ch')return'Выбери правильный ответ.';
   if(it.type==='grid')return it.ask==='P'?'Найди периметр фигуры. Сторона клетки 1 см.':'Найди площадь фигуры. Одна клетка 1 кв. см.';
@@ -2269,8 +2744,11 @@ function tokRow(str,it,showAns){
   const box=()=>{const R=noSp(it?fmt(it.ans):'');return `<span class="cbox">${[...R].map(x=>cc(showAns?x:'','a')).join('')}</span>`};
   return out.map(t=>t.w?`<span class="tw">${esc(t.w)}</span>`:t.gap?cc(''):t.c==='□'?box():t.c==='◯'?cc(showAns?it.ans:'','circ a'):t.p?`<span class="c">${t.c==='-'?'−':t.c}<i class="pn">${esc(t.p)}</i></span>`:cc(t.c==='-'?'−':t.c)).join('')}
 const badgeH=i=>`<span class="cb"><i>${i+1}</i></span>`;
+function insHTML(it,showAns){const [a,b]=it.w.split('□');
+  return `<span class="iw">${esc(a)}<span class="ib${it.opts.some(x=>x.length>1)?' w2':''}">${showAns?esc(it.ans):''}</span>${esc(b)}</span>${it.chk?`<span class="ichk">${showAns?esc(it.chk):''}</span>`:''}`}
 /* задания с текстом и рисунками: каждая строка текста — в строке клеток, рисунки по высоте кратны клетке */
 function richItemHTML(it,i,showAns){
+  if(it.type==='ins')return `<div class="it rich ins${it.phr?' span':''}">${badgeH(i)}<div class="rb">${insHTML(it,showAns)}</div></div>`;
   if(it.type==='word')return `<div class="it rich span wq2">${badgeH(i)}<div class="rb"><p class="tl">${esc(it.q)}</p><div class="sol2"></div><div class="aline"><span>Ответ:</span><i>${showAns?esc(fmt(it.ans)):''}</i></div></div></div>`;
   if(it.type==='grid')return `<div class="it rich">${badgeH(i)}<div class="rb">${gridSVG(it,true)}<span class="crow">${tokRow(`${it.ask} = □ ${gridUnit(it)}`,it,showAns)}</span></div></div>`;
   if(it.type==='ch')return `<div class="it rich${it.svg?'':' span'}">${badgeH(i)}<div class="rb"><p class="tl">${esc(it.q)}</p>${it.svg||''}<span class="opts2">${it.opts.map(o=>`<span class="ob${showAns&&o===it.ans?' on':''}">${esc(o)}</span>`).join('')}</span></div></div>`;
@@ -2302,7 +2780,7 @@ function sheetParts(items,{topic,level,seed,studentName,answers,design}){
   const tight=true;
   /* на «Строгом» шрифт крупнее, поэтому три колонки только для коротких примеров */
   const fit=c=>maxLen>(tight?28:34)?'c1':maxLen>(D?13:11)&&c==='c3'?'c2':c;
-  const cols=mixed?fit('c2'):kind==='word'?'c1':kind==='ch'?'c2':kind==='col'?(Math.max(...items.map(x=>String(fmt(x.ans)).length))>(tight?4:6)?'c3':'c4'):fit(kind==='expr'?'c2':kind==='own'?(ownLen>40?'c1':ownLen>16?'c2':'c3'):'c3');
+  const cols=mixed?fit('c2'):kind==='ins'?(items.some(x=>x.phr)?'c1':items.some(x=>x.chk)?'c2':items.some(x=>x.w.length>11)?'c3':'c4'):kind==='word'?'c1':kind==='ch'?'c2':kind==='col'?(Math.max(...items.map(x=>String(fmt(x.ans)).length))>(tight?4:6)?'c3':'c4'):fit(kind==='expr'?'c2':kind==='own'?(ownLen>40?'c1':ownLen>16?'c2':'c3'):'c3');
   /* сетка колонок в клетках: ширина задания и промежутки кратны клетке */
   const padX=!D?7:D.lv===3?8:9;const avail=Math.floor((100-2*padX-2*CELL)/CELL);
   const cellItems=items.filter(cellable);const k0=cellItems.length?Math.max(...cellItems.map(cellWidth)):0;
@@ -2317,11 +2795,12 @@ function sheetParts(items,{topic,level,seed,studentName,answers,design}){
   const subText=answers?esc(topic.t):esc(topic.L[level].n)+'. '+(mixed?'Лист из нескольких частей, у каждой своё указание.':esc(instr(items[0])));
   const fields=`<div class="sh-head"><div class="fld">Имя: <b>${esc(studentName||'')}</b></div><div class="fld">Дата: </div>
     <div class="fld">${gradeWord(topic.grade)} · ${lvl}</div><div class="fld">Вариант <b class="num">${seed}</b></div></div>`;
+  const rule=topic.rule&&!answers&&!V.noRule?`<div class="sh-rule"><b>Правило</b><span>${esc(topic.rule[0])}</span><i>${esc(topic.rule[1])}</i></div>`:'';
   const titleH=`<div class="sh-title">${answers?'<span class="key-stamp">Ключ</span> ':''}${D&&D.lv===3?stkSVG(D.theme.stk[0],'tico'):''}${esc(title)}</div>`;
-  const head=!D?`${fields}<div>${titleH}</div><div class="sh-sub">${subText}</div>`
+  const head=(!D?`${fields}<div>${titleH}</div><div class="sh-sub">${subText}</div>`
     :D.lv===1?`${fields}<div class="hero"><div class="hero-art">${D.img?artImg(D.img.top):charSVG(D.char)}</div><div class="hero-r">${titleH}<div class="bubble">${subText}</div></div></div>`
     :D.lv===2?`<div class="band"><div class="band-t">${titleH}<div class="sh-sub">${subText}</div></div><div class="band-art">${D.img?artImg(D.img.char):charSVG(D.char)}</div></div>${fields}`
-    :`${fields}<div>${titleH}</div><div class="sh-sub">${subText}</div>`;
+    :`${fields}<div>${titleH}</div><div class="sh-sub">${subText}</div>`)+rule;
   const mini=`<div class="sh-mini">${D&&D.lv<=2?stkSVG(D.theme.stk[1],'gico'):''}<b>${esc(studentName||'')}</b><span>${answers?'Ключ · ':''}${esc(topic.t)} · продолжение</span></div>`;
   /* задания идут строкой с переносом; ширина — по самому широкому заданию своей части, поэтому в части они встают ровными колонками */
   const gid=[];items.forEach((it,i)=>gid.push(i&&!newGroup(it,i)?gid[i-1]:i));
@@ -2411,7 +2890,7 @@ function sheetParts(items,{topic,level,seed,studentName,answers,design}){
       for(const b of blocks){out.push(...pieces.slice(at,b.t),b.html);at=b.hi}
       out.push(...pieces.slice(at));pieces.splice(0,pieces.length,...out)}
   }
-  const cls=D?`lv${D.lv} fr-${D.frame}${D.bw?' bw':''}`:'';
+  const cls=(D?`lv${D.lv} fr-${D.frame}${D.bw?' bw':''}`:'')+(topic.subject==='rus'?' ru':'');
   const pal=D?(D.bw?['#555','#999','#f2f2f2','#777']:D.pal):null;
   const style=D?`--p1:${pal[0]};--p2:${pal[1]};--p3:${pal[2]};--p4:${pal[3]}`:'';
   const deco=k=>{if(!D)return'';const r=rng(D.seed*31+k*7+1);let h='<div class="fr"></div>';
@@ -2420,7 +2899,7 @@ function sheetParts(items,{topic,level,seed,studentName,answers,design}){
     return `<div class="deco" aria-hidden="true">${h}</div>`};
   /* картинки для пустых мест внизу печатных страниц */
   const pics=D&&D.img&&D.lv<=2?[D.img.bot,D.img.char,D.img.top].filter(Boolean):[];
-  return{head:heroIn?fields:head,pics,mini,cols,gridStyle,pieces,cls,style,deco,footL:esc(topic.section),footR:`Проверить онлайн: код варианта ${seed}`};
+  return{head:heroIn?fields+rule:head,pics,mini,cols,gridStyle,pieces,cls,style,deco,footL:esc(topic.section),footR:`Проверить онлайн: код варианта ${seed}`};
 }
 function sheetHTML(items,o){
   const s=sheetParts(items,o);
@@ -2770,10 +3249,10 @@ function viewStudents(){
 
 /* порядок тем: по математике встроенная программа 1–4 класса, свои темы встают в конец своего класса;
    по русскому пока только свои темы, по классам */
-function trackIds(subj='math'){const ids=[];for(const g of [1,2,3,4]){if(subj==='math')for(const sec of MATH[g])for(const t of sec.topics)ids.push(t.id);
+function trackIds(subj='math'){const ids=[];for(const g of [1,2,3,4]){if(PROG[subj])for(const sec of PROG[subj][g])for(const t of sec.topics)if(!t.soon)ids.push(t.id);
   for(const c of S.customTopics)if(c.subject===subj&&c.grade===g&&!c.review&&!c.sheet)ids.push(c.id)}return ids}
 function trackPos(st,subj='math'){const tr=trackIds(subj);if(!tr.length)return{tr,i:-1};let i=tr.indexOf(curOf(st,subj));
-  if(i<0){if(subj==='math')i=tr.indexOf(MATH[st.grade][0].topics[0].id);else{i=tr.findIndex(id=>TOPICS[id].grade>=st.grade);if(i<0)i=0}}
+  if(i<0){i=tr.findIndex(id=>TOPICS[id].grade>=st.grade&&!TOPICS[id].custom);if(i<0)i=tr.findIndex(id=>TOPICS[id].grade>=st.grade);if(i<0)i=0}
   return{tr,i}}
 function makeReview(st,subj='math'){
   const {tr,i}=trackPos(st,subj);const prev=tr.slice(0,i);
@@ -2825,26 +3304,20 @@ function viewStudent(){
       <p class="empty" style="margin:0">Тем пока нет.</p>
       <div class="route-act"><button class="btn primary" id="r-new">+ Своя тема по русскому</button></div></section>`;
   }
-  const grades=subj==='math'?[1,2,3,4]:[1,2,3,4].filter(g=>g===st.grade||mine(g).length);
+  const grades=[1,2,3,4];
   let prog='';
   const cur=pos.i>=0?TOPICS[pos.tr[pos.i]]:null,cg=cur?cur.grade:st.grade,cp=cur?partOf(cur.id):1;
   const trI=id=>pos.tr.indexOf(id);
   const secRows=ts=>{const done=ts.filter(t=>pos.i>=0&&trI(t.id)>=0&&trI(t.id)<pos.i),rest=ts.filter(t=>!done.includes(t));
     return (done.length?`<details class="done"><summary>Пройдено: ${done.length} ${plural(done.length,['тема','темы','тем'])}</summary>${done.map(t=>row(TOPICS[t.id])).join('')}</details>`:'')+rest.map(t=>row(TOPICS[t.id])).join('')};
-  if(subj==='math')for(const g of grades){
-    const secs=MATH[g],parts=[...new Set(secs.map(x=>x.part))],my=mine(g),n=secs.reduce((a,x)=>a+x.topics.length,0)+my.length;
+  const PR=PROG[subj];
+  if(PR)for(const g of grades){
+    const secs=PR[g],parts=[...new Set(secs.map(x=>x.part))],my=mine(g),n=secs.reduce((a,x)=>a+x.topics.filter(t=>!t.soon).length,0)+my.length;
     prog+=`<details class="cg"${g===cg?' open':''}><summary><b>${gradeWord(g)}</b>${secs[0].unverified?'<span class="chip warn">не сверено с учебником</span>':''}<span class="cnt">${n} ${plural(n,['тема','темы','тем'])}</span></summary>`;
-    for(const pt of parts){const inner=secs.filter(x=>x.part===pt).map(sec=>`<div class="sec"><h3>${esc(sec.s)}</h3>${secRows(sec.topics)}</div>`).join('');
+    for(const pt of parts){const inner=secs.filter(x=>x.part===pt).map(sec=>`<div class="sec"><h3>${esc(sec.s)}</h3>${secRows(sec.topics.filter(t=>!t.soon))}${sec.topics.filter(t=>t.soon).map(t=>`<div class="topic soon"><span class="dot"></span><span class="tt"><span>${esc(t.t)}<span class="mine">скоро</span></span></span></div>`).join('')}</div>`).join('');
       prog+=parts.length>1?`<details class="cp"${g===cg&&pt===cp?' open':''}><summary>Часть ${pt}</summary>${inner}</details>`:inner}
     if(my.length)prog+=`<div class="sec"><h3>${MY}</h3>${secRows(my)}</div>`;
     prog+='</details>';
-  }
-  if(subj!=='math')for(const g of grades){
-    prog+=`<div class="gradehead">${gradeWord(g)}${g===st.grade?' · класс ученика':''}</div>`;
-    const my=mine(g);
-    if(my.length)prog+=`<div class="sec"><h3>${MY}</h3>${my.map(row).join('')}</div>`;
-    if(subj!=='math'&&g===st.grade)prog+=`<div class="locked">Генератор «Вставь букву» появится в следующей версии, его темы встанут в этот же маршрут.</div>`+
-      RUS[g].map(sec=>`<div class="sec"><h3>${esc(sec.s)} · скоро</h3>${sec.topics.map(t=>`<button class="topic" disabled><span class="dot"></span><span class="tt">${esc(t)}</span></button>`).join('')}</div>`).join('');
   }
   prog+=`<div class="legend"><span><i class="dot ok"></i>освоено</span><span><i class="dot warn"></i>в работе</span><span><i class="dot bad"></i>западает</span></div>`;
   const LUPA='<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M15.5 15.5 L21 21" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>';
@@ -2918,8 +3391,9 @@ function viewWork(){
   const as=document.getElementById('as');if(as)as.onclick=()=>startPlayer(h);
 }
 /* ---------- поиск темы: слова с опечатками, синонимы, подтемы учебника и пример вида 37 + 48 ---------- */
-const partOf=id=>{for(const g in MATH)for(const sec of MATH[g])if(sec.topics.some(t=>t.id===id))return sec.part;return 1};
-const secOf=id=>{for(const g in MATH)for(const sec of MATH[g])if(sec.topics.some(t=>t.id===id))return sec.s;return TOPICS[id]?TOPICS[id].section:''};
+const progSec=id=>{for(const subj in PROG)for(const g in PROG[subj])for(const sec of PROG[subj][g])if(sec.topics.some(t=>t.id===id))return sec;return null};
+const partOf=id=>{const sec=progSec(id);return sec?sec.part:1};
+const secOf=id=>{const sec=progSec(id);return sec?sec.s:TOPICS[id]?TOPICS[id].section:''};
 const normT=x=>String(x).toLowerCase().replace(/ё/g,'е').replace(/[«»"(),.:;!?…]/g,' ').replace(/\s+/g,' ').trim();
 function lev(a,b){if(Math.abs(a.length-b.length)>2)return 9;const d=[];for(let i=0;i<=a.length;i++)d[i]=[i];for(let j=1;j<=b.length;j++)d[0][j]=j;
   for(let i=1;i<=a.length;i++)for(let j=1;j<=b.length;j++)d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1));return d[a.length][b.length]}
@@ -2970,7 +3444,7 @@ function searchTopics(q,subj){
   const out=[];const ex=subj==='math'?parseExample(q):null;if(ex)out.push({...ex,score:100});
   const toks=normT(q).split(' ').filter(t=>/^[a-zа-я0-9]+$/.test(t)&&(t.length>=2||/^\d+$/.test(t)));
   if(!toks.length||(ex&&toks.every(t=>/^\d+$/.test(t))))return out;
-  const ids=subj==='math'?trackIds('math'):S.customTopics.filter(c=>c.subject===subj&&!c.review&&!c.sheet).map(c=>c.id);
+  const ids=trackIds(subj);
   for(const id of ids){const t=TOPICS[id];const syn=normT((t.syn||[]).join(' ')+' '+t.t).split(' ');
     let best=null;
     [{txt:t.t,si:-1},...(t.sub||[]).map((x,k)=>({txt:x.n||x,si:k}))].forEach(e=>{const words=[...normT(e.txt).split(' '),...syn];let sc=0;
@@ -3017,7 +3491,7 @@ function tplBlocks(tpl,st,t,lvl){
 }
 function sheetTopic(name,blocks,t){
   const parts=blocks.map(b=>({tid:b.tid,label:b.label||'',count:b.count,p:TOPICS[b.tid].L[b.lv].p}));
-  return{id:'sheet-preview',sheet:true,custom:true,subject:t.subject,grade:t.grade,section:'Лист «'+name+'»',t:t.t,
+  return{id:'sheet-preview',sheet:true,custom:true,subject:t.subject,grade:t.grade,section:'Лист «'+name+'»',t:t.t,rule:t.rule,
     L:[{n:name,d:blocks.map(b=>b.label||TOPICS[b.tid].t).join(' · '),p:{kind:'mix',parts,count:parts.reduce((s,x)=>s+x.count,0)}}]};
 }
 const tplName=k=>TPL.find(x=>x[0]===k)[1];
@@ -3063,7 +3537,7 @@ function viewTopic(){
     <p>${gradeWord(t.grade)}${m.pct!=null?` · усвоение ${m.pct}%`:''}${V.subName&&tpl==='train'?` · ${esc(V.subName)} <button class="btn link" id="subx">вся тема</button>`:''}</p></div></div>
     <div class="topic-grid">
       <div class="levels">${tplSeg}${tpl==='own'?'':lv}
-        ${blocksHTML}${designBox(st,V.seed)}
+        ${blocksHTML}${t.rule?`<label class="chk"><input type="checkbox" id="rulecb"${V.noRule?'':' checked'}> Правило на листе</label>`:''}${designBox(st,V.seed)}
         <div class="actions"><button class="btn primary" id="print">Печать</button><button class="btn" id="link">Ссылка ученику</button><button class="btn link" id="tomat">Сохранить в материалы</button></div>
         <details class="fold"><summary>Ещё</summary>
           ${tunable?`<div class="tune-row"><label for="lo">Числа от</label><input id="lo" type="number" value="${p.lo}"><label for="hi">до</label><input id="hi" type="number" value="${p.hi}"></div>
@@ -3083,6 +3557,7 @@ function viewTopic(){
   snapCells(app);countPages();if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{snapCells(app);countPages()});
   app.querySelectorAll('#lvseg [data-l]').forEach(b=>b.onclick=()=>go({level:+b.dataset.l,seed:newSeed(),over:null,subName:null}));
   bindDesign(st);
+  if($('rulecb'))$('rulecb').onchange=e=>{V.noRule=!e.target.checked;render()};
   if($('subx'))$('subx').onclick=()=>go({over:null,subName:null,seed:newSeed()});
   if($('tpl'))$('tpl').querySelectorAll('button').forEach(b=>b.onclick=()=>{const k=b.dataset.k;
     if(k==='own'&&tpl!=='own')V.blocks=(tpl==='train'?tplBlocks('lesson',st,t,V.level):blocks).map(x=>({...x}));
@@ -3884,6 +4359,7 @@ const isNumAns=it=>/^\d+$/.test(String(it.ans));
 const textMode=it=>it.type==='own'&&!isNumAns(it);
 const norm=s=>String(s).trim().toLowerCase().replace(/ё/g,'е').replace(/\s+/g,' ');
 function qText(it){
+  if(it.type==='ins'){const [a,b]=it.w.split('□');return `${esc(a)}<span class="slot${P.input?' filled':''}">${esc(P.input)||'?'}</span>${esc(b)}`}
   const sl=()=>`<span class="slot${P.input?' filled':''}">${esc(P.input)||'?'}</span>`;
   if(it.type==='word')return `<span class="wq">${esc(it.q)}</span><span class="wa">Ответ: ${sl()}</span>`;
   if(it.type==='grid')return `<span class="gwrap">${gridSVG(it)}</span><span class="wa">${it.ask} = ${sl()} ${gridUnit(it)}</span>`;
@@ -3898,6 +4374,7 @@ function qText(it){
   return `${it.miss==='a'?slot:fmt(it.a)} ${sym(it.op)} ${it.miss==='b'?slot:fmt(it.b)} = ${it.miss==='res'?slot:fmt(it.res)}`;
 }
 function plainQ(it){
+  if(it.type==='ins')return it.w;
   if(it.type==='word'||it.type==='ch'||it.svg)return it.q.length>70?it.q.slice(0,67)+'…':it.q;
   if(it.type==='grid')return (it.ask==='P'?'Периметр':'Площадь')+` фигуры из ${it.cells.length} клеток`;
   if(it.type==='own')return it.q.includes('□')?it.q:it.q+' = □';
@@ -3910,7 +4387,7 @@ function plainQ(it){
 function viewPlayer(){
   const it=P.items[P.i];const who=P.name||student(P.h.studentId).name;
   const tm=textMode(it);
-  const pad=it.type==='ch'?`<div class="opts-pad">${it.opts.map((o,k)=>`<button data-opt="${k}">${esc(o)}</button>`).join('')}</div>`
+  const pad=it.type==='ch'||it.type==='ins'?`<div class="opts-pad">${it.opts.map((o,k)=>`<button data-opt="${k}">${esc(o)}</button>`).join('')}</div>`
     :it.type==='cmp'
     ?`<div class="signs">${['<','=','>'].map(s=>`<button data-sign="${s}" aria-label="знак ${s}">${s}</button>`).join('')}</div>`
     :tm?`<div class="txt"><input id="tx" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Ответ" placeholder="Ответ" value="${esc(P.input)}"><button class="btn primary" id="txok">Готово</button></div>`
@@ -3921,7 +4398,7 @@ function viewPlayer(){
       <div class="score num"><span>${P.score}<small>очки</small></span><span>${P.streak}<small>подряд</small></span></div></div>
     <div class="prog"><i style="width:${P.i/P.items.length*100}%"></i></div>
     <p class="pl-instr">${esc(instr(it))}</p>
-    <div class="task${it.type==='own'&&!it.svg&&it.q.length>16&&it.q.length<=26?' long':''}${it.type==='word'||it.type==='ch'||it.svg||(it.type==='own'&&it.q.length>26)?' word':''}${it.type==='grid'?' grid':''}" aria-live="polite"><div class="q">${qText(it)}</div>${P.fb?`<div class="fb ${P.fb.ok?'ok':'bad'}">${P.fb.ok?'Верно! +10':'Правильный ответ: '+esc(P.fb.ans)}</div>`:''}</div>
+    <div class="task${it.type==='ins'&&it.phr?' word':''}${it.type==='own'&&!it.svg&&it.q.length>16&&it.q.length<=26?' long':''}${it.type==='word'||it.type==='ch'||it.svg||(it.type==='own'&&it.q.length>26)?' word':''}${it.type==='grid'?' grid':''}" aria-live="polite"><div class="q">${qText(it)}</div>${P.fb?`<div class="fb ${P.fb.ok?'ok':'bad'}">${P.fb.ok?'Верно! +10':'Правильный ответ: '+esc(P.fb.ans)}</div>`:''}</div>
     ${pad}
     <div style="text-align:center"><button class="btn small quiet" id="stop">Закончить досрочно</button></div></div>`;
   app.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>key(b.dataset.k));
