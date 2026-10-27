@@ -846,6 +846,7 @@ body.shell .top .logo{display:none}
 .wadd{margin-top:auto;border:1px dashed var(--line);background:none;border-radius:8px;color:var(--ink-3);font-size:18px;line-height:1;padding:6px;opacity:.6}
 .wadd:hover{opacity:1;border-color:var(--ink);color:var(--ink)}
 .les-when{margin:-6px 0 0;color:var(--ink-2)}
+.lpaid{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .mv{display:flex;gap:8px;flex-wrap:wrap}
 .slots{display:flex;flex-direction:column;gap:8px}
 .slots:empty{display:none}
@@ -3314,9 +3315,22 @@ function money(st,a=0,b=Date.now()+90*DAY){
   const ls=lessonsIn(a,b,st.id).filter(charged);const ch=ls.reduce((s,l)=>s+lprice(l),0);
   const pd=S.payments.filter(p=>p.sid===st.id&&p.date>=a&&p.date<b).reduce((s,p)=>s+p.amount,0);
   return{n:ls.length,charged:ch,paid:pd,bal:pd-ch}}
-function balTxt(st){const b=money(st).bal;if(b<0)return{cls:'bad',t:'долг '+rub(-b)};
-  if(b>0){const n=st.price?Math.floor(b/st.price):0;return{cls:'ok',t:n?`оплачено вперёд ${n} ${plural(n,LESSONS)}`:'аванс '+rub(b)}}
-  return{cls:'',t:'без долга'}}
+/* какие занятия оплачены: сначала оплата, отмеченная в самом занятии, потом остальные деньги по порядку дат */
+function coverage(st){
+  const ls=lessonsIn(0,Date.now()+180*DAY,st.id).filter(l=>lstat(l)!=='cancel');
+  const ids=new Set(ls.map(l=>l.id)),own={};let pool=0;
+  for(const p of S.payments)if(p.sid===st.id){if(p.lid&&ids.has(p.lid))own[p.lid]=(own[p.lid]||0)+p.amount;else pool+=p.amount}
+  const paid=new Map();let un=0,unSum=0,until=0;
+  for(const l of ls){const pr=lprice(l);let a=own[l.id]||0;if(a>pr){pool+=a-pr;a=pr}
+    if(a<pr&&pool>0){const t=Math.min(pool,pr-a);pool-=t;a+=t}
+    if(a>=pr){paid.set(l.id,own[l.id]?'own':'pre');if(lstat(l)==='plan')until=l.at}
+    else if(charged(l)){un++;unSum+=pr-a}}
+  return{paid,un,unSum,until,pool}}
+function balTxt(st){const c=coverage(st);
+  if(c.un)return{cls:'bad',t:`не оплачено ${c.un} ${plural(c.un,LESSONS)} · ${rub(c.unSum)}`};
+  if(c.until)return{cls:'ok',t:'оплачено до '+dayTxt(c.until)};
+  if(c.pool>0)return{cls:'ok',t:'аванс '+rub(c.pool)};
+  return{cls:'',t:'всё оплачено'}}
 const nextLesson=sid=>lessonsIn(Date.now(),Date.now()+60*DAY,sid).find(l=>lstat(l)==='plan');
 const slotsTxt=st=>(st.slots||[]).filter(s=>!s.until).sort((a,b)=>a.wd-b.wd||a.t.localeCompare(b.t)).map(s=>WD[s.wd]+' '+s.t).join(', ');
 
@@ -3420,12 +3434,19 @@ function lessonModal(l0){
     <p class="les-when">${WDL[wdOf(l.at)]}, ${dayTxt(l.at)} · <span class="num">${hm(l.at)}–${hm(l.at+(l.dur||60)*60000)}</span> · ${pr?rub(pr):'цена не указана'}</p>
     <div class="field"><span class="label">Как прошло</span><div class="seg" id="lst">${[['done','Проведено'],['miss','Пропуск с оплатой'],['cancel','Отменено']].map(([k,n])=>`<button data-k="${k}" class="${k===s?'on':''}">${n}</button>`).join('')}</div>
       <span class="hint">${s==='plan'?'Когда занятие пройдёт, оно само станет проведённым. Отмечать нужно только отмену или пропуск.':'Проведённые занятия и пропуски с оплатой списываются с баланса ученика.'}</span></div>
+    ${s==='cancel'||!pr?'':(()=>{const c=coverage(st).paid.get(l.id);
+      return`<div class="field"><span class="label">Оплата</span>${c?`<div class="lpaid"><span class="chip ok">✓ Оплачено${c==='pre'?' заранее':''}</span>${c==='own'?'<button class="btn small quiet" id="unpay">Отменить</button>':''}</div>`
+        :`<div class="seg lpay"><button class="on" id="pay1">Оплатил · ${rub(pr)}</button><button data-pn="4">4 занятия</button><button data-pn="8">8 занятий</button></div>`}</div>`})()}
     <div class="field"><span class="label">Перенести</span><div class="mv"><input type="date" id="mvD" value="${dkey(l.at)}" aria-label="Дата"><input type="time" id="mvT" value="${hm(l.at)}" aria-label="Время"><button class="btn small" id="mv">Перенести</button></div></div>
     <div class="field"><label class="label" for="lnote">Заметка к занятию</label><textarea id="lnote" rows="2" placeholder="Что прошли, что задать">${esc(l.note||'')}</textarea></div>
     <div class="modal-actions">${!l.virtual&&!l.slot?'<button class="btn quiet pen" id="ldel">Удалить</button>':''}<button class="btn quiet" id="lcard">Карточка ученика</button>${s==='cancel'?'':'<button class="btn quiet" id="lsheet">Лист к уроку</button>'}<button class="btn primary" id="cl">Готово</button></div>`,()=>{
       const $=id=>document.getElementById(id);
       const keepNote=()=>{const n=$('lnote').value.trim();if(n!==(l.note||'')){l=realize(l);l.note=n;save()}};
       document.querySelectorAll('#lst [data-k]').forEach(b=>b.onclick=()=>{keepNote();l=realize(l);l.status=b.dataset.k===lstat(l)&&l.status===b.dataset.k?'plan':b.dataset.k;save();render();draw()});
+      if($('pay1'))$('pay1').onclick=()=>{keepNote();l=realize(l);S.payments.push({id:'p'+Date.now(),sid:st.id,lid:l.id,amount:pr,date:Date.now(),note:'Занятие '+dayTxt(l.at)});save();render();draw();toast('Оплата отмечена: '+rub(pr))};
+      document.querySelectorAll('[data-pn]').forEach(b=>b.onclick=()=>{const n=+b.dataset.pn,p=st.price||pr;keepNote();
+        S.payments.push({id:'p'+Date.now(),sid:st.id,amount:n*p,date:Date.now(),note:`Абонемент на ${n} ${plural(n,LESSONS)}`});save();render();draw();toast(`Оплата отмечена: ${n} ${plural(n,LESSONS)}, ${rub(n*p)}`)});
+      if($('unpay'))$('unpay').onclick=()=>{S.payments=S.payments.filter(p=>p.lid!==l.id);save();render();draw()};
       $('mv').onclick=()=>{const at=atOf($('mvD').value||dkey(l.at),$('mvT').value||hm(l.at));keepNote();l=realize(l);l.at=at;if(l.status==='cancel')l.status='plan';save();close();render();toast('Занятие перенесено: '+whenTxt(at))};
       $('cl').onclick=()=>{keepNote();close();render()};
       $('lcard').onclick=()=>{keepNote();close();go({screen:'student',studentId:st.id,subject:st.subjects[0]})};
