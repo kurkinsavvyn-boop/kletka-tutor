@@ -999,7 +999,9 @@ button.mchip:hover{background:rgba(255,255,255,.24)}
 .rm-pres{font-size:13px;color:var(--ink-3)}
 .rm-pres.on{color:var(--ok)}
 .rm-pres.on::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ok);margin-right:6px;vertical-align:1px}
-.rm-act{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.rm-act{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end;margin-left:auto}
+.rm-start{background:var(--pen);border-color:var(--pen);color:#fff}
+.rm-start:hover{background:#B83526;border-color:#B83526;color:#fff}
 .rm-body{display:grid;grid-template-columns:250px minmax(0,1fr);gap:18px;align-items:start}
 .r-s .rm-body{grid-template-columns:minmax(0,1fr)}
 .rm-side{position:sticky;top:76px;display:flex;flex-direction:column;gap:6px;max-height:calc(100vh - 96px);overflow:auto;padding-right:2px}
@@ -1103,7 +1105,7 @@ body.inroom .wrap{max-width:1360px}
   .r-t .rm-side .rm-past{flex:0 0 auto;align-self:center}
   .r-t .rm-side .rm-past[open]{flex-basis:220px}
   .rm-tools{top:56px}
-  .rm-top{gap:8px}.rm-who b{font-size:15px}.rm-pres{font-size:12px}.rm-top .btn.small{padding:6px 10px}
+  .rm-top{gap:8px}.r-t .rm-who{flex:1 1 0}.r-t .rm-act{flex:1 1 100%}.rm-who b{font-size:15px}.rm-pres{font-size:12px}.rm-top .btn.small{padding:6px 10px}
   .r-s .rm-who{order:-1;flex-basis:100%}
   .rm-tools{position:static}
   .rm-top{position:static}
@@ -5659,7 +5661,7 @@ function roomTop(){
       <div class="rm-who"><b>${esc(R.info.name)}</b><span class="rm-pres${roomHere()?' on':''}">${roomHere()?esc(where):'не в комнате'}</span></div>
       <div class="rm-act"><button class="btn small" id="rmCall">${R.st.call?'Звонок':'+ Звонок'}</button>
         <button class="ibtn" id="rmSet" aria-label="Настройки комнаты">⋯</button>
-        ${live?'<button class="btn small" id="rmEnd">Завершить урок</button>':'<button class="btn primary small" id="rmLive">Начать урок</button>'}</div>`;
+        ${live?'<button class="btn small" id="rmEnd">Завершить урок</button>':'<button class="btn small rm-start" id="rmLive">Начать урок</button>'}</div>`;
     const $=id=>document.getElementById(id);
     $('rmBack').onclick=()=>go({screen:'student'});
     $('rmCall').onclick=()=>R.st.call?window.open(R.st.call,'_blank','noopener'):roomCallModal();
