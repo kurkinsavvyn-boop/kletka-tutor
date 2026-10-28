@@ -1170,6 +1170,11 @@ body.inroom .wrap{max-width:1360px}
 .vc-b{width:38px;height:38px;border-radius:50%;border:0;background:rgba(255,255,255,.12);color:#fff;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .vc-b:hover{background:rgba(255,255,255,.22)}.vc-b.off{background:#fff;color:#141A28}
 .vc-b.end{background:#D5402F}.vc-b.end:hover{background:#B83526}
+.vc-lv{display:grid;grid-template-columns:auto 1fr auto 1fr;gap:4px 6px;align-items:center;padding:6px 10px 0;font-size:11px;color:#9AA5BF}
+.vc-lv span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:80px}
+.vc-lv i{height:6px;border-radius:3px;background:rgba(255,255,255,.12);overflow:hidden}
+.vc-lv b{display:block;height:100%;width:0;background:#5CC98C;transition:width .1s}
+.vc-snd{position:fixed;left:0;right:0;top:0;z-index:90;border:0;background:#E8A317;color:#1F2C55;font:600 16px var(--f-ui);padding:12px 16px;cursor:pointer;text-align:center}
 .vc-msg{font-size:12px;line-height:1.4;color:#FBF0D9;padding:0 12px 10px}
 .vc-ring{display:flex;flex-direction:column;gap:4px;padding:18px 16px}
 .vc-ring b{font-size:18px}.vc-ring span{font-size:13px;color:#9AA5BF}
@@ -6527,7 +6532,7 @@ async function callIce(){
 /* камера и микрофон; без камеры — только голос; совсем без устройств — только смотреть и слушать */
 async function callMedia(){
   const audio={echoCancellation:true,noiseSuppression:true,autoGainControl:true};
-  const video={width:{ideal:640},height:{ideal:480},frameRate:{ideal:24,max:30},facingMode:'user'};
+  const video={width:{ideal:480},height:{ideal:360},frameRate:{ideal:20,max:24},facingMode:'user'};
   try{return await navigator.mediaDevices.getUserMedia({audio,video})}
   catch(e){if(e&&(e.name==='NotAllowedError'||e.name==='SecurityError')){C.msg='';mediaHelp();throw e}}
   try{const s=await navigator.mediaDevices.getUserMedia({audio});C.msg='Камера не найдена: звонок только с голосом.';return s}catch(e){}
@@ -6541,7 +6546,8 @@ async function callPc(){
   if(!kinds.includes('video'))pc.addTransceiver('video',{direction:'recvonly'});
   /* звук в приоритете, видео не больше 700 кбит/с: так не забивается слабый канал */
   pc.getSenders().forEach(snd=>{if(!snd.track)return;const p=snd.getParameters();p.encodings=p.encodings&&p.encodings.length?p.encodings:[{}];
-    if(snd.track.kind==='video'){p.encodings[0].maxBitrate=700000;p.encodings[0].maxFramerate=24;p.degradationPreference='balanced'}
+    if(snd.track.kind==='video'){p.encodings[0].maxBitrate=450000;p.encodings[0].maxFramerate=20;p.degradationPreference='maintain-framerate'}
+    else p.encodings[0].maxBitrate=48000;
     p.encodings[0].priority=snd.track.kind==='audio'?'high':'medium';p.encodings[0].networkPriority=p.encodings[0].priority;
     snd.setParameters(p).catch(()=>{})});
   pc.ontrack=e=>{C.rem=e.streams[0]||C.rem||new MediaStream();if(!e.streams[0])C.rem.addTrack(e.track);callVideos()};
@@ -6615,6 +6621,7 @@ async function callOnSig(d){
   if(R.role==='t'&&C.st==='idle'&&d&&d.call&&mine===d.call){C.n=d.call;callStart(true);return}
   if(R.role==='s'&&C.st==='idle'&&d&&d.call&&mine===d.call&&!C.joinSent){C.joinSent=true;roomPulse({join:mine,jt:Date.now()},true)}
   if(R.role==='t'&&d&&d.join&&d.join===C.n&&d.jt!==C.lastJoin&&C.st!=='idle'){C.lastJoin=d.jt;callOffer(false);return}
+  if(d&&!!d.ao!==!!C.themAo){C.themAo=!!d.ao;callUI()}
   const s=d&&d.sig;if(!s||!s.n)return;const key=s.i||s.n+':'+s.t+':'+(s.r||0);if(key===C.seen)return;C.seen=key;
   if(s.t==='bye'){if(R.role==='t'&&C.n===s.n&&!s.left)C.declined=true;if(C.n===s.n){callEnd(false,R.role==='t'?'Ученик завершил звонок':'Репетитор завершил звонок')}if(C.offer&&C.offer.n===s.n){C.offer=null;callUI()}return}
   if(R.role==='t'){if(s.t==='answer'&&C.pc&&s.n===C.n&&(!s.oi||s.oi===C.oid)&&C.pc.signalingState==='have-local-offer'){try{await C.pc.setRemoteDescription({type:'answer',sdp:s.sdp});C.st='connecting';callUI()}catch(e){}}return}
@@ -6633,7 +6640,7 @@ function callNet(){
     clearTimeout(C.restT);C.restT=null;callUI();return}
   if(['disconnected','failed'].includes(s)&&C.st==='live'){C.st='reconnecting';callUI()}
   if(R.role==='t'&&['disconnected','failed'].includes(s)&&!C.restT){
-    C.restT=setTimeout(()=>{C.restT=null;const st=C.pc&&(C.pc.connectionState||C.pc.iceConnectionState);if(C.st!=='idle'&&st!=='connected')callOffer(st!=='failed'||C.r<3)},s==='failed'?300:2500)}
+    C.restT=setTimeout(()=>{C.restT=null;const st=C.pc&&(C.pc.connectionState||C.pc.iceConnectionState);if(C.st!=='idle'&&st!=='connected')callOffer(st!=='failed'||C.r<3)},s==='failed'?500:6000)}
 }
 /* качество связи раз в 2 секунды: задержка и потери */
 function callStats(){clearInterval(C.statsT);let prevLost=0,prevRecv=0;
@@ -6642,7 +6649,12 @@ function callStats(){clearInterval(C.statsT);let prevLost=0,prevRecv=0;
       rep.forEach(x=>{if(x.type==='candidate-pair'&&x.nominated&&x.state==='succeeded'){rtt=x.currentRoundTripTime;const lc=rep.get(x.localCandidateId);if(lc&&lc.candidateType==='relay')relay=true}
         if(x.type==='inbound-rtp'&&x.kind==='audio'){lost=x.packetsLost||0;recv=x.packetsReceived||0}});
       const dl=lost-prevLost,dr=recv-prevRecv;prevLost=lost;prevRecv=recv;const loss=dr+dl>0?dl/(dr+dl):0;
-      C.q=rtt==null?'':rtt<0.25&&loss<0.03?'good':rtt<0.5&&loss<0.08?'mid':'bad';C.rtt=rtt;C.relay=relay;callQ()}catch(e){}},2000)}
+      C.q=rtt==null?'':rtt<0.25&&loss<0.03?'good':rtt<0.5&&loss<0.08?'mid':'bad';C.rtt=rtt;C.relay=relay;callQ();callAdapt()}catch(e){}},2000)}
+/* плохая связь 4 секунды — видео легче (меньше и реже), голос не трогаем; хорошая 20 секунд — обратно */
+function callAdapt(){C.bad=C.q==='bad'?(C.bad||0)+1:0;C.good=C.q==='good'?(C.good||0)+1:0;
+  const snd=C.pc&&C.pc.getSenders().find(x=>x.track&&x.track.kind==='video');if(!snd)return;
+  const set=(br,sc)=>{const p=snd.getParameters();if(!p.encodings||!p.encodings[0])return;p.encodings[0].maxBitrate=br;p.encodings[0].scaleResolutionDownBy=sc;snd.setParameters(p).catch(()=>{})};
+  if(C.bad>=2&&!C.lite){C.lite=true;set(150000,2)}else if(C.good>=10&&C.lite){C.lite=false;set(450000,1)}}
 /* ---------- завершение ---------- */
 /* left — просто вышел из комнаты: вернётся, звонок поднимется сам; иначе положил трубку */
 function callEnd(send,why,left){
@@ -6652,19 +6664,39 @@ function callEnd(send,why,left){
   if(C.loc)C.loc.getTracks().forEach(t=>t.stop());C.loc=null;C.rem=null;C.st='idle';C.offer=null;C.q='';
   try{sessionStorage.removeItem(CALL_KEY)}catch(e){}
   if(R.on)roomPulse({sig:send?{n:C.n,t:'bye',left:left==='left',i:RID(6)}:null,call:null},true);
-  C.n=null;C.needTap=false;callUI();if(why)toast(why);
+  if(C.aonly)roomPulse({ao:false},true);C.n=null;C.needTap=false;C.lite=false;C.aonly=false;C.themAo=false;const au=document.getElementById('vcA');if(au){au.srcObject=null;au.remove()}callBanner();callUI();if(why)toast(why);
 }
 function callMic(){C.mic=!C.mic;if(C.loc)C.loc.getAudioTracks().forEach(t=>t.enabled=C.mic);callUI()}
 function callCam(){C.cam=!C.cam;if(C.loc)C.loc.getVideoTracks().forEach(t=>t.enabled=C.cam);callUI()}
+/* только звук: видео не отправляется вовсе — для плохой связи */
+async function callAudioOnly(){C.aonly=!C.aonly;const snd=C.pc&&C.pc.getSenders().find(x=>x.track?x.track.kind==='video':x._v);
+  if(C.aonly){if(snd){snd._v=1;await snd.replaceTrack(null).catch(()=>{})}C.loc&&C.loc.getVideoTracks().forEach(t=>{t.stop();C.loc.removeTrack(t)})}
+  else{try{const v=await navigator.mediaDevices.getUserMedia({video:{width:{ideal:480},height:{ideal:360},frameRate:{ideal:20,max:24},facingMode:'user'}});const t=v.getVideoTracks()[0];C.loc.addTrack(t);if(snd)await snd.replaceTrack(t)}catch(e){C.aonly=true;toast('Камера не включилась')}}
+  roomPulse({ao:C.aonly},true);const l=document.getElementById('vcL');if(l){l.srcObject=null;l.srcObject=C.loc}callUI()}
 /* ---------- окно звонка ---------- */
 function callRing(){try{const a=new AudioContext(),o=a.createOscillator(),g=a.createGain();o.frequency.value=660;g.gain.value=.06;o.connect(g).connect(a.destination);o.start();
   [0,.25,.5].forEach((t,k)=>g.gain.setValueAtTime(k%2?0:.06,a.currentTime+t));o.stop(a.currentTime+.7)}catch(e){}}
+/* голос собеседника играет в отдельном элементе: видео всегда без звука и не блокируется браузером.
+   Если браузер не дал включить звук сам, любое нажатие на странице включает его. */
+function callAudio(){if(!C.rem)return;let a=document.getElementById('vcA');if(!a){a=document.createElement('audio');a.id='vcA';a.autoplay=true;a.setAttribute('playsinline','');document.body.appendChild(a)}
+  if(a.srcObject!==C.rem)a.srcObject=C.rem;a.muted=false;
+  a.play().then(()=>{if(C.needTap){C.needTap=false;callBanner()}}).catch(()=>{if(!C.needTap){C.needTap=true;callBanner()}})}
+function callBanner(){let b=document.getElementById('vcSnd');if(!C.needTap||C.st==='idle'){if(b)b.remove();return}
+  if(!b){b=document.createElement('button');b.id='vcSnd';b.className='vc-snd';b.textContent='🔇 Нажмите здесь или в любом месте, чтобы слышать собеседника';document.body.appendChild(b);b.onclick=callAudio}}
+document.addEventListener('pointerdown',()=>{if(C.needTap)callAudio()},true);document.addEventListener('keydown',()=>{if(C.needTap)callAudio()},true);
 function callVideos(){const r=document.getElementById('vcR'),l=document.getElementById('vcL');
-  /* браузер может не дать включить звук без нажатия: тогда видео идёт без звука, а кнопка включает звук */
-  if(r&&C.rem&&r.srcObject!==C.rem){r.srcObject=C.rem;r.muted=!!C.needTap;r.play().catch(()=>{if(C.needTap)return;C.needTap=true;r.muted=true;r.play().catch(()=>{});callUI()})}
-  if(l&&C.loc&&l.srcObject!==C.loc)l.srcObject=C.loc}
+  if(r&&C.rem&&r.srcObject!==C.rem){r.srcObject=C.rem;r.muted=true;r.play().catch(()=>{})}
+  if(l&&C.loc&&l.srcObject!==C.loc)l.srcObject=C.loc;callAudio();callLevels()}
+/* полоски громкости: видно, что микрофон работает у вас и что собеседник говорит */
+function callLevels(){if(C.lvT)return;let ac;try{ac=C.ac||(C.ac=new (window.AudioContext||window.webkitAudioContext)())}catch(e){return}
+  const mk=st=>{if(!st||!st.getAudioTracks().length)return null;try{const src=ac.createMediaStreamSource(new MediaStream(st.getAudioTracks())),an=ac.createAnalyser();an.fftSize=256;src.connect(an);return an}catch(e){return null}};
+  const lvl=an=>{if(!an)return 0;const d=new Uint8Array(an.fftSize);an.getByteTimeDomainData(d);let m=0;for(const v of d)m=Math.max(m,Math.abs(v-128));return Math.min(1,m/50)};
+  let la=null,ra=null,ls=null,rs=null;
+  C.lvT=setInterval(()=>{if(C.st==='idle'){clearInterval(C.lvT);C.lvT=null;return}if(ac.state==='suspended')ac.resume().catch(()=>{});
+    if(ls!==C.loc){ls=C.loc;la=mk(C.loc)}if(rs!==C.rem){rs=C.rem;ra=mk(C.rem)}
+    const a=document.getElementById('vcLvMe'),b=document.getElementById('vcLvThem');if(a)a.style.width=Math.round((C.mic?lvl(la):0)*100)+'%';if(b)b.style.width=Math.round(lvl(ra)*100)+'%'},120)}
 function callQ(){const q=document.getElementById('vcQ');if(!q)return;q.className='vc-q '+C.q;
-  q.textContent=C.q==='good'?'Связь хорошая':C.q==='mid'?'Связь средняя':C.q==='bad'?'Связь слабая':'';
+  q.textContent=(C.q==='good'?'Связь хорошая':C.q==='mid'?'Связь средняя':C.q==='bad'?'Связь слабая':'')+(C.rtt!=null?` · ${Math.round(C.rtt*1000)} мс${C.relay?' · через сервер':''}`:'')+(C.lite?' · видео облегчено':'');
   q.title=C.rtt!=null?`Задержка ${Math.round(C.rtt*1000)} мс${C.relay?', через сервер':''}`:''}
 /* окно звонка можно унести в любое место и растянуть за угол; место и размер запоминаются */
 const VC_KEY='kletka-vc';
@@ -6697,18 +6729,19 @@ function callUI(){
     document.getElementById('vcYes').onclick=()=>callAccept(false);document.getElementById('vcNo').onclick=callDecline;return}
   /* видео создаётся один раз на звонок: пересоздание плееров тормозит браузер */
   if(el.dataset.m!=='call'){el.dataset.m='call';el.innerHTML=`<div class="vc-v"><video id="vcR" autoplay playsinline></video><video id="vcL" autoplay playsinline muted></video><div id="vcOv"></div></div>
+    <div class="vc-lv"><span title="Ваш микрофон">Вы</span><i><b id="vcLvMe"></b></i><span title="Голос собеседника">${esc(other)}</span><i><b id="vcLvThem"></b></i></div>
     <div class="vc-bar" id="vcBar"></div><div id="vcMsg"></div><i class="vc-rs tl" data-rs="tl"></i><i class="vc-rs br" data-rs="br"></i>`;callDrag(el)}
   const wait=C.st==='calling'?`Звоним: ${esc(other)}…${roomHere()?'':' Ученик пока не в комнате, звонок дождётся его.'}`:C.st==='connecting'?'Соединяем…':C.st==='reconnecting'?'Связь прервалась, восстанавливаем…':'';
-  document.getElementById('vcOv').innerHTML=(wait?`<div class="vc-wait">${wait}</div>`:'')+(C.needTap?'<button class="vc-tap" id="vcTap">Нажмите, чтобы включить звук</button>':'');
+  document.getElementById('vcOv').innerHTML=wait?`<div class="vc-wait">${wait}</div>`:C.themAo&&C.st==='live'?`<div class="vc-wait">🔈 ${esc(other)}: только звук</div>`:'';
   document.getElementById('vcBar').innerHTML=`<span class="vc-q" id="vcQ"></span>
       <button class="vc-b${C.mic?'':' off'}" id="vcMic" aria-label="${C.mic?'Выключить микрофон':'Включить микрофон'}" title="Микрофон">${C.mic?'🎙':'🔇'}</button>
       <button class="vc-b${C.cam?'':' off'}" id="vcCam" aria-label="${C.cam?'Выключить камеру':'Включить камеру'}" title="Камера">${C.cam?'📷':'🚫'}</button>
+      <button class="vc-b${C.aonly?' off':''}" id="vcAo" title="${C.aonly?'Включить видео':'Только звук: при плохой связи'}" aria-label="Только звук">${C.aonly?'🎞':'🔈'}</button>
       <button class="vc-b end" id="vcEnd" aria-label="Завершить звонок" title="Завершить">✕</button>`;
   document.getElementById('vcMsg').innerHTML=C.msg?`<div class="vc-msg">${esc(C.msg)}</div>`:'';
   const $=id=>document.getElementById(id);
-  $('vcMic').onclick=callMic;$('vcCam').onclick=callCam;$('vcEnd').onclick=()=>callEnd(true);
-  if($('vcTap'))$('vcTap').onclick=()=>{C.needTap=false;const r=$('vcR');r.muted=false;r.play().catch(()=>{});callUI()};
-  callVideos();callQ();roomTop();
+  $('vcMic').onclick=callMic;$('vcCam').onclick=callCam;$('vcAo').onclick=callAudioOnly;$('vcEnd').onclick=()=>callEnd(true);
+  callVideos();callQ();callBanner();roomTop();
 }
 /* ---------- Разбор урока ----------
    После «Завершить урок» каждое задание с ответом раскладывается по темам и по видам ошибок.
