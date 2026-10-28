@@ -1112,6 +1112,28 @@ body.inroom .wrap{max-width:1360px}
   .ra-pad{grid-template-columns:repeat(6,1fr);width:100%}.ra-num{flex:1 1 100%;flex-direction:column;align-items:stretch}
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .rpg{box-shadow:0 0 0 1px var(--line)}}
+
+/* ответы в окошках листа: синяя ручка ученика, зелёное верно, красное ошибка, серый ключ репетитора */
+.sheet .r-ok,.sheet .r-ok .c{color:#2C8A57!important}
+.sheet .r-bad,.sheet .r-bad .c{color:#D5402F!important}
+.sheet .r-ans,.sheet .r-ans .c,.sheet .r-typ,.sheet .r-typ .c{color:#2D57C8!important}
+.sheet .r-key,.sheet .r-key .c{color:#9AA5BF!important}
+.sheet .cbox.r-ok,.sheet .cbox.r-bad,.sheet .cbox.r-ans,.sheet .cbox.r-key,.sheet .cbox.r-typ,.sheet .c.circ.r-ok,.sheet .c.circ.r-bad,.sheet .c.circ.r-ans{font-family:var(--f-ui);font-weight:600}
+.sheet .cbox.r-bad{outline:2px solid rgba(213,64,47,.45);outline-offset:-1px}
+.sheet .cbox.r-ok{outline:2px solid rgba(44,138,87,.4);outline-offset:-1px}
+.sheet .cbox .rx{border-color:transparent}
+.sheet .ob.r-pick{outline:2px solid currentColor;border-radius:999px;font-weight:600}
+.r-s .sheet .it.r-has{cursor:text}
+.r-s .sheet .it.r-has .cbox,.r-s .sheet .it.r-has .ib,.r-s .sheet .it.r-has .aline i,.r-s .sheet .it.r-has .ichk,.r-s .sheet .it.r-has .c.circ{background:rgba(45,87,200,.06)}
+.r-s .sheet .it.r-has:hover .cbox,.r-s .sheet .it.r-has:hover .ib,.r-s .sheet .it.r-has:hover .aline i,.r-s .sheet .it.r-has:hover .c.circ{background:rgba(45,87,200,.14)}
+.r-mk{position:absolute;z-index:2;right:-2px;top:-2px;transform:translateY(-50%);font:700 max(10px,calc(var(--c) * .6))/1 var(--f-ui);font-style:normal;pointer-events:none;white-space:nowrap}
+.r-mk.ok{color:#2C8A57}.r-mk.bad{color:#D5402F}
+.r-in{position:absolute;z-index:6;box-sizing:border-box;border:2px solid #2D57C8;border-radius:4px;background:#fff;color:#2D57C8;font-family:var(--f-ui);font-weight:600;padding:0 4px;letter-spacing:.08em;outline:none;box-shadow:0 0 0 4px rgba(45,87,200,.18)}
+.sheet .r-tag{display:inline-block;margin-left:calc(var(--c) * .4);font:600 calc(var(--c) * .55)/1.4 var(--f-ui);color:#2D57C8}
+.sheet .r-tag:empty{display:none}
+.r-pop{position:absolute;z-index:6;display:flex;gap:6px;flex-wrap:wrap;max-width:260px;background:#fff;border:1px solid #C9D2E2;border-radius:10px;padding:6px;box-shadow:0 8px 24px rgba(20,30,60,.18)}
+.r-pop button{min-width:40px;height:38px;padding:0 10px;border:1px solid #C9D2E2;border-radius:8px;background:#fff;font:600 17px var(--f-ui);color:#1A1F2E;cursor:pointer}
+.r-pop button:hover,.r-pop button.on{border-color:#2D57C8;background:#E8EEFC;color:#2D57C8}
 @media print{.room{display:none}}
 </style>
 
@@ -5534,7 +5556,7 @@ const INK_COL={t:'#D5402F',s:'#2D57C8'};
 const R_LIVE_MAX=3*3600e3;
 const roomLive=st=>!!(st&&st.live&&Date.now()-(st.liveAt||0)<R_LIVE_MAX);
 const R_KIND={sheet:'Лист',pdf:'PDF',img:'Картинка',board:'Доска',note:'Объяснение',link:'Ссылка'};
-const rAnswerable=it=>it&&!['sort','mor','snt'].includes(it.type)&&!(it.type==='line'&&it.noLine)&&it.ans!=null&&String(it.ans)!=='';
+const rAnswerable=it=>it&&!['mor','snt'].includes(it.type)&&!(it.type==='sort'&&!it.opts)&&!(it.type==='line'&&it.noLine)&&it.ans!=null&&String(it.ans)!=='';
 const rOk=(it,v)=>norm(it.ans)===norm(v);
 
 /* репетитор открывает комнату ученика: аккаунт ученика и комната создаются при первом входе */
@@ -5741,7 +5763,7 @@ function roomTools(){
   }else{
     const pen=!!R.st.pen&&roomLive(R.st);if(!pen&&R.tool!=='hand')R.tool='hand';
     el.innerHTML=pen?`<div class="rt-g">${tb('hand','Листать')}${tb('pen','Маркер')}<button class="rt" id="rmUndo">↶ Отменить</button></div><span class="rt-note">Ручку дал репетитор</span>`
-      :(m&&m.k==='sheet'&&roomItems(m).some(rAnswerable)?'<span class="rt-note">Нажми на задание, чтобы ответить</span>':'');
+      :(m&&m.k==='sheet'&&roomItems(m).some(rAnswerable)?'<span class="rt-note">Нажми на окошко и впиши ответ</span>':'');
     const u=document.getElementById('rmUndo');if(u)u.onclick=roomUndo;
   }
   el.querySelectorAll('[data-tool]').forEach(b=>b.onclick=()=>{R.tool=b.dataset.tool;roomTools();roomDrawMode()});
@@ -5769,7 +5791,7 @@ function roomStage(){
   if(m.k==='sheet'){
     const items=roomItems(m);R.items=items;
     const o={topic:roomTopic(m),level:m.lv||0,seed:m.s,studentName:R.role==='t'?R.info.name:R.info.name,design:m.dz?resolveDesign({design:m.dz},m.s):null};
-    const lay=()=>{if(R.stageKey!==key)return;paginate(pages,items,o);const els=[...pages.querySelectorAll('.sh-items .it')];
+    const lay=()=>{if(R.stageKey!==key)return;paginate(pages,items,o);const els=[...pages.querySelectorAll('.sh-items .it:not(.stab)')];
       if(els.length===items.length)els.forEach((e,i)=>{e.dataset.ri=i;if(rAnswerable(items[i]))e.classList.add('r-it')});done()};
     lay();if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{if(R.stageKey===key)lay()});
   }else if(m.k==='pdf'){pages.innerHTML='<p class="hint">Открываю PDF…</p>';roomPdf(pages,m,key).then(()=>{if(R.stageKey===key)done()}).catch(()=>{if(R.stageKey===key)pages.innerHTML='<p class="empty">PDF не открылся. Проверьте интернет.</p>'})}
@@ -5862,45 +5884,114 @@ function roomFocus(f){const m=roomMat();if(!f||!m||f.m!==m.id||Date.now()-(f.at|
   el.classList.remove('r-foc');void el.offsetWidth;el.classList.add('r-foc');setTimeout(()=>el.classList.remove('r-foc'),3200)}
 
 /* ---------- ответы ученика прямо в листе ---------- */
+/* ---------- ответы ученика прямо в окошках листа ----------
+   У каждого вида задания своё место ответа: клетки окошка, строка ответа в столбике, кружок сравнения,
+   пропуск буквы, строка «Ответ:», варианты. Ответ пишется туда же, где ребёнок написал бы ручкой. */
+function rTarget(el,it){
+  if(!el||!it)return null;
+  if(it.type==='ch'){const o=el.querySelector('.opts2');return o?{el:o,k:'opts'}:null}
+  if(it.type==='sort'){let t=el.querySelector('.r-tag');if(!t){const rb=el.querySelector('.rb');if(!rb)return null;t=document.createElement('span');t.className='r-tag';rb.appendChild(t)}return{el:t,k:'text'}}
+  if(it.type==='col'){const rows=el.querySelectorAll('.ccol > .cl');return rows.length?{el:rows[rows.length-1],k:'col'}:null}
+  let t=el.querySelector('.cbox');if(t)return{el:t,k:'cells'};
+  t=el.querySelector('.c.circ');if(t)return{el:t,k:'circ'};
+  t=el.querySelector('.ib');if(t)return{el:t,k:'text'};
+  t=el.querySelector('.aline i');if(t)return{el:t,k:'text'};
+  t=el.querySelector('.ichk');if(t)return{el:t,k:'text'};
+  return null;
+}
+/* состояние: ok, bad, ans (без проверки), key (ключ у репетитора), typ (ученик печатает) */
+function rPaint(el,it,v,st){
+  const tg=rTarget(el,it);if(!tg)return false;const s=v==null?'':String(v);
+  const box=tg.el;box.classList.remove('r-ok','r-bad','r-ans','r-key','r-typ');if(s)box.classList.add('r-'+st);
+  if(tg.k==='cells'){box.querySelectorAll('.rx').forEach(x=>x.remove());const cells=[...box.children],ch=[...s.replace(/\s+/g,'')];
+    cells.forEach((c,k)=>c.textContent=ch[k]||'');for(let k=cells.length;k<ch.length;k++){const x=document.createElement('span');x.className='c a rx';x.textContent=ch[k];box.appendChild(x)}}
+  else if(tg.k==='col'){const cells=[...box.children],ch=[...s.replace(/\s+/g,'')].slice(-cells.length),off=cells.length-ch.length;
+    cells.forEach((c,k)=>c.textContent=k>=off?ch[k-off]:'')}
+  else if(tg.k==='opts'){box.querySelectorAll('.ob').forEach(o=>{const on=!!s&&norm(o.textContent)===norm(s);o.classList.toggle('r-pick',on);o.classList.remove('r-ok','r-bad','r-ans','r-key');if(on)o.classList.add('r-'+st)})}
+  else box.textContent=s;
+  return true;
+}
 function roomAnsPaint(){
   const m=roomMat();const p=document.getElementById('rmPages');if(!m||!p||m.k!=='sheet'||!R.items)return;
   const a=R.ans[m.id]||{},show=R.role==='t'||R.st.chk!==false;
-  p.querySelectorAll('[data-ri]').forEach(el=>{const i=+el.dataset.ri,it=R.items[i];let c=el.querySelector('.r-a');
-    const v=a[i];let html='',cls='';
-    if(v!=null&&v!==''){const ok=rOk(it,v);cls=show?(ok?'ok':'bad'):'ans';html=esc(String(v))+(show?(ok?' ✓':' ✗'):'')+(R.role==='t'&&!ok&&R.keys?` <i>${esc(String(fmt(it.ans)))}</i>`:'')}
-    else if(R.role==='t'&&R.keys&&rAnswerable(it)){cls='key';html=esc(String(fmt(it.ans)))}
-    if(!html){if(c)c.remove();return}
-    if(!c){c=document.createElement('span');c.className='r-a';el.appendChild(c)}
-    c.className='r-a '+cls;c.innerHTML=html});
+  p.querySelectorAll('[data-ri]').forEach(el=>{const i=+el.dataset.ri,it=R.items[i];const v=a[i];
+    let mk=el.querySelector('.r-mk');if(mk)mk.remove();const old=el.querySelector('.r-a');if(old)old.remove();
+    if(R.edit&&R.edit.i===i&&R.role==='s')return;
+    let st='';if(v!=null&&v!=='')st=show?(rOk(it,v)?'ok':'bad'):'ans';
+    const keyOn=R.role==='t'&&R.keys&&rAnswerable(it);
+    const painted=rPaint(el,it,st?v:keyOn?fmt(it.ans):'',st||(keyOn?'key':''));
+    if(!painted&&st){const c=document.createElement('span');c.className='r-a '+st;c.textContent=String(v);el.appendChild(c)}
+    if(st&&show){mk=document.createElement('i');mk.className='r-mk '+st;mk.textContent=st==='ok'?'✓':'✗';
+      if(R.role==='t'&&st==='bad'&&R.keys)mk.textContent='✗ '+fmt(it.ans);el.appendChild(mk)}
+    if(rTarget(el,it)&&rAnswerable(it))el.classList.add('r-has')});
   roomSide();
 }
 function roomStageClick(e){
   if(R.tool!=='hand')return;const el=e.target.closest('[data-ri]');if(!el)return;const m=roomMat();if(!m||!R.items)return;const i=+el.dataset.ri;
   if(R.role==='t'){roomSet({foc:{m:m.id,i,at:Date.now()}});roomFocus(R.st.foc);return}
-  if(!rAnswerable(R.items[i]))return;roomAnsOpen(i);
+  const it=R.items[i];if(!rAnswerable(it))return;
+  if(it.type==='ch'){const o=e.target.closest('.ob');if(o){roomAnswer(i,o.textContent,true);return}}
+  roomAnsOpen(i);
 }
-function roomAnsClose(){const b=document.getElementById('rmAnsBar');if(b)b.remove();document.querySelectorAll('.r-sel').forEach(x=>x.classList.remove('r-sel'));R.sel=null}
+/* где печатать: на широком экране прямо в окошке, на телефоне — крупная клавиатура внизу, цифры встают в окошко */
+const rInline=()=>{const p=document.querySelector('#rmPages > .rpg');return p&&p.clientWidth>=560&&!matchMedia('(pointer:coarse)').matches};
+function roomAnsClose(){
+  const b=document.getElementById('rmAnsBar');if(b)b.remove();document.querySelectorAll('.r-in').forEach(x=>x._kill?x._kill():x.remove());document.querySelectorAll('.r-pop').forEach(x=>x.remove());
+  document.querySelectorAll('.r-sel').forEach(x=>x.classList.remove('r-sel'));const had=R.edit;R.sel=null;R.edit=null;if(had)roomAnsPaint();
+}
 function roomAnsOpen(i){
-  roomAnsClose();const m=roomMat(),it=R.items[i];R.sel=i;R.input=String((R.ans[m.id]||{})[i]??'');
-  const el=document.querySelector(`#rmPages [data-ri="${i}"]`);if(el)el.classList.add('r-sel');
+  roomAnsClose();const m=roomMat(),it=R.items[i];if(!m||!it)return;
+  const el=document.querySelector(`#rmPages [data-ri="${i}"]`);if(!el)return;
+  R.sel=i;R.input=String((R.ans[m.id]||{})[i]??'');R.edit={i};el.classList.add('r-sel');
+  const tg=rTarget(el,it);const opts=it.opts&&it.type!=='cmp'?it.opts.map(String):it.type==='cmp'?['<','=','>']:null;
+  const live=()=>{rPaint(el,it,R.input,'typ');roomPulse({typ:1})};
+  if(tg&&rInline()){
+    const pg=el.closest('.rpg'),pr=pg.getBoundingClientRect(),r=tg.el.getBoundingClientRect(),c=pg.clientWidth*CELL/100;
+    if(opts){const pop=document.createElement('div');pop.className='r-pop';
+      pop.innerHTML=opts.map(o=>`<button data-o="${esc(o)}" class="${norm(o)===norm(R.input)?'on':''}">${esc(o)}</button>`).join('');
+      pop.style.left=Math.max(4,Math.min(r.left-pr.left,pr.width-220))+'px';pop.style.top=(r.bottom-pr.top+6)+'px';pg.appendChild(pop);
+      pop.querySelectorAll('[data-o]').forEach(b=>b.onclick=ev=>{ev.stopPropagation();roomAnswer(i,b.dataset.o,true)});
+      el.scrollIntoView({block:'nearest',behavior:'smooth'});return}
+    const inp=document.createElement('input');inp.className='r-in';inp.type='text';inp.autocomplete='off';inp.spellcheck=false;inp.setAttribute('autocapitalize','off');
+    inp.setAttribute('aria-label','Ответ к заданию '+(i+1));if(isNumAns(it))inp.inputMode='numeric';
+    const w=Math.max(r.width,c*3,(String(it.ans).length+1)*c*0.9);
+    Object.assign(inp.style,{left:(r.left-pr.left-2)+'px',top:(r.top-pr.top-2)+'px',width:(w+4)+'px',height:(Math.max(r.height,c)+4)+'px',fontSize:Math.max(14,c*0.72)+'px'});
+    inp.value=R.input;pg.appendChild(inp);rPaint(el,it,'','typ');
+    let done=false;const commit=next=>{if(done)return;done=true;const v=inp.value.trim();inp.remove();
+      if(v)roomAnswer(i,v,next);else{R.edit=null;roomAnsClose();roomPulse({typ:0})}};
+    /* ушли на другое окошко: введённое сохраняется */
+    inp._kill=()=>{if(done)return;done=true;const v=inp.value.trim();inp.remove();if(v&&v!==String((R.ans[m.id]||{})[i]??'')){R.ans[m.id]=R.ans[m.id]||{};R.ans[m.id][i]=v;roomSaveAns()}};
+    inp.oninput=()=>{R.input=inp.value;roomPulse({typ:1})};
+    inp.onkeydown=ev=>{if(ev.key==='Enter'||ev.key==='Tab'){ev.preventDefault();commit(true)}else if(ev.key==='Escape'){done=true;inp.remove();roomAnsClose();roomPulse({typ:0})}};
+    inp.onblur=()=>setTimeout(()=>commit(false),0);
+    inp.focus({preventScroll:true});inp.select();el.scrollIntoView({block:'nearest',behavior:'smooth'});return}
+  /* телефон или окошка нет: крупная панель внизу */
   const bar=document.createElement('div');bar.id='rmAnsBar';bar.className='rm-ans';document.body.appendChild(bar);
-  const opts=it.type==='ch'||it.type==='ins'||(it.opts&&it.type!=='cmp');const tm=textMode(it);
+  const tm=textMode(it);
   const draw=()=>{bar.innerHTML=`<div class="ra-in"><div class="ra-q"><span class="ra-n">Задание ${i+1}</span><b>${esc(plainQ(it))}</b><small>${esc(it.hintOn||instr(it))}</small></div>
-    ${opts?`<div class="ra-opts">${it.opts.map((o,k)=>`<button data-o="${k}" class="${R.input===String(o)?'on':''}">${esc(o)}</button>`).join('')}</div>`
-    :it.type==='cmp'?`<div class="ra-opts">${['<','=','>'].map(s=>`<button data-o="${s}" class="${R.input===s?'on':''}">${s}</button>`).join('')}</div>`
+    ${opts?`<div class="ra-opts">${opts.map(o=>`<button data-o="${esc(o)}" class="${norm(R.input)===norm(o)?'on':''}">${esc(o)}</button>`).join('')}</div>`
     :tm?`<div class="ra-txt"><input id="raTx" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Ответ" value="${esc(R.input)}"><button class="btn primary" id="raOk">Готово</button></div>`
     :`<div class="ra-num"><span class="ra-v num">${esc(R.input)||'?'}</span><div class="ra-pad">${[1,2,3,4,5,6,7,8,9,'⌫',0,'OK'].map(k=>`<button data-k="${k}" class="${k==='OK'?'go':''}">${k}</button>`).join('')}</div></div>`}
     <button class="ibtn ra-x" id="raX" aria-label="Закрыть">✕</button></div>`;
-    bar.querySelectorAll('[data-o]').forEach(b=>b.onclick=()=>{const v=b.dataset.o;roomAnswer(i,opts?String(it.opts[+v]):v)});
+    bar.querySelectorAll('[data-o]').forEach(b=>b.onclick=()=>roomAnswer(i,b.dataset.o,true));
     bar.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>numKey(b.dataset.k));
-    const tx=document.getElementById('raTx');if(tx){tx.oninput=()=>{R.input=tx.value;roomPulse({typ:1})};tx.onkeydown=ev=>{if(ev.key==='Enter'&&tx.value.trim())roomAnswer(i,tx.value.trim())};
-      document.getElementById('raOk').onclick=()=>{if(tx.value.trim())roomAnswer(i,tx.value.trim())};setTimeout(()=>tx.focus(),30)}
+    const tx=document.getElementById('raTx');if(tx){tx.oninput=()=>{R.input=tx.value;live()};tx.onkeydown=ev=>{if(ev.key==='Enter'&&tx.value.trim())roomAnswer(i,tx.value.trim(),true)};
+      document.getElementById('raOk').onclick=()=>{if(tx.value.trim())roomAnswer(i,tx.value.trim(),true)};setTimeout(()=>tx.focus(),30)}
     document.getElementById('raX').onclick=()=>{roomAnsClose();roomPulse({typ:0})}};
-  const numKey=k=>{if(k==='OK'){if(R.input)roomAnswer(i,R.input);return}if(k==='⌫')R.input=R.input.slice(0,-1);else if(R.input.length<10)R.input+=k;roomPulse({typ:1});draw()};
-  bar.numKey=numKey;draw();
-  if(el){const r=el.getBoundingClientRect();if(r.bottom>innerHeight-bar.offsetHeight-12)scrollBy({top:r.bottom-(innerHeight-bar.offsetHeight-24),behavior:'smooth'})}
+  const numKey=k=>{if(k==='OK'){if(R.input)roomAnswer(i,R.input,true);return}if(k==='⌫')R.input=R.input.slice(0,-1);else if(R.input.length<10)R.input+=k;live();draw()};
+  bar.numKey=numKey;draw();if(tg)rPaint(el,it,R.input,'typ');
+  const r=el.getBoundingClientRect();if(r.bottom>innerHeight-bar.offsetHeight-12||r.top<80)scrollBy({top:r.bottom-(innerHeight-bar.offsetHeight-24),behavior:'smooth'});
 }
-function roomAnswer(i,v){const m=roomMat();R.ans[m.id]=R.ans[m.id]||{};R.ans[m.id][i]=v;roomSaveAns();roomPulse({typ:0});roomAnsClose();roomAnsPaint()}
+/* после ответа — следующее задание с окошком, как по строчкам тетради */
+function roomAnswer(i,v,next){
+  const m=roomMat();R.ans[m.id]=R.ans[m.id]||{};R.ans[m.id][i]=String(v);roomSaveAns();roomPulse({typ:0});R.edit=null;roomAnsClose();roomAnsPaint();
+  if(!next)return;const a=R.ans[m.id];
+  for(let j=i+1;j<R.items.length;j++){if(!rAnswerable(R.items[j])||(a[j]!=null&&a[j]!==''))continue;
+    const el=document.querySelector(`#rmPages [data-ri="${j}"]`);if(!el)continue;
+    if(R.items[j].type==='ch'&&rInline())return;
+    roomAnsOpen(j);return}
+}
+document.addEventListener('pointerdown',e=>{const p=document.querySelector('.r-pop');if(p&&!p.contains(e.target)&&!e.target.closest('.r-sel'))roomAnsClose()},true);
 document.addEventListener('keydown',e=>{const bar=document.getElementById('rmAnsBar');if(!bar||!bar.numKey||document.activeElement&&document.activeElement.id==='raTx')return;
   if(/^[0-9]$/.test(e.key))bar.numKey(e.key);else if(e.key==='Backspace')bar.numKey('⌫');else if(e.key==='Enter')bar.numKey('OK');else if(e.key==='Escape')roomAnsClose()});
 document.addEventListener('paste',e=>{if(V.screen!=='room'||!R.on||R.role!=='t'||mroot.innerHTML)return;
