@@ -1,0 +1,23 @@
+{
+	https_port 8443
+	auto_https disable_redirects
+	servers :8443 {
+		listener_wrappers {
+			proxy_protocol {
+				allow 127.0.0.1/32
+			}
+			tls
+		}
+	}
+}
+http://153-76-170-187.sslip.io, http://turn-153-76-170-187.sslip.io {
+	redir https://{host}{uri} permanent
+}
+153-76-170-187.sslip.io {
+	encode gzip
+	reverse_proxy 127.0.0.1:8090
+}
+# имя для ретранслятора звонков: здесь Caddy только получает сертификат, сами звонки принимает nginx на 443
+turn-153-76-170-187.sslip.io {
+	respond "turn" 200
+}

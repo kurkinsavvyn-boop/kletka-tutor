@@ -1,0 +1,13 @@
+[Unit]
+Description=Kletka 443 router (API + TURN over TLS)
+After=network.target caddy.service
+[Service]
+Type=forking
+PIDFile=/run/kletka-sni.pid
+ExecStartPre=/usr/sbin/nginx -t -q -c /etc/kletka-sni/nginx.conf
+ExecStart=/usr/sbin/nginx -c /etc/kletka-sni/nginx.conf
+ExecReload=/usr/sbin/nginx -c /etc/kletka-sni/nginx.conf -s reload
+ExecStop=/usr/sbin/nginx -c /etc/kletka-sni/nginx.conf -s quit
+Restart=on-failure
+[Install]
+WantedBy=multi-user.target
