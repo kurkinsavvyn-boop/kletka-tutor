@@ -784,8 +784,52 @@ body.cabinet .top{display:none}
 .cab-head h1{font-family:var(--f-disp);font-size:clamp(28px,6vw,40px);letter-spacing:-.02em;line-height:1.05}
 .cab-head p{margin:6px 0 0;color:var(--ink-2)}
 .cab-h{font-family:var(--f-disp);font-size:19px;margin:28px 0 12px}
+.smode{margin-right:6px}.smode button{padding:6px 10px;font-size:13px}
+.mcal .mc-g,.fc-g{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.mc-h{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;font-size:12px;color:var(--mute);margin:0 0 4px;text-align:center}
+.mc-d,.fc-d{position:relative;min-height:96px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:4px 4px 22px;display:flex;flex-direction:column;gap:3px;min-width:0}
+.mc-d.out,.fc-d.out{opacity:.45}.mc-d.today,.fc-d.today{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.mc-n{align-self:flex-start;border:0;background:none;font:600 13px var(--f-ui);color:var(--ink);cursor:pointer;padding:2px 4px;border-radius:6px}.mc-n:hover{background:var(--line)}
+.mc-l,.fc-l{display:block;width:100%;text-align:left;border:0;border-radius:6px;padding:2px 5px;font:12px var(--f-ui);background:#E9F0FB;color:var(--ink);cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mc-l.done{background:#E5F4EA}.mc-l.cancel{background:#f3f1ec;text-decoration:line-through;color:var(--mute)}.mc-l.miss{background:#FDF1DC}
+.mc-more{border:0;background:none;font-size:12px;color:var(--mute);text-align:left;cursor:pointer;padding:0 5px}
+.mc-add{position:absolute;right:4px;bottom:3px;border:0;background:none;color:var(--mute);font-size:16px;cursor:pointer;opacity:0;transition:opacity .15s}.mc-d:hover .mc-add,.mc-add:focus{opacity:1}
+.m3{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}.m3-m .ph small{font-weight:400;color:var(--mute);font-size:13px;margin-left:6px}
+.m3-h,.m3-g{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;text-align:center}.m3-h{font-size:11px;color:var(--mute);margin-bottom:3px}
+.m3-d{position:relative;aspect-ratio:1;border:1px solid transparent;border-radius:8px;background:none;font:13px var(--f-ui);color:var(--ink);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px}
+.m3-d.has{background:#E9F0FB}.m3-d.today{border-color:var(--ink)}.m3-d i{font-style:normal;font-size:10px;font-weight:700;color:#2F6FB0}.m3-d:hover{border-color:var(--line)}
+.fc-n{font:600 13px var(--f-ui);padding:2px 4px}
+.fc-p{display:block;font-size:12px;font-weight:600;color:#1E7A45;background:#E5F4EA;border-radius:6px;padding:2px 5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fc-l.ok{background:#E5F4EA}.fc-l.debt{background:#FBE3DF;color:#A3261B}.fc-l.wait{background:#f3f1ec;color:var(--mute)}
+.fc-end{display:block;font-size:11px;color:#8A5A00;background:#FDF1DC;border-radius:6px;padding:2px 5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fc-key{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 10px}.fc-key>*{display:inline-block;width:auto}
+.fcov small{display:block;color:var(--mute);font-size:12px}.bad-t{color:#A3261B;font-weight:600}
+@media (max-width:640px){.mc-d,.fc-d{min-height:64px;padding:2px 2px 16px}.mc-l,.fc-l,.fc-p,.fc-end{font-size:10px;padding:1px 3px}.mc-l .num{display:none}}
+.kseg{flex-wrap:wrap}.kseg button{font-size:13px}
+.it.mt{width:calc(var(--c) * 17);max-width:100%}.it.mt .rb{flex-direction:row;align-items:center;gap:0;width:100%}.it.mt .iw{min-width:calc(var(--c) * 6);white-space:nowrap}
+.mt-dot{width:8px;height:8px;border-radius:50%;background:var(--ink,#1F2C55);flex:none}
+.mt-gap{flex:none;width:calc(var(--c) * 5);text-align:center;font-size:.9em;color:#B83526}
+.mt-r{min-width:calc(var(--c) * 4);padding-left:calc(var(--c) * .5);white-space:nowrap}
+.dpal{display:flex;gap:6px;flex-wrap:wrap}.dpal button{display:inline-flex;gap:0;padding:3px;border:1.5px solid var(--line);border-radius:8px;background:var(--card);cursor:pointer;height:28px;align-items:center}
+.dpal button i{width:9px;height:18px;display:block}.dpal button i:first-child{border-radius:4px 0 0 4px}.dpal button i:last-child{border-radius:0 4px 4px 0}
+.dpal button.on{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink)}.dpal .dp-any{width:28px;justify-content:center;font-weight:700;color:var(--mute)}
+.search{position:relative}.search .mic{position:absolute;right:6px;top:50%;transform:translateY(-50%);border:0;background:none;font-size:18px;cursor:pointer;width:34px;height:34px;border-radius:50%}
+.search .mic.on{background:#FBE3DF;color:#B83526;animation:micp 1s infinite}@keyframes micp{50%{opacity:.5}}
+.sr-desc{border-color:var(--ink)!important}.sr-more{margin:10px 0 4px}
+.bd-show{position:fixed;inset:0;z-index:9999;background:#141a2e;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden}
+.bd-sh-st{position:relative;flex:none;transform-origin:center;background:#fff}.bd-sh-st .bd-it{position:absolute}
+.bd-sh-bar{position:fixed;left:50%;bottom:8px;transform:translateX(-50%);display:flex;gap:8px;align-items:center;background:rgba(255,255,255,.12);color:#fff;border-radius:12px;padding:4px 8px;font:14px var(--f-ui);cursor:default}
+.bd-sh-bar button{border:0;background:none;color:#fff;font-size:20px;width:34px;height:30px;cursor:pointer;border-radius:8px}.bd-sh-bar button:hover{background:rgba(255,255,255,.15)}
+.bd-lbl{font-size:12px;color:#5b6684;margin:0 2px}.bd-swr{background:#fff!important;border:4px solid}
 .ctasks{display:flex;flex-direction:column;gap:10px}
-.ct-pr{align-self:flex-end;margin:-6px 6px 2px;font-size:13px}
+.ct-x{display:flex;justify-content:flex-end;gap:14px;margin:-6px 6px 2px;font-size:13px;flex-wrap:wrap}
+.ct-rv{margin:-4px 6px 0;font-size:14px;color:var(--ink)}
+.ph-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin-bottom:12px}
+.phw{position:relative;border-radius:10px;overflow:hidden;border:1px solid var(--line);aspect-ratio:3/4;background:#f3f1ec}
+.phw img{width:100%;height:100%;object-fit:cover;cursor:zoom-in;display:block}
+.ph-x{position:absolute;top:4px;right:4px;width:28px;height:28px;border-radius:50%;border:0;background:rgba(31,44,85,.75);color:#fff;cursor:pointer}
+.ph-big img{max-width:100%;max-height:75vh;display:block;margin:0 auto;border-radius:8px}
+.wpaper{margin-bottom:14px}.wrev{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.wrev input{flex:1;min-width:200px;font:inherit;padding:8px 10px;border:1.5px solid var(--line);border-radius:10px}
 .ctask{display:flex;align-items:center;gap:14px;text-align:left;background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:10px 14px 10px 10px;font:inherit;color:var(--ink);transition:transform .15s,border-color .15s}
 .ctask:not(.done):hover{border-color:var(--ink);transform:translateY(-1px)}
 .ctask.done{opacity:.75;cursor:default}
@@ -921,7 +965,7 @@ body.shell .top .logo{display:none}
 .bl{font-size:13px;color:var(--ink-2)}
 .mbar.on .bl{color:var(--ink);font-weight:700}
 .ftable{display:flex;flex-direction:column}
-.frw{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,.8fr) minmax(0,1.3fr) minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 4px;border-top:1px solid var(--line)}
+.frw{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,.7fr) minmax(0,1.2fr) minmax(0,1fr) minmax(0,1.1fr) auto;gap:10px;align-items:center;padding:10px 4px;border-top:1px solid var(--line)}
 .frw.fh{border-top:0;color:var(--ink-3);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;padding-top:0}
 .frw .btn.link{padding:0;color:var(--ink);font-weight:600;text-align:left}
 .fact{display:flex;gap:6px;justify-content:flex-end}
@@ -932,7 +976,7 @@ body.shell .top .logo{display:none}
 @media (max-width:760px){.kpis{grid-template-columns:minmax(0,1fr);gap:8px}.kpi{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;column-gap:10px;padding:10px 14px}
   .kpi b{font-size:19px;grid-column:2;grid-row:1/3}.kpi small{grid-column:1}
   .mbars{gap:6px;height:150px}.bv{font-size:10px}
-  .frw{grid-template-columns:minmax(0,1fr) auto;row-gap:4px}.frw.fh{display:none}.frw>span:nth-child(2),.frw>span:nth-child(3){grid-column:1;font-size:13px;color:var(--ink-2)}
+  .frw{grid-template-columns:minmax(0,1fr) auto;row-gap:4px}.frw.fh{display:none}.frw>span:nth-child(2),.frw>span:nth-child(3),.frw>span:nth-child(5){grid-column:1;font-size:13px;color:var(--ink-2)}
   .frw>span:nth-child(4){grid-row:1;grid-column:2}.fact{grid-column:1/-1;justify-content:flex-start}
   .pay{grid-template-columns:minmax(0,1fr) auto auto}.pay>span:first-child{grid-column:1/-1;font-size:13px;color:var(--ink-3)}.pay small{grid-column:1;grid-row:3}}
 
@@ -1269,7 +1313,7 @@ body.bd-open{overflow:hidden}
 .bd-pop{position:fixed;z-index:70;background:#fff;border-radius:12px;box-shadow:0 2px 10px rgba(20,30,60,.10),0 0 0 1px rgba(20,30,60,.06);padding:6px;display:flex;flex-direction:column;gap:2px;min-width:200px}
 .bd-pop button{border:0;background:none;text-align:left;padding:7px 10px;border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;gap:16px;font:inherit;color:#1F2C55}
 .bd-pop button:hover{background:#F0F2F6}.bd-pop kbd{color:#66718D;font:12px var(--f-ui)}
-.bd-ctx{position:absolute;z-index:15;background:#fff;border-radius:10px;box-shadow:0 2px 10px rgba(20,30,60,.12),0 0 0 1px rgba(20,30,60,.06);display:flex;align-items:center;gap:2px;padding:4px;white-space:nowrap}
+.bd-ctx{position:absolute;z-index:15;background:#fff;border-radius:10px;box-shadow:0 2px 10px rgba(20,30,60,.12),0 0 0 1px rgba(20,30,60,.06);display:flex;align-items:center;gap:2px;padding:4px;white-space:nowrap;flex-wrap:wrap;max-width:min(760px,calc(100vw - 16px));row-gap:4px}
 .bd-ctx .bd-ib{width:32px;height:32px;font-size:14px}
 .bd-sw{width:22px;height:22px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px #DDE3EE;cursor:pointer;margin:0 1px;display:inline-block}
 .bd-sw.bd-on{box-shadow:0 0 0 2px #2D57C8}
@@ -1446,6 +1490,7 @@ function generate(p,seed){
   if(p.kind==='lit')return litItems(p,r);
   if(p.kind==='facts')return factItems(p,r);
   if(p.kind==='esort')return envSortItems(p,r);
+  if(p.kind==='match'||p.kind==='fix'||p.kind==='ineq')return kindItems(p,r,seed);
   if(p.kind==='own'){
     const arr=p.list.slice();for(let i=arr.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]]}
     return arr.slice(0,Math.min(n,arr.length)).map(x=>({type:'own',q:x.q,ans:x.ans}));
@@ -1607,6 +1652,34 @@ const O=(q,ans)=>({type:'own',q,ans:String(ans)});
 const CMP=(l,r,lv,rv)=>({type:'cmp',left:String(l),right:String(r),ans:lv>rv?'>':lv<rv?'<':'='});
 const COL=(a,op,b)=>({type:'col',a,b,op,ans:op==='+'?a+b:op==='-'?a-b:a*b});
 const CH=(q,opts,ans,svg)=>({type:'ch',q,opts,ans,svg:svg||''});
+/* ---------- другие виды для любой темы на вычисления ----------
+   Берём обычные примеры темы и делаем из них:
+   match — «соедини стрелкой пример и ответ» (на бумаге две колонки с точками, онлайн — выбор ответа);
+   fix   — «найди и исправь ошибку»: решённые примеры, в половине типичная ошибка, ученик пишет верный ответ;
+   ineq  — «выбери верную запись»: три записи со знаками >, <, =, верна одна. */
+function pairOf(it){
+  if((it.type==='eq'||it.type==='col')&&typeof it.res==='number')return{l:`${fmt(it.a)} ${sym(it.op)} ${fmt(it.b)}`,r:fmt(it.res),v:it.res};
+  if(it.type==='col'&&typeof it.ans==='number')return{l:`${fmt(it.a)} ${sym(it.op)} ${fmt(it.b)}`,r:fmt(it.ans),v:it.ans};
+  if(it.type==='own'&&/^[^□]+=\s*□/.test(it.q)){const[l,rest]=it.q.split(/\s*=\s*□/);const u=(rest||'').trim();const n=+String(it.ans).replace(/\s/g,'');
+    return{l:l.trim(),r:fmt(isNaN(n)?it.ans:n)+(u?' '+u:''),v:isNaN(n)||u?null:n}}
+  return null}
+const VKINDS={match:'Соедини стрелкой',fix:'Найди и исправь ошибку',ineq:'Выбери верную запись'};
+function kindPairs(p,seed,need){const base=generate({...p.base,count:Math.max(need*3,18)},seed+101),out=[],L=new Set(),Rr=new Set();
+  for(const it of base){const x=pairOf(it);if(!x||L.has(x.l)||Rr.has(x.r))continue;L.add(x.l);Rr.add(x.r);out.push(x);if(out.length>=need)break}return out}
+function kindItems(p,r,seed){const n=p.count||8;
+  if(p.kind==='match'){const ps=kindPairs(p,seed,Math.min(n,8));if(ps.length<3)return[];const rs=shuffle(r,ps.map(x=>x.r));
+    return ps.map((x,k)=>({type:'sort',m:true,w:x.l,ans:x.r,opts:rs,cols:rs,rk:rs[k],hint:'Соедини стрелкой пример и его значение.',hintOn:'Какой ответ у этого примера?'}))}
+  if(p.kind==='fix'){const ps=kindPairs(p,seed,n);
+    return ps.map(x=>{let shown=x.r;
+      if(x.v!=null&&r()<.55){const v=x.v,ds=String(v);const opts=[v+10,v-10,v+1,v-1];if(ds.length>1&&ds[0]!==ds[ds.length-1])opts.push(+ds.split('').reverse().join(''));
+        const w=pick(r,opts.filter(y=>y>=0&&y!==v));if(w!=null)shown=fmt(w)}
+      return{type:'own',fix:true,q:`${x.l} = ${shown}   ✎ □`,ans:String(x.r),hint:'Проверь. Если ответ неверный — впиши верный, если верный — перепиши его.',hintOn:'Проверь пример. Впиши верный ответ.'}})}
+  /* ineq */
+  const ps=kindPairs(p,seed,n).filter(x=>x.v!=null);const out=[];
+  for(const x of ps){const d=pick(r,[1,2,10,0,0]);const c=Math.max(0,x.v+(r()<.5?d:-d));
+    const rec=[`${x.l} > ${fmt(c)}`,`${x.l} < ${fmt(c)}`,`${x.l} = ${fmt(c)}`],ok=x.v>c?0:x.v<c?1:2;
+    out.push({...CH('',shuffle(r,rec),rec[ok]),hint:'Подчеркни верную запись.',hintOn:'Выбери верную запись.'})}
+  return out}
 const shuffle=(r,a)=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
 const EMO=['🍎','🍐','🍓','🐱','🐶','🐰','🐻','🦊','🐟','🌸','⭐','🚗','🎈','🍄','🐞'];
 const EMO_N={'🍎':['яблоко','яблока','яблок'],'🍐':['груша','груши','груш'],'🍓':['клубничка','клубнички','клубничек'],'🐱':['котёнок','котёнка','котят'],'🐶':['щенок','щенка','щенков'],
@@ -2106,7 +2179,10 @@ function resolveDesign(st,seed){
   const lv=+d.lv||2;
   /* удалённая тема (например, «Супергерои») считается случайной */
   const theme=(d.theme&&THEMES.find(t=>t.id===d.theme))||THEMES[Math.floor(r()*THEMES.length)];
-  const out={lv,bw:!!d.bw,theme,pal:PALETTES[Math.floor(r()*PALETTES.length)],frame:FRAMES[Math.floor(r()*FRAMES.length)],char:pick(r,theme.chars),seed};
+  /* цвета и ободок можно выбрать вручную; иначе случайные, свои у каждого варианта */
+  const rp=PALETTES[Math.floor(r()*PALETTES.length)],rf=FRAMES[Math.floor(r()*FRAMES.length)];
+  const pal=d.pal!=null&&d.pal!=='random'&&PALETTES[+d.pal]?PALETTES[+d.pal]:rp,frame=d.frame&&FRAMES.includes(d.frame)?d.frame:rf;
+  const out={lv,bw:!!d.bw,theme,pal,frame,char:pick(r,theme.chars),seed};
   out.img=artSet(theme,seed);return out;
 }
 
@@ -2380,7 +2456,7 @@ const MATH={
    {id:'g3-eq',t:'Уравнения',sub:['Решение уравнений'],syn:['уравнение','икс','x'],L:[
      {n:'Сложение и вычитание',d:'x + 35 = 82',p:F(['eqAdd','eqSub'],10)},{n:'Умножение и деление',d:'x × 7 = 56',p:F(['eqMul'],10)},{n:'Вперемешку',d:'',p:F(['eqAdd','eqSub','eqMul'],12)}]},
    {id:'g3-letters',t:'Обозначение фигур буквами',sub:['Обозначение геометрических фигур буквами'],syn:['вершины','буквы'],L:[
-     {n:'Вершины и стороны',d:'',p:F(['polyLetters'],6)},{n:'Больше фигур',d:'',p:F(['polyLetters'],8)},{n:'Ещё больше',d:'',p:F(['polyLetters'],10)}]}]},
+     {n:'Вершины и стороны',d:'',p:F(['polyLetters'],6)},{n:'Больше фигур',d:'',p:F(['polyLetters'],8)},{n:'Ещё больше',d:'',p:F(['polyLetters'],9)}]}]},
   {part:1,s:'Умножение и деление',topics:[
    {id:'g3-table',t:'Таблица умножения и деления: повторение',sub:['Связь деления с умножением','Повторение табличного умножения и деления',S_('Умножение и деление с числом 5',{tab:[5,5]}),S_('Умножение и деление с числом 6',{tab:[6,6]}),S_('Умножение и деление с числом 7',{tab:[7,7]}),S_('Умножение и деление с числами 8 и 9',{tab:[8,9]})],syn:['таблица','таблица умножения'],L:[
      {n:'На 5, 6, 7',d:'',p:F(['tab'],15,{tab:[5,7]})},{n:'На 2–9',d:'',p:F(['tab'],18,{tab:[2,9]})},{n:'Окошки',d:'',p:F(['tabWin'],18,{tab:[2,9]})}]},
@@ -4014,6 +4090,7 @@ function sortTable(group,showAns){const cols=group[0].cols,rows=Math.max(...cols
   return `<div class="it rich span stab"><div class="stab-g" style="grid-template-columns:repeat(${cols.length},1fr)">${cols.map(c=>{const ws=group.filter(x=>x.ans===c);
     return `<div class="stc"><b>${esc(c)}</b>${Array.from({length:rows},(_,k)=>`<i>${showAns&&ws[k]?esc(ws[k].w):''}</i>`).join('')}</div>`}).join('')}</div></div>`}
 function richItemHTML(it,i,showAns){
+  if(it.type==='sort'&&it.m)return `<div class="it rich span mt">${badgeH(i)}<div class="rb"><span class="iw">${esc(it.w)}</span><i class="mt-dot"></i><span class="mt-gap">${showAns?`→ ${esc(it.ans)}`:''}</span><i class="mt-dot"></i><span class="mt-r">${esc(it.rk)}</span></div></div>`;
   if(it.type==='sort')return `<div class="it rich srt${it.long?' span':''}">${badgeH(i)}<div class="rb"><span class="iw">${esc(it.w)}</span></div></div>`;
   if(it.type==='line')return `<div class="it rich ln${it.long?' span':''}">${badgeH(i)}<div class="rb"><span class="iw${it.noLine?' big':''}">${esc(showAns&&it.noLine?it.key:it.w)}</span>${it.noLine?'':`<span class="ichk${it.long?' wide':''}">${showAns?esc(it.key):''}</span>`}</div></div>`;
   if(it.type==='mor')return `<div class="it rich mr">${badgeH(i)}<div class="rb">${morHTML(it,showAns)}</div></div>`;
@@ -4083,7 +4160,7 @@ function sheetParts(items,{topic,level,seed,studentName,answers,design}){
     const grp=newGroup(it,i)?`<div class="grp"><span class="gn">${bno[i]}</span>${head?`<b>${esc(head)}.</b> `:''}${esc(instr(it))}</div>`:'';
     if(cellable(it))return grp+`<div class="it ci" style="width:calc(var(--c) * ${kOf[gid[i]]})">${cellItemHTML(it,i,answers)}</div>`;
     return grp+richItemHTML(it,i,answers).replace('<div class="it rich','<div data-g="'+gid[i]+'" class="it rich')});
-  items.forEach((it,i)=>{if(it.type!=='sort')return;const nx=items[i+1];if(nx&&nx.type==='sort'&&nx.blk===it.blk)return;
+  items.forEach((it,i)=>{if(it.type!=='sort'||it.m)return;const nx=items[i+1];if(nx&&nx.type==='sort'&&nx.blk===it.blk)return;
     let a=i;while(a>0&&items[a-1].type==='sort'&&items[a-1].blk===it.blk)a--;it.tbl=true;pieces[i]+=sortTable(items.slice(a,i+1),answers)});
   /* «Сказка»: картинка слева сверху, справа название и сразу первые задания;
      внизу справа вторая картинка, задания слева от неё. Всё на одной сетке клеток */
@@ -4276,10 +4353,14 @@ let lastSync=0;
 async function syncResults(force){
   if(!ACC.user||(!force&&Date.now()-lastSync<20000))return;lastSync=Date.now();
   try{
-    const list=await pbT.collection('assignments').getFullList({filter:pbT.filter('tutor = {:id} && status = "done"',{id:ACC.user.id}),fields:'id,code,result'});
-    let n=0;
-    for(const r of list){const h=S.assignments.find(a=>a.code===r.code);
-      if(h&&h.status!=='сдано'&&r.result){const d=r.result;recordResult(h,{correct:d.k,total:d.n,answered:d.a,time:d.tm,log:d.l||[],mistakes:d.m||[]});n++}}
+    /* если на сервере ещё нет поля фото — забираем только сданные, как раньше */
+    const list=await pbT.collection('assignments').getFullList({filter:pbT.filter('tutor = {:id} && (status = "done" || photos != "")',{id:ACC.user.id}),fields:'id,code,result,photos'})
+      .catch(()=>pbT.collection('assignments').getFullList({filter:pbT.filter('tutor = {:id} && status = "done"',{id:ACC.user.id}),fields:'id,code,result'}));
+    let n=0,fresh=[];
+    for(const r of list){const h=S.assignments.find(a=>a.code===r.code);if(!h)continue;
+      const ph=r.photos||[];if(ph.join()!==(h.photos||[]).join()){if(ph.length>(h.photos||[]).length){h.phNew=true;fresh.push(h)}h.photos=ph;n++;save()}
+      if(h.status!=='сдано'&&r.result&&r.result.n){const d=r.result;recordResult(h,{correct:d.k,total:d.n,answered:d.a,time:d.tm,log:d.l||[],mistakes:d.m||[]});n++}}
+    if(fresh.length){const st=student(fresh[0].studentId);toast(`📷 ${st?st.name:'Ученик'} прислал фото работы`)}
     if(n&&['students','student','works','work'].includes(V.screen))render();
   }catch(e){}
 }
@@ -4379,7 +4460,7 @@ const CABINET=/\/u\/(index\.html)?$/.test(location.pathname);
 const CAB={items:null,err:'',me:null};
 async function loadCab(){
   try{CAB.me=pbS.authStore.record;
-    CAB.items=await pbS.collection('assignments').getFullList({sort:'-created',fields:'id,code,title,payload,status,result,created'});CAB.err=''}
+    CAB.items=await pbS.collection('assignments').getFullList({sort:'-created',fields:'id,code,title,payload,status,result,created,photos,review'});CAB.err=''}
   catch(e){if(e&&(e.status===401||e.status===403)){pbS.authStore.clear();V={screen:'cablogin'}}else CAB.err='Нет связи. Проверь интернет.'}
   flushCab();render();loadCabRoom();
 }
@@ -4408,12 +4489,13 @@ function viewCab(){
   const me=CAB.me||pbS.authStore.record||{};
   if(CAB.items===null){app.innerHTML=`<div class="cab"><p class="hint">Загружаем задания…</p></div>`;return}
   const pick=(seed)=>{const L=THEMES.filter(t=>artList(t).length);const t=L[seed%L.length];return artSet(t,seed)};
-  const card=r=>{const d=r.payload||{},done=r.status==='done',res=r.result||{};const a=pick(d.s||7);
+  const card=r=>{const d=r.payload||{},done=r.status==='done',res=r.result||{},rv=r.review||{},ph=(r.photos||[]).length;const a=pick(d.s||7);
     return `<button class="ctask${done?' done':''}" data-id="${r.id}"${done?' disabled':''}>
       <span class="ct-pic">${a?`<img src="${a.char}" alt="" loading="lazy">`:''}</span>
-      <span class="ct-t"><b>${esc(r.title||d.t||'Задание')}</b><small>${done?`Сделано · ${res.k} из ${res.n}`:`Новое · ${ago(Date.parse(r.created))}`}</small></span>
-      ${done?`<span class="ct-score num">${Math.round(res.k/res.n*100)}%</span>`:'<span class="btn primary small">Решать</span>'}</button>
-      <button class="btn link ct-pr" data-pr="${r.id}">Распечатать</button>`};
+      <span class="ct-t"><b>${esc(r.title||d.t||'Задание')}</b><small>${done?(res.n?`Сделано · ${res.k} из ${res.n}`:'Репетитор проверил'):ph?`Фото отправлены: ${ph}`:`Новое · ${ago(Date.parse(r.created))}`}</small></span>
+      ${done&&res.n?`<span class="ct-score num">${Math.round(res.k/res.n*100)}%</span>`:done&&rv.mark?`<span class="ct-score num">${esc(rv.mark)}</span>`:done?'':'<span class="btn primary small">Решать</span>'}</button>
+      ${rv.mark||rv.note?`<div class="ct-rv">Репетитор${rv.mark?`: отметка <b>${esc(rv.mark)}</b>`:''}${rv.note?` — ${esc(rv.note)}`:''}</div>`:''}
+      <div class="ct-x"><button class="btn link" data-ph="${r.id}">📷 ${ph?`Фото работы: ${ph}`:'Сфотографировать работу'}</button><button class="btn link" data-pr="${r.id}">Распечатать</button></div>`};
   const fresh=CAB.items.filter(r=>r.status!=='done'),done=CAB.items.filter(r=>r.status==='done');
   app.innerHTML=`<div class="cab">
     <div class="cab-head"><div><h1>Привет, ${esc(me.name||'')}!</h1>${me.tutorName?`<p>Твой репетитор: ${esc(me.tutorName)}</p>`:''}</div>
@@ -4428,9 +4510,31 @@ function viewCab(){
   /* ученик может решить на бумаге: печать того же варианта, что и на экране */
   app.querySelectorAll('[data-pr]').forEach(b=>b.onclick=()=>{const r=CAB.items.find(x=>x.id===b.dataset.pr),d=r.payload||{};
     printPages(generate(d.p,d.s),{topic:{t:d.t||r.title||'Задание',grade:d.g||1,sheet:true,section:'',L:[{n:d.mix?'Лист':'Домашнее задание'}]},level:0,seed:d.s,studentName:(CAB.me&&CAB.me.name)||''})});
+  app.querySelectorAll('[data-ph]').forEach(b=>b.onclick=()=>cabPhotos(CAB.items.find(x=>x.id===b.dataset.ph)));
   bindCabRoom();
   document.getElementById('cout').onclick=()=>{pbS.authStore.clear();CAB.items=null;CAB.room=null;V={screen:'cablogin'};render()};
 }
+/* ---------- фото работы на бумаге ----------
+   Ученик снимает каждую страницу, снимки уменьшаются до 1600 px (быстро уходят и по плохому интернету)
+   и прикрепляются к домашке. Репетитор смотрит их у работы и ставит отметку. */
+function shrinkPhoto(file,max=1600){return new Promise(res=>{const u=URL.createObjectURL(file),im=new Image();
+  im.onload=()=>{const k=Math.min(1,max/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);
+    c.getContext('2d').drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(u);c.toBlob(b=>res(b||file),'image/jpeg',.82)};
+  im.onerror=()=>{URL.revokeObjectURL(u);res(file)};im.src=u})}
+async function photoURLs(pb,rec){if(!(rec.photos||[]).length)return[];const tok=await pb.files.getToken();return rec.photos.map(f=>({f,url:pb.files.getURL(rec,f,{token:tok}),th:pb.files.getURL(rec,f,{token:tok,thumb:'240x0'})}))}
+function photoBig(url,back){modal(`<div class="ph-big"><img src="${esc(url)}" alt="Фото работы"></div><div class="modal-actions"><a class="btn quiet" href="${esc(url)}" target="_blank" rel="noopener">Открыть отдельно</a><button class="btn primary" id="cl">${back?'Назад':'Закрыть'}</button></div>`,()=>{document.getElementById('cl').onclick=()=>back?back():close()})}
+async function cabPhotos(r){if(!r)return;const done=r.status==='done';
+  const draw=async()=>{const L=await photoURLs(pbS,r).catch(()=>[]);
+    modal(`<h2>Фото работы</h2><p class="hint" style="margin:0 0 12px">${done?'Работа проверена, фото можно только посмотреть.':'Сфотографируй каждую страницу целиком, при хорошем свете. Репетитор увидит фото сразу.'}</p>
+      <div class="ph-grid">${L.map(x=>`<div class="phw"><img src="${esc(x.th)}" data-big="${esc(x.url)}" alt="Фото работы">${done?'':`<button class="ph-x" data-del="${esc(x.f)}" aria-label="Удалить фото">✕</button>`}</div>`).join('')||'<p class="hint">Фото пока нет.</p>'}</div>
+      <div class="modal-actions">${done?'':`<label class="btn primary">📷 Добавить фото<input type="file" id="phIn" accept="image/*" multiple hidden></label>`}<button class="btn quiet" id="cl">Готово</button></div>`,()=>{
+      const $=id=>document.getElementById(id);$('cl').onclick=()=>{close();render()};
+      mroot.querySelectorAll('[data-big]').forEach(i=>i.onclick=()=>photoBig(i.dataset.big,draw));
+      mroot.querySelectorAll('[data-del]').forEach(b=>b.onclick=async()=>{b.disabled=true;try{Object.assign(r,await pbS.collection('assignments').update(r.id,{'photos-':[b.dataset.del]}))}catch(e){toast('Не удалось удалить. Проверь интернет')}draw()});
+      const inp=$('phIn');if(inp)inp.onchange=async()=>{const fs=[...inp.files].slice(0,12-(r.photos||[]).length);if(!fs.length){toast('Можно до 12 фото');return}
+        inp.closest('label').textContent='Отправляем…';const fd=new FormData();for(const f of fs)fd.append('photos+',await shrinkPhoto(f),'page.jpg');
+        try{Object.assign(r,await pbS.collection('assignments').update(r.id,fd));toast('Фото отправлены репетитору')}catch(e){toast('Не отправилось. Проверь интернет и попробуй ещё раз')}draw()}})};
+  draw()}
 function startCab(r){const d=r.payload;
   P={h:{code:d.c,level:0},t:{t:d.t,grade:d.g,sheet:d.mix},name:d.n,remote:true,cab:r.id,items:generate(d.p,d.s),i:0,input:'',correct:0,streak:0,score:0,mistakes:[],log:[],start:Date.now(),fb:null,lock:false};
   V={screen:'player'};render();window.scrollTo({top:0});
@@ -4615,7 +4719,7 @@ function viewStudent(){
   const body=`${route}${studentSummary(st,subj)}<section class="allt">
       <div class="allt-head"><button class="allt-t" id="allt" aria-expanded="${V.allOpen?'true':'false'}">Все темы <span aria-hidden="true">${V.allOpen?'▴':'▾'}</span></button>
         <button class="qbtn${V.qOpen?' on':''}" id="qbtn" aria-label="Найти тему">${LUPA}</button></div>
-      ${V.qOpen?`<div class="search"><input id="tq" type="search" autocomplete="off" aria-label="Найти тему" placeholder="Тема или пример: 37 + 48" value="${esc(V.q||'')}"></div>`:''}
+      ${V.qOpen?`<div class="search"><input id="tq" type="search" autocomplete="off" aria-label="Найти тему или описать задание" placeholder="Тема, пример 37 + 48 или «10 примеров в столбик, сложный»" value="${esc(V.q||'')}">${SR?'<button type="button" class="mic" id="tmic" aria-label="Сказать голосом" title="Сказать голосом">🎤</button>':''}</div>`:''}
       <div id="sres" class="sres" hidden></div><div id="pmain"${V.allOpen?'':' hidden'}>${prog}</div></section>`;
   const nWait=S.assignments.filter(a=>a.studentId===st.id&&a.status==='выдано'&&TOPICS[a.topicId]).length;
   const nDone=S.assignments.filter(a=>a.studentId===st.id&&a.status==='сдано').length+S.attempts.filter(a=>a.studentId===st.id&&!a.hw&&!a.via).length;
@@ -4639,6 +4743,7 @@ function viewStudent(){
   $('allt').onclick=()=>{V.allOpen=!V.allOpen;render()};
   $('qbtn').onclick=()=>{V.qOpen=!V.qOpen;if(!V.qOpen)V.q='';render();if(V.qOpen&&$('tq'))$('tq').focus()};
   const tq=$('tq');if(tq){tq.oninput=()=>{V.q=tq.value;showSearch(st,subj)}}showSearch(st,subj);
+  if($('tmic'))$('tmic').onclick=()=>listen($('tmic'),txt=>{tq.value=txt;V.q=txt;showSearch(st,subj)});
   if($('newt'))$('newt').onclick=()=>{V.menu=false;openBuilder()};
   if($('stacc'))$('stacc').onclick=()=>{V.menu=false;render();accessModal(st,false)};
   $('more').onclick=()=>{V.menu=!V.menu;V.confirmStDel=false;render()};
@@ -4663,7 +4768,8 @@ function viewWorks(){
   const old=S.attempts.filter(a=>a.studentId===st.id&&!a.hw&&!a.via&&TOPICS[a.topicId]).sort((a,b)=>b.date-a.date);
   const hRow=h=>{const t=TOPICS[h.topicId];return `<button class="wk" data-code="${esc(h.code)}"><span class="wk-t"><b>${esc(t.sheet||t.review?t.L[0].n+': '+t.t:t.t)}</b>
       <small>Код ${esc(h.code)} · выдано ${ago(h.date)}${h.result?' · '+Math.floor(h.result.time/60)+' мин '+h.result.time%60+' с':''}</small></span>
-      ${h.status==='сдано'&&h.result?resChip(h.result.correct,h.result.total):h.status==='сдано'?'<span class="chip ok">сдано</span>':'<span class="chip warn">ждём</span>'}<span class="arr">→</span></button>`};
+      ${(h.photos||[]).length?`<span class="chip${h.phNew?' warn':''}">📷 ${h.photos.length}${h.phNew?' новые':''}</span>`:''}
+      ${h.status==='сдано'&&h.result?resChip(h.result.correct,h.result.total):h.review&&h.review.mark?`<span class="chip ok">отметка ${esc(h.review.mark)}</span>`:h.status==='сдано'?'<span class="chip ok">сдано</span>':'<span class="chip warn">ждём</span>'}<span class="arr">→</span></button>`};
   app.innerHTML=`<div class="head"><div><h1>Работы и домашки</h1><p>${esc(st.name)}, ${gradeWord(st.grade)}. Откройте работу, чтобы увидеть каждое задание и ответ ученика.</p></div>
     <button class="btn" id="imp">Внести результат по коду</button></div>
     <div class="panel wlist">${hs.length?hs.map(hRow).join(''):'<p class="empty">Домашек пока нет. Выдайте задание по ссылке на экране темы.</p>'}</div>
@@ -4680,10 +4786,26 @@ function viewWork(){
     return `<div class="wrow ${done?(ok?'ok':'bad'):''}"><span class="wn">${i+1}</span><span class="wq2">${esc(plainQ(it))}</span>
       <span class="wa2">${done?(ok?`<b>${esc(r.answers[i])}</b> ✓`:`<s>${esc(r.answers[i])}</s> → <b>${esc(fmt(it.ans))}</b>`):`<span class="hint">ответ: ${esc(fmt(it.ans))}</span>`}</span></div>`}).join('');
   app.innerHTML=`<div class="head"><div><span class="label">${esc(st.name)} · код ${esc(h.code)}</span><h1>${esc(t.sheet||t.review?t.L[0].n+': '+t.t:t.t)}</h1>
-    <p>${r?`Результат ${r.correct} из ${r.total}${r.answered<r.total?`, решено ${r.answered}`:''} · ${Math.floor(r.time/60)} мин ${r.time%60} с · сдано ${ago(r.date)}`:h.status==='сдано'?'Сдано до этой версии: подробных ответов нет.':'Ученик ещё не сдал работу. Ниже задания с правильными ответами.'}</p></div>
+    <p>${r?`Результат ${r.correct} из ${r.total}${r.answered<r.total?`, решено ${r.answered}`:''} · ${Math.floor(r.time/60)} мин ${r.time%60} с · сдано ${ago(r.date)}`:h.paper?`Сделано на бумаге, проверено по фото${h.review&&h.review.mark?' · отметка '+esc(h.review.mark):''}`:h.status==='сдано'?'Сдано до этой версии: подробных ответов нет.':'Ученик ещё не сдал работу. Ниже задания с правильными ответами.'}</p></div>
     ${h.status==='выдано'?'<button class="btn" id="as">Решить здесь как ученик</button>':''}</div>
+    ${(h.photos||[]).length||h.rid?`<div class="panel wpaper"><h2 class="pr-h">Работа на бумаге</h2>
+      ${(h.photos||[]).length?`<div class="ph-grid" id="wph"><p class="hint">Загружаем фото…</p></div>`:'<p class="hint" style="margin:0 0 10px">Ученик может сфотографировать работу в своём кабинете: «📷 Сфотографировать работу». Фото появятся здесь.</p>'}
+      <div class="wrev"><span>Отметка:</span>${['5','4','3','2','✓'].map(m=>`<button class="btn small${(h.review||{}).mark===m?' primary':''}" data-mk="${m}">${m}</button>`).join('')}
+        <input id="wnote" maxlength="300" placeholder="Комментарий ученику (необязательно)" value="${esc((h.review||{}).note||'')}"><button class="btn primary small" id="wsave">Сохранить</button></div>
+      ${h.review&&h.review.at?`<p class="hint" style="margin:8px 0 0">Ученик видит отметку в кабинете · ${ago(h.review.at)}</p>`:''}</div>`:''}
     <div class="panel wwork">${rows}</div>`;
   const as=document.getElementById('as');if(as)as.onclick=()=>startPlayer(h);
+  if(h.phNew){h.phNew=false;save()}
+  const box=document.getElementById('wph');
+  if(box&&h.rid)pbT.collection('assignments').getOne(h.rid,{fields:'id,collectionId,collectionName,photos'}).then(rec=>photoURLs(pbT,rec)).then(L=>{
+    box.innerHTML=L.map(x=>`<div class="phw"><img src="${esc(x.th)}" data-big="${esc(x.url)}" alt="Фото работы"></div>`).join('');
+    box.querySelectorAll('[data-big]').forEach(i=>i.onclick=()=>photoBig(i.dataset.big))}).catch(()=>{box.innerHTML='<p class="hint">Нет связи, фото не загрузились</p>'});
+  let mk=(h.review||{}).mark||'';
+  app.querySelectorAll('[data-mk]').forEach(b=>b.onclick=()=>{mk=mk===b.dataset.mk?'':b.dataset.mk;app.querySelectorAll('[data-mk]').forEach(x=>x.classList.toggle('primary',x.dataset.mk===mk))});
+  const sv=document.getElementById('wsave');if(sv)sv.onclick=async()=>{const review={mark:mk,note:document.getElementById('wnote').value.trim(),at:Date.now()};
+    sv.disabled=true;try{await pbT.collection('assignments').update(h.rid,{review,...(h.status==='выдано'?{status:'done'}:{})});
+      h.review=review;if(h.status==='выдано'){h.status='сдано';h.paper=true}save();toast('Отметка у ученика в кабинете');render()}
+    catch(e){sv.disabled=false;toast('Нет связи с сервером, не сохранилось')}};
 }
 /* ---------- поиск темы: слова с опечатками, синонимы, подтемы учебника и пример вида 37 + 48 ---------- */
 const progSec=id=>{for(const subj in PROG)for(const g in PROG[subj])for(const sec of PROG[subj][g])if(sec.topics.some(t=>t.id===id))return sec;return null};
@@ -4748,10 +4870,38 @@ function searchTopics(q,subj){
       if(!best||sc>best.score)best={tid:id,si:e.si,score:sc}});
     if(best&&!(ex&&best.tid===ex.tid))out.push(best)}
   return out.sort((a,b)=>b.score-a.score).slice(0,15)}
+/* ---------- задание по описанию: текстом или голосом ----------
+   «12 примеров на сложение в столбик с переходом, сложный уровень, найди ошибку»:
+   число заданий, уровень и вид вынимаем из фразы, по остальным словам ищем тему. ИИ не нужен. */
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition||null;
+function listen(btn,cb){if(!SR)return;const rec=new SR();rec.lang='ru-RU';rec.interimResults=true;rec.maxAlternatives=1;
+  btn.classList.add('on');btn.textContent='●';let last='';
+  rec.onresult=e=>{last=[...e.results].map(x=>x[0].transcript).join(' ');cb(last)};
+  rec.onerror=e=>{if(e.error==='not-allowed')toast('Браузер не дал микрофон. Разрешите его в адресной строке.');else if(e.error!=='no-speech'&&e.error!=='aborted')toast('Не расслышал, попробуйте ещё раз')};
+  rec.onend=()=>{btn.classList.remove('on');btn.textContent='🎤'};try{rec.start()}catch(e){btn.classList.remove('on');btn.textContent='🎤'}}
+const NUMW={'два':2,'две':2,'три':3,'четыре':4,'пять':5,'шесть':6,'семь':7,'восемь':8,'девять':9,'десять':10,'одиннадцать':11,'двенадцать':12,'пятнадцать':15,'двадцать':20};
+function parseDesc(q){const w=normT(q).split(' ').filter(Boolean),d={},t=w.join(' ');
+  /* число заданий: «12 примеров», «десять заданий» */
+  for(let k=0;k<w.length;k++){const n=/^\d+$/.test(w[k])?+w[k]:NUMW[w[k]];if(n&&w[k+1]&&/^(пример|задани|задач|штук|слов|упражнен|уравнен)/.test(w[k+1])){d.count=Math.max(2,Math.min(30,n));w[k]='';break}}
+  if(/базов|лёгк|легк|прост/.test(t))d.level=0;else if(/средн/.test(t))d.level=1;else if(/сложн|трудн/.test(t))d.level=2;
+  if(/соедин|стрелк|сопостав/.test(t))d.kind='match';else if(/ошибк|исправ/.test(t))d.kind='fix';else if(/верн[а-я]* запис|неравенств/.test(t))d.kind='ineq';
+  const stop=/^(пример|задани|задач|штук|уровен|уровн|базов|средн|сложн|трудн|лёгк|легк|прост|сдела|дай|нужн|лист|соедин|стрелк|сопостав|найди|найти|ошибк|исправ|верн|запис|неравенств)|^(на|по|для|с|и|в|а|мне)$/;
+  d.rest=w.filter(x=>x&&!stop.test(x)).join(' ');
+  d.any=d.count!=null||d.level!=null||!!d.kind;return d}
 function showSearch(st,subj){
   const box=document.getElementById('sres'),main=document.getElementById('pmain');if(!box)return;
   const q=(V.q||'').trim();if(!q){box.hidden=true;main.hidden=!V.allOpen;return}
-  const res=searchTopics(q,subj);main.hidden=true;box.hidden=false;
+  const dsc=parseDesc(q);const res=searchTopics(dsc.any&&dsc.rest?dsc.rest:q,subj);main.hidden=true;box.hidden=false;
+  if(dsc.any&&res.length){const r0=res[0],t0=TOPICS[r0.tid],okK=dsc.kind&&t0.subject==='math';
+    const parts=[dsc.level!=null&&t0.L[dsc.level]?LV[dsc.level].toLowerCase()+' уровень':'',dsc.count?dsc.count+' '+plural(dsc.count,['задание','задания','заданий']):'',okK?VKINDS[dsc.kind].toLowerCase():''].filter(Boolean);
+    box.innerHTML=`<button class="sr sr-desc" id="srDesc"><span class="sr-t"><span class="chip ok">по описанию</span> ${esc(t0.t)}</span><small>${esc(parts.join(' · '))}${parts.length?' · ':''}${gradeWord(t0.grade)}</small></button>`;
+    document.getElementById('srDesc').onclick=()=>{const lv=dsc.level!=null&&t0.L[dsc.level]?dsc.level:0,base=t0.L[lv].p;
+      openTopic(r0.tid,{level:lv});const over={};if(dsc.count)over.count=dsc.count;if(okK)Object.assign(over,{kind:dsc.kind,base,count:dsc.count||(dsc.kind==='match'?6:8)});
+      if(Object.keys(over).length){V.over=over;V.subName=okK?VKINDS[dsc.kind]:null;render()}};
+    box.insertAdjacentHTML('beforeend','<p class="hint sr-more">Другие темы:</p>');
+    const more=document.createElement('div');box.appendChild(more);
+    more.innerHTML=res.slice(1,6).map((r,k)=>`<button class="sr" data-k="${k+1}"><span class="sr-t">${esc(TOPICS[r.tid].t)}</span><small>${gradeWord(TOPICS[r.tid].grade)}</small></button>`).join('');
+    more.querySelectorAll('.sr').forEach(b=>b.onclick=()=>openTopicSub(res[+b.dataset.k].tid,null,null));return}
   box.innerHTML=res.length?res.map((r,k)=>{const t=TOPICS[r.tid],sb=r.si>=0?t.sub[r.si]:null;
     return `<button class="sr" data-k="${k}"><span class="sr-t">${r.ex?`<span class="chip ok">по примеру ${esc(r.ex)}</span> `:''}${esc(sb?(sb.n||sb):t.t)}</span>
       <small>${sb?'тема «'+esc(t.t)+'» · ':''}${gradeWord(t.grade)}${t.custom?'':' · часть '+partOf(t.id)+' · '+esc(secOf(t.id))}</small></button>`}).join('')
@@ -4834,10 +4984,14 @@ function viewTopic(){
   else if(tpl!=='train')blocksHTML=`<details class="fold"><summary>Состав листа</summary><ol class="bsum">${blocks.map(b=>`<li><b>${esc(b.label)}</b><span>${esc(TOPICS[b.tid].t)} · ${b.count}</span></li>`).join('')}</ol>
     <button type="button" class="btn small quiet" id="to-own">Изменить</button></details>`;
   const total=items.length;
+  /* вид заданий: обычные примеры темы или те же примеры в другом виде */
+  const lvP=t.L[V.level].p,curK=V.over&&VKINDS[V.over.kind]?V.over.kind:'';
+  const okK=tpl==='train'&&t.subject==='math'?Object.keys(VKINDS).filter(k=>{try{return generate({kind:k,base:lvP,count:6},7).length>=3}catch(e){return false}}):[];
+  const kindRow=okK.length?`<div class="field"><span class="label">Вид заданий</span><div class="seg kseg" id="kseg"><button type="button" data-kk="" class="${curK?'':'on'}">Обычный</button>${okK.map(k=>`<button type="button" data-kk="${k}" class="${curK===k?'on':''}">${VKINDS[k]}</button>`).join('')}</div></div>`:'';
   app.innerHTML=`<div class="head"><div><h1>${esc(t.t)}</h1>
     <p>${gradeWord(t.grade)}${m.pct!=null?` · усвоение ${m.pct}%`:''}${V.subName&&tpl==='train'?` · ${esc(V.subName)} <button class="btn link" id="subx">вся тема</button>`:''}</p></div></div>
     <div class="topic-grid">
-      <div class="levels">${tplSeg}${tpl==='own'?'':lv}${cntRow}
+      <div class="levels">${tplSeg}${tpl==='own'?'':lv}${kindRow}${cntRow}
         ${blocksHTML}${t.rule?`<label class="chk"><input type="checkbox" id="rulecb"${V.noRule?'':' checked'}> Правило на листе</label>`:''}${designBox(st,V.seed)}
         ${V.forRoom&&R.on?`<div class="actions"><button class="btn primary" id="toroom">${V.forRoom.rep?'Обновить в комнате':'Добавить в комнату'}</button><button class="btn" id="backroom">← В комнату</button></div>`
           :`<div class="actions"><button class="btn primary" id="print">Печать</button><button class="btn" id="link">Ссылка ученику</button><button class="btn link" id="tomat">Сохранить в материалы</button></div>`}
@@ -4864,6 +5018,7 @@ function viewTopic(){
   bindDesign(st);
   if($('rulecb'))$('rulecb').onchange=e=>{V.noRule=!e.target.checked;render()};
   if($('subx'))$('subx').onclick=()=>go({over:null,subName:null,seed:newSeed()});
+  app.querySelectorAll('#kseg [data-kk]').forEach(b=>b.onclick=()=>{const k=b.dataset.kk;go(k?{over:{kind:k,base:lvP,count:k==='match'?6:8},subName:VKINDS[k],seed:newSeed()}:{over:null,subName:null,seed:newSeed()})});
   if($('tpl'))$('tpl').querySelectorAll('button').forEach(b=>b.onclick=()=>{const k=b.dataset.k;
     if(k==='own'&&tpl!=='own')V.blocks=(tpl==='train'?tplBlocks('lesson',st,t,V.level):blocks).map(x=>({...x}));
     go({tpl:k,seed:newSeed()})});
@@ -4905,11 +5060,16 @@ function designBox(st,seed){const d=designOf(st),R=resolveDesign(st,seed);
     <div class="seg dseg" id="dlv">${LEVELS.map(([k,l])=>`<button type="button" data-lv="${k}" class="${String(d.lv)===k?'on':''}">${l}</button>`).join('')}</div>
     ${+d.lv<4?`<div class="drow"><select id="dth" aria-label="Сюжет"><option value="random"${d.theme==='random'?' selected':''}>Любой сюжет</option>${THEMES.map(t=>`<option value="${t.id}"${d.theme===t.id?' selected':''}>${esc(t.n)}</option>`).join('')}</select>
       <label class="bwl"><input type="checkbox" id="dbw"${d.bw?' checked':''}> Ч/Б</label><button type="button" class="btn link" id="dgal">все сюжеты</button></div>
+    ${d.bw?'':`<div class="drow dpal" id="dpal" role="group" aria-label="Цвета листа"><button type="button" data-pal="random" class="dp-any${d.pal==null||d.pal==='random'?' on':''}" title="Случайные цвета">?</button>${PALETTES.map((p,k)=>`<button type="button" data-pal="${k}" class="${String(d.pal)===String(k)?'on':''}" aria-label="Цвета ${k+1}">${p.map(c=>`<i style="background:${c}"></i>`).join('')}</button>`).join('')}</div>`}
+    <div class="drow"><select id="dfr" aria-label="Ободок"><option value="random"${!d.frame||d.frame==='random'?' selected':''}>Ободок: любой</option>${FRAMES.map(f=>`<option value="${f}"${d.frame===f?' selected':''}>Ободок: ${FRAME_N[f]}</option>`).join('')}</select></div>
 `:''}</div>`}
+const FRAME_N={solid:'сплошной',dashed:'пунктир',double:'двойной',dots:'точки',stripes:'полоски'};
 function bindDesign(st){const d=designOf(st);const $=id=>document.getElementById(id);
   document.querySelectorAll('#dlv button').forEach(b=>b.onclick=()=>{d.lv=+b.dataset.lv;save();render()});
   if($('dth'))$('dth').onchange=e=>{d.theme=e.target.value;save();render()};
   if($('dbw'))$('dbw').onchange=e=>{d.bw=e.target.checked;save();render()};
+  document.querySelectorAll('#dpal [data-pal]').forEach(b=>b.onclick=()=>{d.pal=b.dataset.pal==='random'?'random':+b.dataset.pal;save();render()});
+  if($('dfr'))$('dfr').onchange=e=>{d.frame=e.target.value;save();render()};
   if($('dgal'))$('dgal').onclick=()=>go({screen:'gallery'})}
 function viewGallery(){const st=student(V.studentId),d=designOf(st);
   app.innerHTML=`<div class="head"><div><h1>Сюжеты оформления</h1><p>Выберите сюжет для листов ${esc(st.name)} или оставьте случайный: тогда каждый новый лист в новом сюжете.</p></div>
@@ -5191,21 +5351,63 @@ function lessonSheet(sid){const st=student(sid);const subj=st.subjects[0];const 
   V.studentId=sid;V.subject=subj;close();openTopic(pos.tr[pos.i],{tpl:'lesson'})}
 
 /* ---------- Расписание ---------- */
+/* сетка месяца: недели с понедельника, дни чужого месяца бледные */
+function monthGrid(m0){const g0=monday(m0),m1=addMonths(m0,1),days=[];for(let d=g0;d<m1||wdOf(d)!==0;d=addDays(d,1))days.push(d);return days}
+const SMODES=[['week','Неделя'],['month','Месяц'],['3m','3 месяца']];
+function schedModes(){return `<div class="seg smode">${SMODES.map(([k,n])=>`<button data-sm="${k}" class="${(V.smode||'week')===k?'on':''}">${n}</button>`).join('')}</div>`}
+function bindSchedModes(){app.querySelectorAll('[data-sm]').forEach(b=>b.onclick=()=>go({smode:b.dataset.sm}))}
+/* месяц: в каждом дне занятия списком; нажать на занятие — карточка занятия, на число — эта неделя */
+function viewScheduleMonth(){
+  const m0=V.month||monthStart(Date.now()),m1=addMonths(m0,1),md=new Date(m0),d0=dayStart(Date.now());
+  const days=monthGrid(m0),ls=lessonsIn(days[0],addDays(days[days.length-1],1));
+  const live=lessonsIn(m0,m1).filter(l=>lstat(l)!=='cancel'),sum=live.reduce((a,l)=>a+lprice(l),0);
+  app.innerHTML=`<div class="head"><div><h1>Расписание</h1><p>${live.length?`${live.length} ${plural(live.length,LESSONS)} за ${MONN[md.getMonth()].toLowerCase()}${sum?' · '+rub(sum):''}`:'В этом месяце занятий нет'}</p></div>
+    <div class="wnav">${schedModes()}<button class="btn small quiet" id="mPrev" aria-label="Прошлый месяц">‹</button><span class="wr">${MONN[md.getMonth()]} ${md.getFullYear()}</span><button class="btn small quiet" id="mNext" aria-label="Следующий месяц">›</button>
+      ${m0!==monthStart(Date.now())?'<button class="btn small quiet" id="mNow">Сегодня</button>':''}<button class="btn small primary" id="addL">+ Занятие</button></div></div>
+    <div class="mcal"><div class="mc-h">${WD.map(w=>`<span>${w}</span>`).join('')}</div><div class="mc-g">
+    ${days.map(d=>{const dl=ls.filter(l=>dayStart(l.at)===d),out=d<m0||d>=m1;
+      return `<section class="mc-d${out?' out':''}${d===d0?' today':''}${d<d0?' past':''}"><button class="mc-n num" data-wk="${d}" aria-label="Неделя с ${dayTxt(d)}">${new Date(d).getDate()}</button>
+        ${dl.slice(0,4).map(l=>{const st=student(l.sid),s2=lstat(l);return `<button class="mc-l ${s2}" data-l="${esc(l.id)}"><span class="num">${hm(l.at)}</span> ${esc(firstName(st))}</button>`}).join('')}
+        ${dl.length>4?`<button class="mc-more" data-wk="${d}">ещё ${dl.length-4}</button>`:''}
+        <button class="mc-add" data-d="${dkey(d)}" aria-label="Добавить занятие ${dayTxt(d)}">+</button></section>`}).join('')}</div></div>`;
+  const $=id=>document.getElementById(id);bindSchedModes();
+  $('mPrev').onclick=()=>go({month:addMonths(m0,-1)});$('mNext').onclick=()=>go({month:m1});if($('mNow'))$('mNow').onclick=()=>go({month:null});
+  $('addL').onclick=()=>addLessonModal({});
+  app.querySelectorAll('[data-l]').forEach(b=>b.onclick=()=>lessonModal(ls.find(l=>l.id===b.dataset.l)));
+  app.querySelectorAll('[data-wk]').forEach(b=>b.onclick=()=>go({smode:'week',week:monday(+b.dataset.wk)}));
+  app.querySelectorAll('.mc-add').forEach(b=>b.onclick=()=>addLessonModal({day:b.dataset.d}));
+}
+/* три месяца подряд: сколько занятий в каждый день, нажать на день — его неделя */
+function viewSchedule3(){
+  const m0=V.month||monthStart(Date.now()),d0=dayStart(Date.now());
+  const ms=[0,1,2].map(k=>addMonths(m0,k)),all=lessonsIn(monday(m0),addDays(addMonths(m0,3),7)).filter(l=>lstat(l)!=='cancel');
+  const by={};for(const l of all){const k=dayStart(l.at);(by[k]=by[k]||[]).push(l)}
+  const tot=all.filter(l=>l.at>=m0&&l.at<addMonths(m0,3)).length;
+  app.innerHTML=`<div class="head"><div><h1>Расписание</h1><p>${tot} ${plural(tot,LESSONS)} за три месяца</p></div>
+    <div class="wnav">${schedModes()}<button class="btn small quiet" id="mPrev" aria-label="Раньше">‹</button><span class="wr">${MONN[new Date(ms[0]).getMonth()]} – ${MONN[new Date(ms[2]).getMonth()].toLowerCase()}</span><button class="btn small quiet" id="mNext" aria-label="Позже">›</button><button class="btn small primary" id="addL">+ Занятие</button></div></div>
+    <div class="m3">${ms.map(m=>{const m1=addMonths(m,1),md=new Date(m);const n=all.filter(l=>l.at>=m&&l.at<m1).length;
+      return `<section class="panel m3-m"><h2 class="ph">${MONN[md.getMonth()]} <small>${n} ${plural(n,LESSONS)}</small></h2><div class="m3-h">${WD.map(w=>`<span>${w}</span>`).join('')}</div>
+        <div class="m3-g">${monthGrid(m).map(d=>{const L=by[d]||[],out=d<m||d>=m1;return out?'<span></span>':`<button class="m3-d${d===d0?' today':''}${L.length?' has':''}" data-wk="${d}" title="${L.map(l=>hm(l.at)+' '+student(l.sid).name).join(', ')}"><span class="num">${new Date(d).getDate()}</span>${L.length?`<i>${L.length}</i>`:''}</button>`}).join('')}</div></section>`}).join('')}</div>`;
+  const $=id=>document.getElementById(id);bindSchedModes();
+  $('mPrev').onclick=()=>go({month:addMonths(m0,-3)});$('mNext').onclick=()=>go({month:addMonths(m0,3)});$('addL').onclick=()=>addLessonModal({});
+  app.querySelectorAll('[data-wk]').forEach(b=>b.onclick=()=>go({smode:'week',week:monday(+b.dataset.wk)}));
+}
 function viewSchedule(){
+  if(V.smode==='month')return viewScheduleMonth();if(V.smode==='3m')return viewSchedule3();
   const w0=V.week||monday(Date.now()),w1=addDays(w0,7),d0=dayStart(Date.now());
   const ls=lessonsIn(w0,w1);
   const days=[0,1,2,3,4,5,6].map(i=>{const d=addDays(w0,i);return{d,k:dkey(d),ls:ls.filter(l=>dayStart(l.at)===d)}});
   const live=ls.filter(l=>lstat(l)!=='cancel'),sum=live.reduce((s,l)=>s+lprice(l),0);
   const range=`${new Date(w0).getDate()} ${MONG[new Date(w0).getMonth()]} – ${new Date(addDays(w0,6)).getDate()} ${MONG[new Date(addDays(w0,6)).getMonth()]}`;
   app.innerHTML=`<div class="head"><div><h1>Расписание</h1><p>${live.length?`${live.length} ${plural(live.length,LESSONS)} за неделю${sum?' · '+rub(sum):''}`:'На этой неделе занятий нет'}</p></div>
-    <div class="wnav"><button class="btn small quiet" id="wPrev" aria-label="Прошлая неделя">‹</button><span class="wr num">${range}</span><button class="btn small quiet" id="wNext" aria-label="Следующая неделя">›</button>
+    <div class="wnav">${schedModes()}<button class="btn small quiet" id="wPrev" aria-label="Прошлая неделя">‹</button><span class="wr num">${range}</span><button class="btn small quiet" id="wNext" aria-label="Следующая неделя">›</button>
       ${w0!==monday(Date.now())?'<button class="btn small quiet" id="wNow">Эта неделя</button>':''}<button class="btn small primary" id="addL">+ Занятие</button></div></div>
     ${S.students.length&&!S.students.some(s=>(s.slots||[]).length)?'<div class="note">Укажите ученикам дни занятий: ⋯ → Редактировать в карточке ученика. Занятия будут появляться сами каждую неделю, а прошедшие — сами считаться проведёнными.</div>':''}
     <div class="week">${days.map(x=>`<section class="wday${x.d===d0?' today':''}${x.d<d0?' past':''}"><h3><span>${WD[wdOf(x.d)]}</span> <b class="num">${new Date(x.d).getDate()}</b></h3>
       ${x.ls.map(l=>{const st=student(l.sid),s=lstat(l);return `<button class="les ${s}" data-l="${esc(l.id)}"><span class="num">${hm(l.at)}</span><b>${esc(st.name)}</b>${s!=='plan'?`<small>${LST[s]}</small>`:''}</button>`}).join('')}
       <button class="wadd" data-d="${x.k}" aria-label="Добавить занятие ${WDL[wdOf(x.d)]}">+</button></section>`).join('')}</div>`;
   const $=id=>document.getElementById(id);
-  $('wPrev').onclick=()=>go({week:addDays(w0,-7)});$('wNext').onclick=()=>go({week:w1});if($('wNow'))$('wNow').onclick=()=>go({week:null});
+  bindSchedModes();$('wPrev').onclick=()=>go({week:addDays(w0,-7)});$('wNext').onclick=()=>go({week:w1});if($('wNow'))$('wNow').onclick=()=>go({week:null});
   $('addL').onclick=()=>addLessonModal({});
   app.querySelectorAll('[data-l]').forEach(b=>b.onclick=()=>lessonModal(ls.find(l=>l.id===b.dataset.l)));
   app.querySelectorAll('.wadd').forEach(b=>b.onclick=()=>addLessonModal({day:b.dataset.d}));
@@ -5294,12 +5496,15 @@ function viewFinance(){
       <div class="kpi"><span>Проведено</span><b class="num">${nL} ${plural(nL,LESSONS)}</b><small>на ${rub(chg)}</small></div>
       <div class="kpi ${debtSum?'bad':''}"><span>Должны сейчас</span><b class="num">${rub(debtSum)}</b><small>${debt.length?debt.length+' '+plural(debt.length,['ученик','ученика','учеников']):'долгов нет'}</small></div></div>
     <section class="panel fpanel"><h2 class="ph">Получено по месяцам</h2>${chart}</section>
+    ${finCal(m0)}
     <section class="panel fpanel"><h2 class="ph">Ученики</h2><div class="ftable" role="table">
-      <div class="frw fh" role="row"><span role="columnheader">Ученик</span><span role="columnheader">Занятие</span><span role="columnheader">За месяц</span><span role="columnheader">Баланс</span><span></span></div>
+      <div class="frw fh" role="row"><span role="columnheader">Ученик</span><span role="columnheader">Занятие</span><span role="columnheader">За месяц</span><span role="columnheader">Баланс</span><span role="columnheader">Оплачено</span><span></span></div>
       ${rows.map(({st,m,all})=>`<div class="frw" role="row"><span role="cell"><button class="btn link" data-st="${st.id}">${esc(st.name)}</button></span>
         <span role="cell" class="num">${st.price?rub(st.price):'<button class="btn link" data-ed="'+st.id+'">указать цену</button>'}</span>
         <span role="cell" class="num">${m.n} ${plural(m.n,LESSONS)}${m.paid?' · оплачено '+rub(m.paid):''}</span>
         <span role="cell"><span class="chip num ${all.bal<0?'bad':all.bal>0?'ok':''}">${all.bal<0?'долг '+rub(-all.bal):all.bal>0?'+'+rub(all.bal):'0 ₽'}</span></span>
+        <span role="cell" class="fcov">${(()=>{const c=coverage(st),lt=lessonsIn(Date.now(),Date.now()+120*DAY,st.id).filter(l=>lstat(l)==='plan'&&c.paid.has(l.id)).length;
+          return c.un?`<span class="bad-t">не оплачено ${c.un}</span>`:c.until?`до ${dayTxt(c.until)}<small>${lt} ${plural(lt,LESSONS)} впереди</small>`:'<small>вперёд не оплачено</small>'})()}</span>
         <span role="cell" class="fact"><button class="btn small" data-pay="${st.id}">+ Оплата</button>${all.bal<0?`<button class="btn small quiet" data-rem="${st.id}">Напомнить</button>`:''}</span></div>`).join('')}</div></section>
     <section class="panel fpanel"><h2 class="ph">Оплаты за ${MONN[md.getMonth()].toLowerCase()}</h2>
       ${pays.length?pays.map(p=>`<div class="pay"><span class="num">${dayTxt(p.date)}</span><b>${esc(student(p.sid).name)}</b><small>${esc(p.note||'')}</small><span class="num pay-a">${rub(p.amount)}</span>
@@ -5314,6 +5519,25 @@ function viewFinance(){
   app.querySelectorAll('[data-dp]').forEach(b=>b.onclick=()=>{if(V.delPay!==b.dataset.dp){V.delPay=b.dataset.dp;render();return}
     S.payments=S.payments.filter(p=>p.id!==b.dataset.dp);V.delPay=null;save();render()});
 }
+/* календарь оплат за месяц: в каждом дне оплаты (зелёным) и занятия — оплаченные, долг или в счёт будущего.
+   Флажок ⚑ — последний оплаченный день ученика: после него занятия ещё не оплачены. */
+function finCal(m0){
+  const m1=addMonths(m0,1),days=monthGrid(m0),d0=dayStart(Date.now());
+  const cov=new Map(S.students.map(st=>[st.id,coverage(st)]));
+  const ls=lessonsIn(days[0],addDays(days[days.length-1],1)).filter(l=>lstat(l)!=='cancel'&&student(l.sid));
+  const pays=S.payments.filter(p=>student(p.sid));
+  const cell=d=>{const e=addDays(d,1),out=d<m0||d>=m1;
+    const P=pays.filter(p=>p.date>=d&&p.date<e),L=ls.filter(l=>l.at>=d&&l.at<e);
+    const ends=S.students.filter(st=>{const c=cov.get(st.id);return c&&c.until&&dayStart(c.until)===d});
+    return `<section class="fc-d${out?' out':''}${d===d0?' today':''}"><span class="fc-n num">${new Date(d).getDate()}</span>
+      ${P.map(p=>`<span class="fc-p" title="${esc(p.note||'')}">+${rub(p.amount)} ${esc(firstName(student(p.sid)))}</span>`).join('')}
+      ${L.map(l=>{const st=student(l.sid),c=cov.get(st.id),paid=c&&c.paid.has(l.id),s2=lstat(l),k=paid?'ok':s2==='plan'?'wait':'debt';
+        return `<button class="fc-l ${k}" data-l="${esc(l.id)}" title="${k==='ok'?'оплачено':k==='debt'?'не оплачено':'ещё не оплачено'}">${hm(l.at)} ${esc(firstName(st))}</button>`}).join('')}
+      ${ends.map(st=>`<span class="fc-end" title="Последнее оплаченное занятие">⚑ ${esc(firstName(st))}: оплачено до сюда</span>`).join('')}</section>`};
+  setTimeout(()=>app.querySelectorAll('.fcal [data-l]').forEach(b=>b.onclick=()=>lessonModal(ls.find(l=>l.id===b.dataset.l))));
+  return `<section class="panel fpanel fcal"><h2 class="ph">Календарь оплат</h2>
+    <p class="fc-key"><span class="fc-p">+ оплата</span><span class="fc-l ok">оплачено</span><span class="fc-l debt">долг</span><span class="fc-l wait">впереди, не оплачено</span><span class="fc-end">⚑ оплачено до</span></p>
+    <div class="mc-h">${WD.map(w=>`<span>${w}</span>`).join('')}</div><div class="fc-g">${days.map(cell).join('')}</div></section>`}
 /* оплата: разовая или абонементом на несколько занятий вперёд */
 function payModal(st){
   if(!S.students.length)return addLessonModal({});
@@ -6924,7 +7148,11 @@ const BD=(()=>{
     else if(it.t==='image')html=`<img src="${url(it.src)}" alt="" draggable="false">`;
     else if(it.t==='answer')html=it.text?tx(32,'center'):`<div class="bd-tx bd-ph" style="font-size:${it.fs||32}px">ответ</div>`;
     else if(it.t==='pen'){const p=it.pts||[];let d='';for(let i=0;i<p.length;i+=2)d+=(i?'L':'M')+(+p[i]).toFixed(1)+' '+(+p[i+1]).toFixed(1);
-      html=`<svg viewBox="0 0 ${it.vw||it.w} ${it.vh||it.h}" preserveAspectRatio="none"><path d="${d}" fill="none" stroke="${it.color||'#1F2C55'}" stroke-width="${it.sw||4}" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/></svg>`}
+      /* стрелка на конце: наконечник в координатах линии, длина ~5 толщин */
+      let head='';if(it.arr&&p.length>=4){const n=p.length,x2=+p[n-2],y2=+p[n-1],x1=+p[n-4],y1=+p[n-3],a=Math.atan2(y2-y1,x2-x1),L=Math.max(14,(it.sw||4)*5)*((it.vw||it.w)/Math.max(1,it.w));
+        const pt=k=>`${(x2-L*Math.cos(a+k)).toFixed(1)} ${(y2-L*Math.sin(a+k)).toFixed(1)}`;head=`<path d="M${pt(.45)}L${x2} ${y2}L${pt(-.45)}" fill="none" stroke="${it.color||'#1F2C55'}" stroke-width="${it.sw||4}" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>`}
+      html=`<svg viewBox="0 0 ${it.vw||it.w} ${it.vh||it.h}" preserveAspectRatio="none" overflow="visible"><path d="${d}" fill="none" stroke="${it.color||'#1F2C55'}" stroke-width="${it.sw||4}" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>${head}</svg>`}
+    if(it.rot&&it.t!=='frame')style+=`transform:rotate(${it.rot}deg);`;if(it.op!=null&&it.op<1)style+=`opacity:${it.op};`;
     return{cls:'bd-it bd-'+it.t,style,html}}
   /* фрейм для комнаты: фон и всё, что на нём лежит, в координатах фрейма */
   function frameHTML(items,f,url){const inside=items.filter(x=>x!==f&&x.t!=='frame'&&x.x+x.w/2>=f.x&&x.x+x.w/2<=f.x+f.w&&x.y+x.h/2>=f.y&&x.y+x.h/2<=f.y+f.h);
@@ -6945,7 +7173,7 @@ const BD=(()=>{
       <button class="bd-ib" id="bdUndo" title="Отменить (Ctrl+Z)" aria-label="Отменить">↶</button><button class="bd-ib" id="bdRedo" title="Вернуть (Ctrl+Shift+Z)" aria-label="Вернуть">↷</button>
       <span class="bd-saved" id="bdSaved">Сохранено</span></div>
     <div class="bd-panel bd-tools" id="bdTools"></div>
-    <div class="bd-panel bd-tr"><button class="bd-tb" id="bdFr">Фреймы</button><button class="bd-tb" id="bdHelp" title="Клавиши">?</button></div>
+    <div class="bd-panel bd-tr"><button class="bd-tb" id="bdShow" title="Показ по фреймам на весь экран">▶ Показ</button><button class="bd-tb" id="bdFr">Фреймы</button><button class="bd-tb" id="bdHelp" title="Клавиши">?</button></div>
     <div class="bd-panel bd-frames" id="bdFrames" hidden></div>
     <div class="bd-panel bd-zoom"><button class="bd-ib" id="bdZo" aria-label="Уменьшить">−</button><span id="bdZv" title="Показать всё">100%</span><button class="bd-ib" id="bdZi" aria-label="Увеличить">+</button></div>
     <div class="bd-ctx" id="bdCtx" hidden></div><div class="bd-hint" id="bdHint"></div>
@@ -6953,6 +7181,7 @@ const BD=(()=>{
     document.body.appendChild(root);bind()}
   /* ---------- инструменты ---------- */
   const IC={
+    line:'<svg viewBox="0 0 24 24"><path d="M5 19L19 5M11 5h8v8" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>',
     select:'<svg viewBox="0 0 24 24"><path d="M5 3l14 8-6.5 1.5L10 19z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>',
     hand:'<svg viewBox="0 0 24 24"><path d="M8 12V5.5a1.5 1.5 0 013 0V11m0-1V4.5a1.5 1.5 0 013 0V11m0-.5V6a1.5 1.5 0 013 0v8a7 7 0 01-7 7h-.5A6.5 6.5 0 015 17.5L3.5 13a1.5 1.5 0 012.6-1.4L8 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
     frame:'<svg viewBox="0 0 24 24"><path d="M7 3v18M17 3v18M3 7h18M3 17h18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
@@ -6964,10 +7193,10 @@ const BD=(()=>{
     lib:'<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="7" cy="4.8" r="1.4" fill="currentColor"/><circle cx="11" cy="4.8" r="1.4" fill="currentColor"/><path d="M4 20c.5-4 2.5-6 5-6s4.5 2 5 6M15 11l1.5-3 1.5 3 3 .4-2.2 2 .6 3-2.9-1.5-2.9 1.5.6-3-2.2-2z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>',
     answer:'<svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="10" rx="3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-dasharray="3 2"/><path d="M7 12h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>'};
   const LIB_EMO=['⭐','❤️','👍','🎉','🏆','🥇','🌟','✅','❌','❓','💡','🎁','🍎','🍊','🥥','🍕','🍬','🐱','🐶','🐰','🦊','🐻','🐸','🦄','🌈','☀️','🌙','⛄','🎈','🚀','✏️','📚','🔔','👀','😊','😎'];
-  const TOOLS=[['select','Выделение (V)'],['hand','Рука: двигать доску (H или зажать пробел)'],'|',['frame','Фрейм (F)'],['text','Текст (T)'],['sticky','Стикер (N)'],['shape','Фигура (S)'],['pen','Карандаш (P)'],['image','Картинка (I)'],'|',['answer','Поле ответа для ученика (A)'],['lib','Библиотека: персонажи и наклейки (L)']];
+  const TOOLS=[['select','Выделение (V)'],['hand','Рука: двигать доску (H или зажать пробел)'],'|',['frame','Фрейм (F)'],['text','Текст (T)'],['sticky','Стикер (N)'],['shape','Фигура (S)'],['pen','Карандаш (P)'],['line','Линия со стрелкой (D)'],['image','Картинка (I)'],'|',['answer','Поле ответа для ученика (A)'],['lib','Библиотека: персонажи и наклейки (L)']];
   function drawTools(){const t=q('bdTools');t.innerHTML=TOOLS.map(x=>x==='|'?'<div class="bd-sep"></div>':`<button class="bd-ib${TOOL===x[0]?' bd-on':''}" data-t="${x[0]}" title="${x[1]}" aria-label="${x[1]}">${IC[x[0]]}</button>`).join('');
     t.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{const k=b.dataset.t;if(k==='image'){q('bdFile').click();return}if(k==='lib'){libToggle();return}if(k==='shape'){shapeMenu(b);return}if(k==='pen'){penMenu(b);return}setTool(k)})}
-  function setTool(t){TOOL=t;drawTools();q('bdVp').className='bd-vp'+(t==='hand'?' bd-pan':['frame','text','sticky','shape','pen','answer'].includes(t)?' bd-make':'')}
+  function setTool(t){TOOL=t;drawTools();q('bdVp').className='bd-vp'+(t==='hand'?' bd-pan':['frame','text','sticky','shape','pen','line','answer'].includes(t)?' bd-make':'')}
   function shapeMenu(b){const r=b.getBoundingClientRect();popup(r.right+8,r.top,[['Прямоугольник',()=>{SHAPE='rect';setTool('shape')}],['Скруглённый',()=>{SHAPE='round';setTool('shape')}],['Круг',()=>{SHAPE='ellipse';setTool('shape')}],['Облачко',()=>{SHAPE='cloud';setTool('shape')}],['Стрелка',()=>{SHAPE='arrow';setTool('shape')}]])}
   function penMenu(b){const r=b.getBoundingClientRect();popup(r.right+8,r.top,INK.slice(0,5).map((c,k)=>[['Тёмно-синий','Красный','Синий','Зелёный','Жёлтый'][k],()=>{PENC=c;setTool('pen')}]))}
   /* ---------- отрисовка ---------- */
@@ -7007,6 +7236,9 @@ const BD=(()=>{
     if(fills)h+=COLORS.map(c=>`<span class="bd-sw${list.every(x=>x.fill===c)?' bd-on':''}" data-fill="${c}" style="background:${c}" title="Цвет"></span>`).join('')+'<span class="bd-vs"></span>';
     if(inks)h+=INK.map(c=>`<span class="bd-sw${list.every(x=>(x.color||'#1F2C55')===c)?' bd-on':''}" data-ink="${c}" style="background:${c}" title="Цвет"></span>`).join('')+'<span class="bd-vs"></span>';
     if(texts)h+=`<button class="bd-ib" data-a="fs-" title="Текст меньше">A−</button><span class="bd-fs">${one?one.fs||(t==='text'?32:24):''}</span><button class="bd-ib" data-a="fs+" title="Текст больше">A+</button><button class="bd-ib" data-a="bold" title="Жирный"><b>Ж</b></button><span class="bd-vs"></span>`;
+    if(list.every(x=>x.t==='shape'))h+=`<span class="bd-lbl">Рамка</span>`+INK.slice(0,5).map(c=>`<span class="bd-sw bd-swr${list.every(x=>(x.stroke||'#1F2C55')===c)?' bd-on':''}" data-stroke="${c}" style="border-color:${c}" title="Цвет рамки"></span>`).join('')+`<button class="bd-ib" data-a="sw" title="Толщина рамки: ${one?one.sw??2:''}">▭</button><span class="bd-vs"></span>`;
+    if(list.every(x=>x.t==='pen'))h+=`<button class="bd-ib${list.every(x=>x.arr)?' bd-on':''}" data-a="arr" title="Стрелка на конце">→</button><button class="bd-ib" data-a="lw" title="Толщина линии">≡</button><span class="bd-vs"></span>`;
+    if(!list.some(x=>x.t==='frame'))h+=`<button class="bd-ib" data-a="op" title="Прозрачность">◐</button><button class="bd-ib" data-a="rl" title="Повернуть влево на 15° (с Shift — на 90°)">⟲</button><button class="bd-ib" data-a="rr" title="Повернуть вправо на 15° (с Shift — на 90°)">⟳</button>${list.some(x=>x.rot)?'<button class="bd-ib" data-a="r0" title="Вернуть прямо">⊥</button>':''}<span class="bd-vs"></span>`;
     if(t==='frame')h+=`<button class="bd-ib" data-a="bgimg" title="Картинка на фон">🖼</button>${one.src?'<button class="bd-ib" data-a="bgx" title="Убрать картинку фона">⨯</button>':''}<span class="bd-vs"></span>`;
     /* урок: верный ответ, зона, куда положить, шторка */
     if(t==='answer')h+=`<button class="bd-tb bd-tb2" data-a="ans">Верный ответ${one.ans?': '+esc(one.ans):''}</button><span class="bd-vs"></span>`;
@@ -7020,13 +7252,20 @@ const BD=(()=>{
     ctx.innerHTML=h;ctx.hidden=false;
     const r=q('bdVp').getBoundingClientRect(),sx=bb.x*VIEW.s+VIEW.x,sy=bb.y*VIEW.s+VIEW.y,w=ctx.offsetWidth;
     if(sx>r.width||sy>r.height||sx+bb.w*VIEW.s<0||sy+bb.h*VIEW.s<0){ctx.hidden=true;return}
-    ctx.style.left=Math.max(8,Math.min(r.width-w-8,sx+bb.w*VIEW.s/2-w/2))+'px';ctx.style.top=Math.max(64,sy-56)+'px';
+    ctx.style.left=Math.max(8,Math.min(r.width-w-8,sx+bb.w*VIEW.s/2-w/2))+'px';ctx.style.top=Math.max(64,sy-ctx.offsetHeight-14)+'px';
     ctx.querySelectorAll('[data-fill]').forEach(b=>b.onclick=()=>edit(()=>list.forEach(x=>x.fill=b.dataset.fill)));
     ctx.querySelectorAll('[data-ink]').forEach(b=>b.onclick=()=>edit(()=>list.forEach(x=>x.color=b.dataset.ink)));
+    ctx.querySelectorAll('[data-stroke]').forEach(b=>b.onclick=()=>edit(()=>list.forEach(x=>x.stroke=b.dataset.stroke)));
     ctx.querySelectorAll('[data-a]').forEach(b=>b.onclick=e=>act(b.dataset.a,e))}
   function act(a,e){const list=[...SEL].map(byId).filter(Boolean);if(!list.length)return;
     if(a==='fs-'||a==='fs+')return edit(()=>list.forEach(x=>{const f=x.fs||(x.t==='text'?32:24);x.fs=Math.max(10,Math.min(240,Math.round(a==='fs+'?f*1.2:f/1.2)))}));
     if(a==='bold')return edit(()=>{const v=!list.every(x=>x.b);list.forEach(x=>x.b=v)});
+    if(a==='sw')return edit(()=>{const cyc=[0,2,4,8],c=list[0].sw??2,n=cyc[(cyc.indexOf(c)+1)%cyc.length];list.forEach(x=>x.sw=n)});
+    if(a==='lw')return edit(()=>{const cyc=[2,4,8,14],c=list[0].sw||4,n=cyc[(cyc.indexOf(c)+1)%cyc.length];list.forEach(x=>x.sw=n)});
+    if(a==='arr')return edit(()=>{const v=!list.every(x=>x.arr);list.forEach(x=>x.arr=v)});
+    if(a==='op')return edit(()=>{const cyc=[1,.7,.4],c=list[0].op??1,n=cyc[(cyc.indexOf(c)+1)%cyc.length];list.forEach(x=>{if(n===1)delete x.op;else x.op=n})});
+    if(a==='rl'||a==='rr')return edit(()=>{const d=(e&&e.shiftKey?90:15)*(a==='rl'?-1:1);list.forEach(x=>{x.rot=(((x.rot||0)+d)%360+360)%360;if(!x.rot)delete x.rot})});
+    if(a==='r0')return edit(()=>list.forEach(x=>delete x.rot));
     if(['front','back','fwd','bwd'].includes(a))return layer(a);
     if(a==='group')return edit(()=>{const g=uid();list.forEach(x=>x.g=g)});
     if(a==='ungroup')return edit(()=>list.forEach(x=>delete x.g));
@@ -7141,6 +7380,7 @@ const BD=(()=>{
       if(e.button===1||SPACE||TOOL==='hand'){DRAG={k:'pan',sx:e.clientX,sy:e.clientY,vx:VIEW.x,vy:VIEW.y};vp.classList.add('bd-panning');return}
       const lk=e.target.closest('.bd-lnk');if(lk){const f=byId(lk.dataset.link);if(f)fitTo(bounds([f]),true);return}
       if(TOOL==='pen'){const it={id:uid(),t:'pen',x:w.x,y:w.y,w:1,h:1,pts:[0,0],color:PENC,sw:4,raw:[w.x,w.y]};DRAG={k:'pen',it};B.items.push(it);renderAll();return}
+      if(TOOL==='line'){const it={id:uid(),t:'pen',arr:true,x:w.x,y:w.y,w:1,h:1,pts:[0,0,1,1],color:PENC,sw:4,raw:[w.x,w.y,w.x+1,w.y+1]};DRAG={k:'pen',it,line:true};B.items.push(it);renderAll();return}
       if(['frame','text','sticky','shape','answer'].includes(TOOL)){DRAG={k:'make',t:TOOL,sx:w.x,sy:w.y,box:null};return}
       const h=e.target.closest('.bd-hdl');
       if(h){const list=[...SEL].map(byId);DRAG={k:'size',h:h.dataset.h,bb:bounds(list),orig:list.map(x=>({...x,h:hOf(x)})),keep:list.length>1||list[0].t==='image'};return}
@@ -7159,6 +7399,10 @@ const BD=(()=>{
       if(DRAG.k==='size'){const{bb,h}=DRAG;let x0=bb.x,y0=bb.y,x1=bb.x+bb.w,y1=bb.y+bb.h;if(h.includes('w'))x0=Math.min(w.x,x1-10);else x1=Math.max(w.x,x0+10);if(h.includes('n'))y0=Math.min(w.y,y1-10);else y1=Math.max(w.y,y0+10);
         let sx=(x1-x0)/bb.w,sy=(y1-y0)/bb.h;if(DRAG.keep||e.shiftKey){const s=Math.max(sx,sy);sx=sy=s;if(h.includes('w'))x0=x1-bb.w*s;if(h.includes('n'))y0=y1-bb.h*s}
         for(const o of DRAG.orig){const it=byId(o.id);it.x=x0+(o.x-bb.x)*sx;it.y=y0+(o.y-bb.y)*sy;it.w=Math.max(8,o.w*sx);it.h=Math.max(8,o.h*sy);if(o.fs&&DRAG.orig.length>1)it.fs=Math.max(8,Math.round(o.fs*sx));renderIt(it,EL.get(it.id))}drawSel();return}
+      if(DRAG.k==='pen'&&DRAG.line){const it=DRAG.it,r=it.raw;let x=w.x,y=w.y;
+        /* с Shift — ровно по горизонтали, вертикали или под 45° */
+        if(e.shiftKey){const dx=x-r[0],dy=y-r[1],a=Math.round(Math.atan2(dy,dx)/(Math.PI/4))*(Math.PI/4),L=Math.hypot(dx,dy);x=r[0]+L*Math.cos(a);y=r[1]+L*Math.sin(a)}
+        it.raw=[r[0],r[1],x,y];penBox(it);renderIt(it,EL.get(it.id));return}
       if(DRAG.k==='pen'){const it=DRAG.it,r=it.raw;if(Math.hypot(w.x-r[r.length-2],w.y-r[r.length-1])<2/VIEW.s)return;r.push(w.x,w.y);penBox(it);renderIt(it,EL.get(it.id));return}
       if(DRAG.k==='make'||DRAG.k==='marq'){const x=Math.min(DRAG.sx,w.x),y=Math.min(DRAG.sy,w.y),ww=Math.abs(w.x-DRAG.sx),hh=Math.abs(w.y-DRAG.sy);
         let m=root.querySelector('.bd-marq');if(!m){m=document.createElement('div');m.className='bd-marq';m.style.zIndex=99998;q('bdWorld').appendChild(m)}
@@ -7197,8 +7441,9 @@ const BD=(()=>{
     q('bdUndo').onclick=undo;q('bdRedo').onclick=redo;
     q('bdZi').onclick=()=>zoomAt(1.2,innerWidth/2,innerHeight/2);q('bdZo').onclick=()=>zoomAt(1/1.2,innerWidth/2,innerHeight/2);q('bdZv').onclick=()=>fitTo(bounds(B.items),true);
     q('bdFr').onclick=()=>{q('bdFrames').hidden=!q('bdFrames').hidden;drawFrames()};
+    q('bdShow').onclick=()=>present(0);
     q('bdHelp').onclick=e=>{const r=e.currentTarget.getBoundingClientRect();popup(r.left-250,r.bottom+6,[
-      ['Двигать доску: пробел + мышь, или рука (H)',()=>{}],['Масштаб: колесо мыши или щипок',()=>{}],['Фрейм F · Текст T · Стикер N · Фигура S',()=>{}],['Карандаш P · Картинка I (или Ctrl+V)',()=>{}],
+      ['Двигать доску: пробел + мышь, или рука (H)',()=>{}],['Масштаб: колесо мыши или щипок',()=>{}],['Фрейм F · Текст T · Стикер N · Фигура S',()=>{}],['Карандаш P · Линия со стрелкой D (с Shift — ровно) · Картинка I (или Ctrl+V)',()=>{}],['Показ по фреймам: ▶ Показ, стрелки ← →, Esc',()=>{}],
       ['Изменить текст: двойной щелчок или Enter',()=>{}],['Копировать и вставить: Ctrl+C, Ctrl+V',()=>{}],['Дублировать: Ctrl+D',()=>{}],['Группа: Ctrl+G, разгруппировать: Ctrl+Shift+G',()=>{}],
       ['Слои: Ctrl+] вперёд, Ctrl+[ назад, с Shift — до конца',()=>{}],['Показать всё: Shift+1',()=>{}]])};
   }
@@ -7217,7 +7462,7 @@ const BD=(()=>{
     if(e.key.startsWith('Arrow')&&SEL.size){e.preventDefault();const d=e.shiftKey?10:1;edit(()=>B.items.filter(x=>SEL.has(x.id)&&!x.lock).forEach(x=>{if(k==='arrowleft')x.x-=d;if(k==='arrowright')x.x+=d;if(k==='arrowup')x.y-=d;if(k==='arrowdown')x.y+=d}));return}
     if(e.shiftKey&&e.code==='Digit1'){fitTo(bounds(B.items),true);return}
     if(m&&(k==='='||k==='+')){e.preventDefault();zoomAt(1.2,innerWidth/2,innerHeight/2);return}if(m&&k==='-'){e.preventDefault();zoomAt(1/1.2,innerWidth/2,innerHeight/2);return}
-    if(m)return;if(k==='l'){libToggle();return}const map={v:'select',h:'hand',f:'frame',t:'text',n:'sticky',s:'shape',p:'pen',a:'answer'};if(map[k]){setTool(map[k]);return}if(k==='i')q('bdFile').click()});
+    if(m)return;if(k==='l'){libToggle();return}const map={v:'select',h:'hand',f:'frame',t:'text',n:'sticky',s:'shape',p:'pen',d:'line',a:'answer'};if(map[k]){setTool(map[k]);return}if(k==='i')q('bdFile').click()});
   addEventListener('keyup',e=>{if(OPEN&&e.code==='Space'){SPACE=false;setTool(TOOL)}});
   addEventListener('paste',e=>{if(!OPEN||EDIT)return;const fs=[...(e.clipboardData&&e.clipboardData.files||[])].filter(f=>/^image\//.test(f.type));
     if(fs.length){e.preventDefault();addImages(fs);return}paste()});
@@ -7227,6 +7472,18 @@ const BD=(()=>{
   function drawFrames(){if(!root)return;const p=q('bdFrames');if(p.hidden)return;const fr=frames(B.items);
     p.innerHTML=`<h3>Фреймы</h3>${fr.map(f=>`<button class="bd-fr" data-f="${f.id}"><i style="background-color:${f.fill||'#fff'};${f.src?`background-image:url('${srcURL(f.src)}')`:''}"></i><span>${esc(f.text||'Фрейм')}</span></button>`).join('')||'<p class="bd-empty">Фреймов нет</p>'}`;
     p.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{const f=byId(b.dataset.f);SEL=new Set([f.id]);fitTo(bounds([f]),true);drawSel()})}
+  /* показ: фреймы по порядку на весь экран, как слайды; стрелки или нажатие — дальше, Esc — выход */
+  function present(i0){flush();const fr=frames(B.items);if(!fr.length){hint('Сначала добавьте фрейм (F): каждый фрейм — один слайд показа');return}
+    let i=Math.max(0,Math.min(i0,fr.length-1));const ov=document.createElement('div');ov.className='bd-show';document.body.appendChild(ov);
+    const draw=()=>{const f=fr[i],k=Math.min(innerWidth/f.w,(innerHeight-44)/f.h);
+      ov.innerHTML=`<div class="bd-sh-st" style="width:${f.w}px;height:${f.h}px;transform:scale(${k})">${frameHTML(B.items,f,srcURL)}</div>
+        <div class="bd-sh-bar"><button data-g="-1" aria-label="Назад">‹</button><span>${i+1} / ${fr.length} · ${esc(f.text||'Фрейм')}</span><button data-g="1" aria-label="Дальше">›</button><button data-g="x" aria-label="Закрыть показ">✕</button></div>`;
+      ov.querySelectorAll('[data-g]').forEach(b=>b.onclick=e=>{e.stopPropagation();go2(b.dataset.g)})};
+    const go2=g=>{if(g==='x'){end();return}i=Math.max(0,Math.min(fr.length-1,i+(+g)));draw()};
+    const key=e=>{if(['ArrowRight','ArrowDown',' ','PageDown'].includes(e.key)){e.preventDefault();e.stopPropagation();go2(1)}else if(['ArrowLeft','ArrowUp','PageUp'].includes(e.key)){e.preventDefault();e.stopPropagation();go2(-1)}else if(e.key==='Escape'){e.stopPropagation();end()}};
+    const end=()=>{removeEventListener('keydown',key,true);removeEventListener('resize',draw);ov.remove();try{document.fullscreenElement&&document.exitFullscreen()}catch(e){}};
+    ov.onclick=e=>{if(!e.target.closest('.bd-sh-bar'))go2(1)};addEventListener('keydown',key,true);addEventListener('resize',draw);draw();
+    try{ov.requestFullscreen&&ov.requestFullscreen().catch(()=>{})}catch(e){}}
   function popup(x,y,items,empty){closePop();const p=document.createElement('div');p.className='bd-pop';p.id='bdPop';
     p.innerHTML=items.length?items.map((it,i)=>it==='|'?'<div class="bd-sep"></div>':`<button data-i="${i}">${esc(it[0])}${it[2]?`<kbd>${it[2]}</kbd>`:''}</button>`).join(''):`<div class="bd-empty">${esc(empty||'')}</div>`;
     root.appendChild(p);p.style.left=Math.max(8,Math.min(x,innerWidth-p.offsetWidth-8))+'px';p.style.top=Math.max(8,Math.min(y,innerHeight-p.offsetHeight-8))+'px';
