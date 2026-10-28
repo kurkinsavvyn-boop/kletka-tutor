@@ -4359,7 +4359,7 @@ async function syncResults(force){
     let n=0,fresh=[];
     for(const r of list){const h=S.assignments.find(a=>a.code===r.code);if(!h)continue;
       const ph=r.photos||[];if(ph.join()!==(h.photos||[]).join()){if(ph.length>(h.photos||[]).length){h.phNew=true;fresh.push(h)}h.photos=ph;n++;save()}
-      if(h.status!=='сдано'&&r.result&&r.result.n){const d=r.result;recordResult(h,{correct:d.k,total:d.n,answered:d.a,time:d.tm,log:d.l||[],mistakes:d.m||[]});n++}}
+      if((h.status!=='сдано'||(h.paper&&!h.result))&&r.result&&r.result.n){const d=r.result;recordResult(h,{correct:d.k,total:d.n,answered:d.a,time:d.tm,log:d.l||[],mistakes:d.m||[]});n++}}
     if(fresh.length){const st=student(fresh[0].studentId);toast(`📷 ${st?st.name:'Ученик'} прислал фото работы`)}
     if(n&&['students','student','works','work'].includes(V.screen))render();
   }catch(e){}
@@ -4492,8 +4492,8 @@ function viewCab(){
   const card=r=>{const d=r.payload||{},done=r.status==='done',res=r.result||{},rv=r.review||{},ph=(r.photos||[]).length;const a=pick(d.s||7);
     return `<button class="ctask${done?' done':''}" data-id="${r.id}"${done?' disabled':''}>
       <span class="ct-pic">${a?`<img src="${a.char}" alt="" loading="lazy">`:''}</span>
-      <span class="ct-t"><b>${esc(r.title||d.t||'Задание')}</b><small>${done?(res.n?`Сделано · ${res.k} из ${res.n}`:'Репетитор проверил'):ph?`Фото отправлены: ${ph}`:`Новое · ${ago(Date.parse(r.created))}`}</small></span>
-      ${done&&res.n?`<span class="ct-score num">${Math.round(res.k/res.n*100)}%</span>`:done&&rv.mark?`<span class="ct-score num">${esc(rv.mark)}</span>`:done?'':'<span class="btn primary small">Решать</span>'}</button>
+      <span class="ct-t"><b>${esc(r.title||d.t||'Задание')}</b><small>${done?(res.n?`Сделано · ${res.k} из ${res.n}`:'Репетитор проверил'):rv.at?'Репетитор проверил фото':ph?`Фото отправлены: ${ph}`:`Новое · ${ago(Date.parse(r.created))}`}</small></span>
+      ${done&&res.n?`<span class="ct-score num">${Math.round(res.k/res.n*100)}%</span>`:rv.mark&&rv.mark!=='✓'?`<span class="ct-score num">${esc(rv.mark)}</span>`:done?'':'<span class="btn primary small">Решать</span>'}</button>
       ${rv.mark||rv.note?`<div class="ct-rv">Репетитор${rv.mark?`: отметка <b>${esc(rv.mark)}</b>`:''}${rv.note?` — ${esc(rv.note)}`:''}</div>`:''}
       <div class="ct-x"><button class="btn link" data-ph="${r.id}">📷 ${ph?`Фото работы: ${ph}`:'Сфотографировать работу'}</button><button class="btn link" data-pr="${r.id}">Распечатать</button></div>`};
   const fresh=CAB.items.filter(r=>r.status!=='done'),done=CAB.items.filter(r=>r.status==='done');
@@ -4523,7 +4523,7 @@ function shrinkPhoto(file,max=1600){return new Promise(res=>{const u=URL.createO
   im.onerror=()=>{URL.revokeObjectURL(u);res(file)};im.src=u})}
 async function photoURLs(pb,rec){if(!(rec.photos||[]).length)return[];const tok=await pb.files.getToken();return rec.photos.map(f=>({f,url:pb.files.getURL(rec,f,{token:tok}),th:pb.files.getURL(rec,f,{token:tok,thumb:'240x0'})}))}
 function photoBig(url,back){modal(`<div class="ph-big"><img src="${esc(url)}" alt="Фото работы"></div><div class="modal-actions"><a class="btn quiet" href="${esc(url)}" target="_blank" rel="noopener">Открыть отдельно</a><button class="btn primary" id="cl">${back?'Назад':'Закрыть'}</button></div>`,()=>{document.getElementById('cl').onclick=()=>back?back():close()})}
-async function cabPhotos(r){if(!r)return;const done=r.status==='done';
+async function cabPhotos(r){if(!r)return;const done=r.status==='done'||!!(r.review&&r.review.at);
   const draw=async()=>{const L=await photoURLs(pbS,r).catch(()=>[]);
     modal(`<h2>Фото работы</h2><p class="hint" style="margin:0 0 12px">${done?'Работа проверена, фото можно только посмотреть.':'Сфотографируй каждую страницу целиком, при хорошем свете. Репетитор увидит фото сразу.'}</p>
       <div class="ph-grid">${L.map(x=>`<div class="phw"><img src="${esc(x.th)}" data-big="${esc(x.url)}" alt="Фото работы">${done?'':`<button class="ph-x" data-del="${esc(x.f)}" aria-label="Удалить фото">✕</button>`}</div>`).join('')||'<p class="hint">Фото пока нет.</p>'}</div>
@@ -4803,7 +4803,7 @@ function viewWork(){
   let mk=(h.review||{}).mark||'';
   app.querySelectorAll('[data-mk]').forEach(b=>b.onclick=()=>{mk=mk===b.dataset.mk?'':b.dataset.mk;app.querySelectorAll('[data-mk]').forEach(x=>x.classList.toggle('primary',x.dataset.mk===mk))});
   const sv=document.getElementById('wsave');if(sv)sv.onclick=async()=>{const review={mark:mk,note:document.getElementById('wnote').value.trim(),at:Date.now()};
-    sv.disabled=true;try{await pbT.collection('assignments').update(h.rid,{review,...(h.status==='выдано'?{status:'done'}:{})});
+    sv.disabled=true;try{await pbT.collection('assignments').update(h.rid,{review});
       h.review=review;if(h.status==='выдано'){h.status='сдано';h.paper=true}save();toast('Отметка у ученика в кабинете');render()}
     catch(e){sv.disabled=false;toast('Нет связи с сервером, не сохранилось')}};
 }
@@ -4874,11 +4874,12 @@ function searchTopics(q,subj){
    «12 примеров на сложение в столбик с переходом, сложный уровень, найди ошибку»:
    число заданий, уровень и вид вынимаем из фразы, по остальным словам ищем тему. ИИ не нужен. */
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition||null;
-function listen(btn,cb){if(!SR)return;const rec=new SR();rec.lang='ru-RU';rec.interimResults=true;rec.maxAlternatives=1;
+let LISTEN=null;
+function listen(btn,cb){if(!SR)return;if(LISTEN){try{LISTEN.stop()}catch(e){}return}const rec=new SR();LISTEN=rec;rec.lang='ru-RU';rec.interimResults=true;rec.maxAlternatives=1;
   btn.classList.add('on');btn.textContent='●';let last='';
   rec.onresult=e=>{last=[...e.results].map(x=>x[0].transcript).join(' ');cb(last)};
   rec.onerror=e=>{if(e.error==='not-allowed')toast('Браузер не дал микрофон. Разрешите его в адресной строке.');else if(e.error!=='no-speech'&&e.error!=='aborted')toast('Не расслышал, попробуйте ещё раз')};
-  rec.onend=()=>{btn.classList.remove('on');btn.textContent='🎤'};try{rec.start()}catch(e){btn.classList.remove('on');btn.textContent='🎤'}}
+  rec.onend=()=>{LISTEN=null;btn.classList.remove('on');btn.textContent='🎤'};try{rec.start()}catch(e){LISTEN=null;btn.classList.remove('on');btn.textContent='🎤'}}
 const NUMW={'два':2,'две':2,'три':3,'четыре':4,'пять':5,'шесть':6,'семь':7,'восемь':8,'девять':9,'десять':10,'одиннадцать':11,'двенадцать':12,'пятнадцать':15,'двадцать':20};
 function parseDesc(q){const w=normT(q).split(' ').filter(Boolean),d={},t=w.join(' ');
   /* число заданий: «12 примеров», «десять заданий» */
@@ -5050,7 +5051,7 @@ function viewTopic(){
   };
   const ap=$('apply');
   if(ap)ap.onclick=()=>{const lo=+$('lo').value,hi=+$('hi').value,c=+$('cnt').value;
-    if(!(hi>lo&&lo>=0&&c>=4&&c<=24))return;V.over={lo,hi,count:c};V.seed=newSeed();render()};
+    if(!(hi>lo&&lo>=0&&c>=4&&c<=24))return;V.over=V.over&&VKINDS[V.over.kind]?{...V.over,lo,hi,base:{...V.over.base,lo,hi},count:c}:{lo,hi,count:c};V.seed=newSeed();render()};
 }
 
 /* ---------- настройка оформления: запоминается в карточке ученика ---------- */
@@ -5358,7 +5359,7 @@ function schedModes(){return `<div class="seg smode">${SMODES.map(([k,n])=>`<but
 function bindSchedModes(){app.querySelectorAll('[data-sm]').forEach(b=>b.onclick=()=>go({smode:b.dataset.sm}))}
 /* месяц: в каждом дне занятия списком; нажать на занятие — карточка занятия, на число — эта неделя */
 function viewScheduleMonth(){
-  const m0=V.month||monthStart(Date.now()),m1=addMonths(m0,1),md=new Date(m0),d0=dayStart(Date.now());
+  const m0=V.smonth||monthStart(Date.now()),m1=addMonths(m0,1),md=new Date(m0),d0=dayStart(Date.now());
   const days=monthGrid(m0),ls=lessonsIn(days[0],addDays(days[days.length-1],1));
   const live=lessonsIn(m0,m1).filter(l=>lstat(l)!=='cancel'),sum=live.reduce((a,l)=>a+lprice(l),0);
   app.innerHTML=`<div class="head"><div><h1>Расписание</h1><p>${live.length?`${live.length} ${plural(live.length,LESSONS)} за ${MONN[md.getMonth()].toLowerCase()}${sum?' · '+rub(sum):''}`:'В этом месяце занятий нет'}</p></div>
@@ -5371,7 +5372,7 @@ function viewScheduleMonth(){
         ${dl.length>4?`<button class="mc-more" data-wk="${d}">ещё ${dl.length-4}</button>`:''}
         <button class="mc-add" data-d="${dkey(d)}" aria-label="Добавить занятие ${dayTxt(d)}">+</button></section>`}).join('')}</div></div>`;
   const $=id=>document.getElementById(id);bindSchedModes();
-  $('mPrev').onclick=()=>go({month:addMonths(m0,-1)});$('mNext').onclick=()=>go({month:m1});if($('mNow'))$('mNow').onclick=()=>go({month:null});
+  $('mPrev').onclick=()=>go({smonth:addMonths(m0,-1)});$('mNext').onclick=()=>go({smonth:m1});if($('mNow'))$('mNow').onclick=()=>go({smonth:null});
   $('addL').onclick=()=>addLessonModal({});
   app.querySelectorAll('[data-l]').forEach(b=>b.onclick=()=>lessonModal(ls.find(l=>l.id===b.dataset.l)));
   app.querySelectorAll('[data-wk]').forEach(b=>b.onclick=()=>go({smode:'week',week:monday(+b.dataset.wk)}));
@@ -5379,7 +5380,7 @@ function viewScheduleMonth(){
 }
 /* три месяца подряд: сколько занятий в каждый день, нажать на день — его неделя */
 function viewSchedule3(){
-  const m0=V.month||monthStart(Date.now()),d0=dayStart(Date.now());
+  const m0=V.smonth||monthStart(Date.now()),d0=dayStart(Date.now());
   const ms=[0,1,2].map(k=>addMonths(m0,k)),all=lessonsIn(monday(m0),addDays(addMonths(m0,3),7)).filter(l=>lstat(l)!=='cancel');
   const by={};for(const l of all){const k=dayStart(l.at);(by[k]=by[k]||[]).push(l)}
   const tot=all.filter(l=>l.at>=m0&&l.at<addMonths(m0,3)).length;
@@ -5387,9 +5388,9 @@ function viewSchedule3(){
     <div class="wnav">${schedModes()}<button class="btn small quiet" id="mPrev" aria-label="Раньше">‹</button><span class="wr">${MONN[new Date(ms[0]).getMonth()]} – ${MONN[new Date(ms[2]).getMonth()].toLowerCase()}</span><button class="btn small quiet" id="mNext" aria-label="Позже">›</button><button class="btn small primary" id="addL">+ Занятие</button></div></div>
     <div class="m3">${ms.map(m=>{const m1=addMonths(m,1),md=new Date(m);const n=all.filter(l=>l.at>=m&&l.at<m1).length;
       return `<section class="panel m3-m"><h2 class="ph">${MONN[md.getMonth()]} <small>${n} ${plural(n,LESSONS)}</small></h2><div class="m3-h">${WD.map(w=>`<span>${w}</span>`).join('')}</div>
-        <div class="m3-g">${monthGrid(m).map(d=>{const L=by[d]||[],out=d<m||d>=m1;return out?'<span></span>':`<button class="m3-d${d===d0?' today':''}${L.length?' has':''}" data-wk="${d}" title="${L.map(l=>hm(l.at)+' '+student(l.sid).name).join(', ')}"><span class="num">${new Date(d).getDate()}</span>${L.length?`<i>${L.length}</i>`:''}</button>`}).join('')}</div></section>`}).join('')}</div>`;
+        <div class="m3-g">${monthGrid(m).map(d=>{const L=by[d]||[],out=d<m||d>=m1;return out?'<span></span>':`<button class="m3-d${d===d0?' today':''}${L.length?' has':''}" data-wk="${d}" title="${esc(L.map(l=>hm(l.at)+' '+student(l.sid).name).join(', '))}"><span class="num">${new Date(d).getDate()}</span>${L.length?`<i>${L.length}</i>`:''}</button>`}).join('')}</div></section>`}).join('')}</div>`;
   const $=id=>document.getElementById(id);bindSchedModes();
-  $('mPrev').onclick=()=>go({month:addMonths(m0,-3)});$('mNext').onclick=()=>go({month:addMonths(m0,3)});$('addL').onclick=()=>addLessonModal({});
+  $('mPrev').onclick=()=>go({smonth:addMonths(m0,-3)});$('mNext').onclick=()=>go({smonth:addMonths(m0,3)});$('addL').onclick=()=>addLessonModal({});
   app.querySelectorAll('[data-wk]').forEach(b=>b.onclick=()=>go({smode:'week',week:monday(+b.dataset.wk)}));
 }
 function viewSchedule(){
@@ -6767,7 +6768,7 @@ async function callPc(){
   const s=C.loc;const kinds=s.getTracks().map(t=>t.kind);
   s.getTracks().forEach(t=>pc.addTrack(t,s));
   if(!kinds.includes('audio'))pc.addTransceiver('audio',{direction:'recvonly'});
-  if(!kinds.includes('video'))pc.addTransceiver('video',{direction:'recvonly'});
+  if(!kinds.includes('video')){const tr=pc.addTransceiver('video',{direction:'sendrecv'});tr.sender._v=1}
   /* звук в приоритете, видео не больше 700 кбит/с: так не забивается слабый канал */
   pc.getSenders().forEach(snd=>{if(!snd.track)return;const p=snd.getParameters();p.encodings=p.encodings&&p.encodings.length?p.encodings:[{}];
     if(snd.track.kind==='video'){p.encodings[0].maxBitrate=450000;p.encodings[0].maxFramerate=20;p.degradationPreference='maintain-framerate'}
@@ -6814,7 +6815,7 @@ function mediaHelp(){if(document.getElementById('mediaHelp'))return;
 async function callStart(again){
   if(C.st!=='idle'&&!again)return;
   if(!navigator.mediaDevices||!window.RTCPeerConnection){toast('Этот браузер не умеет видеозвонки. Откройте Клетку в Chrome, Яндекс Браузере, Safari или Firefox');return}
-  C.n=again&&C.n||RID(8);C.st='calling';C.msg='';C.r=0;callUI();
+  C.n=again&&C.n||RID(8);C.st='calling';C.msg='';C.r=0;C.aonly=false;roomPulse({ao:false});callUI();
   try{if(!C.loc)C.loc=await (MEDIA_P||callMedia())}catch(e){C.st='idle';callUI();return}
   try{sessionStorage.setItem(CALL_KEY,C.n)}catch(e){}
   await callOffer(false);
@@ -6827,7 +6828,7 @@ async function callOffer(restart){
 }
 /* ---------- ученик: звонок пришёл ---------- */
 async function callAccept(auto){
-  const o=C.offer;if(!o)return;C.st='connecting';C.n=o.n;C.msg='';callUI();
+  const o=C.offer;if(!o)return;C.st='connecting';C.n=o.n;C.msg='';C.aonly=false;roomPulse({ao:false});callUI();
   /* без доступа к камере звонок не обрываем: репетитор ждёт, пока ученик разрешит */
   try{if(!C.loc)C.loc=await (MEDIA_P||callMedia())}catch(e){C.st='idle';callUI();return}
   try{sessionStorage.setItem(CALL_KEY,C.n)}catch(e){}
@@ -6895,7 +6896,9 @@ function callCam(){C.cam=!C.cam;if(C.loc)C.loc.getVideoTracks().forEach(t=>t.ena
 /* только звук: видео не отправляется вовсе — для плохой связи */
 async function callAudioOnly(){C.aonly=!C.aonly;const snd=C.pc&&C.pc.getSenders().find(x=>x.track?x.track.kind==='video':x._v);
   if(C.aonly){if(snd){snd._v=1;await snd.replaceTrack(null).catch(()=>{})}C.loc&&C.loc.getVideoTracks().forEach(t=>{t.stop();C.loc.removeTrack(t)})}
-  else{try{const v=await navigator.mediaDevices.getUserMedia({video:{width:{ideal:480},height:{ideal:360},frameRate:{ideal:20,max:24},facingMode:'user'}});const t=v.getVideoTracks()[0];C.loc.addTrack(t);if(snd)await snd.replaceTrack(t)}catch(e){C.aonly=true;toast('Камера не включилась')}}
+  else{try{const v=await navigator.mediaDevices.getUserMedia({video:{width:{ideal:480},height:{ideal:360},frameRate:{ideal:20,max:24},facingMode:'user'}});const t=v.getVideoTracks()[0];C.loc.addTrack(t);
+      if(snd){await snd.replaceTrack(t);try{const p=snd.getParameters();p.encodings=p.encodings&&p.encodings.length?p.encodings:[{}];p.encodings[0].maxBitrate=C.lite?150000:450000;p.encodings[0].maxFramerate=20;await snd.setParameters(p)}catch(e){}}}
+    catch(e){C.aonly=true;toast('Камера не включилась')}}
   roomPulse({ao:C.aonly},true);const l=document.getElementById('vcL');if(l){l.srcObject=null;l.srcObject=C.loc}callUI()}
 /* ---------- окно звонка ---------- */
 function callRing(){try{const a=new AudioContext(),o=a.createOscillator(),g=a.createGain();o.frequency.value=660;g.gain.value=.06;o.connect(g).connect(a.destination);o.start();
@@ -6995,7 +6998,7 @@ function errKind(it,v){
     return 'calc'}
   if(it.type==='ins')return 'spell';
   if(it.type==='line')return 'split';
-  if(it.type==='sort')return 'sort';
+  if(it.type==='sort')return it.m?'choice':'sort';
   if(it.type==='ch')return 'choice';
   return 'other';
 }
@@ -7501,7 +7504,10 @@ const BD=(()=>{
    Объекты разработки лежат в материале (пишет репетитор). Ученик свои изменения пишет в ответы комнаты:
    p — положение, x — текст, v — поле ответа. Побеждает более позднее изменение. */
 function deckEff(m){const a=R.ans[m.id]||{},P=a.p||{},X=a.x||{},Vv=a.v||{};
-  return (m.items||[]).map(it=>{const e={...it};const p=P[it.id];if(p&&p[2]>(it.mt||0)){e.x=p[0];e.y=p[1]}const x=X[it.id];if(x&&x[1]>(it.tt||0))e.text=x[0];if(it.t==='answer')e.text=Vv[it.id]||'';return e})}
+  /* правки ученика приходят с сервера как есть: положение — только числа, текст — только строка (иначе это путь к чужому коду в странице репетитора) */
+  const num=v=>Number.isFinite(+v)?+v:null;
+  return (m.items||[]).map(it=>{const e={...it};const p=P[it.id];if(Array.isArray(p)&&num(p[2])>(it.mt||0)&&num(p[0])!=null&&num(p[1])!=null){e.x=num(p[0]);e.y=num(p[1])}
+    const x=X[it.id];if(Array.isArray(x)&&num(x[1])>(it.tt||0))e.text=String(x[0]??'').slice(0,2000);if(it.t==='answer')e.text=String(Vv[it.id]??'').slice(0,200);return e})}
 const deckIn=(x,f)=>x.t!=='frame'&&x.x+x.w/2>=f.x&&x.x+x.w/2<=f.x+f.w&&x.y+x.h/2>=f.y&&x.y+x.h/2<=f.y+f.h;
 const zoneAt=(it,zs)=>zs.find(z=>it.x+it.w/2>=z.x&&it.x+it.w/2<=z.x+z.w&&it.y+it.h/2>=z.y&&it.y+it.h/2<=z.y+z.h);
 const deckURL=s=>s&&s.startsWith('d:')?R.pb.files.getURL(R.rec,s.slice(2),{token:FTOK.t}):s&&s.startsWith('art:')?ART_BASE+s.slice(4):s;
@@ -7544,8 +7550,8 @@ function deckEdit(el,it,m){let tx=el.querySelector('.bd-tx');if(!tx)return;if(tx
   R.deckBusy=el;tx.contentEditable='true';tx.focus();const rg=document.createRange();rg.selectNodeContents(tx);const sl=getSelection();sl.removeAllRanges();sl.addRange(rg);roomPulse({typ:1});
   const done=()=>{tx.removeEventListener('blur',done);tx.contentEditable='false';R.deckBusy=null;roomPulse({typ:0});const v=tx.innerText.replace(/\n$/,'').trim();if(v!==(it.text||''))deckSave(m,it,{text:v});else roomDeckPaint()};
   tx.addEventListener('blur',done);tx.onkeydown=ev=>{ev.stopPropagation();if(ev.key==='Escape'||(ev.key==='Enter'&&(it.t==='answer'||ev.metaKey||ev.ctrlKey))){ev.preventDefault();tx.blur()}}}
-function deckRemoteDrag(dg){const m=roomMat();if(!dg||!m||m.k!=='deck'||dg.m!==m.id)return;const el=document.querySelector(`#rmPages .rdeck [data-id="${dg.id}"]`);if(!el||el===R.deckBusy)return;
-  const f=m.items.find(x=>x.id===el.closest('.rdeck').dataset.f);if(!f)return;el.style.left=(dg.x-f.x)+'px';el.style.top=(dg.y-f.y)+'px'}
+function deckRemoteDrag(dg){const m=roomMat();if(!dg||!m||m.k!=='deck'||dg.m!==m.id||!Number.isFinite(+dg.x)||!Number.isFinite(+dg.y))return;const el=document.querySelector(`#rmPages .rdeck [data-id="${CSS.escape(String(dg.id))}"]`);if(!el||el===R.deckBusy)return;
+  const f=m.items.find(x=>x.id===el.closest('.rdeck').dataset.f);if(!f)return;el.style.left=(+dg.x-f.x)+'px';el.style.top=(+dg.y-f.y)+'px'}
 /* итог по разработкам для разбора урока */
 function deckReport(m){const items=deckEff(m);let n=0,k=0;const mm=[];
   for(const it of items){if(it.t==='answer'&&it.ans&&it.text){n++;if(rOk({ans:it.ans},it.text))k++;else mm.push({q:'Поле ответа',g:it.text,a:it.ans})}
