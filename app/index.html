@@ -146,6 +146,9 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .hint{font-size:13px;color:var(--ink-3)}
 .tune{border-top:1px solid var(--line);padding-top:12px;margin-top:4px}
 .tune summary{cursor:pointer;font-weight:600;color:var(--ink-2);font-size:14px}
+.lvl-d{margin:6px 0 0;padding:0;list-style:none;font-size:13px;color:var(--ink-3);display:flex;flex-direction:column;gap:2px}
+.lvl-d li.on{color:var(--ink)}
+.cnt-row{display:flex;align-items:center;gap:10px}.cnt-row b{min-width:28px;text-align:center;font-size:18px}
 .tune-row{display:flex;gap:10px;align-items:center;margin-top:10px;flex-wrap:wrap;font-size:14px}
 .tune-row input{width:84px;padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);font:inherit}
 
@@ -328,7 +331,10 @@ details.done .topic{opacity:.7}
 .tw{display:inline-block;height:var(--c);line-height:var(--c);font-size:calc(var(--c) * .62);white-space:nowrap;padding:0 calc(var(--c) * .2);flex:none;text-align:center}
 .c .pn{position:absolute;right:-.08em;bottom:.05em;font-style:normal;font-size:.8em;line-height:1}
 .crow.cwrap{flex-wrap:wrap;row-gap:0}
-.sol2{height:calc(var(--c) * 4);width:100%}
+.sol2{height:calc(var(--c) * 3);width:100%;position:relative}
+.kz{height:calc(var(--c) * 2);width:100%;position:relative;border-bottom:.2cqw dashed #b9c4d8}
+.sheet .sh-foot span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.wq2 .sl{position:absolute;left:calc(var(--c) * .15);top:0;font-size:calc(var(--c) * .42);line-height:1.2;color:#8a95ad;background:#fff;padding:0 .3em}
 .aline{display:flex;align-items:flex-end;gap:calc(var(--c) * .3);width:100%;height:var(--c);font-size:calc(var(--c) * .62);line-height:var(--c)}
 .aline i{flex:1;height:calc(var(--c) * .85);border-bottom:.3cqw solid #7d88a3;font-style:normal;font-weight:700;color:var(--sheet-pen);padding-left:calc(var(--c) * .3);line-height:calc(var(--c) * .85)}
 .opts2{display:flex;flex-wrap:wrap;gap:0 var(--c)}
@@ -356,13 +362,15 @@ details.done .topic{opacity:.7}
 .sheet.bw{--grid:linear-gradient(#d4d4d4 1px,transparent 1px),linear-gradient(90deg,#d4d4d4 1px,transparent 1px)}
 .sheet .sheet-in{--c:2.8cqw;gap:var(--c);background:transparent}
 /* клетка только там, где ребёнок пишет: под заданиями, в шапке с полями и в месте для решения задачи */
-.sheet .sh-items,.sheet .sh-head,.sheet .sh-mini,.sgrid,.wq2 .sol2,.wq2 .aline{background-color:#fff;background-image:var(--grid) !important;background-size:var(--c) var(--c) !important;background-position:0 0 !important}
+.sheet .sh-items,.sheet .sh-head,.sheet .sh-mini,.sgrid,.wq2 .sol2,.wq2 .kz,.wq2 .aline{background-color:#fff;background-image:var(--grid) !important;background-size:var(--c) var(--c) !important;background-position:0 0 !important}
 .sheet .sh-items,.sheet .sh-head,.sheet .sh-mini{border:0 !important;border-radius:0 !important;box-shadow:0 0 0 1px #c9dcf0}
 .sheet .sh-items{padding:0 !important}
 .sheet .sh-head{padding:0 var(--c) !important}
 /* русский: лист в линейку, слово с окошком для буквы, правило в рамке */
 .sheet.ru{--grid:linear-gradient(#c9dcf0 1px,transparent 1px)}
 .sheet.ru.bw{--grid:linear-gradient(#d4d4d4 1px,transparent 1px)}
+/* русский: линейка не идёт через текст; писать — в окошках и на строках ответа, у них своя черта */
+.sheet.ru .sh-items{background-image:none!important;box-shadow:none}
 .it.ins .rb{flex-direction:row;align-items:flex-end;gap:calc(var(--c) * .6);flex-wrap:wrap}
 .iw{height:var(--c);line-height:var(--c);font-size:calc(var(--c) * .82);white-space:nowrap;padding-left:calc(var(--c) * .25)}
 .ib{display:inline-block;min-width:calc(var(--c) * .78);height:calc(var(--c) * .86);vertical-align:-.16em;margin:0 .04em;border:.25cqw solid #7d88a3;border-radius:.4cqw;background:#fff;text-align:center;line-height:calc(var(--c) * .8);font-weight:700;color:var(--sheet-pen)}
@@ -577,6 +585,8 @@ img.art.pic{object-fit:contain;display:block}
 .task.long{font-size:clamp(20px,4.5vw,26px)}
 
 /* Печать */
+.tp-pages{display:flex;flex-direction:column;gap:16px}
+.tp-pages .sheet.page{box-shadow:0 1px 4px rgba(20,30,60,.15)}
 .print-pages{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,420px),1fr));gap:22px;margin-bottom:26px}
 .pr-h{font-size:16px;font-weight:600;margin:0 0 12px}
 .pg-measure,#printHost{position:absolute;left:-10000px;top:0;width:210mm;visibility:hidden}
@@ -775,6 +785,7 @@ body.cabinet .top{display:none}
 .cab-head p{margin:6px 0 0;color:var(--ink-2)}
 .cab-h{font-family:var(--f-disp);font-size:19px;margin:28px 0 12px}
 .ctasks{display:flex;flex-direction:column;gap:10px}
+.ct-pr{align-self:flex-end;margin:-6px 6px 2px;font-size:13px}
 .ctask{display:flex;align-items:center;gap:14px;text-align:left;background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:10px 14px 10px 10px;font:inherit;color:var(--ink);transition:transform .15s,border-color .15s}
 .ctask:not(.done):hover{border-color:var(--ink);transform:translateY(-1px)}
 .ctask.done{opacity:.75;cursor:default}
@@ -1308,9 +1319,22 @@ body.bd-open{overflow:hidden}
 .bd-emo{width:52px;height:52px;font-size:32px;display:flex;align-items:center;justify-content:center;border-radius:8px;cursor:grab;background:#F5F6F8}
 .rdeck .r-lnk{position:absolute;right:-14px;top:-14px;width:36px;height:36px;border-radius:50%;background:#2D57C8;color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;pointer-events:auto;z-index:3}
 .rx-g .rt{font-size:18px;padding:4px 6px;min-height:32px}
+.ink-sw{align-items:center;padding:5px 6px}
+.isw{width:22px;height:22px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px var(--line);cursor:pointer;padding:0}
+.isw.on{box-shadow:0 0 0 2px var(--blue)}
+.drawing.er .rpg .r-ink{cursor:cell}
 .rx-fly{position:fixed;bottom:60px;z-index:80;pointer-events:none;animation:rxfly 2.2s ease-out forwards;opacity:0}
 @keyframes rxfly{0%{transform:translateY(0) scale(.6);opacity:0}15%{opacity:1}100%{transform:translateY(-55vh) scale(1.2);opacity:0}}
 @media (max-width:700px){.bd-lib{left:8px;right:8px;width:auto;top:auto;height:45%}}
+
+.rmlist{display:flex;flex-direction:column;padding:6px 14px}
+.rmrow{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+.rmrow:first-child{border-top:0}
+.rmr-t{flex:1;min-width:0;display:flex;flex-direction:column}.rmr-t small{color:var(--ink-3)}
+.rmr-on{color:var(--ok);font-weight:600}
+.rhelp{margin:0;display:grid;grid-template-columns:max-content 1fr;gap:8px 14px}
+.rhelp dt{font-weight:600}.rhelp dd{margin:0;color:var(--ink-2)}
+@media (max-width:600px){.rhelp{grid-template-columns:1fr}.rhelp dd{margin-bottom:6px}}
 @media print{.room{display:none}}
 </style>
 
@@ -3990,7 +4014,7 @@ function richItemHTML(it,i,showAns){
   if(it.type==='mor')return `<div class="it rich mr">${badgeH(i)}<div class="rb">${morHTML(it,showAns)}</div></div>`;
   if(it.type==='snt')return `<div class="it rich span sn">${badgeH(i)}<div class="rb"><span class="iw">${sntHTML(it,showAns)}</span></div></div>`;
   if(it.type==='ins')return `<div class="it rich ins${it.phr?' span':''}">${badgeH(i)}<div class="rb">${insHTML(it,showAns)}</div></div>`;
-  if(it.type==='word')return `<div class="it rich span wq2">${badgeH(i)}<div class="rb"><p class="tl">${esc(it.q)}</p><div class="sol2"></div><div class="aline"><span>Ответ:</span><i>${showAns?esc(fmt(it.ans)):''}</i></div></div></div>`;
+  if(it.type==='word')return `<div class="it rich span wq2">${badgeH(i)}<div class="rb"><p class="tl">${esc(it.q)}</p><div class="kz"><span class="sl">Краткая запись</span></div><div class="sol2"><span class="sl">Решение</span></div><div class="aline"><span>Ответ:</span><i>${showAns?esc(fmt(it.ans)):''}</i></div></div></div>`;
   if(it.type==='grid')return `<div class="it rich">${badgeH(i)}<div class="rb">${gridSVG(it,true)}<span class="crow">${tokRow(`${it.ask} = □ ${gridUnit(it)}`,it,showAns)}</span></div></div>`;
   if(it.type==='ch')return `<div class="it rich${it.svg?'':' span'}">${badgeH(i)}<div class="rb"><p class="tl">${esc(it.q)}</p>${it.svg||''}<span class="opts2">${it.opts.map(o=>`<span class="ob${showAns&&o===it.ans?' on':''}">${esc(o)}</span>`).join('')}</span></div></div>`;
   if(it.type==='cmp')return `<div class="it rich">${badgeH(i)}<div class="rb"><span class="crow cwrap">${tokRow(`${it.left} ◯ ${it.right}`,it,showAns)}</span></div></div>`;
@@ -4383,7 +4407,8 @@ function viewCab(){
     return `<button class="ctask${done?' done':''}" data-id="${r.id}"${done?' disabled':''}>
       <span class="ct-pic">${a?`<img src="${a.char}" alt="" loading="lazy">`:''}</span>
       <span class="ct-t"><b>${esc(r.title||d.t||'Задание')}</b><small>${done?`Сделано · ${res.k} из ${res.n}`:`Новое · ${ago(Date.parse(r.created))}`}</small></span>
-      ${done?`<span class="ct-score num">${Math.round(res.k/res.n*100)}%</span>`:'<span class="btn primary small">Решать</span>'}</button>`};
+      ${done?`<span class="ct-score num">${Math.round(res.k/res.n*100)}%</span>`:'<span class="btn primary small">Решать</span>'}</button>
+      <button class="btn link ct-pr" data-pr="${r.id}">Распечатать</button>`};
   const fresh=CAB.items.filter(r=>r.status!=='done'),done=CAB.items.filter(r=>r.status==='done');
   app.innerHTML=`<div class="cab">
     <div class="cab-head"><div><h1>Привет, ${esc(me.name||'')}!</h1>${me.tutorName?`<p>Твой репетитор: ${esc(me.tutorName)}</p>`:''}</div>
@@ -4395,6 +4420,9 @@ function viewCab(){
     ${done.length?`<h2 class="cab-h">Сделано</h2><div class="ctasks">${done.map(card).join('')}</div>`:''}
   </div>`;
   app.querySelectorAll('.ctask[data-id]:not(.done)').forEach(b=>b.onclick=()=>startCab(CAB.items.find(r=>r.id===b.dataset.id)));
+  /* ученик может решить на бумаге: печать того же варианта, что и на экране */
+  app.querySelectorAll('[data-pr]').forEach(b=>b.onclick=()=>{const r=CAB.items.find(x=>x.id===b.dataset.pr),d=r.payload||{};
+    printPages(generate(d.p,d.s),{topic:{t:d.t||r.title||'Задание',grade:d.g||1,sheet:true,section:'',L:[{n:d.mix?'Лист':'Домашнее задание'}]},level:0,seed:d.s,studentName:(CAB.me&&CAB.me.name)||''})});
   bindCabRoom();
   document.getElementById('cout').onclick=()=>{pbS.authStore.clear();CAB.items=null;CAB.room=null;V={screen:'cablogin'};render()};
 }
@@ -4473,7 +4501,7 @@ function render(){
   crumbs();renderSide();
   if(ACC.user)syncResults();
   requestAnimationFrame(()=>snapCells(app));
-  ({auth:viewAuth,cablogin:viewCabLogin,cab:viewCab,today:viewToday,schedule:viewSchedule,finance:viewFinance,materials:viewMaterials,profile:viewProfile,students:viewStudents,student:viewStudent,topic:viewTopic,print:viewPrint,player:viewPlayer,done:viewDone,builder:viewBuilder,works:viewWorks,work:viewWork,gallery:viewGallery,report:viewReport,room:viewRoom,croom:viewRoom,
+  ({auth:viewAuth,cablogin:viewCabLogin,cab:viewCab,today:viewToday,schedule:viewSchedule,finance:viewFinance,materials:viewMaterials,profile:viewProfile,students:viewStudents,student:viewStudent,topic:viewTopic,print:viewPrint,player:viewPlayer,done:viewDone,builder:viewBuilder,works:viewWorks,work:viewWork,gallery:viewGallery,rooms:viewRooms,report:viewReport,room:viewRoom,croom:viewRoom,
     badlink:()=>{app.innerHTML='<div class="player"><div class="panel finish"><h1 style="font-size:22px">Ссылка не открывается</h1><p style="margin:0">Похоже, она скопирована не целиком. Попроси репетитора прислать её ещё раз.</p></div></div>'}})[V.screen]();
 }
 
@@ -4782,8 +4810,12 @@ function viewTopic(){
   if(tpl!=='train'){blocks=currentBlocks(st,t);shown=sheetTopic(tplName(tpl),blocks,t);shownLv=0;items=generate(shown.L[0].p,V.seed)}
   else items=generate(curParams(),V.seed);
   const LC=t.L[V.level]||t.L[0];
+  /* уровни отличаются материалом, а не количеством: показываем, чем именно */
   const lv=t.L.length>1?`<div class="field"><span class="label">Уровень</span><div class="seg" id="lvseg">${t.L.map((L,i)=>`<button type="button" class="${i===V.level?'on':''}" data-l="${i}" title="${esc(L.n)}">${LV[i]}</button>`).join('')}</div>
-     <span class="hint">${esc(LC.n)}${LC.d?' · '+esc(LC.d):''}</span></div>`:'';
+     <ul class="lvl-d">${t.L.map((L,i)=>`<li class="${i===V.level?'on':''}"><b>${LV[i]}</b> — ${esc(L.n)}${L.d?' · '+esc(L.d):''}</li>`).join('')}</ul></div>`:'';
+  /* количество — только где генератор действительно даёт больше заданий (у части тем список слов ограничен) */
+  const cntNow=tpl==='train'&&!fixed&&curParams().count&&(()=>{try{const q=curParams();return generate({...q,count:q.count+1},V.seed).length>items.length}catch(e){return false}})()?curParams().count:0;
+  const cntRow=cntNow?`<div class="field"><span class="label">Заданий в листе</span><div class="cnt-row"><button type="button" class="btn small quiet" id="cntM" aria-label="Меньше">−</button><b class="num" id="cntV">${cntNow}</b><button type="button" class="btn small quiet" id="cntP" aria-label="Больше">+</button></div></div>`:'';
   const p=curParams();const tunable=tpl==='train'&&p.kind!=='order'&&!p.table&&!p.extra&&p.ops&&!p.aLo&&p.cmp!=='num';
   const tplSeg=fixed?'':`<div class="field"><span class="label">Лист</span><div class="seg tpl" id="tpl">${TPL.map(([k,l])=>`<button type="button" data-k="${k}" class="${k===tpl?'on':''}">${l}</button>`).join('')}</div></div>`;
   const opts=sel=>[1,2,3,4].map(g=>{const ids=trackIds(t.subject).filter(id=>TOPICS[id].grade===g);return ids.length?`<optgroup label="${gradeWord(g)}">${ids.map(id=>`<option value="${id}"${id===sel?' selected':''}>${esc(TOPICS[id].t)}</option>`).join('')}</optgroup>`:''}).join('');
@@ -4793,14 +4825,14 @@ function viewTopic(){
       <div class="brow-bot"><select class="b-lv" aria-label="Уровень блока ${i+1}">${TOPICS[b.tid].L.map((L,k)=>`<option value="${k}"${k===b.lv?' selected':''}>${TOPICS[b.tid].L.length>1?LV[k]+': ':''}${esc(L.n)}</option>`).join('')}</select>
         <input class="b-cnt" type="number" min="1" max="20" value="${b.count}" aria-label="Сколько заданий в блоке ${i+1}">
         <button type="button" class="bi b-up" aria-label="Поднять блок"${i?'':' disabled'}>↑</button><button type="button" class="bi b-dn" aria-label="Опустить блок"${i<blocks.length-1?'':' disabled'}>↓</button><button type="button" class="bi b-rm" aria-label="Удалить блок"${blocks.length>1?'':' disabled'}>✕</button></div></div>`).join('')}
-    ${blocks.length<6?'<button type="button" class="btn small quiet" id="b-add">+ Блок</button>':''}</div>`;
+    ${blocks.length<12?'<button type="button" class="btn small quiet" id="b-add">+ Блок</button>':'<span class="hint">Не больше 12 блоков в листе</span>'}</div>`;
   else if(tpl!=='train')blocksHTML=`<details class="fold"><summary>Состав листа</summary><ol class="bsum">${blocks.map(b=>`<li><b>${esc(b.label)}</b><span>${esc(TOPICS[b.tid].t)} · ${b.count}</span></li>`).join('')}</ol>
     <button type="button" class="btn small quiet" id="to-own">Изменить</button></details>`;
   const total=items.length;
   app.innerHTML=`<div class="head"><div><h1>${esc(t.t)}</h1>
     <p>${gradeWord(t.grade)}${m.pct!=null?` · усвоение ${m.pct}%`:''}${V.subName&&tpl==='train'?` · ${esc(V.subName)} <button class="btn link" id="subx">вся тема</button>`:''}</p></div></div>
     <div class="topic-grid">
-      <div class="levels">${tplSeg}${tpl==='own'?'':lv}
+      <div class="levels">${tplSeg}${tpl==='own'?'':lv}${cntRow}
         ${blocksHTML}${t.rule?`<label class="chk"><input type="checkbox" id="rulecb"${V.noRule?'':' checked'}> Правило на листе</label>`:''}${designBox(st,V.seed)}
         ${V.forRoom&&R.on?`<div class="actions"><button class="btn primary" id="toroom">${V.forRoom.rep?'Обновить в комнате':'Добавить в комнату'}</button><button class="btn" id="backroom">← В комнату</button></div>`
           :`<div class="actions"><button class="btn primary" id="print">Печать</button><button class="btn" id="link">Ссылка ученику</button><button class="btn link" id="tomat">Сохранить в материалы</button></div>`}
@@ -4812,15 +4844,18 @@ function viewTopic(){
         </details>
       </div>
       <div class="sheet-wrap"><div class="sheet-bar"><span class="hint" id="pg-hint"></span><button class="btn small quiet" id="again" title="Другой вариант">⟳ Другой вариант</button></div>
-        ${sheetHTML(items,{topic:shown,level:shownLv,seed:V.seed,studentName:st.name,design:resolveDesign(st,V.seed)})}</div>
+        <div class="tp-pages" id="tpPages"></div></div>
     </div>`;
   const $=id=>document.getElementById(id);
   /* считаем страницы печати в невидимом черновике той же ширины */
-  const countPages=()=>{if(V.screen!=='topic'||!$('pg-hint'))return;const tmp=document.createElement('div');tmp.className='pg-measure';document.body.appendChild(tmp);
-    const n=paginate(tmp,items,{topic:shown,level:shownLv,seed:V.seed,studentName:st.name,design:resolveDesign(st,V.seed)});tmp.remove();
-    $('pg-hint').textContent=pagesWord(n)};
+  /* предпросмотр сразу по страницам А4 — так же, как выйдет на печати */
+  const countPages=()=>{if(V.screen!=='topic'||!$('tpPages'))return;
+    const n=paginate($('tpPages'),items,{topic:shown,level:shownLv,seed:V.seed,studentName:st.name,design:resolveDesign(st,V.seed)});
+    $('pg-hint').textContent=pagesWord(n)+' А4'};
   snapCells(app);countPages();if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{snapCells(app);countPages()});
-  app.querySelectorAll('#lvseg [data-l]').forEach(b=>b.onclick=()=>go({level:+b.dataset.l,seed:newSeed(),over:null,subName:null}));
+  app.querySelectorAll('#lvseg [data-l]').forEach(b=>b.onclick=()=>go({level:+b.dataset.l,seed:newSeed(),over:V.over&&V.over.count?{count:V.over.count}:null,subName:null}));
+  const setCnt=d=>{const c=Math.max(2,Math.min(30,(curParams().count||0)+d));V.over={...(V.over||{}),count:c};render()};
+  if($('cntM')){$('cntM').onclick=()=>setCnt(-1);$('cntP').onclick=()=>setCnt(1)}
   bindDesign(st);
   if($('rulecb'))$('rulecb').onchange=e=>{V.noRule=!e.target.checked;render()};
   if($('subx'))$('subx').onclick=()=>go({over:null,subName:null,seed:newSeed()});
@@ -5082,10 +5117,11 @@ const IC={
   schedule:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3.5 2"/>',
   materials:'<path d="M3.5 6.5a2 2 0 0 1 2-2h4l2 2.5h7a2 2 0 0 1 2 2v8.5a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/>',
   finance:'<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h4"/>',
+  rooms:'<path d="M4 20V6.5a1.5 1.5 0 0 1 1.5-1.5h13A1.5 1.5 0 0 1 20 6.5V20M2.5 20h19M9 20v-6h6v6M8 9h2M14 9h2"/>',
   profile:'<circle cx="12" cy="8.5" r="4"/><path d="M4.5 20.5c1.1-4 3.9-6 7.5-6s6.4 2 7.5 6"/>'};
 const icon=k=>`<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[k]}</svg>`;
-const NAV=[['today','Сегодня'],['students','Ученики'],['schedule','Расписание'],['materials','Материалы'],['finance','Финансы'],['profile','Профиль']];
-const SEC_T={today:'Сегодня',schedule:'Расписание',materials:'Мои материалы',finance:'Финансы',profile:'Профиль'};
+const NAV=[['today','Сегодня'],['students','Ученики'],['rooms','Комнаты'],['schedule','Расписание'],['materials','Материалы'],['finance','Финансы'],['profile','Профиль']];
+const SEC_T={rooms:'Комнаты',today:'Сегодня',schedule:'Расписание',materials:'Мои материалы',finance:'Финансы',profile:'Профиль'};
 const sectionOf=s=>SEC_T[s]?s:'students';
 const shellOn=()=>!CABINET&&!STUDENT_MODE&&(ACC.user||ACC.demo)&&!['auth','cablogin','cab','player','done','badlink','room','croom'].includes(V.screen);
 function renderSide(){
@@ -5870,6 +5906,7 @@ function viewRoom(){
     <div class="rm-body"><aside class="rm-side" id="rmSide"></aside>
       <section class="rm-main"><div class="rm-tools" id="rmTools"></div><div class="rm-stage" id="rmStage"></div></section></div></div>`;
   R.stageKey='';roomUpdate();
+  try{const k='kletka-room-help-'+R.role;if(!localStorage.getItem(k)){localStorage.setItem(k,'1');setTimeout(()=>roomHelp(R.role),600)}}catch(e){}
   const stage=document.getElementById('rmStage');
   stage.addEventListener('click',roomStageClick);deckBind(stage);
   stage.addEventListener('pointermove',e=>{if(R.role!=='t'||R.tool!=='hand'||e.pointerType==='touch')return;const pg=e.target.closest('.rpg');if(!pg)return;
@@ -5892,13 +5929,13 @@ function roomTop(){
     el.innerHTML=`<button class="btn quiet small" id="rmBack">← Выйти</button>
       <div class="rm-who"><b>${esc(R.info.name)}</b><span class="rm-pres${roomHere()?' on':''}">${roomHere()?esc(where):'не в комнате'}</span></div>
       <div class="rm-act">${live&&C.st==='idle'?'<button class="btn small" id="rmVideo">Позвонить снова</button>':''}${R.st.call?'<button class="btn small quiet" id="rmCall">Ссылка</button>':''}
-        <button class="ibtn" id="rmSet" aria-label="Настройки комнаты">⋯</button>
+        <button class="ibtn" id="rmHelpBtn" aria-label="Как работает комната" title="Как работает комната">?</button><button class="ibtn" id="rmSet" aria-label="Настройки комнаты">⋯</button>
         ${live?'<button class="btn small rm-start" id="rmEnd">Завершить урок</button>':'<button class="btn small rm-start" id="rmLive">Начать урок</button>'}</div>`;
     const $=id=>document.getElementById(id);
     $('rmBack').onclick=()=>go({screen:'student'});
     if($('rmVideo'))$('rmVideo').onclick=()=>{C.declined=false;callStart()};
     if($('rmCall'))$('rmCall').onclick=()=>window.open(R.st.call,'_blank','noopener');
-    $('rmSet').onclick=roomSettings;
+    $('rmSet').onclick=roomSettings;$('rmHelpBtn').onclick=()=>roomHelp('t');
     if($('rmLive'))$('rmLive').onclick=roomBegin;
     if($('rmEnd'))$('rmEnd').onclick=roomFinish;
   }else{
@@ -5906,10 +5943,10 @@ function roomTop(){
     el.innerHTML=`<button class="btn quiet small" id="rmBack">← Мои задания</button>
       <div class="rm-who"><b>${live?'Урок идёт':'Моя тетрадь'}</b><span class="rm-pres${live?' on':''}">${esc(R.info.tutor||'Репетитор')}${live&&R.st.lead!==false&&!away?' показывает':''}</span></div>
       <div class="rm-act">${away?'<button class="btn primary small" id="rmFollow">К репетитору</button>':''}
-        <button class="btn small" id="rmNote">Тетрадь</button>${R.st.call&&live?'<button class="btn primary small" id="rmCall">Звонок</button>':''}</div>`;
+        <button class="ibtn" id="rmHelpBtn" aria-label="Как работает урок">?</button><button class="btn small" id="rmNote">Тетрадь</button>${R.st.call&&live?'<button class="btn primary small" id="rmCall">Звонок</button>':''}</div>`;
     const $=id=>document.getElementById(id);
     $('rmBack').onclick=()=>{roomStop();V={screen:'cab'};CAB.items=null;render();loadCab()};
-    $('rmNote').onclick=()=>{R.side=!R.side;roomSide()};
+    $('rmNote').onclick=()=>{R.side=!R.side;roomSide()};$('rmHelpBtn').onclick=()=>roomHelp('s');
     if($('rmCall'))$('rmCall').onclick=()=>window.open(R.st.call,'_blank','noopener');
     if($('rmFollow'))$('rmFollow').onclick=()=>{R.away=false;R.myCur=null;roomUpdate();roomScrollPg(R.st.pg||0)};
   }
@@ -5953,12 +5990,12 @@ function roomTools(){
   const el=document.getElementById('rmTools');if(!el||!R.on)return;const m=roomMat();
   const tb=(k,n)=>`<button class="rt${R.tool===k?' on':''}" data-tool="${k}">${n}</button>`;
   if(R.role==='t'){
-    el.innerHTML=`<div class="seg rm-seg"><button class="${R.st.lead!==false?'on':''}" id="rmLead">Веду я</button><button class="${R.st.lead===false?'on':''}" id="rmFree">Свободно</button></div>
-      <div class="rt-g">${tb('hand','Указка')}${tb('pen','Маркер')}${tb('hl','Выделитель')}<button class="rt" id="rmUndo" aria-label="Отменить свою линию">↶</button><button class="rt" id="rmClr">Очистить</button></div>
+    el.innerHTML=`<div class="seg rm-seg"><button class="${R.st.lead!==false?'on':''}" id="rmLead" title="Ученик видит то же, что вы: тот же материал и страницу">Веду я</button><button class="${R.st.lead===false?'on':''}" id="rmFree" title="Ученик листает сам, вы видите, где он">Свободно</button></div>
+      <div class="rt-g">${tb('hand','Указка')}${tb('pen','Маркер')}${tb('hl','Выделитель')}${tb('er','Ластик')}<button class="rt" id="rmUndo" aria-label="Отменить свою линию" title="Отменить последнюю линию">↶</button><button class="rt" id="rmClr" title="Стереть все пометки этой страницы">Очистить</button></div>
       <div class="rt-g"><button class="rt${R.st.pen?' on':''}" id="rmPen">${R.st.pen?'Ручка у ученика':'Дать ручку'}</button>
         ${m&&m.k==='sheet'&&m.tid&&TOPICS[m.tid]?'<button class="rt" id="rmTune">Настроить лист</button>':''}
         ${m&&m.k==='sheet'?`<button class="rt${R.keys?' on':''}" id="rmKeys">Ответы</button>${m.tid&&TOPICS[m.tid]?'<button class="rt" id="rmHw">В домашку</button>':''}`:''}
-        ${m&&m.k==='board'?'<button class="rt" id="rmPg">+ Страница</button>':''}</div>${rxBar()}`;
+        ${m&&m.k==='board'?'<button class="rt" id="rmPg">+ Страница</button>':''}</div>${inkSwatches()}${rxBar()}`;
     const $=id=>document.getElementById(id);
     $('rmLead').onclick=()=>{const c=R.mats.find(x=>x.id===R.st.cur);if(c&&!c.vis&&roomLive(R.st)){c.vis=true;roomSaveMats()}roomSet({lead:true,pg:R.pgNow});roomUpdate()};
     $('rmFree').onclick=()=>{roomSet({lead:false});roomUpdate()};
@@ -5970,14 +6007,15 @@ function roomTools(){
     if($('rmPg'))$('rmPg').onclick=()=>{m.n=(m.n||1)+1;roomSaveMats();R.stageKey='';roomStage();setTimeout(()=>roomScrollPg(m.n-1),60)};
   }else{
     const pen=!!R.st.pen&&roomLive(R.st);if(!pen&&R.tool!=='hand')R.tool='hand';
-    el.innerHTML=(pen?`<div class="rt-g">${tb('hand','Листать')}${tb('pen','Маркер')}<button class="rt" id="rmUndo">↶ Отменить</button></div><span class="rt-note">Ручку дал репетитор</span>`
+    el.innerHTML=(pen?`<div class="rt-g">${tb('hand','Листать')}${tb('pen','Маркер')}${tb('hl','Выделитель')}${tb('er','Ластик')}<button class="rt" id="rmUndo">↶</button></div>${inkSwatches()}<span class="rt-note">Ручку дал репетитор</span>`
       :(m&&m.k==='sheet'&&roomItems(m).some(rAnswerable)?'<span class="rt-note">Нажми на окошко и впиши ответ</span>':m&&m.k==='deck'?'<span class="rt-note">Двигай карточки, пиши в стикеры и поля</span>':''))+(roomLive(R.st)?rxBar():'');
     const u=document.getElementById('rmUndo');if(u)u.onclick=roomUndo;
   }
   el.querySelectorAll('[data-tool]').forEach(b=>b.onclick=()=>{R.tool=b.dataset.tool;roomTools();roomDrawMode()});
+  el.querySelectorAll('[data-ic]').forEach(b=>b.onclick=()=>{if(R.tool==='hl')R.hlC=+b.dataset.ic;else R.penC=+b.dataset.ic;roomTools()});
   rxBind(el);roomDrawMode();
 }
-function roomDrawMode(){const s=document.getElementById('rmStage');if(s)s.classList.toggle('drawing',R.tool!=='hand')}
+function roomDrawMode(){const s=document.getElementById('rmStage');if(s){s.classList.toggle('drawing',R.tool!=='hand');s.classList.toggle('er',R.tool==='er')}}
 
 /* ---------- материал на экране: всегда страницы ---------- */
 function roomTopic(m){const tp=m.tp||{};const L=[];for(let i=0;i<=(m.lv||0);i++)L.push({n:tp.ln||''});
@@ -6042,16 +6080,29 @@ function roomSetupPage(pg,k){
   const lz=document.createElement('i');lz.className='r-laser';pg.appendChild(lz);
   let cur=null;
   const pt=e=>{const r=pg.getBoundingClientRect();return[+((e.clientX-r.left)/r.width).toFixed(4),+((e.clientY-r.top)/r.width).toFixed(4)]};
-  cv.addEventListener('pointerdown',e=>{if(!roomCanDraw()||e.button>0)return;e.preventDefault();cv.setPointerCapture(e.pointerId);
-    const m=roomMat();cur={mat:m.id,pg:k,who:R.role,kind:R.tool,pts:pt(e)}});
-  cv.addEventListener('pointermove',e=>{if(!cur)return;const p=pt(e),n=cur.pts.length;
+  let erasing=false;
+  cv.addEventListener('pointerdown',e=>{if(!roomCanDraw()||e.button>0)return;e.preventDefault();try{cv.setPointerCapture(e.pointerId)}catch(_){}
+    if(R.tool==='er'){erasing=true;roomErase(pg,k,pt(e));return}
+    const m=roomMat();cur={mat:m.id,pg:k,who:R.role,kind:R.tool+(R.tool==='hl'?inkHl():inkPen()),pts:pt(e)}});
+  cv.addEventListener('pointermove',e=>{if(erasing){roomErase(pg,k,pt(e));return}if(!cur)return;const p=pt(e),n=cur.pts.length;
     if(Math.hypot(p[0]-cur.pts[n-2],p[1]-cur.pts[n-1])<0.0025)return;cur.pts.push(p[0],p[1]);roomInkPaint(pg,cur)});
-  const end=()=>{if(!cur)return;const s=cur;cur=null;if(s.pts.length<4)s.pts.push(s.pts[0]+0.001,s.pts[1]);
+  const end=()=>{erasing=false;if(!cur)return;const s=cur;cur=null;if(s.pts.length<4)s.pts.push(s.pts[0]+0.001,s.pts[1]);
     const rec={id:RID(),room:R.rec.id,...s};R.ink.push(rec);roomInkPaint(pg);
     R.pb.collection('ink').create(rec).catch(()=>{R.ink=R.ink.filter(x=>x.id!==rec.id);roomInkPaint(pg);toast('Линия не сохранилась: нет связи')})};
   cv.addEventListener('pointerup',end);cv.addEventListener('pointercancel',end);
 }
 const roomCanDraw=()=>R.tool!=='hand'&&(R.role==='t'||(R.st.pen&&roomLive(R.st)));
+/* цвета ручки и выделителя; по умолчанию у репетитора красная ручка, у ученика синяя */
+const INK_PEN=['#D5402F','#2D57C8','#2C8A57','#1F2C55','#E8A317','#7E57C2'],INK_HL=['#F2C94C','#7FD3A0','#F6A6C1','#8EC5FF'];
+const inkPen=()=>R.penC??(R.role==='t'?0:1),inkHl=()=>R.hlC??0;
+/* ластик стирает только ту линию, которой коснулся (ученик — только свои) */
+function roomErase(pg,k,p){const m=roomMat();if(!m)return;const W=pg.clientWidth,r=12/W;
+  const near=s=>{const q=s.pts||[];for(let i=0;i+3<q.length;i+=2){const ax=q[i],ay=q[i+1],bx=q[i+2],by=q[i+3],dx=bx-ax,dy=by-ay,l=dx*dx+dy*dy;
+    let t=l?((p[0]-ax)*dx+(p[1]-ay)*dy)/l:0;t=Math.max(0,Math.min(1,t));if(Math.hypot(ax+t*dx-p[0],ay+t*dy-p[1])<r+(String(s.kind).startsWith('hl')?0.011:0))return true}return q.length===2&&Math.hypot(q[0]-p[0],q[1]-p[1])<r};
+  const hit=R.ink.filter(s=>s.mat===m.id&&(s.pg||0)===k&&(R.role==='t'||s.who==='s')&&near(s));if(!hit.length)return;
+  R.ink=R.ink.filter(s=>!hit.includes(s));roomInkPaint(pg);hit.forEach(s=>R.pb.collection('ink').delete(s.id).catch(()=>{}))}
+function inkSwatches(){if(R.tool!=='pen'&&R.tool!=='hl')return'';const L=R.tool==='pen'?INK_PEN:INK_HL,cur=R.tool==='pen'?inkPen():inkHl();
+  return `<div class="rt-g ink-sw">${L.map((c,i)=>`<button class="isw${i===cur?' on':''}" data-ic="${i}" style="background:${c}" aria-label="Цвет ${i+1}"></button>`).join('')}</div>`}
 function roomInkAll(){const p=document.getElementById('rmPages');if(p)[...p.children].forEach(pg=>pg.classList.contains('rpg')&&roomInkPaint(pg))}
 function roomInkPage(mat,k){const m=roomMat();if(!m||m.id!==mat)return;const pg=document.querySelector(`#rmPages > .rpg[data-pg="${k}"]`);if(pg)roomInkPaint(pg)}
 function roomInkPaint(pg,live){
@@ -6061,7 +6112,8 @@ function roomInkPaint(pg,live){
   const x=cv.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);x.clearRect(0,0,W,H);
   const k=+pg.dataset.pg;const list=R.ink.filter(s=>s.mat===m.id&&(s.pg||0)===k);if(live)list.push(live);
   for(const s of list){const p=s.pts||[];if(p.length<4)continue;
-    x.globalAlpha=s.kind==='hl'?0.32:1;x.strokeStyle=s.kind==='hl'?'#F2C94C':INK_COL[s.who]||INK_COL.t;x.lineWidth=s.kind==='hl'?W*0.022:Math.max(2,W*0.0034);
+    const hl=String(s.kind||'').startsWith('hl'),ci=parseInt(String(s.kind||'').replace(/\D/g,''),10);
+    x.globalAlpha=hl?0.32:1;x.strokeStyle=hl?INK_HL[isNaN(ci)?0:ci]||INK_HL[0]:isNaN(ci)?INK_COL[s.who]||INK_COL.t:INK_PEN[ci]||INK_COL[s.who];x.lineWidth=hl?W*0.022:Math.max(2,W*0.0034);
     x.lineCap='round';x.lineJoin='round';x.beginPath();x.moveTo(p[0]*W,p[1]*W);
     for(let i=2;i<p.length-2;i+=2){const mx=(p[i]+p[i+2])/2,my=(p[i+1]+p[i+3])/2;x.quadraticCurveTo(p[i]*W,p[i+1]*W,mx*W,my*W)}
     x.lineTo(p[p.length-2]*W,p[p.length-1]*W);x.stroke()}
@@ -7217,6 +7269,40 @@ function rxBar(){return `<div class="rt-g rx-g">${RX.map(e=>`<button class="rt r
 function rxBind(el){el.querySelectorAll('[data-rx]').forEach(b=>b.onclick=()=>{const e=b.dataset.rx;rxShow(e,true);roomPulse({rx:{e,i:RID(5)}},true)})}
 function rxShow(e,mine){for(let k=0;k<5;k++){const s=document.createElement('span');s.className='rx-fly';s.textContent=e;
   s.style.left=(mine?70:20)+Math.random()*20+'%';s.style.animationDelay=k*90+'ms';s.style.fontSize=28+Math.random()*22+'px';document.body.appendChild(s);setTimeout(()=>s.remove(),2400)}}
+
+
+/* ---------- раздел «Комнаты»: все комнаты учеников в одном месте ---------- */
+let ROOMS=null;
+async function loadRooms(){if(!ACC.user)return;try{const list=await pbT.collection('rooms').getFullList({filter:pbT.filter('tutor = {:t}',{t:ACC.user.id}),fields:'id,student,st,mats,updated'});ROOMS={};list.forEach(r=>ROOMS[r.student]=r)}catch(e){ROOMS=ROOMS||{}}if(V.screen==='rooms')render()}
+function viewRooms(){
+  if(ACC.user&&ROOMS===null)loadRooms();
+  const rows=S.students.map(st=>{const r=ROOMS&&st.acc&&ROOMS[st.acc.id];const live=r&&roomLive(r.st||{});const n=r?(r.mats||[]).length:0;const nx=nextLesson(st.id);
+    return `<div class="rmrow${live?' live':''}"><div class="rmr-t"><b>${esc(st.name)}</b><small>${live?'<span class="rmr-on">Урок идёт</span>':r?`В тетради материалов: ${n}`:'Комнату ещё не открывали'}${nx?' · занятие '+whenTxt(nx.at):''}</small></div>
+      <button class="btn small rm-start" data-room="${st.id}">${live?'Вернуться в урок':'Открыть комнату'}</button></div>`}).join('');
+  app.innerHTML=`<div class="head"><div><h1>Комнаты</h1><p>У каждого ученика своя комната — тетрадь для уроков онлайн.</p></div><button class="btn quiet" id="rmHelp">Как это работает</button></div>
+    ${S.students.length?`<div class="panel rmlist">${rows}</div>`:`<div class="empty-first big-empty">${emptyArt('prostokvashino-1')}<div><h2>Сначала добавьте ученика</h2><p>Комната появится у каждого ученика сама.</p></div></div>`}
+    ${ACC.user?'':'<p class="hint">Комнаты работают в аккаунте: ученик входит в них из своего кабинета.</p>'}`;
+  app.querySelectorAll('[data-room]').forEach(b=>b.onclick=()=>openRoom(b.dataset.room));
+  document.getElementById('rmHelp').onclick=()=>roomHelp('t');
+}
+/* что умеет комната: коротко и по делу */
+function roomHelp(role){
+  const T=[['Комната','Это общая тетрадь с учеником для урока онлайн. Всё, что вы показываете, рисуете и что ученик отвечает, видно обоим сразу. Материалы прошлых уроков лежат ниже, ничего не теряется.'],
+    ['Начать урок','Ученику в кабинете загорается «Урок идёт · Войти», и сразу идёт видеозвонок. «Завершить урок» кладёт трубку и открывает разбор: что усвоено, где ошибки.'],
+    ['Веду я','Ученик видит ровно то, что вы: тот же материал и ту же страницу. Нажали на задание — оно подсвечивается у ученика.'],
+    ['Свободно','Ученик листает сам, например на самостоятельной работе. Вы видите сверху, на каком материале и странице он сейчас.'],
+    ['Указка','Ваш курсор виден ученику красной точкой. Удобно показывать «вот здесь». Нажатие на задание подсвечивает его у ученика.'],
+    ['Маркер, выделитель, ластик','Рисуют поверх листа. Цвет выбирается рядом. Ластик стирает одну линию, «Очистить» — все пометки страницы.'],
+    ['Дать ручку','Разрешает ученику рисовать. Пока не дали, ученик только отвечает в окошках.'],
+    ['Ответы ученика','Ученик пишет прямо в окошках листа. У вас ответ появляется сразу: верно — зелёным, ошибка — красным. «Ответы» показывают ключ только вам.']];
+  const S2=[['Урок','Когда репетитор начинает урок, нажми «Войти». Разреши камеру и микрофон — так вы будете видеть и слышать друг друга.'],
+    ['Ответы','Нажми на окошко в задании и впиши ответ. В столбик цифры пишутся с конца, как в тетради.'],
+    ['Рисовать','Когда репетитор даст ручку, появится «Маркер». Им можно обводить и писать.'],
+    ['Тетрадь','Кнопка «Тетрадь» показывает материалы с уроков. Их можно открыть и после урока.']];
+  const L=role==='s'?S2:T;
+  modal(`<h2>${role==='s'?'Как работает урок':'Как работает комната'}</h2><dl class="rhelp">${L.map(([a,b])=>`<dt>${a}</dt><dd>${b}</dd>`).join('')}</dl>
+    <div class="modal-actions"><button class="btn primary" id="cl">Понятно</button></div>`,()=>{document.getElementById('cl').onclick=close});
+}
 
 /* ---------- кабинет ученика: комната ---------- */
 async function loadCabRoom(){
