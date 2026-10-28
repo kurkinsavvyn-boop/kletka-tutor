@@ -850,7 +850,8 @@ body.shell .top .logo{display:none}
 .lrow{display:flex;align-items:center;gap:10px;border-radius:10px}
 .lrow-m{flex:1;min-width:0;display:flex;align-items:center;gap:14px;border:0;background:none;text-align:left;padding:10px 8px;border-radius:10px}
 .lrow-m:hover{background:var(--ink-soft)}
-.lr-act{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.lr-act{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;margin-left:auto}
+.sth-room{margin-left:auto;flex:none}
 .lr-time{font-family:var(--f-disp);font-weight:600;font-size:17px;min-width:56px}
 .lr-t{display:flex;flex-direction:column;min-width:0}
 .lr-t small{color:var(--ink-2);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -1194,6 +1195,15 @@ body.inroom .wrap{max-width:1360px}
 .sum-rep{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--card);border-radius:var(--r);padding:6px 10px;font:inherit;font-size:13px;color:var(--ink);cursor:pointer}
 .sum-rep small{color:var(--ink-3)}
 @media (max-width:700px){.rp-row{grid-template-columns:minmax(0,1fr) auto;row-gap:4px}.rp-tr{grid-column:1/-1;text-align:left;min-width:0}}
+
+.sheet .r-cr{position:absolute;inset:0;pointer-events:none;z-index:4}
+.sheet .r-cc{position:absolute;box-sizing:border-box;display:flex;align-items:center;justify-content:center;font:700 calc(var(--c) * .5)/1 var(--f-ui);color:#2D57C8;border-radius:2px;pointer-events:auto;cursor:pointer}
+.r-s .sheet .r-cc{border:1px dashed rgba(45,87,200,.45);background:rgba(45,87,200,.05)}
+.r-s .sheet .r-cc:hover{background:rgba(45,87,200,.15)}
+.sheet .r-cc.on{border-color:transparent!important;background:transparent!important}
+.r-t .sheet .r-cc{pointer-events:none}
+.sheet .r-cc.r-edit{background:rgba(45,87,200,.2)!important;border-style:solid}
+.r-cpop{max-width:250px}
 @media print{.room{display:none}}
 </style>
 
@@ -4474,7 +4484,7 @@ function viewStudent(){
   const meta=`<div class="sth-meta"><button class="mchip" id="mNext">${nxL?'Занятие '+whenTxt(nxL.at):sl?esc(sl):'Дни занятий не заданы'}</button>
     ${st.price?`<span class="mchip">${rub(st.price)} · ${st.dur||60} мин</span>`:''}<button class="mchip ${bt.cls}" id="mBal">${st.price||S.payments.some(p=>p.sid===st.id)?bt.t:'Указать цену'}</button></div>`;
   app.innerHTML=`<div class="sthead"><div class="sth-l"><div class="sth-t"><h1>${esc(st.name)}</h1><span>${gradeWord(st.grade)}</span>${nWait?`<button class="wait-chip red" id="works2">ждём выполнения ${nWait} ${plural(nWait,['домашки','домашек','домашек'])}</button>`:''}</div>${meta}</div>
-      <button class="btn primary sth-room" id="toRoom">Комната</button>
+      <button class="btn rm-start sth-room" id="toRoom">Комната</button>
       <div class="more"><button class="more-btn" id="more" aria-label="Ещё действия" aria-expanded="${V.menu?'true':'false'}">⋯</button>
         ${V.menu?`<div class="more-pop"><button class="edit" id="works">Работы и домашки${nDone?` · ${nDone}`:''}</button>${ACC.demo?'':'<button class="edit" id="stacc">Доступ для ученика</button>'}<button class="edit" id="newt">+ Своя тема</button><button class="edit" id="mpay">Внести оплату</button><button class="edit" id="mrem">Напомнить об оплате</button><button class="edit" id="edst">Редактировать</button><button class="${V.confirmStDel?'danger':''}" id="delst">${V.confirmStDel?'Нажмите ещё раз: ученик и все его работы удалятся':'Удалить ученика'}</button></div>`:''}</div></div>
     ${st.goal||st.note||st.contact?`<div class="st-notes">${st.goal?`<p><b>Цель</b> ${esc(st.goal)}</p>`:''}${st.contact?`<p><b>Связь</b> ${esc(st.contact)}</p>`:''}${st.note?`<p><b>Заметка</b> ${esc(st.note)}</p>`:''}</div>`:''}
@@ -4995,7 +5005,7 @@ function viewToday(){
   const lrow=l=>{const st=student(l.sid),s=lstat(l),cur=TOPICS[curOf(st,st.subjects[0])];
     return `<div class="lrow ${s}"><button class="lrow-m" data-l="${esc(l.id)}"><span class="lr-time num">${hm(l.at)}</span>
       <span class="lr-t"><b>${esc(st.name)}</b><small>${cur?esc(cur.t):gradeWord(st.grade)}${s!=='plan'?' · '+LST[s]:''}</small></span></button>
-      ${s==='cancel'?'':`<span class="lr-act"><button class="btn small quiet" data-sheet="${st.id}">Лист к уроку</button><button class="btn small primary" data-room="${st.id}">Комната</button></span>`}</div>`};
+      ${s==='cancel'?'':`<span class="lr-act"><button class="btn small quiet" data-sheet="${st.id}">Лист к уроку</button><button class="btn small rm-start" data-room="${st.id}">Комната</button></span>`}</div>`};
   if(!S.students.length){app.innerHTML=`<div class="head"><div><h1>Сегодня</h1><p>${WDL[wdOf(now)]}, ${dayTxt(now)}</p></div></div>
     <div class="empty-first big-empty">${emptyArt('prostokvashino-1')}<div><h2>Начните с ученика</h2><p>Добавьте ученика, укажите дни занятий и стоимость. Здесь появятся занятия на сегодня, домашки и оплаты.</p>
     <button class="btn primary" id="addSt">+ Добавить ученика</button></div></div>`;
@@ -5757,7 +5767,7 @@ function roomTop(){
       <div class="rm-who"><b>${esc(R.info.name)}</b><span class="rm-pres${roomHere()?' on':''}">${roomHere()?esc(where):'не в комнате'}</span></div>
       <div class="rm-act">${live&&C.st==='idle'?'<button class="btn small" id="rmVideo">Позвонить снова</button>':''}${R.st.call?'<button class="btn small quiet" id="rmCall">Ссылка</button>':''}
         <button class="ibtn" id="rmSet" aria-label="Настройки комнаты">⋯</button>
-        ${live?'<button class="btn small" id="rmEnd">Завершить урок</button>':'<button class="btn small rm-start" id="rmLive">Начать урок</button>'}</div>`;
+        ${live?'<button class="btn small rm-start" id="rmEnd">Завершить урок</button>':'<button class="btn small rm-start" id="rmLive">Начать урок</button>'}</div>`;
     const $=id=>document.getElementById(id);
     $('rmBack').onclick=()=>go({screen:'student'});
     if($('rmVideo'))$('rmVideo').onclick=()=>{C.declined=false;callStart()};
@@ -5864,7 +5874,7 @@ function roomStage(){
     const items=roomItems(m);R.items=items;
     const o={topic:roomTopic(m),level:m.lv||0,seed:m.s,studentName:R.role==='t'?R.info.name:R.info.name,design:m.dz?resolveDesign({design:m.dz},m.s):null};
     const lay=()=>{if(R.stageKey!==key)return;paginate(pages,items,o);const els=[...pages.querySelectorAll('.sh-items .it:not(.stab)')];
-      if(els.length===items.length)els.forEach((e,i)=>{e.dataset.ri=i;if(rAnswerable(items[i]))e.classList.add('r-it')});done()};
+      if(els.length===items.length){els.forEach((e,i)=>{e.dataset.ri=i;if(rAnswerable(items[i]))e.classList.add('r-it')});roomCarry(pages,items)}done()};
     lay();if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{if(R.stageKey===key)lay()});
   }else if(m.k==='pdf'){pages.innerHTML='<p class="hint">Открываю PDF…</p>';roomPdf(pages,m,key).then(()=>{if(R.stageKey===key)done()}).catch(()=>{if(R.stageKey===key)pages.innerHTML='<p class="empty">PDF не открылся. Проверьте интернет.</p>'})}
   else if(m.k==='img'){roomFileURL(m.f).then(u=>{if(R.stageKey!==key)return;pages.innerHTML=`<div class="rpg rimg"><img src="${esc(u)}" alt="${esc(m.t)}"></div>`;
@@ -5956,6 +5966,38 @@ function roomFocus(f){const m=roomMat();if(!f||!m||f.m!==m.id||Date.now()-(f.at|
   el.classList.remove('r-foc');void el.offsetWidth;el.classList.add('r-foc');setTimeout(()=>el.classList.remove('r-foc'),3200)}
 
 /* ---------- ответы ученика прямо в листе ---------- */
+
+/* ---------- перенос в столбик: «один запоминаем» ----------
+   Над столбиком сложения и умножения — маленькие клетки над каждым разрядом, кроме последнего.
+   Цифра переноса не влияет на оценку ответа, но репетитор видит её сразу. Хранится в ответах как c<номер>. */
+const rCarryable=it=>it&&it.type==='col'&&['+','×'].includes(it.op);
+function roomCarry(pages,items){
+  pages.querySelectorAll('[data-ri]').forEach(el=>{const i=+el.dataset.ri,it=items[i];if(!rCarryable(it))return;
+    const top=el.querySelector('.ccol > .cl');if(!top)return;const cells=[...top.children];if(cells.length<2)return;
+    const er=el.getBoundingClientRect();let row=el.querySelector('.r-cr');if(row)row.remove();
+    row=document.createElement('span');row.className='r-cr';row.dataset.n=cells.length-1;
+    cells.slice(0,-1).forEach((c,k)=>{const r=c.getBoundingClientRect(),b=document.createElement('span');b.className='r-cc';b.dataset.k=k;
+      Object.assign(b.style,{left:(r.left-er.left+r.width*.5)+'px',top:(r.top-er.top-r.height*.52)+'px',width:(r.width*.48)+'px',height:(r.height*.48)+'px'});row.appendChild(b)});
+    el.appendChild(row)});
+}
+function roomCarryPaint(){const m=roomMat();const p=document.getElementById('rmPages');if(!m||!p||!R.items)return;const a=R.ans[m.id]||{};
+  p.querySelectorAll('.r-cr').forEach(row=>{const i=+row.closest('[data-ri]').dataset.ri;const v=String(a['c'+i]||'');
+    row.querySelectorAll('.r-cc').forEach(b=>{const ch=v[+b.dataset.k];b.textContent=ch&&ch!=='_'?ch:'';b.classList.toggle('on',!!b.textContent)})})}
+function roomCarrySet(i,k,d){const m=roomMat();R.ans[m.id]=R.ans[m.id]||{};const row=document.querySelector(`#rmPages [data-ri="${i}"] .r-cr`);const n=row?+row.dataset.n:k+1;
+  const v=[...String(R.ans[m.id]['c'+i]||'').padEnd(n,'_')];v[k]=d||'_';const s=v.join('');
+  if(/^_*$/.test(s))delete R.ans[m.id]['c'+i];else R.ans[m.id]['c'+i]=s;roomSaveAns();roomCarryPaint()}
+function roomCarryOpen(b){
+  roomAnsClose();const el=b.closest('[data-ri]'),i=+el.dataset.ri,k=+b.dataset.k,pg=el.closest('.rpg');
+  const pr=pg.getBoundingClientRect(),r=b.getBoundingClientRect();b.classList.add('r-edit');
+  const pop=document.createElement('div');pop.className='r-pop r-cpop';pop.dataset.i=i;pop.dataset.k=k;
+  pop.innerHTML=[1,2,3,4,5,6,7,8,9].map(d=>`<button data-d="${d}">${d}</button>`).join('')+'<button data-d="" aria-label="Стереть">✕</button>';
+  pop.style.left=Math.max(4,Math.min(r.left-pr.left-60,pr.width-260))+'px';pop.style.top=(r.bottom-pr.top+6)+'px';pg.appendChild(pop);
+  const done=d=>{roomCarrySet(i,k,d);pop.remove();b.classList.remove('r-edit')};
+  pop.querySelectorAll('[data-d]').forEach(x=>x.onclick=ev=>{ev.stopPropagation();done(x.dataset.d)});
+  pop._key=e=>{if(/^[1-9]$/.test(e.key)){e.preventDefault();done(e.key)}else if(e.key==='Backspace'||e.key==='Delete'||e.key==='0'){e.preventDefault();done('')}else if(e.key==='Escape'){pop.remove();b.classList.remove('r-edit')}};
+}
+document.addEventListener('keydown',e=>{const p=document.querySelector('.r-cpop');if(p&&p._key)p._key(e)});
+
 /* ---------- ответы ученика прямо в окошках листа ----------
    У каждого вида задания своё место ответа: клетки окошка, строка ответа в столбике, кружок сравнения,
    пропуск буквы, строка «Ответ:», варианты. Ответ пишется туда же, где ребёнок написал бы ручкой. */
@@ -5996,10 +6038,12 @@ function roomAnsPaint(){
     if(st&&show){mk=document.createElement('i');mk.className='r-mk '+st;mk.textContent=st==='ok'?'✓':'✗';
       if(R.role==='t'&&st==='bad'&&R.keys)mk.textContent='✗ '+fmt(it.ans);el.appendChild(mk)}
     if(rTarget(el,it)&&rAnswerable(it))el.classList.add('r-has')});
-  roomSide();
+  roomCarryPaint();roomSide();
 }
 function roomStageClick(e){
-  if(R.tool!=='hand')return;const el=e.target.closest('[data-ri]');if(!el)return;const m=roomMat();if(!m||!R.items)return;const i=+el.dataset.ri;
+  if(R.tool!=='hand')return;
+  const cc=e.target.closest('.r-cc');if(cc&&R.role==='s'){e.stopPropagation();roomCarryOpen(cc);return}
+  const el=e.target.closest('[data-ri]');if(!el)return;const m=roomMat();if(!m||!R.items)return;const i=+el.dataset.ri;
   if(R.role==='t'){roomSet({foc:{m:m.id,i,at:Date.now()}});roomFocus(R.st.foc);return}
   const it=R.items[i];if(!rAnswerable(it))return;
   if(it.type==='ch'){const o=e.target.closest('.ob');if(o){roomAnswer(i,o.textContent,true);return}}
@@ -6009,7 +6053,7 @@ function roomStageClick(e){
 const rInline=()=>{const p=document.querySelector('#rmPages > .rpg');return p&&p.clientWidth>=560&&!matchMedia('(pointer:coarse)').matches};
 function roomAnsClose(){
   const b=document.getElementById('rmAnsBar');if(b)b.remove();document.querySelectorAll('.r-in').forEach(x=>x._kill?x._kill():x.remove());document.querySelectorAll('.r-pop').forEach(x=>x.remove());
-  document.querySelectorAll('.r-sel').forEach(x=>x.classList.remove('r-sel'));const had=R.edit;R.sel=null;R.edit=null;if(had)roomAnsPaint();
+  document.querySelectorAll('.r-sel,.r-cc.r-edit').forEach(x=>x.classList.remove('r-sel','r-edit'));const had=R.edit;R.sel=null;R.edit=null;if(had)roomAnsPaint();
 }
 function roomAnsOpen(i){
   roomAnsClose();const m=roomMat(),it=R.items[i];if(!m||!it)return;
