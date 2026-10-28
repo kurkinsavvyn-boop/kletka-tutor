@@ -850,6 +850,7 @@ body.shell .top .logo{display:none}
 .lrow{display:flex;align-items:center;gap:10px;border-radius:10px}
 .lrow-m{flex:1;min-width:0;display:flex;align-items:center;gap:14px;border:0;background:none;text-align:left;padding:10px 8px;border-radius:10px}
 .lrow-m:hover{background:var(--ink-soft)}
+.lr-act{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
 .lr-time{font-family:var(--f-disp);font-weight:600;font-size:17px;min-width:56px}
 .lr-t{display:flex;flex-direction:column;min-width:0}
 .lr-t small{color:var(--ink-2);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -990,6 +991,126 @@ button.mchip:hover{background:rgba(255,255,255,.24)}
   #printHost .sheet.page:last-child{break-after:auto;page-break-after:auto}
   *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
 }
+/* Комната урока: слева лента материалов, справа страницы. Пометки репетитора красные, ученика синие. */
+.room{display:flex;flex-direction:column;gap:14px}
+.rm-top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;position:sticky;top:0;z-index:5;background:var(--paper);padding:8px 0;border-bottom:1px solid var(--line)}
+.rm-who{display:flex;flex-direction:column;min-width:0;flex:1}
+.rm-who b{font-size:17px;line-height:1.2}
+.rm-pres{font-size:13px;color:var(--ink-3)}
+.rm-pres.on{color:var(--ok)}
+.rm-pres.on::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ok);margin-right:6px;vertical-align:1px}
+.rm-act{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.rm-body{display:grid;grid-template-columns:250px minmax(0,1fr);gap:18px;align-items:start}
+.r-s .rm-body{grid-template-columns:minmax(0,1fr)}
+.rm-side{position:sticky;top:76px;display:flex;flex-direction:column;gap:6px;max-height:calc(100vh - 96px);overflow:auto;padding-right:2px}
+.r-s .rm-side{display:none}
+.r-s .rm-side.open{display:flex;position:fixed;z-index:30;top:0;left:0;bottom:0;width:min(320px,86vw);max-height:none;background:var(--card);padding:16px;border-right:1px solid var(--line);box-shadow:0 10px 40px rgba(20,30,60,.18)}
+.rm-sh{font-size:12px;font-weight:600;color:var(--ink-3);text-transform:uppercase;letter-spacing:.04em;margin:2px 0}
+.rm-mat{display:flex;align-items:center;gap:2px;border:1px solid var(--line);background:var(--card);border-radius:var(--r)}
+.rm-mat.on{border-color:var(--blue);box-shadow:0 0 0 1px var(--blue)}
+.rm-mat.hid .rm-mb b{color:var(--ink-2)}
+.rm-mb{flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start;text-align:left;background:none;border:0;padding:8px 10px;cursor:pointer;color:var(--ink);font:inherit}
+.rm-mb b{font-size:14px;font-weight:500;line-height:1.3;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.rm-mb small{font-size:12px;color:var(--ink-3)}
+.rm-mb small .g{color:var(--ok)}.rm-mb small .r{color:var(--bad)}
+.rmk{font-size:11px;color:var(--ink-3)}
+.rm-eye{font-size:13px;min-width:30px}
+.rm-mat .ibtn{flex:none}
+.rm-paste{font-size:12px;margin:0}
+.rm-past summary{cursor:pointer;font-size:13px;color:var(--ink-2);padding:6px 0}
+.rm-day{font-size:12px;color:var(--ink-3);margin:8px 0 4px}
+.rm-past .rm-mat{margin-bottom:6px}
+.rm-main{min-width:0;display:flex;flex-direction:column;gap:10px}
+.rm-tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center;position:sticky;top:64px;z-index:4;background:var(--paper);padding:6px 0}
+.rm-tools:empty{display:none}
+.rt-g{display:flex;gap:4px;flex-wrap:wrap;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:3px}
+.rt{border:0;background:none;padding:6px 10px;border-radius:7px;font:inherit;font-size:13px;color:var(--ink);cursor:pointer;min-height:34px}
+.rt:hover{background:var(--ink-soft)}
+.rt.on{background:var(--blue-soft);color:var(--blue);font-weight:600}
+.rt-note{font-size:13px;color:var(--ink-2)}
+.rm-seg{margin:0}
+.rm-stage{min-width:0}
+.rm-pages{display:flex;flex-direction:column;gap:18px;max-width:880px;margin:0 auto;container-type:inline-size}
+.rpg{position:relative;scroll-margin-top:120px;background:#fff;box-shadow:0 1px 3px rgba(20,30,60,.12);border-radius:4px;overflow:hidden}
+.rpg .r-ink{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:3}
+.drawing .rpg .r-ink{pointer-events:auto;touch-action:none;cursor:crosshair}
+.r-laser{position:absolute;z-index:4;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;background:rgba(213,64,47,.75);box-shadow:0 0 0 6px rgba(213,64,47,.18);pointer-events:none;opacity:0;transition:opacity .25s,left .08s linear,top .08s linear}
+.r-laser.on{opacity:1}
+.rpg .r-bg{display:block;width:100%;height:100%}
+.rimg img{display:block;width:100%;height:auto}
+.rbd{aspect-ratio:210/297}
+.bg-grid{background-image:linear-gradient(#c9dcf0 1px,transparent 1px),linear-gradient(90deg,#c9dcf0 1px,transparent 1px);background-size:3.4cqw 3.4cqw}
+.bg-lines{background-image:linear-gradient(#c9dcf0 1px,transparent 1px);background-size:100% 4.2cqw}
+.bg-white{background:#fff}
+.rnote,.rlink{min-height:40cqw;color:#1A1F2E}
+.rn-in{padding:6cqw 7cqw;display:flex;flex-direction:column;gap:2cqw;align-items:flex-start}
+.rn-k{font-size:2.2cqw;color:#66718D;text-transform:uppercase;letter-spacing:.05em}
+.rn-in h3{font-size:4.6cqw;line-height:1.2;margin:0}
+.rn-in p{font-size:3.4cqw;line-height:1.45;margin:0}
+.rn-ex{padding:2cqw 3cqw;border-left:.8cqw solid #D5402F;background:#FBE6E2;font-style:italic}
+.rlink .btn{font-size:3cqw}
+.sheet .it.r-it{cursor:pointer;position:relative;border-radius:3px}
+.r-s .sheet .it.r-it:hover{background:rgba(45,87,200,.07)}
+.sheet .it.r-sel{background:rgba(45,87,200,.12);box-shadow:0 0 0 2px #2D57C8}
+.sheet .it.r-foc{animation:rfoc 1s ease-in-out 3}
+@keyframes rfoc{0%,100%{box-shadow:0 0 0 0 rgba(213,64,47,0)}50%{box-shadow:0 0 0 4px rgba(213,64,47,.55)}}
+.sheet .it{position:relative}
+.r-a{position:absolute;z-index:2;right:0;top:0;transform:translateY(-55%);font:600 max(9px,calc(var(--c) * .7))/1.2 var(--f-ui);padding:1px 6px;border-radius:6px;white-space:nowrap;pointer-events:none;background:#E8EEFC;color:#2D57C8;border:1px solid #2D57C8}
+.r-a.ok{background:#E1F2E8;color:#2C8A57;border-color:#2C8A57}
+.r-a.bad{background:#FBE6E2;color:#D5402F;border-color:#D5402F}
+.r-a.key{background:#fff;color:#66718D;border:1px dashed #9AA5BF;font-weight:500}
+.r-a i{font-style:normal;color:#2C8A57;margin-left:2px}
+.rm-empty{max-width:560px;margin:30px auto;text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center}
+.rm-empty h2{margin:0}.rm-empty p{margin:0;color:var(--ink-2)}
+.rm-quick,.rm-pick{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;width:100%}
+.rq{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;border:1px solid var(--line);background:var(--card);border-radius:var(--r);padding:12px 14px;cursor:pointer;font:inherit;color:var(--ink)}
+.rq:hover{border-color:var(--blue)}
+.rq.main{border-color:var(--blue);background:var(--blue-soft)}
+.rq b{font-weight:600;font-size:15px}.rq small{font-size:13px;color:var(--ink-2)}
+.rm-pick.bd{grid-template-columns:repeat(3,1fr)}
+.bdp{display:block;width:100%;aspect-ratio:3/4;border:1px solid var(--line);border-radius:6px;margin-bottom:6px;container-type:inline-size;background-color:#fff}
+.bdp.bg-grid{background-size:12cqw 12cqw}.bdp.bg-lines{background-size:100% 14cqw}
+.rm-ans{position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--card);border-top:1px solid var(--line);box-shadow:0 -8px 30px rgba(20,30,60,.14);padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px))}
+.ra-in{max-width:880px;margin:0 auto;display:flex;gap:16px;align-items:center;position:relative;flex-wrap:wrap;padding-right:44px}
+.ra-q{flex:1 1 240px;min-width:0;display:flex;flex-direction:column;gap:2px}
+.ra-n{font-size:12px;color:var(--ink-3)}.ra-q b{font-size:20px;font-weight:600}.ra-q small{color:var(--ink-2);font-size:13px}
+.ra-opts{display:flex;gap:8px;flex-wrap:wrap}
+.ra-opts button{min-width:56px;min-height:48px;padding:0 16px;font:600 20px var(--f-ui);border:1px solid var(--line);border-radius:var(--r);background:var(--card);color:var(--ink);cursor:pointer}
+.ra-opts button.on,.ra-opts button:hover{border-color:var(--blue);background:var(--blue-soft)}
+.ra-txt{display:flex;gap:8px;flex:1 1 260px}.ra-txt input{flex:1;font-size:18px}
+.ra-num{display:flex;gap:12px;align-items:center}
+.ra-v{min-width:70px;text-align:center;font:600 26px var(--f-ui);border-bottom:2px solid var(--blue);padding:2px 6px}
+.ra-pad{display:grid;grid-template-columns:repeat(6,46px);gap:6px}
+.ra-pad button{height:44px;border:1px solid var(--line);border-radius:8px;background:var(--card);font:600 18px var(--f-ui);color:var(--ink);cursor:pointer}
+.ra-pad button.go{background:var(--blue);color:#fff;border-color:var(--blue)}
+.ra-x{position:absolute;top:0;right:0}
+.rm-res{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:6px 0;border-top:1px solid var(--line)}
+.rm-mist{margin:0 0 6px;padding-left:18px;font-size:13px;color:var(--ink-2)}
+.cab-room{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:0 0 18px}
+.cab-room.live{border-color:var(--ok);background:var(--ok-soft)}
+.cab-room div:first-child{display:flex;flex-direction:column}
+.cab-room b{font-size:18px}.cab-room span{font-size:14px;color:var(--ink-2)}
+.cab-room.live b::before{content:"";display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--ok);margin-right:8px;animation:rlive 1.6s infinite}
+@keyframes rlive{50%{opacity:.35}}
+.cr-act{display:flex;gap:8px}
+body.inroom .wrap{max-width:1360px}
+@media (max-width:900px){
+  .rm-body{grid-template-columns:minmax(0,1fr)}
+  .r-t .rm-side{position:static;flex-direction:row;overflow-x:auto;max-height:none;gap:6px;padding-bottom:4px}
+  .r-t .rm-side .rm-sh,.r-t .rm-side .rm-paste,.r-t .rm-side .empty{display:none}
+  .r-t .rm-side .rm-mat{flex:0 0 200px}
+  .r-t .rm-side #rmAdd{flex:0 0 auto;width:auto;white-space:nowrap}
+  .r-t .rm-side .rm-past{flex:0 0 auto;align-self:center}
+  .r-t .rm-side .rm-past[open]{flex-basis:220px}
+  .rm-tools{top:56px}
+  .rm-top{gap:8px}.rm-who b{font-size:15px}.rm-pres{font-size:12px}.rm-top .btn.small{padding:6px 10px}
+  .r-s .rm-who{order:-1;flex-basis:100%}
+  .rm-tools{position:static}
+  .rm-top{position:static}
+  .ra-pad{grid-template-columns:repeat(6,1fr);width:100%}.ra-num{flex:1 1 100%;flex-direction:column;align-items:stretch}
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .rpg{box-shadow:0 0 0 1px var(--line)}}
+@media print{.room{display:none}}
 </style>
 
 <header class="top"><div class="top-in">
@@ -4030,7 +4151,7 @@ async function loadCab(){
   try{CAB.me=pbS.authStore.record;
     CAB.items=await pbS.collection('assignments').getFullList({sort:'-created',fields:'id,code,title,payload,status,result,created'});CAB.err=''}
   catch(e){if(e&&(e.status===401||e.status===403)){pbS.authStore.clear();V={screen:'cablogin'}}else CAB.err='Нет связи. Проверь интернет.'}
-  flushCab();render();
+  flushCab();render();loadCabRoom();
 }
 function viewCabLogin(){
   const pre=decodeURIComponent((location.hash||'').slice(1)).replace(/[^a-z0-9-]/gi,'').toLowerCase();
@@ -4067,12 +4188,14 @@ function viewCab(){
     <div class="cab-head"><div><h1>Привет, ${esc(me.name||'')}!</h1>${me.tutorName?`<p>Твой репетитор: ${esc(me.tutorName)}</p>`:''}</div>
       <button class="btn link" id="cout">Выйти</button></div>
     ${CAB.err?`<p class="auth-err">${esc(CAB.err)}</p>`:''}
+    ${cabRoomHTML()}
     <h2 class="cab-h">${fresh.length?'Новые задания':'Новых заданий нет'}</h2>
     ${fresh.length?`<div class="ctasks">${fresh.map(card).join('')}</div>`:'<p class="hint">Когда репетитор пришлёт задание, оно появится здесь.</p>'}
     ${done.length?`<h2 class="cab-h">Сделано</h2><div class="ctasks">${done.map(card).join('')}</div>`:''}
   </div>`;
   app.querySelectorAll('.ctask[data-id]:not(.done)').forEach(b=>b.onclick=()=>startCab(CAB.items.find(r=>r.id===b.dataset.id)));
-  document.getElementById('cout').onclick=()=>{pbS.authStore.clear();CAB.items=null;V={screen:'cablogin'};render()};
+  bindCabRoom();
+  document.getElementById('cout').onclick=()=>{pbS.authStore.clear();CAB.items=null;CAB.room=null;V={screen:'cablogin'};render()};
 }
 function startCab(r){const d=r.payload;
   P={h:{code:d.c,level:0},t:{t:d.t,grade:d.g,sheet:d.mix},name:d.n,remote:true,cab:r.id,items:generate(d.p,d.s),i:0,input:'',correct:0,streak:0,score:0,mistakes:[],log:[],start:Date.now(),fb:null,lock:false};
@@ -4128,6 +4251,7 @@ function crumbs(){
   if(V.screen==='print'){parts.push('›');parts.push('<span class="cur">Печать</span>')}
   if(V.screen==='builder'){parts.push('›');parts.push('<span class="cur">Своя тема</span>')}
   if(V.screen==='gallery'){parts.push('›');parts.push('<span class="cur">Сюжеты оформления</span>')}
+  if(V.screen==='room'){parts.push('›');parts.push('<span class="cur">Комната</span>')}
   if(V.screen==='works'){parts.push('›');parts.push('<span class="cur">Работы и домашки</span>')}
   if(V.screen==='work'){parts.push('›');parts.push('<button data-go="works">Работы и домашки</button>');parts.push('›');parts.push(`<span class="cur">${esc(V.code||'')}</span>`)}
   if(['player','done'].includes(V.screen)){parts.length=0;parts.push('<span class="cur">Экран ученика</span>')}
@@ -4141,10 +4265,12 @@ function crumbs(){
 
 function render(){
   document.body.classList.toggle('authbg',['auth','cablogin'].includes(V.screen));
+  if(R.on&&!['room','croom'].includes(V.screen))roomStop();
+  document.body.classList.toggle('inroom',['room','croom'].includes(V.screen));
   crumbs();renderSide();
   if(ACC.user)syncResults();
   requestAnimationFrame(()=>snapCells(app));
-  ({auth:viewAuth,cablogin:viewCabLogin,cab:viewCab,today:viewToday,schedule:viewSchedule,finance:viewFinance,materials:viewMaterials,profile:viewProfile,students:viewStudents,student:viewStudent,topic:viewTopic,print:viewPrint,player:viewPlayer,done:viewDone,builder:viewBuilder,works:viewWorks,work:viewWork,gallery:viewGallery,
+  ({auth:viewAuth,cablogin:viewCabLogin,cab:viewCab,today:viewToday,schedule:viewSchedule,finance:viewFinance,materials:viewMaterials,profile:viewProfile,students:viewStudents,student:viewStudent,topic:viewTopic,print:viewPrint,player:viewPlayer,done:viewDone,builder:viewBuilder,works:viewWorks,work:viewWork,gallery:viewGallery,room:viewRoom,croom:viewRoom,
     badlink:()=>{app.innerHTML='<div class="player"><div class="panel finish"><h1 style="font-size:22px">Ссылка не открывается</h1><p style="margin:0">Похоже, она скопирована не целиком. Попроси репетитора прислать её ещё раз.</p></div></div>'}})[V.screen]();
 }
 
@@ -4262,6 +4388,7 @@ function viewStudent(){
   const meta=`<div class="sth-meta"><button class="mchip" id="mNext">${nxL?'Занятие '+whenTxt(nxL.at):sl?esc(sl):'Дни занятий не заданы'}</button>
     ${st.price?`<span class="mchip">${rub(st.price)} · ${st.dur||60} мин</span>`:''}<button class="mchip ${bt.cls}" id="mBal">${st.price||S.payments.some(p=>p.sid===st.id)?bt.t:'Указать цену'}</button></div>`;
   app.innerHTML=`<div class="sthead"><div class="sth-l"><div class="sth-t"><h1>${esc(st.name)}</h1><span>${gradeWord(st.grade)}</span>${nWait?`<button class="wait-chip red" id="works2">ждём выполнения ${nWait} ${plural(nWait,['домашки','домашек','домашек'])}</button>`:''}</div>${meta}</div>
+      <button class="btn primary sth-room" id="toRoom">Комната</button>
       <div class="more"><button class="more-btn" id="more" aria-label="Ещё действия" aria-expanded="${V.menu?'true':'false'}">⋯</button>
         ${V.menu?`<div class="more-pop"><button class="edit" id="works">Работы и домашки${nDone?` · ${nDone}`:''}</button>${ACC.demo?'':'<button class="edit" id="stacc">Доступ для ученика</button>'}<button class="edit" id="newt">+ Своя тема</button><button class="edit" id="mpay">Внести оплату</button><button class="edit" id="mrem">Напомнить об оплате</button><button class="edit" id="edst">Редактировать</button><button class="${V.confirmStDel?'danger':''}" id="delst">${V.confirmStDel?'Нажмите ещё раз: ученик и все его работы удалятся':'Удалить ученика'}</button></div>`:''}</div></div>
     ${st.goal||st.note||st.contact?`<div class="st-notes">${st.goal?`<p><b>Цель</b> ${esc(st.goal)}</p>`:''}${st.contact?`<p><b>Связь</b> ${esc(st.contact)}</p>`:''}${st.note?`<p><b>Заметка</b> ${esc(st.note)}</p>`:''}</div>`:''}
@@ -4279,6 +4406,7 @@ function viewStudent(){
   if($('newt'))$('newt').onclick=()=>{V.menu=false;openBuilder()};
   if($('stacc'))$('stacc').onclick=()=>{V.menu=false;render();accessModal(st,false)};
   $('more').onclick=()=>{V.menu=!V.menu;V.confirmStDel=false;render()};
+  $('toRoom').onclick=()=>openRoom(st.id);
   if($('edst'))$('edst').onclick=()=>{V.menu=false;render();editStudentModal(st)};
   if($('delst'))$('delst').onclick=()=>{if(!V.confirmStDel){V.confirmStDel=true;render();return}V.menu=false;deleteStudent(st)};
   if($('works'))$('works').onclick=()=>go({screen:'works',menu:false});
@@ -4750,7 +4878,7 @@ const icon=k=>`<svg viewBox="0 0 24 24" width="22" height="22" fill="none" strok
 const NAV=[['today','Сегодня'],['students','Ученики'],['schedule','Расписание'],['materials','Материалы'],['finance','Финансы'],['profile','Профиль']];
 const SEC_T={today:'Сегодня',schedule:'Расписание',materials:'Мои материалы',finance:'Финансы',profile:'Профиль'};
 const sectionOf=s=>SEC_T[s]?s:'students';
-const shellOn=()=>!CABINET&&!STUDENT_MODE&&(ACC.user||ACC.demo)&&!['auth','cablogin','cab','player','done','badlink'].includes(V.screen);
+const shellOn=()=>!CABINET&&!STUDENT_MODE&&(ACC.user||ACC.demo)&&!['auth','cablogin','cab','player','done','badlink','room','croom'].includes(V.screen);
 function renderSide(){
   const el=document.getElementById('sidenav');const on=shellOn();document.body.classList.toggle('shell',!!on);document.body.classList.toggle('sec',!!SEC_T[V.screen]);
   if(!on){el.innerHTML='';return}
@@ -4775,7 +4903,7 @@ function viewToday(){
   const lrow=l=>{const st=student(l.sid),s=lstat(l),cur=TOPICS[curOf(st,st.subjects[0])];
     return `<div class="lrow ${s}"><button class="lrow-m" data-l="${esc(l.id)}"><span class="lr-time num">${hm(l.at)}</span>
       <span class="lr-t"><b>${esc(st.name)}</b><small>${cur?esc(cur.t):gradeWord(st.grade)}${s!=='plan'?' · '+LST[s]:''}</small></span></button>
-      ${s==='cancel'?'':`<button class="btn small" data-sheet="${st.id}">Лист к уроку</button>`}</div>`};
+      ${s==='cancel'?'':`<span class="lr-act"><button class="btn small quiet" data-sheet="${st.id}">Лист к уроку</button><button class="btn small primary" data-room="${st.id}">Комната</button></span>`}</div>`};
   if(!S.students.length){app.innerHTML=`<div class="head"><div><h1>Сегодня</h1><p>${WDL[wdOf(now)]}, ${dayTxt(now)}</p></div></div>
     <div class="empty-first big-empty">${emptyArt('prostokvashino-1')}<div><h2>Начните с ученика</h2><p>Добавьте ученика, укажите дни занятий и стоимость. Здесь появятся занятия на сегодня, домашки и оплаты.</p>
     <button class="btn primary" id="addSt">+ Добавить ученика</button></div></div>`;
@@ -4800,6 +4928,7 @@ function viewToday(){
   const all=[...today,...tom];
   app.querySelectorAll('[data-l]').forEach(b=>b.onclick=()=>lessonModal(all.find(l=>l.id===b.dataset.l)));
   app.querySelectorAll('[data-sheet]').forEach(b=>b.onclick=()=>lessonSheet(b.dataset.sheet));
+  app.querySelectorAll('[data-room]').forEach(b=>b.onclick=()=>openRoom(b.dataset.room));
   app.querySelectorAll('[data-w]').forEach(b=>b.onclick=()=>go({screen:'works',studentId:b.dataset.w}));
   app.querySelectorAll('[data-wk]').forEach(b=>b.onclick=()=>go({screen:'work',studentId:b.dataset.sid,code:b.dataset.wk}));
   app.querySelectorAll('[data-rem]').forEach(b=>b.onclick=()=>remindModal(student(b.dataset.rem)));
@@ -5390,6 +5519,575 @@ document.addEventListener('keydown',e=>{
   if(textMode(it)||it.type==='ch')return;
   if(/^[0-9]$/.test(e.key))key(e.key);else if(e.key==='Backspace')key('del');else if(e.key==='Enter')key('ok');
 });
+/* ---------- Комната урока: общая тетрадь репетитора и ученика ----------
+   Одна комната на ученика. Репетитор пишет материалы и состояние урока (rooms.mats, rooms.st), ученик — свои ответы (rooms.ans).
+   Где кто сейчас и указка идут через pulse, линии маркера — через ink.
+   Координаты линий и указки — в долях ширины страницы: на телефоне и на компьютере пометка ложится в то же место. */
+const R={on:false};
+const RID=n=>{const a='abcdefghijklmnopqrstuvwxyz0123456789';let s='';for(let i=0;i<(n||15);i++)s+=a[Math.floor(Math.random()*36)];return s};
+const INK_COL={t:'#D5402F',s:'#2D57C8'};
+const R_LIVE_MAX=3*3600e3;
+const roomLive=st=>!!(st&&st.live&&Date.now()-(st.liveAt||0)<R_LIVE_MAX);
+const R_KIND={sheet:'Лист',pdf:'PDF',img:'Картинка',board:'Доска',note:'Объяснение',link:'Ссылка'};
+const rAnswerable=it=>it&&!['sort','mor','snt'].includes(it.type)&&!(it.type==='line'&&it.noLine)&&it.ans!=null&&String(it.ans)!=='';
+const rOk=(it,v)=>norm(it.ans)===norm(v);
+
+/* репетитор открывает комнату ученика: аккаунт ученика и комната создаются при первом входе */
+async function openRoom(sid){
+  const st=student(sid);if(!st)return;
+  if(!ACC.user){modal(`<h2>Комната урока</h2><p style="margin:0">Комната работает в аккаунте: ученик входит в неё из своего кабинета, а вы видите его ответы и пометки сразу.</p>
+    <div class="modal-actions"><button class="btn quiet" id="cl">Понятно</button>${ACC.demo?'<button class="btn primary" id="su">Зарегистрироваться</button>':''}</div>`,()=>{
+    document.getElementById('cl').onclick=close;const su=document.getElementById('su');if(su)su.onclick=()=>{close();go({screen:'auth',authMode:'signup'})}});return}
+  modal(`<h2>Открываем комнату…</h2><p class="hint" style="margin:0">${esc(st.name)}</p>`);
+  try{
+    const acc=await ensureAccount(st);let rec;
+    try{rec=await pbT.collection('rooms').getFirstListItem(pbT.filter('student = {:s}',{s:acc.id}))}
+    catch(e){if(!e||e.status!==404)throw e;rec=await pbT.collection('rooms').create({tutor:ACC.user.id,student:acc.id,mats:[],st:{lead:true,pen:false,chk:true},ans:{}})}
+    close();roomStart(pbT,'t',rec,{sid,name:st.name,first:firstName(st)});go({screen:'room',studentId:sid,menu:false});
+  }catch(e){close();toast('Нет связи с сервером, комната не открылась')}
+}
+/* ученик входит из кабинета */
+async function openRoomCab(id){
+  try{const rec=await pbS.collection('rooms').getOne(id);const me=pbS.authStore.record||{};
+    roomStart(pbS,'s',rec,{name:me.name||'',tutor:me.tutorName||''});V={screen:'croom'};render();window.scrollTo({top:0})}
+  catch(e){toast('Нет связи. Проверь интернет')}
+}
+
+function roomStart(pb,role,rec,info){
+  roomStop();
+  Object.assign(R,{on:true,pb,role,rec,info,mats:rec.mats||[],st:rec.st||{},ans:rec.ans||{},ink:[],other:null,otherAt:0,
+    tool:'hand',stageKey:'',items:null,sel:null,keys:false,unsub:[],timers:[],obs:[],myPulse:null,pgNow:0,away:false,myCur:null,live:null,icache:{},side:false});
+  if(role==='t'&&!R.st.cur&&R.mats.length)R.st.cur=R.mats[R.mats.length-1].id;
+  roomConnect(rec.id);
+}
+function roomStop(){
+  if(!R.on)return;R.on=false;
+  (R.unsub||[]).forEach(u=>{try{u()}catch(e){}});(R.timers||[]).forEach(clearInterval);(R.obs||[]).forEach(o=>o.disconnect());
+  clearTimeout(R.stT);clearTimeout(R.ansT);
+  if(R.myPulse)R.pb.collection('pulse').update(R.myPulse.id,{d:{at:Date.now(),gone:true}}).catch(()=>{});
+  document.getElementById('rmAnsBar')&&document.getElementById('rmAnsBar').remove();
+}
+async function roomConnect(id){
+  const pb=R.pb,f=pb.filter('room = {:r}',{r:id}),alive=()=>R.on&&R.rec.id===id;
+  try{const ink=await pb.collection('ink').getFullList({filter:f,sort:'created'});if(alive()){R.ink=ink;roomInkAll()}}catch(e){}
+  try{const ps=await pb.collection('pulse').getFullList({filter:f});if(!alive())return;
+    R.myPulse=ps.find(p=>p.who===R.role)||null;const o=ps.find(p=>p.who!==R.role);if(o&&Date.now()-Date.parse(o.updated.replace(' ','T'))<40000){R.other=o.d;R.otherAt=Date.now()}}catch(e){}
+  if(!alive())return;
+  if(!R.myPulse)try{R.myPulse=await pb.collection('pulse').create({room:id,who:R.role,d:{at:Date.now()}})}catch(e){}
+  roomPulse({},true);
+  const sub=async(c,topic,cb,o)=>{try{const u=await pb.collection(c).subscribe(topic,cb,o);if(alive())R.unsub.push(u);else u()}catch(e){}};
+  await sub('rooms',id,e=>roomOnRec(e.record));
+  await sub('ink','*',roomOnInk,{filter:f});
+  await sub('pulse','*',roomOnPulse,{filter:f});
+  R.timers.push(setInterval(()=>{if(!R.on)return;roomPulse({},true);
+    if(R.role==='t'&&R.st.live&&Date.now()-(R.st.liveAt||0)>10*60e3)roomSet({liveAt:Date.now()});roomTop()},15000));
+  /* после обрыва связи забираем свежую комнату целиком */
+  const back=async()=>{if(!alive())return;try{const r=await pb.collection('rooms').getOne(id);roomOnRec(r);const ink=await pb.collection('ink').getFullList({filter:f,sort:'created'});R.ink=ink;roomInkAll()}catch(e){}};
+  addEventListener('online',back);R.unsub.push(()=>removeEventListener('online',back));
+  if(R.role==='s'){const vis=()=>{if(document.visibilityState==='visible')back()};document.addEventListener('visibilitychange',vis);R.unsub.push(()=>document.removeEventListener('visibilitychange',vis))}
+  roomUpdate();
+}
+
+/* ---------- изменения с сервера ---------- */
+function roomOnRec(r){
+  if(!R.on||r.id!==R.rec.id)return;R.rec=r;
+  if(R.role==='t'){R.ans=r.ans||{};roomAnsPaint();roomSide();return}
+  const was=R.st;R.mats=r.mats||[];R.st=r.st||{};
+  if(was.cur!==R.st.cur)R.away=false;
+  roomUpdate();
+  if(!R.away&&roomFollow()&&(was.pg!==R.st.pg||was.cur!==R.st.cur))roomScrollPg(R.st.pg||0);
+  if(R.st.foc&&JSON.stringify(R.st.foc)!==JSON.stringify(was.foc))roomFocus(R.st.foc);
+}
+function roomOnInk(e){
+  if(!R.on)return;const r=e.record;
+  if(e.action==='create'){if(R.ink.some(x=>x.id===r.id))return;R.ink.push(r)}
+  else if(e.action==='delete'){const n=R.ink.length;R.ink=R.ink.filter(x=>x.id!==r.id);if(n===R.ink.length)return}
+  else return;
+  roomInkPage(r.mat,r.pg||0);
+}
+function roomOnPulse(e){
+  if(!R.on||!e.record||e.record.who===R.role)return;
+  R.other=e.record.d||{};R.otherAt=R.other.gone?0:Date.now();
+  if(R.role==='s')roomLaser(R.other);
+  clearTimeout(R.topT);R.topT=setTimeout(roomTop,120);
+}
+const roomHere=()=>R.otherAt&&Date.now()-R.otherAt<40000;
+const roomFollow=()=>R.role==='s'&&roomLive(R.st)&&R.st.lead!==false;
+
+/* ---------- запись ---------- */
+function roomSet(patch){
+  Object.assign(R.st,patch);R.st.v=(R.st.v||0)+1;
+  clearTimeout(R.stT);R.stT=setTimeout(()=>R.pb.collection('rooms').update(R.rec.id,{st:R.st}).catch(()=>toast('Нет связи: ученик увидит изменения, когда связь вернётся')),120);
+}
+function roomSaveMats(){R.pb.collection('rooms').update(R.rec.id,{mats:R.mats}).catch(()=>toast('Нет связи с сервером'))}
+function roomSaveAns(){clearTimeout(R.ansT);R.ansT=setTimeout(()=>R.pb.collection('rooms').update(R.rec.id,{ans:R.ans}).catch(()=>{}),250)}
+let pulseLast=0,pulseT=null;
+function roomPulse(d,now){
+  if(!R.myPulse)return;R.myD={...(R.myD||{}),...d,at:Date.now()};
+  const send=()=>{pulseLast=Date.now();R.pb.collection('pulse').update(R.myPulse.id,{d:R.myD}).catch(()=>{})};
+  clearTimeout(pulseT);if(now||Date.now()-pulseLast>90)send();else pulseT=setTimeout(send,90);
+}
+
+/* ---------- экран ---------- */
+function viewRoom(){
+  if(!R.on){if(R.role==='s'||CABINET){V={screen:'cab'};render()}else go({screen:V.studentId?'student':'today'});return}
+  app.innerHTML=`<div class="room r-${R.role}">
+    <div class="rm-top" id="rmTop"></div>
+    <div class="rm-body"><aside class="rm-side" id="rmSide"></aside>
+      <section class="rm-main"><div class="rm-tools" id="rmTools"></div><div class="rm-stage" id="rmStage"></div></section></div></div>`;
+  R.stageKey='';roomUpdate();
+  const stage=document.getElementById('rmStage');
+  stage.addEventListener('click',roomStageClick);
+  stage.addEventListener('pointermove',e=>{if(R.role!=='t'||R.tool!=='hand'||e.pointerType==='touch')return;const pg=e.target.closest('.rpg');if(!pg)return;
+    const r=pg.getBoundingClientRect();roomPulse({m:R.st.cur,pg:+pg.dataset.pg,x:+((e.clientX-r.left)/r.width).toFixed(4),y:+((e.clientY-r.top)/r.width).toFixed(4)})});
+  stage.addEventListener('pointerleave',()=>{if(R.role==='t')roomPulse({x:null})});
+  let lastW=stage.clientWidth;const ro=new ResizeObserver(()=>{const w=stage.clientWidth;if(Math.abs(w-lastW)>30){lastW=w;R.stageKey='';roomStage()}else roomInkAll()});
+  ro.observe(stage);R.obs.push(ro);
+}
+function roomUpdate(){if(!R.on||!document.getElementById('rmTop'))return;roomTop();roomSide();roomTools();roomStage()}
+function roomMat(){
+  if(R.role==='t')return R.mats.find(m=>m.id===R.st.cur)||null;
+  const vis=R.mats.filter(m=>m.vis);const id=roomFollow()&&!R.away?R.st.cur:(R.myCur||R.st.cur);
+  return vis.find(m=>m.id===id)||vis[vis.length-1]||null;
+}
+function roomTop(){
+  const el=document.getElementById('rmTop');if(!el||!R.on)return;const live=roomLive(R.st),o=R.other||{};
+  if(R.role==='t'){
+    const om=R.mats.find(m=>m.id===o.m);
+    const where=roomHere()?(o.typ?'печатает ответ…':om?'смотрит «'+om.t+'»'+(o.pg?', стр. '+(o.pg+1):''):'в комнате'):'';
+    el.innerHTML=`<button class="btn quiet small" id="rmBack">← Выйти</button>
+      <div class="rm-who"><b>${esc(R.info.name)}</b><span class="rm-pres${roomHere()?' on':''}">${roomHere()?esc(where):'не в комнате'}</span></div>
+      <div class="rm-act"><button class="btn small" id="rmCall">${R.st.call?'Звонок':'+ Звонок'}</button>
+        <button class="ibtn" id="rmSet" aria-label="Настройки комнаты">⋯</button>
+        ${live?'<button class="btn small" id="rmEnd">Завершить урок</button>':'<button class="btn primary small" id="rmLive">Начать урок</button>'}</div>`;
+    const $=id=>document.getElementById(id);
+    $('rmBack').onclick=()=>go({screen:'student'});
+    $('rmCall').onclick=()=>R.st.call?window.open(R.st.call,'_blank','noopener'):roomCallModal();
+    $('rmSet').onclick=roomSettings;
+    if($('rmLive'))$('rmLive').onclick=roomBegin;
+    if($('rmEnd'))$('rmEnd').onclick=roomFinish;
+  }else{
+    const away=roomFollow()&&R.away;
+    el.innerHTML=`<button class="btn quiet small" id="rmBack">← Мои задания</button>
+      <div class="rm-who"><b>${live?'Урок идёт':'Моя тетрадь'}</b><span class="rm-pres${live?' on':''}">${esc(R.info.tutor||'Репетитор')}${live&&R.st.lead!==false&&!away?' показывает':''}</span></div>
+      <div class="rm-act">${away?'<button class="btn primary small" id="rmFollow">К репетитору</button>':''}
+        <button class="btn small" id="rmNote">Тетрадь</button>${R.st.call&&live?'<button class="btn primary small" id="rmCall">Звонок</button>':''}</div>`;
+    const $=id=>document.getElementById(id);
+    $('rmBack').onclick=()=>{roomStop();V={screen:'cab'};CAB.items=null;render();loadCab()};
+    $('rmNote').onclick=()=>{R.side=!R.side;roomSide()};
+    if($('rmCall'))$('rmCall').onclick=()=>window.open(R.st.call,'_blank','noopener');
+    if($('rmFollow'))$('rmFollow').onclick=()=>{R.away=false;R.myCur=null;roomUpdate();roomScrollPg(R.st.pg||0)};
+  }
+}
+/* лента материалов: сегодня сверху, прошлые уроки свёрнуты по дням */
+function roomItems(m){return R.icache[m.id]||(R.icache[m.id]=generate(m.p,m.s))}
+function roomProg(m){
+  if(m.k!=='sheet')return'';const a=R.ans[m.id]||{},items=roomItems(m);const done=Object.keys(a).filter(i=>items[i]);
+  const all=items.filter(rAnswerable).length;if(!done.length)return all?`0 из ${all}`:'';
+  if(R.role!=='t')return `${done.length} из ${all}`;
+  const k=done.filter(i=>rOk(items[i],a[i])).length;return `<span class="${k===done.length?'g':'r'}">${k} верно</span> · ${done.length} из ${all}`;
+}
+function roomSide(){
+  const el=document.getElementById('rmSide');if(!el||!R.on)return;
+  const t=R.role==='t',cur=roomMat();
+  if(!t){el.classList.toggle('open',!!R.side);if(!R.side){el.innerHTML='';return}}
+  const list=t?R.mats:R.mats.filter(m=>m.vis);
+  const d0=dayStart(Date.now());const today=list.filter(m=>(m.at||0)>=d0),past=list.filter(m=>(m.at||0)<d0);
+  const row=m=>`<div class="rm-mat${cur&&cur.id===m.id?' on':''}${t&&!m.vis?' hid':''}"><button class="rm-mb" data-m="${m.id}"><span class="rmk">${R_KIND[m.k]||''}</span><b>${esc(m.t)}</b>${m.k==='sheet'?`<small>${roomProg(m)}</small>`:''}</button>
+    ${t?`<button class="ibtn rm-eye" data-eye="${m.id}" aria-label="${m.vis?'Скрыть от ученика':'Показать ученику'}" title="${m.vis?'Ученик видит':'Ученик не видит'}">${m.vis?'👁':'—'}</button><button class="ibtn${R.delM===m.id?' on':''}" data-del="${m.id}" aria-label="Убрать">${R.delM===m.id?'Убрать?':'✕'}</button>`:''}</div>`;
+  const byDay={};past.forEach(m=>{const k=dkey(m.at||0);(byDay[k]=byDay[k]||[]).push(m)});
+  const days=Object.keys(byDay).sort().reverse();
+  el.innerHTML=`<div class="rm-sh">${t?'Сегодня':'Тетрадь'}</div>
+    ${today.length?today.map(row).join(''):`<p class="empty">${t?'На сегодня материалов нет.':'Сегодня пока ничего.'}</p>`}
+    ${t?'<button class="btn wide" id="rmAdd">+ Материал</button><p class="hint rm-paste">Скриншот или фото учебника можно вставить прямо сюда: Ctrl+V</p>':''}
+    ${days.length?`<details class="rm-past"${R.pastOpen?' open':''}><summary>Прошлые уроки · ${days.length}</summary>${days.map(k=>`<div class="rm-day">${dayTxt(atOf(k))}</div>${byDay[k].map(row).join('')}`).join('')}</details>`:''}`;
+  el.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>roomOpenMat(b.dataset.m));
+  el.querySelectorAll('[data-eye]').forEach(b=>b.onclick=()=>{const m=R.mats.find(x=>x.id===b.dataset.eye);m.vis=!m.vis;roomSaveMats();roomSide()});
+  el.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{const id=b.dataset.del;if(R.delM!==id){R.delM=id;roomSide();return}
+    R.delM=null;R.mats=R.mats.filter(m=>m.id!==id);if(R.st.cur===id)roomSet({cur:R.mats.length?R.mats[R.mats.length-1].id:null,pg:0});roomSaveMats();roomUpdate()});
+  const pd=el.querySelector('.rm-past');if(pd)pd.ontoggle=()=>{R.pastOpen=pd.open};
+  const add=document.getElementById('rmAdd');if(add)add.onclick=roomPicker;
+}
+function roomOpenMat(id){
+  if(R.role==='t'){const m=R.mats.find(x=>x.id===id);
+    if(R.st.lead!==false&&roomLive(R.st)&&m&&!m.vis){m.vis=true;roomSaveMats()}
+    roomSet({cur:id,pg:0,foc:null});R.pgNow=0;roomUpdate();window.scrollTo({top:0});return}
+  R.myCur=id;R.away=roomFollow()&&id!==R.st.cur;R.side=false;roomUpdate();window.scrollTo({top:0});
+}
+function roomTools(){
+  const el=document.getElementById('rmTools');if(!el||!R.on)return;const m=roomMat();
+  const tb=(k,n)=>`<button class="rt${R.tool===k?' on':''}" data-tool="${k}">${n}</button>`;
+  if(R.role==='t'){
+    el.innerHTML=`<div class="seg rm-seg"><button class="${R.st.lead!==false?'on':''}" id="rmLead">Веду я</button><button class="${R.st.lead===false?'on':''}" id="rmFree">Свободно</button></div>
+      <div class="rt-g">${tb('hand','Указка')}${tb('pen','Маркер')}${tb('hl','Выделитель')}<button class="rt" id="rmUndo" aria-label="Отменить свою линию">↶</button><button class="rt" id="rmClr">Очистить</button></div>
+      <div class="rt-g"><button class="rt${R.st.pen?' on':''}" id="rmPen">${R.st.pen?'Ручка у ученика':'Дать ручку'}</button>
+        ${m&&m.k==='sheet'?`<button class="rt${R.keys?' on':''}" id="rmKeys">Ответы</button>${m.tid&&TOPICS[m.tid]?'<button class="rt" id="rmHw">В домашку</button>':''}`:''}
+        ${m&&m.k==='board'?'<button class="rt" id="rmPg">+ Страница</button>':''}</div>`;
+    const $=id=>document.getElementById(id);
+    $('rmLead').onclick=()=>{const c=R.mats.find(x=>x.id===R.st.cur);if(c&&!c.vis&&roomLive(R.st)){c.vis=true;roomSaveMats()}roomSet({lead:true,pg:R.pgNow});roomUpdate()};
+    $('rmFree').onclick=()=>{roomSet({lead:false});roomUpdate()};
+    $('rmPen').onclick=()=>{roomSet({pen:!R.st.pen});roomTools()};
+    $('rmUndo').onclick=roomUndo;$('rmClr').onclick=roomClear;
+    if($('rmKeys'))$('rmKeys').onclick=()=>{R.keys=!R.keys;roomTools();roomAnsPaint()};
+    if($('rmHw'))$('rmHw').onclick=()=>roomHomework(m);
+    if($('rmPg'))$('rmPg').onclick=()=>{m.n=(m.n||1)+1;roomSaveMats();R.stageKey='';roomStage();setTimeout(()=>roomScrollPg(m.n-1),60)};
+  }else{
+    const pen=!!R.st.pen&&roomLive(R.st);if(!pen&&R.tool!=='hand')R.tool='hand';
+    el.innerHTML=pen?`<div class="rt-g">${tb('hand','Листать')}${tb('pen','Маркер')}<button class="rt" id="rmUndo">↶ Отменить</button></div><span class="rt-note">Ручку дал репетитор</span>`
+      :(m&&m.k==='sheet'&&roomItems(m).some(rAnswerable)?'<span class="rt-note">Нажми на задание, чтобы ответить</span>':'');
+    const u=document.getElementById('rmUndo');if(u)u.onclick=roomUndo;
+  }
+  el.querySelectorAll('[data-tool]').forEach(b=>b.onclick=()=>{R.tool=b.dataset.tool;roomTools();roomDrawMode()});
+  roomDrawMode();
+}
+function roomDrawMode(){const s=document.getElementById('rmStage');if(s)s.classList.toggle('drawing',R.tool!=='hand')}
+
+/* ---------- материал на экране: всегда страницы ---------- */
+function roomTopic(m){const tp=m.tp||{};const L=[];for(let i=0;i<=(m.lv||0);i++)L.push({n:tp.ln||''});
+  return{t:tp.t||m.t,grade:tp.grade||1,subject:tp.subject||'math',rule:tp.rule||null,sheet:!!tp.sheet,section:tp.sec||SUBJ[tp.subject]||'',L}}
+function roomStage(){
+  const host=document.getElementById('rmStage');if(!host||!R.on)return;const m=roomMat();
+  const key=m?m.id+'|'+JSON.stringify(m):'none';
+  if(key===R.stageKey){roomAnsPaint();return}
+  R.stageKey=key;R.items=null;roomAnsClose();(R.pgObs&&R.pgObs.disconnect());
+  if(R.role==='s')roomPulse({m:m?m.id:null,pg:0});
+  if(!m){host.innerHTML=R.role==='t'?`<div class="rm-empty"><h2>Тетрадь · ${esc(R.info.first||'')}</h2><p>Добавьте материал к уроку: лист по текущей теме, файл, фото учебника или чистую доску. Ученик увидит его, только когда вы покажете.</p>
+      <div class="rm-quick">${roomQuickHTML()}</div></div>`
+    :`<div class="rm-empty"><h2>${roomLive(R.st)?'Репетитор готовит материал':'Тетрадь пока пустая'}</h2><p>${roomLive(R.st)?'Сейчас здесь появится задание.':'Здесь будут материалы с уроков.'}</p></div>`;
+    host.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>roomQuick(b.dataset.q));return}
+  host.innerHTML=`<div class="rm-pages" id="rmPages"></div>`;
+  const pages=document.getElementById('rmPages');
+  const done=()=>{if(R.stageKey!==key)return;[...pages.children].forEach((pg,k)=>roomSetupPage(pg,k));roomInkAll();roomAnsPaint();roomTrackPages(pages);
+    if(roomFollow()&&!R.away)roomScrollPg(R.st.pg||0,true)};
+  if(m.k==='sheet'){
+    const items=roomItems(m);R.items=items;
+    const o={topic:roomTopic(m),level:m.lv||0,seed:m.s,studentName:R.role==='t'?R.info.name:R.info.name,design:m.dz?resolveDesign({design:m.dz},m.s):null};
+    const lay=()=>{if(R.stageKey!==key)return;paginate(pages,items,o);const els=[...pages.querySelectorAll('.sh-items .it')];
+      if(els.length===items.length)els.forEach((e,i)=>{e.dataset.ri=i;if(rAnswerable(items[i]))e.classList.add('r-it')});done()};
+    lay();if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{if(R.stageKey===key)lay()});
+  }else if(m.k==='pdf'){pages.innerHTML='<p class="hint">Открываю PDF…</p>';roomPdf(pages,m,key).then(()=>{if(R.stageKey===key)done()}).catch(()=>{if(R.stageKey===key)pages.innerHTML='<p class="empty">PDF не открылся. Проверьте интернет.</p>'})}
+  else if(m.k==='img'){roomFileURL(m.f).then(u=>{if(R.stageKey!==key)return;pages.innerHTML=`<div class="rpg rimg"><img src="${esc(u)}" alt="${esc(m.t)}"></div>`;
+    const im=pages.querySelector('img');im.onload=done;im.onerror=()=>{pages.innerHTML='<p class="empty">Картинка не загрузилась.</p>'}}).catch(()=>{pages.innerHTML='<p class="empty">Нет связи.</p>'})}
+  else if(m.k==='board'){pages.innerHTML=Array.from({length:m.n||1},()=>`<div class="rpg rbd bg-${m.bg||'grid'}"></div>`).join('');done()}
+  else if(m.k==='note'){pages.innerHTML=`<div class="rpg rnote"><div class="rn-in"><span class="rn-k">Объяснение</span><h3>${esc(m.t)}</h3>${(m.txt||'').split(/\n+/).map(x=>`<p>${esc(x)}</p>`).join('')}${m.ex?`<p class="rn-ex">${esc(m.ex)}</p>`:''}</div></div>`;done()}
+  else if(m.k==='link'){let host2='';try{host2=new URL(m.url).hostname}catch(e){}
+    pages.innerHTML=`<div class="rpg rlink"><div class="rn-in"><span class="rn-k">Ссылка</span><h3>${esc(m.t)}</h3><a class="btn primary" href="${esc(m.url)}" target="_blank" rel="noopener">Открыть</a><p class="hint">${esc(host2)}</p></div></div>`;done()}
+}
+let FTOK={t:'',at:0};
+async function roomFileURL(f){
+  if(!FTOK.t||Date.now()-FTOK.at>90000||FTOK.pb!==R.pb){FTOK={t:await R.pb.files.getToken(),at:Date.now(),pb:R.pb}}
+  return R.pb.files.getURL(R.rec,f,{token:FTOK.t});
+}
+let PDFJS=null;
+/* pdf.js лежит на самом сайте: внешние CDN из России открываются не всегда */
+function loadPdfJs(){if(PDFJS)return PDFJS;const base=new URL('../vendor/pdfjs/',location.href).href;
+  PDFJS=import(base+'pdf.min.mjs').then(lib=>{lib.GlobalWorkerOptions.workerSrc=base+'pdf.worker.min.mjs';return lib}).catch(e=>{PDFJS=null;throw e});return PDFJS}
+async function roomPdf(host,m,key){
+  const lib=await loadPdfJs();const url=await roomFileURL(m.f);const doc=await lib.getDocument(url).promise;
+  if(R.stageKey!==key)return;host.innerHTML='';
+  const W=Math.min(1700,Math.round((host.clientWidth||800)*Math.min(2,devicePixelRatio||1)));
+  for(let i=1;i<=doc.numPages;i++){
+    const page=await doc.getPage(i);if(R.stageKey!==key)return;const vp=page.getViewport({scale:1});
+    const pg=document.createElement('div');pg.className='rpg rpdf';pg.style.aspectRatio=vp.width+' / '+vp.height;host.appendChild(pg);
+    const v2=page.getViewport({scale:W/vp.width});const c=document.createElement('canvas');c.className='r-bg';c.width=Math.round(v2.width);c.height=Math.round(v2.height);pg.appendChild(c);
+    await page.render({canvasContext:c.getContext('2d'),viewport:v2}).promise;
+    if(R.stageKey===key){roomSetupPage(pg,i-1);roomInkPaint(pg)}
+  }
+}
+/* у каждой страницы свой холст для линий и точка указки */
+function roomSetupPage(pg,k){
+  pg.classList.add('rpg');pg.dataset.pg=k;
+  if(pg.querySelector('.r-ink'))return;
+  const cv=document.createElement('canvas');cv.className='r-ink';pg.appendChild(cv);
+  const lz=document.createElement('i');lz.className='r-laser';pg.appendChild(lz);
+  let cur=null;
+  const pt=e=>{const r=pg.getBoundingClientRect();return[+((e.clientX-r.left)/r.width).toFixed(4),+((e.clientY-r.top)/r.width).toFixed(4)]};
+  cv.addEventListener('pointerdown',e=>{if(!roomCanDraw()||e.button>0)return;e.preventDefault();cv.setPointerCapture(e.pointerId);
+    const m=roomMat();cur={mat:m.id,pg:k,who:R.role,kind:R.tool,pts:pt(e)}});
+  cv.addEventListener('pointermove',e=>{if(!cur)return;const p=pt(e),n=cur.pts.length;
+    if(Math.hypot(p[0]-cur.pts[n-2],p[1]-cur.pts[n-1])<0.0025)return;cur.pts.push(p[0],p[1]);roomInkPaint(pg,cur)});
+  const end=()=>{if(!cur)return;const s=cur;cur=null;if(s.pts.length<4)s.pts.push(s.pts[0]+0.001,s.pts[1]);
+    const rec={id:RID(),room:R.rec.id,...s};R.ink.push(rec);roomInkPaint(pg);
+    R.pb.collection('ink').create(rec).catch(()=>{R.ink=R.ink.filter(x=>x.id!==rec.id);roomInkPaint(pg);toast('Линия не сохранилась: нет связи')})};
+  cv.addEventListener('pointerup',end);cv.addEventListener('pointercancel',end);
+}
+const roomCanDraw=()=>R.tool!=='hand'&&(R.role==='t'||(R.st.pen&&roomLive(R.st)));
+function roomInkAll(){const p=document.getElementById('rmPages');if(p)[...p.children].forEach(pg=>pg.classList.contains('rpg')&&roomInkPaint(pg))}
+function roomInkPage(mat,k){const m=roomMat();if(!m||m.id!==mat)return;const pg=document.querySelector(`#rmPages > .rpg[data-pg="${k}"]`);if(pg)roomInkPaint(pg)}
+function roomInkPaint(pg,live){
+  const cv=pg.querySelector('.r-ink');if(!cv)return;const m=roomMat();if(!m)return;
+  const W=pg.clientWidth,H=pg.clientHeight,dpr=Math.min(2,devicePixelRatio||1);
+  if(cv.width!==Math.round(W*dpr)||cv.height!==Math.round(H*dpr)){cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr)}
+  const x=cv.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);x.clearRect(0,0,W,H);
+  const k=+pg.dataset.pg;const list=R.ink.filter(s=>s.mat===m.id&&(s.pg||0)===k);if(live)list.push(live);
+  for(const s of list){const p=s.pts||[];if(p.length<4)continue;
+    x.globalAlpha=s.kind==='hl'?0.32:1;x.strokeStyle=s.kind==='hl'?'#F2C94C':INK_COL[s.who]||INK_COL.t;x.lineWidth=s.kind==='hl'?W*0.022:Math.max(2,W*0.0034);
+    x.lineCap='round';x.lineJoin='round';x.beginPath();x.moveTo(p[0]*W,p[1]*W);
+    for(let i=2;i<p.length-2;i+=2){const mx=(p[i]+p[i+2])/2,my=(p[i+1]+p[i+3])/2;x.quadraticCurveTo(p[i]*W,p[i+1]*W,mx*W,my*W)}
+    x.lineTo(p[p.length-2]*W,p[p.length-1]*W);x.stroke()}
+  x.globalAlpha=1;
+}
+function roomUndo(){const m=roomMat();if(!m)return;const mine=R.ink.filter(s=>s.mat===m.id&&s.who===R.role);const s=mine[mine.length-1];if(!s){toast('Отменять нечего');return}
+  R.ink=R.ink.filter(x=>x!==s);roomInkPage(m.id,s.pg||0);R.pb.collection('ink').delete(s.id).catch(()=>{})}
+function roomClear(){const m=roomMat();if(!m)return;const k=R.pgNow||0;const list=R.ink.filter(s=>s.mat===m.id&&(s.pg||0)===k);
+  if(!list.length){toast('На этой странице нет пометок');return}
+  if(!R.clrAsk){R.clrAsk=true;toast('Нажмите «Очистить» ещё раз: сотрутся все пометки страницы '+(k+1));setTimeout(()=>R.clrAsk=false,3000);return}
+  R.clrAsk=false;R.ink=R.ink.filter(s=>!list.includes(s));roomInkPage(m.id,k);list.forEach(s=>R.pb.collection('ink').delete(s.id).catch(()=>{}))}
+/* какая страница сейчас перед глазами: по ней идёт «Веду я» и «Очистить» */
+function roomTrackPages(pages){
+  const vis=new Map();const io=new IntersectionObserver(es=>{es.forEach(e=>vis.set(+e.target.dataset.pg,e.intersectionRatio));
+    let best=0,bv=-1;vis.forEach((v,k)=>{if(v>bv){bv=v;best=k}});
+    if(best!==R.pgNow){R.pgNow=best;if(R.role==='t'&&R.st.lead!==false){clearTimeout(R.pgT);R.pgT=setTimeout(()=>roomSet({pg:R.pgNow}),400)}
+      if(R.role==='s')roomPulse({pg:best})}},{threshold:[0,.25,.5,.75,1]});
+  [...pages.children].forEach(pg=>pg.classList.contains('rpg')&&io.observe(pg));R.pgObs=io;R.obs.push(io);
+}
+function roomScrollPg(k,instant){const pg=document.querySelector(`#rmPages > .rpg[data-pg="${k}"]`);if(!pg)return;
+  if(k===0&&!instant){window.scrollTo({top:0,behavior:'smooth'});return}pg.scrollIntoView({behavior:instant?'auto':'smooth',block:'start'})}
+function roomLaser(d){
+  const m=roomMat();document.querySelectorAll('.r-laser.on').forEach(l=>l.classList.remove('on'));
+  if(!d||d.x==null||!m||d.m!==m.id)return;const pg=document.querySelector(`#rmPages > .rpg[data-pg="${d.pg||0}"]`);if(!pg)return;
+  const l=pg.querySelector('.r-laser');if(!l)return;l.style.left=d.x*100+'%';l.style.top=d.y*pg.clientWidth+'px';l.classList.add('on');
+  clearTimeout(R.lzT);R.lzT=setTimeout(()=>l.classList.remove('on'),1600);
+}
+function roomFocus(f){const m=roomMat();if(!f||!m||f.m!==m.id||Date.now()-(f.at||0)>15000)return;
+  const el=document.querySelector(`#rmPages [data-ri="${f.i}"]`);if(!el)return;
+  if(R.role==='s'&&!R.away)el.scrollIntoView({behavior:'smooth',block:'center'});
+  el.classList.remove('r-foc');void el.offsetWidth;el.classList.add('r-foc');setTimeout(()=>el.classList.remove('r-foc'),3200)}
+
+/* ---------- ответы ученика прямо в листе ---------- */
+function roomAnsPaint(){
+  const m=roomMat();const p=document.getElementById('rmPages');if(!m||!p||m.k!=='sheet'||!R.items)return;
+  const a=R.ans[m.id]||{},show=R.role==='t'||R.st.chk!==false;
+  p.querySelectorAll('[data-ri]').forEach(el=>{const i=+el.dataset.ri,it=R.items[i];let c=el.querySelector('.r-a');
+    const v=a[i];let html='',cls='';
+    if(v!=null&&v!==''){const ok=rOk(it,v);cls=show?(ok?'ok':'bad'):'ans';html=esc(String(v))+(show?(ok?' ✓':' ✗'):'')+(R.role==='t'&&!ok&&R.keys?` <i>${esc(String(fmt(it.ans)))}</i>`:'')}
+    else if(R.role==='t'&&R.keys&&rAnswerable(it)){cls='key';html=esc(String(fmt(it.ans)))}
+    if(!html){if(c)c.remove();return}
+    if(!c){c=document.createElement('span');c.className='r-a';el.appendChild(c)}
+    c.className='r-a '+cls;c.innerHTML=html});
+  roomSide();
+}
+function roomStageClick(e){
+  if(R.tool!=='hand')return;const el=e.target.closest('[data-ri]');if(!el)return;const m=roomMat();if(!m||!R.items)return;const i=+el.dataset.ri;
+  if(R.role==='t'){roomSet({foc:{m:m.id,i,at:Date.now()}});roomFocus(R.st.foc);return}
+  if(!rAnswerable(R.items[i]))return;roomAnsOpen(i);
+}
+function roomAnsClose(){const b=document.getElementById('rmAnsBar');if(b)b.remove();document.querySelectorAll('.r-sel').forEach(x=>x.classList.remove('r-sel'));R.sel=null}
+function roomAnsOpen(i){
+  roomAnsClose();const m=roomMat(),it=R.items[i];R.sel=i;R.input=String((R.ans[m.id]||{})[i]??'');
+  const el=document.querySelector(`#rmPages [data-ri="${i}"]`);if(el)el.classList.add('r-sel');
+  const bar=document.createElement('div');bar.id='rmAnsBar';bar.className='rm-ans';document.body.appendChild(bar);
+  const opts=it.type==='ch'||it.type==='ins'||(it.opts&&it.type!=='cmp');const tm=textMode(it);
+  const draw=()=>{bar.innerHTML=`<div class="ra-in"><div class="ra-q"><span class="ra-n">Задание ${i+1}</span><b>${esc(plainQ(it))}</b><small>${esc(it.hintOn||instr(it))}</small></div>
+    ${opts?`<div class="ra-opts">${it.opts.map((o,k)=>`<button data-o="${k}" class="${R.input===String(o)?'on':''}">${esc(o)}</button>`).join('')}</div>`
+    :it.type==='cmp'?`<div class="ra-opts">${['<','=','>'].map(s=>`<button data-o="${s}" class="${R.input===s?'on':''}">${s}</button>`).join('')}</div>`
+    :tm?`<div class="ra-txt"><input id="raTx" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Ответ" value="${esc(R.input)}"><button class="btn primary" id="raOk">Готово</button></div>`
+    :`<div class="ra-num"><span class="ra-v num">${esc(R.input)||'?'}</span><div class="ra-pad">${[1,2,3,4,5,6,7,8,9,'⌫',0,'OK'].map(k=>`<button data-k="${k}" class="${k==='OK'?'go':''}">${k}</button>`).join('')}</div></div>`}
+    <button class="ibtn ra-x" id="raX" aria-label="Закрыть">✕</button></div>`;
+    bar.querySelectorAll('[data-o]').forEach(b=>b.onclick=()=>{const v=b.dataset.o;roomAnswer(i,opts?String(it.opts[+v]):v)});
+    bar.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>numKey(b.dataset.k));
+    const tx=document.getElementById('raTx');if(tx){tx.oninput=()=>{R.input=tx.value;roomPulse({typ:1})};tx.onkeydown=ev=>{if(ev.key==='Enter'&&tx.value.trim())roomAnswer(i,tx.value.trim())};
+      document.getElementById('raOk').onclick=()=>{if(tx.value.trim())roomAnswer(i,tx.value.trim())};setTimeout(()=>tx.focus(),30)}
+    document.getElementById('raX').onclick=()=>{roomAnsClose();roomPulse({typ:0})}};
+  const numKey=k=>{if(k==='OK'){if(R.input)roomAnswer(i,R.input);return}if(k==='⌫')R.input=R.input.slice(0,-1);else if(R.input.length<10)R.input+=k;roomPulse({typ:1});draw()};
+  bar.numKey=numKey;draw();
+  if(el){const r=el.getBoundingClientRect();if(r.bottom>innerHeight-bar.offsetHeight-12)scrollBy({top:r.bottom-(innerHeight-bar.offsetHeight-24),behavior:'smooth'})}
+}
+function roomAnswer(i,v){const m=roomMat();R.ans[m.id]=R.ans[m.id]||{};R.ans[m.id][i]=v;roomSaveAns();roomPulse({typ:0});roomAnsClose();roomAnsPaint()}
+document.addEventListener('keydown',e=>{const bar=document.getElementById('rmAnsBar');if(!bar||!bar.numKey||document.activeElement&&document.activeElement.id==='raTx')return;
+  if(/^[0-9]$/.test(e.key))bar.numKey(e.key);else if(e.key==='Backspace')bar.numKey('⌫');else if(e.key==='Enter')bar.numKey('OK');else if(e.key==='Escape')roomAnsClose()});
+document.addEventListener('paste',e=>{if(V.screen!=='room'||!R.on||R.role!=='t'||mroot.innerHTML)return;
+  const f=[...(e.clipboardData&&e.clipboardData.files||[])].find(x=>/^image\//.test(x.type));if(!f)return;e.preventDefault();roomUpload(f,'Скриншот '+hm(Date.now()))});
+
+/* ---------- добавление материалов ---------- */
+function roomStudent(){return student(R.info.sid)}
+function roomSubj(){const st=roomStudent();return st.subjects.includes(V.subject)?V.subject:st.subjects[0]}
+function roomCurTopic(){const st=roomStudent(),pos=trackPos(st,roomSubj());return pos.i>=0?TOPICS[pos.tr[pos.i]]:null}
+function roomQuickHTML(){const t=roomCurTopic();
+  return `${t?`<button class="rq main" data-q="lesson"><b>Урок по теме</b><small>${esc(t.t)} · правило, разминка, задачи</small></button>`:''}
+    <button class="rq" data-q="pick"><b>Другой материал</b><small>лист, файл, доска, объяснение</small></button>`}
+function roomQuick(q){if(q==='lesson')roomAddLesson();else roomPicker()}
+function roomAdd(m,open=true){
+  m.id=m.id||RID(10);m.at=Date.now();m.vis=false;R.mats.push(m);
+  if(open){if(R.st.lead!==false&&roomLive(R.st))m.vis=true;roomSet({cur:m.id,pg:0,foc:null});R.pgNow=0}
+  roomSaveMats();roomUpdate();window.scrollTo({top:0});
+}
+function roomSheetFrom(t,lv,over,seed){const st=roomStudent();
+  return{k:'sheet',t:t.t+' · '+(t.sheet||t.review?t.L[0].n:LV[lv].toLowerCase()+' уровень'),tid:t.sheet||t.review?null:t.id,lv,over:over||null,
+    p:{...t.L[lv].p,...(over||{})},s:seed||newSeed(),dz:st.design||null,tp:{t:t.t,grade:t.grade,subject:t.subject,rule:t.rule||null,sheet:!!(t.sheet||t.review),ln:t.L[lv].n,sec:t.section||(t.id?secOf(t.id):'')}}}
+function roomAddLesson(){
+  const t=roomCurTopic();if(!t){roomTopicPick();return}const st=roomStudent();
+  const mm=mastery(st.id,t.id),lv=Math.min(mm.cls==='ok'?2:mm.cls==='bad'?0:1,t.L.length-1);
+  const sh=sheetTopic('Урок',tplBlocks('lesson',st,t,lv),t);
+  roomAdd({k:'sheet',t:'Урок: '+t.t,tid:t.id,lv,p:sh.L[0].p,s:newSeed(),dz:st.design||null,tp:{t:t.t,grade:t.grade,subject:t.subject,rule:t.rule||null,sheet:true,ln:'Урок',sec:'Лист «Урок»'}});
+}
+function roomPicker(){
+  const t=roomCurTopic();
+  const it=(a,b,s)=>`<button class="rq" data-a="${a}"><b>${b}</b><small>${s}</small></button>`;
+  modal(`<h2>Добавить в урок</h2><div class="rm-pick">
+      ${t?`<button class="rq main" data-a="lesson"><b>Урок по теме</b><small>${esc(t.t)} · правило, разминка, задачи</small></button>`:''}
+      ${it('topic','Лист по теме','любая тема и уровень')}${it('saved','Из моих материалов','сохранённые листы и файлы')}
+      ${it('file','Файл или фото','PDF, картинка, фото страницы учебника')}${it('board','Чистая доска','в клетку, в линейку или белая')}
+      ${it('note','Объяснение','правило темы или свой текст')}${it('link','Ссылка','видео, игра, сайт')}</div>
+    <p class="hint" style="margin:0">Скриншот можно вставить прямо в комнату: Ctrl+V. Ученик видит материал, только когда вы его покажете.</p>
+    <div class="modal-actions"><button class="btn quiet" id="cl">Отмена</button></div>`,()=>{
+    document.getElementById('cl').onclick=close;
+    document.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{const a=b.dataset.a;
+      if(a==='lesson'){close();roomAddLesson()}else if(a==='topic')roomTopicPick();else if(a==='saved')roomSavedPick();
+      else if(a==='file')roomFilePick();else if(a==='board')roomBoardPick();else if(a==='note')roomNoteEdit();else if(a==='link')roomLinkEdit()})});
+}
+function roomTopicPick(){
+  const st=roomStudent(),subj=roomSubj(),pos=trackPos(st,subj);
+  const near=pos.i>=0?[pos.tr[pos.i-1],pos.tr[pos.i],pos.tr[pos.i+1]].filter(Boolean):[];
+  let sel=null;
+  modal(`<h2>Лист по теме</h2>
+    <div class="field"><label class="label" for="rq1">Найти тему</label><input id="rq1" type="search" autocomplete="off" placeholder="Тема или пример: 37 + 48"></div>
+    <div class="picks" id="rqL"></div><div id="rqLv"></div>
+    <div class="modal-actions"><button class="btn quiet" id="cl">Назад</button></div>`,()=>{
+    const L=document.getElementById('rqL'),Lv=document.getElementById('rqLv');
+    const show=ids=>{L.innerHTML=ids.length?ids.map(id=>`<button class="pick" data-t="${id}"><b>${esc(TOPICS[id].t)}</b><small>${gradeWord(TOPICS[id].grade)}${id===pos.tr[pos.i]?' · сейчас':''}</small></button>`).join(''):'<p class="empty">Ничего не нашлось.</p>';
+      L.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{sel=TOPICS[b.dataset.t];L.querySelectorAll('.pick').forEach(x=>x.classList.toggle('on',x===b));
+        Lv.innerHTML=`<span class="label">Уровень</span><div class="seg">${sel.L.map((l,k)=>`<button data-lv="${k}">${esc(sel.L.length>1?LV[k]:l.n)}</button>`).join('')}</div>`;
+        Lv.querySelectorAll('[data-lv]').forEach(x=>x.onclick=()=>{close();roomAdd(roomSheetFrom(sel,+x.dataset.lv))})})};
+    show(near);
+    const q=document.getElementById('rq1');q.oninput=()=>{const v=q.value.trim();show(v?searchTopics(v,subj).filter(r=>TOPICS[r.tid]).map(r=>r.tid).filter((x,k,a)=>a.indexOf(x)===k).slice(0,10):near)};
+    document.getElementById('cl').onclick=roomPicker;setTimeout(()=>q.focus(),30)});
+}
+async function roomSavedPick(){
+  if(FILES===null&&ACC.user)await loadFiles();
+  const sv=S.saved,fs=(FILES||[]).filter(f=>/\.(pdf|png|jpe?g|webp|gif)$/i.test(f.name||f.file));
+  modal(`<h2>Из моих материалов</h2>
+    ${sv.length?`<span class="label">Листы</span><div class="picks">${sv.map(m=>`<button class="pick" data-sv="${m.id}"><b>${esc(m.name)}</b><small>${esc(m.kind||'Лист')}</small></button>`).join('')}</div>`:''}
+    ${fs.length?`<span class="label">Файлы</span><div class="picks">${fs.map(f=>`<button class="pick" data-f="${f.id}"><b>${esc(f.name||f.file)}</b><small>${fileKind(f.name||f.file)}</small></button>`).join('')}</div>`:''}
+    ${!sv.length&&!fs.length?'<p class="empty">В «Моих материалах» пока нет листов и файлов, которые можно открыть в комнате (PDF и картинки).</p>':''}
+    <div class="modal-actions"><button class="btn quiet" id="cl">Назад</button></div>`,()=>{
+    document.getElementById('cl').onclick=roomPicker;
+    document.querySelectorAll('[data-sv]').forEach(b=>b.onclick=()=>{const m=S.saved.find(x=>x.id===b.dataset.sv);close();
+      if(m.sheet){const t=m.sheet;roomAdd({...roomSheetFrom({...t,id:null,sheet:true},0,null,m.seed),t:m.name})}
+      else{const t=TOPICS[m.topicId];if(!t){toast('Тема этого листа удалена');return}roomAdd({...roomSheetFrom(t,Math.min(m.level||0,t.L.length-1),m.over,m.seed),t:m.name})}});
+    document.querySelectorAll('[data-f]').forEach(b=>b.onclick=async()=>{const f=FILES.find(x=>x.id===b.dataset.f);close();toast('Копирую файл в комнату…');
+      try{const tok=await pbT.files.getToken();const bl=await (await fetch(pbT.files.getURL(f,f.file,{token:tok}))).blob();
+        roomUpload(new File([bl],f.name||f.file,{type:bl.type}),(f.name||f.file).replace(/\.[^.]+$/,''))}catch(e){toast('Файл не скопировался')}});
+  });
+}
+function roomFilePick(){
+  close();const inp=document.createElement('input');inp.type='file';inp.accept='.pdf,image/*';inp.multiple=true;
+  inp.onchange=async()=>{for(const f of inp.files)await roomUpload(f)};inp.click();
+}
+async function roomUpload(file,title){
+  if(file.size>25e6){toast('Файл больше 25 МБ');return}
+  toast('Загружаю '+(file.name||'файл')+'…');
+  const before=new Set(R.rec.docs||[]);const fd=new FormData();fd.append('docs+',file);
+  try{const r=await R.pb.collection('rooms').update(R.rec.id,fd);R.rec=r;const fn=(r.docs||[]).find(x=>!before.has(x));if(!fn)throw 0;
+    const pdf=/pdf/i.test(file.type)||/\.pdf$/i.test(file.name||'');
+    roomAdd({k:pdf?'pdf':'img',f:fn,t:title||(file.name||'Файл').replace(/\.[^.]+$/,'')})}
+  catch(e){toast('Файл не загрузился. Проверьте интернет')}
+}
+function roomBoardPick(){
+  modal(`<h2>Чистая доска</h2><div class="rm-pick bd">
+    <button class="rq" data-bg="grid"><span class="bdp bg-grid"></span><b>В клетку</b></button>
+    <button class="rq" data-bg="lines"><span class="bdp bg-lines"></span><b>В линейку</b></button>
+    <button class="rq" data-bg="white"><span class="bdp bg-white"></span><b>Белая</b></button></div>
+    <div class="modal-actions"><button class="btn quiet" id="cl">Назад</button></div>`,()=>{
+    document.getElementById('cl').onclick=roomPicker;
+    document.querySelectorAll('[data-bg]').forEach(b=>b.onclick=()=>{close();roomAdd({k:'board',bg:b.dataset.bg,n:1,t:'Доска '+({grid:'в клетку',lines:'в линейку',white:'белая'})[b.dataset.bg]})})});
+}
+function roomNoteEdit(){
+  const t=roomCurTopic();
+  modal(`<h2>Объяснение</h2>
+    <div class="field"><label class="label" for="rn1">Заголовок</label><input id="rn1" type="text" maxlength="120" value="${t&&t.rule?esc(t.t):''}"></div>
+    <div class="field"><label class="label" for="rn2">Текст</label><textarea id="rn2" rows="5" maxlength="3000">${t&&t.rule?esc(t.rule[0]):''}</textarea></div>
+    <div class="field"><label class="label" for="rn3">Пример</label><input id="rn3" type="text" maxlength="300" value="${t&&t.rule?esc(t.rule[1]):''}"></div>
+    ${t&&t.rule?'<p class="hint" style="margin:0">Подставлено правило текущей темы. Можно поменять.</p>':''}
+    <p class="hint" id="rnE" style="margin:0"></p>
+    <div class="modal-actions"><button class="btn quiet" id="cl">Назад</button><button class="btn primary" id="ok">Добавить</button></div>`,()=>{
+    document.getElementById('cl').onclick=roomPicker;
+    document.getElementById('ok').onclick=()=>{const h=val('rn1'),x=document.getElementById('rn2').value.trim(),ex=val('rn3');
+      if(!h&&!x){document.getElementById('rnE').textContent='Впишите заголовок или текст.';return}close();roomAdd({k:'note',t:h||'Объяснение',txt:x,ex})}});
+}
+function roomLinkEdit(){
+  modal(`<h2>Ссылка</h2>
+    <div class="field"><label class="label" for="rl1">Адрес</label><input id="rl1" type="url" inputmode="url" placeholder="https://wordwall.net/…"></div>
+    <div class="field"><label class="label" for="rl2">Название</label><input id="rl2" type="text" maxlength="120" placeholder="Игра на слова"></div>
+    <p class="hint" id="rlE" style="margin:0">Ученик увидит кнопку «Открыть»: ссылка откроется у него в новой вкладке.</p>
+    <div class="modal-actions"><button class="btn quiet" id="cl">Назад</button><button class="btn primary" id="ok">Добавить</button></div>`,()=>{
+    document.getElementById('cl').onclick=roomPicker;
+    document.getElementById('ok').onclick=()=>{let u=val('rl1');if(u&&!/^https?:\/\//i.test(u))u='https://'+u;
+      try{new URL(u)}catch(e){document.getElementById('rlE').textContent='Проверьте адрес ссылки.';return}
+      close();roomAdd({k:'link',url:u,t:val('rl2')||new URL(u).hostname})}});
+}
+function roomCallModal(){
+  modal(`<h2>Звонок</h2>
+    <p style="margin:0">Вставьте постоянную ссылку на звонок: Яндекс Телемост, Zoom, VK Звонки. Ученик увидит кнопку «Звонок», когда урок идёт.</p>
+    <div class="field"><label class="label" for="rc1">Ссылка</label><input id="rc1" type="url" inputmode="url" value="${esc(R.st.call||'')}" placeholder="https://telemost.yandex.ru/j/…"></div>
+    <p class="hint" id="rcE" style="margin:0"></p>
+    <div class="modal-actions">${R.st.call?'<button class="btn quiet" id="rx">Убрать</button>':''}<button class="btn quiet" id="cl">Отмена</button><button class="btn primary" id="ok">Сохранить</button></div>`,()=>{
+    document.getElementById('cl').onclick=close;const rx=document.getElementById('rx');if(rx)rx.onclick=()=>{roomSet({call:''});close();roomTop()};
+    document.getElementById('ok').onclick=()=>{let u=val('rc1');if(u&&!/^https?:\/\//i.test(u))u='https://'+u;
+      try{if(u)new URL(u)}catch(e){document.getElementById('rcE').textContent='Проверьте ссылку.';return}roomSet({call:u});close();roomTop()}});
+}
+function roomSettings(){
+  modal(`<h2>Комната ${esc(R.info.first||'')}</h2>
+    <div class="field"><span class="label">Ученик видит, верно ли ответил</span><div class="seg" id="rsChk"><button data-v="1" class="${R.st.chk!==false?'on':''}">Сразу</button><button data-v="0" class="${R.st.chk===false?'on':''}">Нет, только я</button></div></div>
+    <p class="hint" style="margin:0">«Нет, только я» подходит для проверочной: ответ встаёт в лист, но без отметки.</p>
+    <div class="modal-actions"><button class="btn quiet" id="rsCall">Ссылка на звонок</button><button class="btn primary" id="cl">Готово</button></div>`,()=>{
+    document.getElementById('cl').onclick=close;document.getElementById('rsCall').onclick=roomCallModal;
+    document.querySelectorAll('#rsChk button').forEach(b=>b.onclick=()=>{roomSet({chk:b.dataset.v==='1'});document.querySelectorAll('#rsChk button').forEach(x=>x.classList.toggle('on',x===b))})});
+}
+
+/* ---------- начало и конец урока ---------- */
+function roomBegin(){
+  const d0=dayStart(Date.now());const c=R.mats.find(m=>m.id===R.st.cur);
+  if(c&&R.st.lead!==false){c.vis=true;roomSaveMats()}
+  roomSet({live:true,liveAt:Date.now(),lead:R.st.lead!==false});roomUpdate();
+  toast(`${R.info.first||'Ученик'} увидит в кабинете «Урок идёт · Войти»`);
+  if(!R.mats.some(m=>(m.at||0)>=d0))roomPicker();
+}
+function roomFinish(){
+  const res=[];
+  for(const m of R.mats.filter(m=>m.k==='sheet'&&!m.rec&&R.ans[m.id])){
+    const items=roomItems(m),a=R.ans[m.id];const idx=Object.keys(a).map(Number).filter(i=>items[i]&&rAnswerable(items[i]));if(!idx.length)continue;
+    const by={};let k=0;const mist=[];
+    for(const i of idx){const it=items[i],ok=rOk(it,a[i]);if(ok)k++;const src=it.src||m.tid;if(!src)continue;
+      const b=by[src]=by[src]||{c:0,n:0,mm:[]};b.n++;if(ok)b.c++;else{const x={q:plainQ(it),given:String(a[i]),ans:String(fmt(it.ans)),src};b.mm.push(x);mist.push(x)}}
+    if(!m.tid&&!Object.keys(by).length)mist.push(...idx.filter(i=>!rOk(items[i],a[i])).map(i=>({q:plainQ(items[i]),given:String(a[i]),ans:String(fmt(items[i].ans))})));
+    Object.keys(by).filter(src=>TOPICS[src]).forEach((src,j)=>S.attempts.push({id:'r'+Date.now()+'-'+j+'-'+m.id,studentId:R.info.sid,topicId:src,
+      level:src===m.tid?Math.min(m.lv||0,TOPICS[src].L.length-1):Math.min(1,TOPICS[src].L.length-1),correct:by[src].c,total:by[src].n,answered:by[src].n,mistakes:by[src].mm,date:Date.now(),via:'room'}));
+    m.rec=Date.now();res.push({m,k,n:idx.length,mist});
+  }
+  if(res.length){save();roomSaveMats()}
+  roomSet({live:false,pen:false});roomUpdate();
+  const bad={};res.forEach(r=>r.mist.forEach(x=>{if(x.src&&TOPICS[x.src])bad[x.src]=(bad[x.src]||0)+1}));
+  const worst=Object.keys(bad).sort((a,b)=>bad[b]-bad[a])[0];
+  modal(`<h2>Урок завершён</h2>
+    ${res.length?res.map(r=>`<div class="rm-res"><b>${esc(r.m.t)}</b>${resChip(r.k,r.n)}</div>${r.mist.length?`<ul class="rm-mist">${r.mist.slice(0,6).map(x=>`<li>${esc(x.q)}: ответ ${esc(x.given)}, верно ${esc(x.ans)}</li>`).join('')}</ul>`:''}`).join('')
+      +'<p class="hint" style="margin:0">Результаты записаны в карточку ученика, как у домашки.</p>'
+      :'<p style="margin:0">В листах этого урока нет ответов ученика, поэтому записывать нечего.</p>'}
+    <div class="modal-actions"><button class="btn quiet" id="cl">Готово</button>${worst?`<button class="btn primary" id="hw">Ошибки → домашка</button>`:''}</div>`,()=>{
+    document.getElementById('cl').onclick=close;
+    const hw=document.getElementById('hw');if(hw)hw.onclick=()=>{close();roomStop();V.studentId=R.info.sid;V.subject=TOPICS[worst].subject;openTopic(worst,{tpl:'home'})}});
+}
+/* домашка из листа комнаты: та же тема и уровень, новый вариант, сразу в кабинет ученика */
+function roomHomework(m){
+  if(!m.tid||!TOPICS[m.tid])return;const t=TOPICS[m.tid];
+  Object.assign(V,{studentId:R.info.sid,topicId:m.tid,level:Math.min(m.lv||0,t.L.length-1),seed:newSeed(),over:m.over||null,subName:null,tpl:'train'});
+  linkModal();
+}
+
+/* ---------- кабинет ученика: комната ---------- */
+async function loadCabRoom(){
+  const me=pbS.authStore.record;if(!me)return;
+  try{CAB.room=await pbS.collection('rooms').getFirstListItem(pbS.filter('student = {:s}',{s:me.id}),{fields:'id,st,mats'})}catch(e){CAB.room=null}
+  if(CAB.room&&!CAB.roomSub){CAB.roomSub=true;try{await pbS.collection('rooms').subscribe(CAB.room.id,e=>{CAB.room=e.record;if(V.screen==='cab')render()},{fields:'id,st,mats'})}catch(e){CAB.roomSub=false}}
+  if(V.screen==='cab')render();
+}
+function cabRoomHTML(){const r=CAB.room;if(!r)return'';const st=r.st||{},live=roomLive(st),n=(r.mats||[]).filter(m=>m.vis).length;
+  if(live)return `<div class="cab-room live"><div><b>Урок идёт</b><span>Репетитор ждёт тебя в комнате</span></div><div class="cr-act">${st.call?'<button class="btn" id="crCall">Звонок</button>':''}<button class="btn primary" id="crGo">Войти</button></div></div>`;
+  return n?`<div class="cab-room"><div><b>Моя тетрадь</b><span>Материалы с уроков: ${n}</span></div><div class="cr-act"><button class="btn" id="crGo">Открыть</button></div></div>`:'';
+}
+function bindCabRoom(){const g=document.getElementById('crGo');if(g)g.onclick=()=>openRoomCab(CAB.room.id);
+  const c=document.getElementById('crCall');if(c)c.onclick=()=>window.open(CAB.room.st.call,'_blank','noopener')}
+
 let STUDENT_MODE=false;
 {const m=location.hash.match(/^#hw=([\w-]+)/);
  if(m){STUDENT_MODE=true;document.body.classList.add('student-mode');
