@@ -1007,6 +1007,7 @@ button.mchip:hover{background:rgba(255,255,255,.24)}
 .rm-side{position:sticky;top:76px;display:flex;flex-direction:column;gap:6px;max-height:calc(100vh - 96px);overflow-y:auto;overflow-x:hidden;padding-right:2px;min-width:0}
 .r-s .rm-side{display:none}
 .r-s .rm-side.open{display:flex;position:fixed;z-index:30;top:0;left:0;bottom:0;width:min(320px,86vw);max-height:none;background:var(--card);padding:16px;border-right:1px solid var(--line);box-shadow:0 10px 40px rgba(20,30,60,.18)}
+.rm-side > *{flex-shrink:0}
 .rm-sh{font-size:12px;font-weight:600;color:var(--ink-3);text-transform:uppercase;letter-spacing:.04em;margin:2px 0}
 .rm-mat{display:flex;align-items:center;gap:2px;border:1px solid var(--line);background:var(--card);border-radius:var(--r);min-width:0;max-width:100%;overflow:hidden}
 .rm-mat.on{border-color:var(--blue);box-shadow:0 0 0 1px var(--blue)}
@@ -1142,7 +1143,7 @@ body.inroom .wrap{max-width:1360px}
 .vc-v #vcR{width:100%;height:100%;object-fit:cover;display:block}
 .vc-v #vcL{position:absolute;right:8px;bottom:8px;width:30%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;border:2px solid rgba(255,255,255,.7);background:#222;transform:scaleX(-1)}
 .vc-wait{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:16px;font-size:14px;line-height:1.4;background:rgba(11,15,25,.72)}
-.vc-tap{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:#fff;color:#141A28;border:0;border-radius:10px;padding:10px 14px;font:600 14px var(--f-ui);cursor:pointer}
+.vc-tap{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);background:#fff;color:#141A28;border:0;border-radius:10px;padding:10px 14px;font:600 14px var(--f-ui);cursor:pointer}
 .vc-bar{display:flex;align-items:center;gap:6px;padding:8px 10px}
 .vc-q{flex:1;font-size:12px;color:#9AA5BF;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .vc-q::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;background:#66718D;vertical-align:0}
@@ -5583,7 +5584,8 @@ const roomLive=st=>!!(st&&st.live&&Date.now()-(st.liveAt||0)<R_LIVE_MAX);
 const rTitle=t=>String(t||'').replace(/\.(pdf|png|jpe?g|webp|gif|heic)$/i,'').replace(/[_]+/g,' ').replace(/\s+/g,' ').trim()||'Файл';
 const R_KIND={sheet:'Лист',pdf:'PDF',img:'Картинка',board:'Доска',note:'Объяснение',link:'Ссылка'};
 const rAnswerable=it=>it&&!['mor','snt'].includes(it.type)&&!(it.type==='sort'&&!it.opts)&&!(it.type==='line'&&it.noLine)&&it.ans!=null&&String(it.ans)!=='';
-const rOk=(it,v)=>norm(it.ans)===norm(v);
+/* числа сверяются без пробелов: «18 000» и «18000» — один ответ */
+const rOk=(it,v)=>{const a=norm(it.ans),b=norm(v);return a===b||(/^[\d\s\u00a0]+$/.test(a+b)&&a.replace(/[\s\u00a0]/g,'')===b.replace(/[\s\u00a0]/g,''))};
 
 /* репетитор открывает комнату ученика: аккаунт ученика и комната создаются при первом входе */
 async function openRoom(sid){
@@ -6281,7 +6283,8 @@ async function callPc(){
 /* полное описание связи сразу со всеми адресами: одно сообщение туда и одно обратно */
 function callGather(pc){return new Promise(res=>{if(pc.iceGatheringState==='complete')return res();
   const t=setTimeout(res,2500);pc.addEventListener('icegatheringstatechange',()=>{if(pc.iceGatheringState==='complete'){clearTimeout(t);res()}})})}
-function callSend(sig){roomPulse({sig,call:C.st==='idle'?null:C.n},true)}
+/* у каждого сообщения свой номер: после перезагрузки страницы старые и новые не путаются */
+function callSend(sig){if(sig)sig.i=RID(6);roomPulse({sig,call:C.st==='idle'?null:C.n},true);return sig&&sig.i}
 
 /* ---------- репетитор звонит ---------- */
 async function callStart(again){
@@ -6296,7 +6299,7 @@ async function callOffer(restart){
   if(C.st==='idle')return;
   if(!C.pc||!restart){if(C.pc)C.pc.close();C.pc=await callPc()}
   const off=await C.pc.createOffer(restart?{iceRestart:true}:{});await C.pc.setLocalDescription(off);await callGather(C.pc);
-  if(C.st==='idle')return;C.r++;callSend({n:C.n,t:'offer',r:C.r,fresh:!restart,sdp:C.pc.localDescription.sdp});
+  if(C.st==='idle')return;C.r++;C.oid=callSend({n:C.n,t:'offer',r:C.r,fresh:!restart,sdp:C.pc.localDescription.sdp});
 }
 /* ---------- ученик: звонок пришёл ---------- */
 async function callAccept(auto){
@@ -6308,17 +6311,20 @@ async function callAccept(auto){
 async function callAnswer(o){
   if(!C.pc||C.pcN!==o.n||o.fresh){if(C.pc)C.pc.close();C.pc=await callPc();C.pcN=o.n}
   await C.pc.setRemoteDescription({type:'offer',sdp:o.sdp});const ans=await C.pc.createAnswer();await C.pc.setLocalDescription(ans);await callGather(C.pc);
-  callSend({n:o.n,t:'answer',r:o.r,sdp:C.pc.localDescription.sdp});
+  callSend({n:o.n,t:'answer',r:o.r,oi:o.i,sdp:C.pc.localDescription.sdp});
 }
 /* сообщения второй стороны из pulse */
 async function callOnSig(d){
-  if(R.role==='t'&&C.st==='idle'&&d&&d.call){let mine='';try{mine=sessionStorage.getItem(CALL_KEY)}catch(e){}if(mine===d.call){C.n=d.call;callStart(true);return}}
-  const s=d&&d.sig;if(!s||!s.n)return;const key=s.n+':'+s.t+':'+(s.r||0);if(key===C.seen)return;C.seen=key;
+  let mine='';try{mine=sessionStorage.getItem(CALL_KEY)||''}catch(e){}
+  /* страницу обновили посреди звонка: репетитор звонит заново сам, ученик просит перезвонить */
+  if(R.role==='t'&&C.st==='idle'&&d&&d.call&&mine===d.call){C.n=d.call;callStart(true);return}
+  if(R.role==='s'&&C.st==='idle'&&d&&d.call&&mine===d.call&&!C.joinSent){C.joinSent=true;roomPulse({join:mine,jt:Date.now()},true)}
+  if(R.role==='t'&&d&&d.join&&d.join===C.n&&d.jt!==C.lastJoin&&C.st!=='idle'){C.lastJoin=d.jt;callOffer(false);return}
+  const s=d&&d.sig;if(!s||!s.n)return;const key=s.i||s.n+':'+s.t+':'+(s.r||0);if(key===C.seen)return;C.seen=key;
   if(s.t==='bye'){if(C.n===s.n){callEnd(false,R.role==='t'?'Ученик завершил звонок':'Репетитор завершил звонок')}if(C.offer&&C.offer.n===s.n){C.offer=null;callUI()}return}
-  if(R.role==='t'){if(s.t==='answer'&&C.pc&&s.n===C.n&&C.pc.signalingState==='have-local-offer'){try{await C.pc.setRemoteDescription({type:'answer',sdp:s.sdp});C.st='connecting';callUI()}catch(e){}}return}
+  if(R.role==='t'){if(s.t==='answer'&&C.pc&&s.n===C.n&&(!s.oi||s.oi===C.oid)&&C.pc.signalingState==='have-local-offer'){try{await C.pc.setRemoteDescription({type:'answer',sdp:s.sdp});C.st='connecting';callUI()}catch(e){}}return}
   if(s.t!=='offer')return;C.offer=s;
   if(C.st!=='idle'){try{await callAnswer(s)}catch(e){}return}
-  let mine='';try{mine=sessionStorage.getItem(CALL_KEY)}catch(e){}
   if(mine===s.n)return callAccept(true);
   C.st='ringing';callUI();callRing();
 }
@@ -6349,7 +6355,7 @@ function callEnd(send,why){
   if(C.loc)C.loc.getTracks().forEach(t=>t.stop());C.loc=null;C.rem=null;C.st='idle';C.offer=null;C.q='';
   try{sessionStorage.removeItem(CALL_KEY)}catch(e){}
   if(R.on)roomPulse({sig:send?{n:C.n,t:'bye'}:null,call:null},true);
-  C.n=null;callUI();if(why)toast(why);
+  C.n=null;C.needTap=false;callUI();if(why)toast(why);
 }
 function callMic(){C.mic=!C.mic;if(C.loc)C.loc.getAudioTracks().forEach(t=>t.enabled=C.mic);callUI()}
 function callCam(){C.cam=!C.cam;if(C.loc)C.loc.getVideoTracks().forEach(t=>t.enabled=C.cam);callUI()}
@@ -6357,7 +6363,8 @@ function callCam(){C.cam=!C.cam;if(C.loc)C.loc.getVideoTracks().forEach(t=>t.ena
 function callRing(){try{const a=new AudioContext(),o=a.createOscillator(),g=a.createGain();o.frequency.value=660;g.gain.value=.06;o.connect(g).connect(a.destination);o.start();
   [0,.25,.5].forEach((t,k)=>g.gain.setValueAtTime(k%2?0:.06,a.currentTime+t));o.stop(a.currentTime+.7)}catch(e){}}
 function callVideos(){const r=document.getElementById('vcR'),l=document.getElementById('vcL');
-  if(r&&C.rem&&r.srcObject!==C.rem){r.srcObject=C.rem;r.play().catch(()=>{C.needTap=true;callUI()})}
+  /* браузер может не дать включить звук без нажатия: тогда видео идёт без звука, а кнопка включает звук */
+  if(r&&C.rem&&r.srcObject!==C.rem){r.srcObject=C.rem;r.muted=!!C.needTap;r.play().catch(()=>{if(C.needTap)return;C.needTap=true;r.muted=true;r.play().catch(()=>{});callUI()})}
   if(l&&C.loc&&l.srcObject!==C.loc)l.srcObject=C.loc}
 function callQ(){const q=document.getElementById('vcQ');if(!q)return;q.className='vc-q '+C.q;
   q.textContent=C.q==='good'?'Связь хорошая':C.q==='mid'?'Связь средняя':C.q==='bad'?'Связь слабая':'';
@@ -6368,24 +6375,25 @@ function callUI(){
   if(!el){el=document.createElement('div');el.id='vc';document.body.appendChild(el)}
   const other=R.role==='t'?(R.info.first||'Ученик'):(R.info.tutor||'Репетитор');
   el.className='vc'+(C.big?' big':'')+(C.st==='live'||C.st==='reconnecting'?' on':'');
-  if(C.st==='ringing'){el.innerHTML=`<div class="vc-ring"><b>${esc(other)} звонит</b><span>Видеозвонок</span>
+  if(C.st==='ringing'){el.dataset.m='ring';el.innerHTML=`<div class="vc-ring"><b>${esc(other)} звонит</b><span>Видеозвонок</span>
       <div class="vc-ra"><button class="btn vc-no" id="vcNo">Не сейчас</button><button class="btn primary vc-yes" id="vcYes">Ответить</button></div></div>`;
     document.getElementById('vcYes').onclick=()=>callAccept(false);document.getElementById('vcNo').onclick=callDecline;return}
+  /* видео создаётся один раз на звонок: пересоздание плееров тормозит браузер */
+  if(el.dataset.m!=='call'){el.dataset.m='call';el.innerHTML=`<div class="vc-v"><video id="vcR" autoplay playsinline></video><video id="vcL" autoplay playsinline muted></video><div id="vcOv"></div></div>
+    <div class="vc-bar" id="vcBar"></div><div id="vcMsg"></div>`}
   const wait=C.st==='calling'?`Звоним: ${esc(other)}…${roomHere()?'':' Ученик пока не в комнате, звонок дождётся его.'}`:C.st==='connecting'?'Соединяем…':C.st==='reconnecting'?'Связь прервалась, восстанавливаем…':'';
-  el.innerHTML=`<div class="vc-v"><video id="vcR" autoplay playsinline></video><video id="vcL" autoplay playsinline muted></video>
-      ${wait?`<div class="vc-wait">${wait}</div>`:''}${C.needTap?'<button class="vc-tap" id="vcTap">Нажмите, чтобы включить звук</button>':''}</div>
-    <div class="vc-bar"><span class="vc-q" id="vcQ"></span>
+  document.getElementById('vcOv').innerHTML=(wait?`<div class="vc-wait">${wait}</div>`:'')+(C.needTap?'<button class="vc-tap" id="vcTap">Нажмите, чтобы включить звук</button>':'');
+  document.getElementById('vcBar').innerHTML=`<span class="vc-q" id="vcQ"></span>
       <button class="vc-b${C.mic?'':' off'}" id="vcMic" aria-label="${C.mic?'Выключить микрофон':'Включить микрофон'}" title="Микрофон">${C.mic?'🎙':'🔇'}</button>
       <button class="vc-b${C.cam?'':' off'}" id="vcCam" aria-label="${C.cam?'Выключить камеру':'Включить камеру'}" title="Камера">${C.cam?'📷':'🚫'}</button>
       <button class="vc-b" id="vcBig" aria-label="${C.big?'Уменьшить':'Увеличить'}" title="Размер">${C.big?'↘':'↖'}</button>
-      <button class="vc-b end" id="vcEnd" aria-label="Завершить звонок" title="Завершить">✕</button></div>
-    ${C.msg?`<div class="vc-msg">${esc(C.msg)}</div>`:''}`;
+      <button class="vc-b end" id="vcEnd" aria-label="Завершить звонок" title="Завершить">✕</button>`;
+  document.getElementById('vcMsg').innerHTML=C.msg?`<div class="vc-msg">${esc(C.msg)}</div>`:'';
   const $=id=>document.getElementById(id);
   $('vcMic').onclick=callMic;$('vcCam').onclick=callCam;$('vcBig').onclick=()=>{C.big=!C.big;callUI()};$('vcEnd').onclick=()=>callEnd(true);
-  if($('vcTap'))$('vcTap').onclick=()=>{C.needTap=false;const r=$('vcR');r.play().catch(()=>{});callUI()};
+  if($('vcTap'))$('vcTap').onclick=()=>{C.needTap=false;const r=$('vcR');r.muted=false;r.play().catch(()=>{});callUI()};
   callVideos();callQ();roomTop();
 }
-
 /* ---------- кабинет ученика: комната ---------- */
 async function loadCabRoom(){
   const me=pbS.authStore.record;if(!me)return;
