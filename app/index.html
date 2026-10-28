@@ -4267,7 +4267,8 @@ function crumbs(){
 
 function render(){
   document.body.classList.toggle('authbg',['auth','cablogin'].includes(V.screen));
-  if(R.on&&!['room','croom'].includes(V.screen))roomStop();
+  if(V.forRoom&&!['room','topic'].includes(V.screen))V.forRoom=null;
+  if(R.on&&!['room','croom'].includes(V.screen)&&!(V.screen==='topic'&&V.forRoom))roomStop();
   document.body.classList.toggle('inroom',['room','croom'].includes(V.screen));
   crumbs();renderSide();
   if(ACC.user)syncResults();
@@ -4597,7 +4598,8 @@ function viewTopic(){
     <div class="topic-grid">
       <div class="levels">${tplSeg}${tpl==='own'?'':lv}
         ${blocksHTML}${t.rule?`<label class="chk"><input type="checkbox" id="rulecb"${V.noRule?'':' checked'}> Правило на листе</label>`:''}${designBox(st,V.seed)}
-        <div class="actions"><button class="btn primary" id="print">Печать</button><button class="btn" id="link">Ссылка ученику</button><button class="btn link" id="tomat">Сохранить в материалы</button></div>
+        ${V.forRoom&&R.on?`<div class="actions"><button class="btn primary" id="toroom">${V.forRoom.rep?'Обновить в комнате':'Добавить в комнату'}</button><button class="btn" id="backroom">← В комнату</button></div>`
+          :`<div class="actions"><button class="btn primary" id="print">Печать</button><button class="btn" id="link">Ссылка ученику</button><button class="btn link" id="tomat">Сохранить в материалы</button></div>`}
         <details class="fold"><summary>Ещё</summary>
           ${tunable?`<div class="tune-row"><label for="lo">Числа от</label><input id="lo" type="number" value="${p.lo}"><label for="hi">до</label><input id="hi" type="number" value="${p.hi}"></div>
           <div class="tune-row"><label for="cnt">Заданий</label><input id="cnt" type="number" min="4" max="24" value="${p.count}"><button class="btn small" id="apply">Применить</button></div>`:''}
@@ -4634,9 +4636,10 @@ function viewTopic(){
   $('again').onclick=()=>{const cur=resolveDesign(st,V.seed);let s2=newSeed();
     for(let k=0;k<30;k++){const nx=resolveDesign(st,s2);if(!cur.img||!nx.img||nx.theme.id!==cur.theme.id||nx.img.id!==cur.img.id)break;s2=newSeed()}
     V.seed=s2;render()};
-  $('print').onclick=()=>{materialize();go({screen:'print'})};
+  if($('toroom')){$('toroom').onclick=()=>roomFromTopic(st,t,tpl,blocks);$('backroom').onclick=()=>go({screen:'room',forRoom:null})}
+  else{$('print').onclick=()=>{materialize();go({screen:'print'})};
   $('tomat').onclick=()=>saveSheetModal(st,t,tpl,blocks);
-  $('link').onclick=()=>{materialize();linkModal();unmaterialize();render()};
+  $('link').onclick=()=>{materialize();linkModal();unmaterialize();render()}}
   const sc=$('setcur');if(sc)sc.onclick=()=>{st[CK(t.subject)]=t.id;save();render()};
   const dl=$('del');
   if(dl)dl.onclick=()=>{
@@ -5723,6 +5726,7 @@ function roomTools(){
     el.innerHTML=`<div class="seg rm-seg"><button class="${R.st.lead!==false?'on':''}" id="rmLead">Веду я</button><button class="${R.st.lead===false?'on':''}" id="rmFree">Свободно</button></div>
       <div class="rt-g">${tb('hand','Указка')}${tb('pen','Маркер')}${tb('hl','Выделитель')}<button class="rt" id="rmUndo" aria-label="Отменить свою линию">↶</button><button class="rt" id="rmClr">Очистить</button></div>
       <div class="rt-g"><button class="rt${R.st.pen?' on':''}" id="rmPen">${R.st.pen?'Ручка у ученика':'Дать ручку'}</button>
+        ${m&&m.k==='sheet'&&m.tid&&TOPICS[m.tid]?'<button class="rt" id="rmTune">Настроить лист</button>':''}
         ${m&&m.k==='sheet'?`<button class="rt${R.keys?' on':''}" id="rmKeys">Ответы</button>${m.tid&&TOPICS[m.tid]?'<button class="rt" id="rmHw">В домашку</button>':''}`:''}
         ${m&&m.k==='board'?'<button class="rt" id="rmPg">+ Страница</button>':''}</div>`;
     const $=id=>document.getElementById(id);
@@ -5732,6 +5736,7 @@ function roomTools(){
     $('rmUndo').onclick=roomUndo;$('rmClr').onclick=roomClear;
     if($('rmKeys'))$('rmKeys').onclick=()=>{R.keys=!R.keys;roomTools();roomAnsPaint()};
     if($('rmHw'))$('rmHw').onclick=()=>roomHomework(m);
+    if($('rmTune'))$('rmTune').onclick=()=>roomTune(m.tid,m);
     if($('rmPg'))$('rmPg').onclick=()=>{m.n=(m.n||1)+1;roomSaveMats();R.stageKey='';roomStage();setTimeout(()=>roomScrollPg(m.n-1),60)};
   }else{
     const pen=!!R.st.pen&&roomLive(R.st);if(!pen&&R.tool!=='hand')R.tool='hand';
@@ -5915,13 +5920,37 @@ function roomAdd(m,open=true){
   roomSaveMats();roomUpdate();window.scrollTo({top:0});
 }
 function roomSheetFrom(t,lv,over,seed){const st=roomStudent();
-  return{k:'sheet',t:t.t+' · '+(t.sheet||t.review?t.L[0].n:LV[lv].toLowerCase()+' уровень'),tid:t.sheet||t.review?null:t.id,lv,over:over||null,
+  return{k:'sheet',t:t.t+' · '+(t.sheet||t.review?t.L[0].n:LV[lv].toLowerCase()+' уровень'),tid:t.sheet||t.review?null:t.id,lv,over:over||null,cfg:t.sheet||t.review?null:{tpl:'train'},
     p:{...t.L[lv].p,...(over||{})},s:seed||newSeed(),dz:st.design||null,tp:{t:t.t,grade:t.grade,subject:t.subject,rule:t.rule||null,sheet:!!(t.sheet||t.review),ln:t.L[lv].n,sec:t.section||(t.id?secOf(t.id):'')}}}
 function roomAddLesson(){
   const t=roomCurTopic();if(!t){roomTopicPick();return}const st=roomStudent();
   const mm=mastery(st.id,t.id),lv=Math.min(mm.cls==='ok'?2:mm.cls==='bad'?0:1,t.L.length-1);
   const sh=sheetTopic('Урок',tplBlocks('lesson',st,t,lv),t);
-  roomAdd({k:'sheet',t:'Урок: '+t.t,tid:t.id,lv,p:sh.L[0].p,s:newSeed(),dz:st.design||null,tp:{t:t.t,grade:t.grade,subject:t.subject,rule:t.rule||null,sheet:true,ln:'Урок',sec:'Лист «Урок»'}});
+  roomAdd({k:'sheet',t:'Урок: '+t.t,tid:t.id,lv,cfg:{tpl:'lesson'},p:sh.L[0].p,s:newSeed(),dz:st.design||null,tp:{t:t.t,grade:t.grade,subject:t.subject,rule:t.rule||null,sheet:true,ln:'Урок',sec:'Лист «Урок»'}});
+}
+/* настроить лист для комнаты на обычном экране темы: вид листа, уровень, оформление, вариант */
+function roomTune(tid,m){
+  const t=TOPICS[tid];if(!t)return;V.subject=t.subject;V.studentId=R.info.sid;
+  const c=m&&m.cfg||{};
+  const tpl0=c.tpl||(m&&m.tp&&m.tp.sheet?({'Урок':'lesson','Проверочная':'test','Домашка':'home'})[m.tp.ln]||'train':'train');
+  openTopic(tid,{forRoom:{rep:m?m.id:null},tpl:tpl0,...(m?{level:Math.min(m.lv||0,t.L.length-1),seed:m.s,over:m.over||null}:{}),blocks:c.blocks?c.blocks.map(x=>({...x})):null});
+}
+function roomFromTopic(st,t,tpl,blocks){
+  let m;
+  if(tpl!=='train'){const sh=sheetTopic(tplName(tpl),blocks,t);
+    m={k:'sheet',t:tplName(tpl)+': '+t.t,tid:t.id,lv:V.level,cfg:{tpl,blocks:tpl==='own'?blocks.map(x=>({...x})):null},p:sh.L[0].p,s:V.seed,dz:st.design?{...st.design}:null,
+      tp:{t:t.t,grade:t.grade,subject:t.subject,rule:t.rule||null,sheet:true,ln:tplName(tpl),sec:'Лист «'+tplName(tpl)+'»'}}}
+  else{m=roomSheetFrom(t,V.level,V.over,V.seed);if(V.subName)m.t=t.t+' · '+V.subName;m.dz=st.design?{...st.design}:null}
+  if(V.noRule&&m.tp)m.tp.rule=null;
+  const old=V.forRoom&&V.forRoom.rep&&R.mats.find(x=>x.id===V.forRoom.rep);
+  V.forRoom=null;
+  if(old){const used=R.ink.some(x=>x.mat===old.id)||Object.keys(R.ans[old.id]||{}).length;
+    m.id=RID(10);m.at=old.at;m.vis=old.vis;
+    if(used)R.mats.splice(R.mats.indexOf(old)+1,0,m);else R.mats[R.mats.indexOf(old)]=m;
+    if(R.st.lead!==false&&roomLive(R.st))m.vis=true;roomSet({cur:m.id,pg:0,foc:null});R.pgNow=0;roomSaveMats();
+    if(used)toast('Старый лист с пометками остался в ленте');
+  }else roomAdd(m);
+  go({screen:'room'});
 }
 function roomPicker(){
   const t=roomCurTopic();
@@ -5949,8 +5978,10 @@ function roomTopicPick(){
     const L=document.getElementById('rqL'),Lv=document.getElementById('rqLv');
     const show=ids=>{L.innerHTML=ids.length?ids.map(id=>`<button class="pick" data-t="${id}"><b>${esc(TOPICS[id].t)}</b><small>${gradeWord(TOPICS[id].grade)}${id===pos.tr[pos.i]?' · сейчас':''}</small></button>`).join(''):'<p class="empty">Ничего не нашлось.</p>';
       L.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{sel=TOPICS[b.dataset.t];L.querySelectorAll('.pick').forEach(x=>x.classList.toggle('on',x===b));
-        Lv.innerHTML=`<span class="label">Уровень</span><div class="seg">${sel.L.map((l,k)=>`<button data-lv="${k}">${esc(sel.L.length>1?LV[k]:l.n)}</button>`).join('')}</div>`;
-        Lv.querySelectorAll('[data-lv]').forEach(x=>x.onclick=()=>{close();roomAdd(roomSheetFrom(sel,+x.dataset.lv))})})};
+        Lv.innerHTML=`<span class="label">Уровень</span><div class="seg">${sel.L.map((l,k)=>`<button data-lv="${k}">${esc(sel.L.length>1?LV[k]:l.n)}</button>`).join('')}</div>
+          <button class="btn link" id="rqTune">Настроить подробно: вид листа, оформление, вариант →</button>`;
+        Lv.querySelectorAll('[data-lv]').forEach(x=>x.onclick=()=>{close();roomAdd(roomSheetFrom(sel,+x.dataset.lv))});
+        document.getElementById('rqTune').onclick=()=>{close();roomTune(sel.id,null)}})};
     show(near);
     const q=document.getElementById('rq1');q.oninput=()=>{const v=q.value.trim();show(v?searchTopics(v,subj).filter(r=>TOPICS[r.tid]).map(r=>r.tid).filter((x,k,a)=>a.indexOf(x)===k).slice(0,10):near)};
     document.getElementById('cl').onclick=roomPicker;setTimeout(()=>q.focus(),30)});
