@@ -996,7 +996,7 @@ button.mchip:hover{background:rgba(255,255,255,.24)}
 .rm-top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;position:sticky;top:0;z-index:5;background:var(--paper);padding:8px 0;border-bottom:1px solid var(--line)}
 .rm-who{display:flex;flex-direction:column;min-width:0;flex:1}
 .rm-who b{font-size:17px;line-height:1.2}
-.rm-pres{font-size:13px;color:var(--ink-3)}
+.rm-pres{font-size:13px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 .rm-pres.on{color:var(--ok)}
 .rm-pres.on::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ok);margin-right:6px;vertical-align:1px}
 .rm-act{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end;margin-left:auto}
@@ -1004,15 +1004,15 @@ button.mchip:hover{background:rgba(255,255,255,.24)}
 .rm-start:hover{background:#B83526;border-color:#B83526;color:#fff}
 .rm-body{display:grid;grid-template-columns:250px minmax(0,1fr);gap:18px;align-items:start}
 .r-s .rm-body{grid-template-columns:minmax(0,1fr)}
-.rm-side{position:sticky;top:76px;display:flex;flex-direction:column;gap:6px;max-height:calc(100vh - 96px);overflow:auto;padding-right:2px}
+.rm-side{position:sticky;top:76px;display:flex;flex-direction:column;gap:6px;max-height:calc(100vh - 96px);overflow-y:auto;overflow-x:hidden;padding-right:2px;min-width:0}
 .r-s .rm-side{display:none}
 .r-s .rm-side.open{display:flex;position:fixed;z-index:30;top:0;left:0;bottom:0;width:min(320px,86vw);max-height:none;background:var(--card);padding:16px;border-right:1px solid var(--line);box-shadow:0 10px 40px rgba(20,30,60,.18)}
 .rm-sh{font-size:12px;font-weight:600;color:var(--ink-3);text-transform:uppercase;letter-spacing:.04em;margin:2px 0}
-.rm-mat{display:flex;align-items:center;gap:2px;border:1px solid var(--line);background:var(--card);border-radius:var(--r)}
+.rm-mat{display:flex;align-items:center;gap:2px;border:1px solid var(--line);background:var(--card);border-radius:var(--r);min-width:0;max-width:100%;overflow:hidden}
 .rm-mat.on{border-color:var(--blue);box-shadow:0 0 0 1px var(--blue)}
 .rm-mat.hid .rm-mb b{color:var(--ink-2)}
 .rm-mb{flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start;text-align:left;background:none;border:0;padding:8px 10px;cursor:pointer;color:var(--ink);font:inherit}
-.rm-mb b{font-size:14px;font-weight:500;line-height:1.3;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.rm-mb b{font-size:14px;font-weight:500;line-height:1.3;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;max-width:100%;overflow-wrap:anywhere;word-break:break-word}
 .rm-mb small{font-size:12px;color:var(--ink-3)}
 .rm-mb small .g{color:var(--ok)}.rm-mb small .r{color:var(--bad)}
 .rmk{font-size:11px;color:var(--ink-3)}
@@ -1134,6 +1134,31 @@ body.inroom .wrap{max-width:1360px}
 .r-pop{position:absolute;z-index:6;display:flex;gap:6px;flex-wrap:wrap;max-width:260px;background:#fff;border:1px solid #C9D2E2;border-radius:10px;padding:6px;box-shadow:0 8px 24px rgba(20,30,60,.18)}
 .r-pop button{min-width:40px;height:38px;padding:0 10px;border:1px solid #C9D2E2;border-radius:8px;background:#fff;font:600 17px var(--f-ui);color:#1A1F2E;cursor:pointer}
 .r-pop button:hover,.r-pop button.on{border-color:#2D57C8;background:#E8EEFC;color:#2D57C8}
+
+/* окно видеозвонка: поверх комнаты в правом нижнем углу, на телефоне — сверху справа */
+.vc{position:fixed;z-index:45;right:16px;bottom:16px;width:280px;background:#141A28;color:#fff;border-radius:14px;overflow:hidden;box-shadow:0 12px 40px rgba(10,15,30,.35)}
+.vc.big{width:min(520px,calc(100vw - 32px))}
+.vc-v{position:relative;aspect-ratio:4/3;background:#0B0F19}
+.vc-v #vcR{width:100%;height:100%;object-fit:cover;display:block}
+.vc-v #vcL{position:absolute;right:8px;bottom:8px;width:30%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;border:2px solid rgba(255,255,255,.7);background:#222;transform:scaleX(-1)}
+.vc-wait{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:16px;font-size:14px;line-height:1.4;background:rgba(11,15,25,.72)}
+.vc-tap{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:#fff;color:#141A28;border:0;border-radius:10px;padding:10px 14px;font:600 14px var(--f-ui);cursor:pointer}
+.vc-bar{display:flex;align-items:center;gap:6px;padding:8px 10px}
+.vc-q{flex:1;font-size:12px;color:#9AA5BF;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vc-q::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;background:#66718D;vertical-align:0}
+.vc-q.good::before{background:#5CC98C}.vc-q.mid::before{background:#E8B04A}.vc-q.bad::before{background:#FF7863}
+.vc-b{width:38px;height:38px;border-radius:50%;border:0;background:rgba(255,255,255,.12);color:#fff;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.vc-b:hover{background:rgba(255,255,255,.22)}.vc-b.off{background:#fff;color:#141A28}
+.vc-b.end{background:#D5402F}.vc-b.end:hover{background:#B83526}
+.vc-msg{font-size:12px;line-height:1.4;color:#FBF0D9;padding:0 12px 10px}
+.vc-ring{display:flex;flex-direction:column;gap:4px;padding:18px 16px}
+.vc-ring b{font-size:18px}.vc-ring span{font-size:13px;color:#9AA5BF}
+.vc-ra{display:flex;gap:8px;margin-top:10px}.vc-ra .btn{flex:1}
+.vc-yes{background:#2C8A57!important;border-color:#2C8A57!important;color:#fff!important}
+.vc-no{background:transparent!important;color:#fff!important;border-color:rgba(255,255,255,.4)!important}
+.vc:not(.on) .vc-v{aspect-ratio:16/9}
+#rmVideo.on{border-color:var(--ok);color:var(--ok)}
+@media (max-width:700px){.vc{top:10px;bottom:auto;right:10px;width:150px}.vc.big{width:calc(100vw - 20px)}.vc-bar{padding:6px;gap:4px}.vc-b{width:32px;height:32px;font-size:14px}.vc-q{font-size:0}.vc-q::before{margin:0}}
 @media print{.room{display:none}}
 </style>
 
@@ -5555,6 +5580,7 @@ const RID=n=>{const a='abcdefghijklmnopqrstuvwxyz0123456789';let s='';for(let i=
 const INK_COL={t:'#D5402F',s:'#2D57C8'};
 const R_LIVE_MAX=3*3600e3;
 const roomLive=st=>!!(st&&st.live&&Date.now()-(st.liveAt||0)<R_LIVE_MAX);
+const rTitle=t=>String(t||'').replace(/\.(pdf|png|jpe?g|webp|gif|heic)$/i,'').replace(/[_]+/g,' ').replace(/\s+/g,' ').trim()||'Файл';
 const R_KIND={sheet:'Лист',pdf:'PDF',img:'Картинка',board:'Доска',note:'Объяснение',link:'Ссылка'};
 const rAnswerable=it=>it&&!['mor','snt'].includes(it.type)&&!(it.type==='sort'&&!it.opts)&&!(it.type==='line'&&it.noLine)&&it.ans!=null&&String(it.ans)!=='';
 const rOk=(it,v)=>norm(it.ans)===norm(v);
@@ -5588,7 +5614,7 @@ function roomStart(pb,role,rec,info){
   roomConnect(rec.id);
 }
 function roomStop(){
-  if(!R.on)return;R.on=false;
+  if(!R.on)return;if(C.st!=='idle'||C.offer)callEnd(true);R.on=false;
   (R.unsub||[]).forEach(u=>{try{u()}catch(e){}});(R.timers||[]).forEach(clearInterval);(R.obs||[]).forEach(o=>o.disconnect());
   clearTimeout(R.stT);clearTimeout(R.ansT);
   if(R.myPulse)R.pb.collection('pulse').update(R.myPulse.id,{d:{at:Date.now(),gone:true}}).catch(()=>{});
@@ -5599,6 +5625,7 @@ async function roomConnect(id){
   try{const ink=await pb.collection('ink').getFullList({filter:f,sort:'created'});if(alive()){R.ink=ink;roomInkAll()}}catch(e){}
   try{const ps=await pb.collection('pulse').getFullList({filter:f});if(!alive())return;
     R.myPulse=ps.find(p=>p.who===R.role)||null;const o=ps.find(p=>p.who!==R.role);if(o&&Date.now()-Date.parse(o.updated.replace(' ','T'))<40000){R.other=o.d;R.otherAt=Date.now()}}catch(e){}
+  if(alive()&&R.other)setTimeout(()=>{if(alive())callOnSig(R.other)},300);
   if(!alive())return;
   if(!R.myPulse)try{R.myPulse=await pb.collection('pulse').create({room:id,who:R.role,d:{at:Date.now()}})}catch(e){}
   roomPulse({},true);
@@ -5621,6 +5648,7 @@ function roomOnRec(r){
   if(R.role==='t'){R.ans=r.ans||{};roomAnsPaint();roomSide();return}
   const was=R.st;R.mats=r.mats||[];R.st=r.st||{};
   if(was.cur!==R.st.cur)R.away=false;
+  if(roomLive(was)&&!roomLive(R.st))setTimeout(roomEndedStudent,50);
   roomUpdate();
   if(!R.away&&roomFollow()&&(was.pg!==R.st.pg||was.cur!==R.st.cur))roomScrollPg(R.st.pg||0);
   if(R.st.foc&&JSON.stringify(R.st.foc)!==JSON.stringify(was.foc))roomFocus(R.st.foc);
@@ -5635,6 +5663,7 @@ function roomOnInk(e){
 function roomOnPulse(e){
   if(!R.on||!e.record||e.record.who===R.role)return;
   R.other=e.record.d||{};R.otherAt=R.other.gone?0:Date.now();
+  if(R.other.gone&&(C.st!=='idle'||C.offer))callEnd(false,R.role==='t'?'Ученик вышел из комнаты':'Репетитор вышел из комнаты');else callOnSig(R.other);
   if(R.role==='s')roomLaser(R.other);
   clearTimeout(R.topT);R.topT=setTimeout(roomTop,120);
 }
@@ -5681,15 +5710,16 @@ function roomTop(){
   const el=document.getElementById('rmTop');if(!el||!R.on)return;const live=roomLive(R.st),o=R.other||{};
   if(R.role==='t'){
     const om=R.mats.find(m=>m.id===o.m);
-    const where=roomHere()?(o.typ?'печатает ответ…':om?'смотрит «'+om.t+'»'+(o.pg?', стр. '+(o.pg+1):''):'в комнате'):'';
+    const where=roomHere()?(o.typ?'печатает ответ…':om?'смотрит «'+rTitle(om.t)+'»'+(o.pg?', стр. '+(o.pg+1):''):'в комнате'):'';
     el.innerHTML=`<button class="btn quiet small" id="rmBack">← Выйти</button>
       <div class="rm-who"><b>${esc(R.info.name)}</b><span class="rm-pres${roomHere()?' on':''}">${roomHere()?esc(where):'не в комнате'}</span></div>
-      <div class="rm-act"><button class="btn small" id="rmCall">${R.st.call?'Звонок':'+ Звонок'}</button>
+      <div class="rm-act"><button class="btn small${C.st==='idle'?'':' on'}" id="rmVideo">${C.st==='idle'?'Видеозвонок':'Звонок идёт'}</button>${R.st.call?'<button class="btn small quiet" id="rmCall">Ссылка</button>':''}
         <button class="ibtn" id="rmSet" aria-label="Настройки комнаты">⋯</button>
         ${live?'<button class="btn small" id="rmEnd">Завершить урок</button>':'<button class="btn small rm-start" id="rmLive">Начать урок</button>'}</div>`;
     const $=id=>document.getElementById(id);
     $('rmBack').onclick=()=>go({screen:'student'});
-    $('rmCall').onclick=()=>R.st.call?window.open(R.st.call,'_blank','noopener'):roomCallModal();
+    $('rmVideo').onclick=()=>C.st==='idle'?callStart():(C.big=true,callUI());
+    if($('rmCall'))$('rmCall').onclick=()=>window.open(R.st.call,'_blank','noopener');
     $('rmSet').onclick=roomSettings;
     if($('rmLive'))$('rmLive').onclick=roomBegin;
     if($('rmEnd'))$('rmEnd').onclick=roomFinish;
@@ -5720,7 +5750,7 @@ function roomSide(){
   if(!t){el.classList.toggle('open',!!R.side);if(!R.side){el.innerHTML='';return}}
   const list=t?R.mats:R.mats.filter(m=>m.vis);
   const d0=dayStart(Date.now());const today=list.filter(m=>(m.at||0)>=d0),past=list.filter(m=>(m.at||0)<d0);
-  const row=m=>`<div class="rm-mat${cur&&cur.id===m.id?' on':''}${t&&!m.vis?' hid':''}"><button class="rm-mb" data-m="${m.id}"><span class="rmk">${R_KIND[m.k]||''}</span><b>${esc(m.t)}</b>${m.k==='sheet'?`<small>${roomProg(m)}</small>`:''}</button>
+  const row=m=>`<div class="rm-mat${cur&&cur.id===m.id?' on':''}${t&&!m.vis?' hid':''}"><button class="rm-mb" data-m="${m.id}"><span class="rmk">${R_KIND[m.k]||''}</span><b>${esc(rTitle(m.t))}</b>${m.k==='sheet'?`<small>${roomProg(m)}</small>`:''}</button>
     ${t?`<button class="ibtn rm-eye" data-eye="${m.id}" aria-label="${m.vis?'Скрыть от ученика':'Показать ученику'}" title="${m.vis?'Ученик видит':'Ученик не видит'}">${m.vis?'👁':'—'}</button><button class="ibtn${R.delM===m.id?' on':''}" data-del="${m.id}" aria-label="Убрать">${R.delM===m.id?'Убрать?':'✕'}</button>`:''}</div>`;
   const byDay={};past.forEach(m=>{const k=dkey(m.at||0);(byDay[k]=byDay[k]||[]).push(m)});
   const days=Object.keys(byDay).sort().reverse();
@@ -6104,7 +6134,7 @@ async function roomUpload(file,title){
   const before=new Set(R.rec.docs||[]);const fd=new FormData();fd.append('docs+',file);
   try{const r=await R.pb.collection('rooms').update(R.rec.id,fd);R.rec=r;const fn=(r.docs||[]).find(x=>!before.has(x));if(!fn)throw 0;
     const pdf=/pdf/i.test(file.type)||/\.pdf$/i.test(file.name||'');
-    roomAdd({k:pdf?'pdf':'img',f:fn,t:title||(file.name||'Файл').replace(/\.[^.]+$/,'')})}
+    roomAdd({k:pdf?'pdf':'img',f:fn,t:rTitle(title||file.name)})}
   catch(e){toast('Файл не загрузился. Проверьте интернет')}
 }
 function roomBoardPick(){
@@ -6154,7 +6184,7 @@ function roomSettings(){
   modal(`<h2>Комната ${esc(R.info.first||'')}</h2>
     <div class="field"><span class="label">Ученик видит, верно ли ответил</span><div class="seg" id="rsChk"><button data-v="1" class="${R.st.chk!==false?'on':''}">Сразу</button><button data-v="0" class="${R.st.chk===false?'on':''}">Нет, только я</button></div></div>
     <p class="hint" style="margin:0">«Нет, только я» подходит для проверочной: ответ встаёт в лист, но без отметки.</p>
-    <div class="modal-actions"><button class="btn quiet" id="rsCall">Ссылка на звонок</button><button class="btn primary" id="cl">Готово</button></div>`,()=>{
+    <div class="modal-actions"><button class="btn quiet" id="rsCall">Запасная ссылка на звонок</button><button class="btn primary" id="cl">Готово</button></div>`,()=>{
     document.getElementById('cl').onclick=close;document.getElementById('rsCall').onclick=roomCallModal;
     document.querySelectorAll('#rsChk button').forEach(b=>b.onclick=()=>{roomSet({chk:b.dataset.v==='1'});document.querySelectorAll('#rsChk button').forEach(x=>x.classList.toggle('on',x===b))})});
 }
@@ -6191,11 +6221,169 @@ function roomFinish(){
     document.getElementById('cl').onclick=close;
     const hw=document.getElementById('hw');if(hw)hw.onclick=()=>{close();roomStop();V.studentId=R.info.sid;V.subject=TOPICS[worst].subject;openTopic(worst,{tpl:'home'})}});
 }
+/* ученик: репетитор завершил урок — звонок закрывается, маркер забирается, ученик видит итог */
+function roomEndedStudent(){
+  if(!R.on||R.role!=='s')return;if(C.st!=='idle'||C.offer)callEnd(false);roomAnsClose();R.tool='hand';roomUpdate();
+  const d0=dayStart(Date.now());let n=0,k=0;
+  R.mats.filter(m=>m.k==='sheet'&&(m.at||0)>=d0).forEach(m=>{const a=R.ans[m.id]||{},items=roomItems(m);Object.keys(a).forEach(i=>{if(!items[i])return;n++;if(rOk(items[i],a[i]))k++})});
+  const show=R.st.chk!==false;
+  modal(`<h2>Урок завершён</h2><p style="margin:0">${n?(show?`Ты ответил на ${n} ${plural(n,['задание','задания','заданий'])}, верно ${k}.`:`Ты ответил на ${n} ${plural(n,['задание','задания','заданий'])}.`)+' Молодец!':'Спасибо за урок!'}</p>
+    <p class="hint" style="margin:0">Материалы урока остаются в твоей тетради.</p>
+    <div class="modal-actions"><button class="btn quiet" id="cl">Остаться в тетради</button><button class="btn primary" id="tocab">К моим заданиям</button></div>`,()=>{
+    document.getElementById('cl').onclick=close;
+    document.getElementById('tocab').onclick=()=>{close();roomStop();V={screen:'cab'};CAB.items=null;render();loadCab()}});
+}
 /* домашка из листа комнаты: та же тема и уровень, новый вариант, сразу в кабинет ученика */
 function roomHomework(m){
   if(!m.tid||!TOPICS[m.tid])return;const t=TOPICS[m.tid];
   Object.assign(V,{studentId:R.info.sid,topicId:m.tid,level:Math.min(m.lv||0,t.L.length-1),seed:newSeed(),over:m.over||null,subName:null,tpl:'train'});
   linkModal();
+}
+
+/* ---------- Видеозвонок в комнате: 1 на 1, браузер к браузеру (WebRTC) ----------
+   Звонит всегда репетитор, ученик отвечает. Предложение и ответ ходят через pulse комнаты.
+   Если напрямую не соединиться (мобильный интернет, офисный Wi-Fi), звонок идёт через ретранслятор (TURN) на нашем сервере.
+   Голос важнее картинки: при плохом интернете браузер снижает видео, звук остаётся.
+   Связь моргнула или страницу обновили — репетитор сам переподключает звонок. */
+const C={st:'idle',n:null,pc:null,loc:null,rem:null,mic:true,cam:true,big:false,seen:'',r:0,restT:null,statsT:null,q:'',msg:'',ice:null,iceAt:0,lastOk:0};
+const CALL_KEY='kletka-call';
+async function callIce(){
+  if(C.ice&&Date.now()-C.iceAt<3*3600e3)return C.ice;
+  const list=[{urls:['stun:stun.l.google.com:19302','stun:stun.cloudflare.com:3478']}];
+  try{const r=await fetch(API+'/api/kletka/turn',{headers:{Authorization:R.pb.authStore.token}});
+    if(r.ok){const t=await r.json();if(t&&t.urls)list.push({urls:t.urls,username:t.username,credential:t.credential})}}catch(e){}
+  C.ice=list;C.iceAt=Date.now();return list;
+}
+/* камера и микрофон; без камеры — только голос; совсем без устройств — только смотреть и слушать */
+async function callMedia(){
+  const audio={echoCancellation:true,noiseSuppression:true,autoGainControl:true};
+  const video={width:{ideal:640},height:{ideal:480},frameRate:{ideal:24,max:30},facingMode:'user'};
+  try{return await navigator.mediaDevices.getUserMedia({audio,video})}
+  catch(e){if(e&&e.name==='NotAllowedError'){C.msg='Браузер не дал доступ к камере и микрофону. Разрешите их в адресной строке (значок замка) и позвоните снова.';throw e}}
+  try{const s=await navigator.mediaDevices.getUserMedia({audio});C.msg='Камера не найдена: звонок только с голосом.';return s}catch(e){}
+  C.msg='Камера и микрофон не найдены: вас не видно и не слышно, но вы видите собеседника.';return new MediaStream();
+}
+async function callPc(){
+  const pc=new RTCPeerConnection({iceServers:await callIce(),bundlePolicy:'max-bundle'});
+  const s=C.loc;const kinds=s.getTracks().map(t=>t.kind);
+  s.getTracks().forEach(t=>pc.addTrack(t,s));
+  if(!kinds.includes('audio'))pc.addTransceiver('audio',{direction:'recvonly'});
+  if(!kinds.includes('video'))pc.addTransceiver('video',{direction:'recvonly'});
+  /* звук в приоритете, видео не больше 700 кбит/с: так не забивается слабый канал */
+  pc.getSenders().forEach(snd=>{if(!snd.track)return;const p=snd.getParameters();p.encodings=p.encodings&&p.encodings.length?p.encodings:[{}];
+    if(snd.track.kind==='video'){p.encodings[0].maxBitrate=700000;p.encodings[0].maxFramerate=24;p.degradationPreference='balanced'}
+    p.encodings[0].priority=snd.track.kind==='audio'?'high':'medium';p.encodings[0].networkPriority=p.encodings[0].priority;
+    snd.setParameters(p).catch(()=>{})});
+  pc.ontrack=e=>{C.rem=e.streams[0]||C.rem||new MediaStream();if(!e.streams[0])C.rem.addTrack(e.track);callVideos()};
+  pc.onconnectionstatechange=()=>callNet();pc.oniceconnectionstatechange=()=>callNet();
+  return pc;
+}
+/* полное описание связи сразу со всеми адресами: одно сообщение туда и одно обратно */
+function callGather(pc){return new Promise(res=>{if(pc.iceGatheringState==='complete')return res();
+  const t=setTimeout(res,2500);pc.addEventListener('icegatheringstatechange',()=>{if(pc.iceGatheringState==='complete'){clearTimeout(t);res()}})})}
+function callSend(sig){roomPulse({sig,call:C.st==='idle'?null:C.n},true)}
+
+/* ---------- репетитор звонит ---------- */
+async function callStart(again){
+  if(C.st!=='idle'&&!again)return;
+  if(!navigator.mediaDevices||!window.RTCPeerConnection){toast('Этот браузер не умеет видеозвонки. Откройте Клетку в Chrome, Яндекс Браузере, Safari или Firefox');return}
+  C.n=again&&C.n||RID(8);C.st='calling';C.msg='';C.r=0;callUI();
+  try{if(!C.loc)C.loc=await callMedia()}catch(e){C.st='idle';callUI();return}
+  try{sessionStorage.setItem(CALL_KEY,C.n)}catch(e){}
+  await callOffer(false);
+}
+async function callOffer(restart){
+  if(C.st==='idle')return;
+  if(!C.pc||!restart){if(C.pc)C.pc.close();C.pc=await callPc()}
+  const off=await C.pc.createOffer(restart?{iceRestart:true}:{});await C.pc.setLocalDescription(off);await callGather(C.pc);
+  if(C.st==='idle')return;C.r++;callSend({n:C.n,t:'offer',r:C.r,fresh:!restart,sdp:C.pc.localDescription.sdp});
+}
+/* ---------- ученик: звонок пришёл ---------- */
+async function callAccept(auto){
+  const o=C.offer;if(!o)return;C.st='connecting';C.n=o.n;C.msg='';callUI();
+  try{if(!C.loc)C.loc=await callMedia()}catch(e){C.st='idle';callSend({n:o.n,t:'bye'});callUI();return}
+  try{sessionStorage.setItem(CALL_KEY,C.n)}catch(e){}
+  await callAnswer(o);
+}
+async function callAnswer(o){
+  if(!C.pc||C.pcN!==o.n||o.fresh){if(C.pc)C.pc.close();C.pc=await callPc();C.pcN=o.n}
+  await C.pc.setRemoteDescription({type:'offer',sdp:o.sdp});const ans=await C.pc.createAnswer();await C.pc.setLocalDescription(ans);await callGather(C.pc);
+  callSend({n:o.n,t:'answer',r:o.r,sdp:C.pc.localDescription.sdp});
+}
+/* сообщения второй стороны из pulse */
+async function callOnSig(d){
+  if(R.role==='t'&&C.st==='idle'&&d&&d.call){let mine='';try{mine=sessionStorage.getItem(CALL_KEY)}catch(e){}if(mine===d.call){C.n=d.call;callStart(true);return}}
+  const s=d&&d.sig;if(!s||!s.n)return;const key=s.n+':'+s.t+':'+(s.r||0);if(key===C.seen)return;C.seen=key;
+  if(s.t==='bye'){if(C.n===s.n){callEnd(false,R.role==='t'?'Ученик завершил звонок':'Репетитор завершил звонок')}if(C.offer&&C.offer.n===s.n){C.offer=null;callUI()}return}
+  if(R.role==='t'){if(s.t==='answer'&&C.pc&&s.n===C.n&&C.pc.signalingState==='have-local-offer'){try{await C.pc.setRemoteDescription({type:'answer',sdp:s.sdp});C.st='connecting';callUI()}catch(e){}}return}
+  if(s.t!=='offer')return;C.offer=s;
+  if(C.st!=='idle'){try{await callAnswer(s)}catch(e){}return}
+  let mine='';try{mine=sessionStorage.getItem(CALL_KEY)}catch(e){}
+  if(mine===s.n)return callAccept(true);
+  C.st='ringing';callUI();callRing();
+}
+function callDecline(){const o=C.offer;C.offer=null;C.st='idle';callSend({n:o&&o.n,t:'bye'});callUI()}
+/* ---------- состояние сети и переподключение ---------- */
+function callNet(){
+  const pc=C.pc;if(!pc||C.st==='idle')return;const s=pc.connectionState||pc.iceConnectionState;
+  if(s==='connected'||pc.iceConnectionState==='connected'||pc.iceConnectionState==='completed'){
+    if(C.st!=='live'){C.st='live';C.msg='';C.lastOk=Date.now();roomPulse({sig:null,call:C.n},true);callStats()}
+    clearTimeout(C.restT);C.restT=null;callUI();return}
+  if(['disconnected','failed'].includes(s)&&C.st==='live'){C.st='reconnecting';callUI()}
+  if(R.role==='t'&&['disconnected','failed'].includes(s)&&!C.restT){
+    C.restT=setTimeout(()=>{C.restT=null;const st=C.pc&&(C.pc.connectionState||C.pc.iceConnectionState);if(C.st!=='idle'&&st!=='connected')callOffer(st!=='failed'||C.r<3)},s==='failed'?300:2500)}
+}
+/* качество связи раз в 2 секунды: задержка и потери */
+function callStats(){clearInterval(C.statsT);let prevLost=0,prevRecv=0;
+  C.statsT=setInterval(async()=>{if(!C.pc||C.st==='idle'){clearInterval(C.statsT);return}
+    try{const rep=await C.pc.getStats();let rtt=null,lost=0,recv=0,relay=false;
+      rep.forEach(x=>{if(x.type==='candidate-pair'&&x.nominated&&x.state==='succeeded'){rtt=x.currentRoundTripTime;const lc=rep.get(x.localCandidateId);if(lc&&lc.candidateType==='relay')relay=true}
+        if(x.type==='inbound-rtp'&&x.kind==='audio'){lost=x.packetsLost||0;recv=x.packetsReceived||0}});
+      const dl=lost-prevLost,dr=recv-prevRecv;prevLost=lost;prevRecv=recv;const loss=dr+dl>0?dl/(dr+dl):0;
+      C.q=rtt==null?'':rtt<0.25&&loss<0.03?'good':rtt<0.5&&loss<0.08?'mid':'bad';C.rtt=rtt;C.relay=relay;callQ()}catch(e){}},2000)}
+/* ---------- завершение ---------- */
+function callEnd(send,why){
+  if(send&&C.n)callSend({n:C.n,t:'bye'});
+  clearTimeout(C.restT);clearInterval(C.statsT);C.restT=null;
+  if(C.pc){try{C.pc.close()}catch(e){}}C.pc=null;C.pcN=null;
+  if(C.loc)C.loc.getTracks().forEach(t=>t.stop());C.loc=null;C.rem=null;C.st='idle';C.offer=null;C.q='';
+  try{sessionStorage.removeItem(CALL_KEY)}catch(e){}
+  if(R.on)roomPulse({sig:send?{n:C.n,t:'bye'}:null,call:null},true);
+  C.n=null;callUI();if(why)toast(why);
+}
+function callMic(){C.mic=!C.mic;if(C.loc)C.loc.getAudioTracks().forEach(t=>t.enabled=C.mic);callUI()}
+function callCam(){C.cam=!C.cam;if(C.loc)C.loc.getVideoTracks().forEach(t=>t.enabled=C.cam);callUI()}
+/* ---------- окно звонка ---------- */
+function callRing(){try{const a=new AudioContext(),o=a.createOscillator(),g=a.createGain();o.frequency.value=660;g.gain.value=.06;o.connect(g).connect(a.destination);o.start();
+  [0,.25,.5].forEach((t,k)=>g.gain.setValueAtTime(k%2?0:.06,a.currentTime+t));o.stop(a.currentTime+.7)}catch(e){}}
+function callVideos(){const r=document.getElementById('vcR'),l=document.getElementById('vcL');
+  if(r&&C.rem&&r.srcObject!==C.rem){r.srcObject=C.rem;r.play().catch(()=>{C.needTap=true;callUI()})}
+  if(l&&C.loc&&l.srcObject!==C.loc)l.srcObject=C.loc}
+function callQ(){const q=document.getElementById('vcQ');if(!q)return;q.className='vc-q '+C.q;
+  q.textContent=C.q==='good'?'Связь хорошая':C.q==='mid'?'Связь средняя':C.q==='bad'?'Связь слабая':'';
+  q.title=C.rtt!=null?`Задержка ${Math.round(C.rtt*1000)} мс${C.relay?', через сервер':''}`:''}
+function callUI(){
+  let el=document.getElementById('vc');
+  if(!R.on||(C.st==='idle'&&!C.offer)){if(el)el.remove();if(R.on)roomTop();return}
+  if(!el){el=document.createElement('div');el.id='vc';document.body.appendChild(el)}
+  const other=R.role==='t'?(R.info.first||'Ученик'):(R.info.tutor||'Репетитор');
+  el.className='vc'+(C.big?' big':'')+(C.st==='live'||C.st==='reconnecting'?' on':'');
+  if(C.st==='ringing'){el.innerHTML=`<div class="vc-ring"><b>${esc(other)} звонит</b><span>Видеозвонок</span>
+      <div class="vc-ra"><button class="btn vc-no" id="vcNo">Не сейчас</button><button class="btn primary vc-yes" id="vcYes">Ответить</button></div></div>`;
+    document.getElementById('vcYes').onclick=()=>callAccept(false);document.getElementById('vcNo').onclick=callDecline;return}
+  const wait=C.st==='calling'?`Звоним: ${esc(other)}…${roomHere()?'':' Ученик пока не в комнате, звонок дождётся его.'}`:C.st==='connecting'?'Соединяем…':C.st==='reconnecting'?'Связь прервалась, восстанавливаем…':'';
+  el.innerHTML=`<div class="vc-v"><video id="vcR" autoplay playsinline></video><video id="vcL" autoplay playsinline muted></video>
+      ${wait?`<div class="vc-wait">${wait}</div>`:''}${C.needTap?'<button class="vc-tap" id="vcTap">Нажмите, чтобы включить звук</button>':''}</div>
+    <div class="vc-bar"><span class="vc-q" id="vcQ"></span>
+      <button class="vc-b${C.mic?'':' off'}" id="vcMic" aria-label="${C.mic?'Выключить микрофон':'Включить микрофон'}" title="Микрофон">${C.mic?'🎙':'🔇'}</button>
+      <button class="vc-b${C.cam?'':' off'}" id="vcCam" aria-label="${C.cam?'Выключить камеру':'Включить камеру'}" title="Камера">${C.cam?'📷':'🚫'}</button>
+      <button class="vc-b" id="vcBig" aria-label="${C.big?'Уменьшить':'Увеличить'}" title="Размер">${C.big?'↘':'↖'}</button>
+      <button class="vc-b end" id="vcEnd" aria-label="Завершить звонок" title="Завершить">✕</button></div>
+    ${C.msg?`<div class="vc-msg">${esc(C.msg)}</div>`:''}`;
+  const $=id=>document.getElementById(id);
+  $('vcMic').onclick=callMic;$('vcCam').onclick=callCam;$('vcBig').onclick=()=>{C.big=!C.big;callUI()};$('vcEnd').onclick=()=>callEnd(true);
+  if($('vcTap'))$('vcTap').onclick=()=>{C.needTap=false;const r=$('vcR');r.play().catch(()=>{});callUI()};
+  callVideos();callQ();roomTop();
 }
 
 /* ---------- кабинет ученика: комната ---------- */
