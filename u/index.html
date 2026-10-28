@@ -1204,6 +1204,76 @@ body.inroom .wrap{max-width:1360px}
 .r-t .sheet .r-cc{pointer-events:none}
 .sheet .r-cc.r-edit{background:rgba(45,87,200,.2)!important;border-style:solid}
 .r-cpop{max-width:250px}
+/* Разработки: доска как в Miro. Все классы с приставкой bd-, чтобы не задевать остальную программу. */
+body.bd-open{overflow:hidden}
+.bd{position:fixed;inset:0;z-index:60;background:#F5F6F8;font-family:var(--f-ui);color:#1F2C55}
+.bd-vp{position:absolute;inset:0;overflow:hidden;background-color:#F5F6F8;background-image:radial-gradient(#C9D0DC 1.1px,transparent 1.1px);touch-action:none}
+.bd-vp.bd-pan{cursor:grab}.bd-vp.bd-panning{cursor:grabbing}.bd-vp.bd-make{cursor:crosshair}
+.bd-world{position:absolute;left:0;top:0;transform-origin:0 0}
+.bd-it{position:absolute;user-select:none;-webkit-user-select:none;box-sizing:border-box}
+.bd-frame{box-shadow:0 0 0 1px rgba(20,30,60,.12);background-size:cover;background-position:center}
+.bd-ftitle{position:absolute;left:0;bottom:100%;margin-bottom:6px;font-size:18px;color:#5B6888;white-space:nowrap}
+.bd-tx{white-space:pre-wrap;word-break:break-word;line-height:1.3;outline:none;min-height:1em}
+.bd-sticky{box-shadow:0 6px 12px rgba(20,30,60,.16);display:flex;align-items:center;justify-content:center;padding:14px}
+.bd-sticky .bd-tx,.bd-shape .bd-tx{width:100%;line-height:1.25;position:relative}
+.bd-shape{display:flex;align-items:center;justify-content:center;padding:10px}
+.bd-shape .bd-bg{position:absolute;inset:0}
+.bd-image img{width:100%;height:100%;display:block;pointer-events:none;-webkit-user-drag:none}
+.bd-pen svg{width:100%;height:100%;overflow:visible;display:block}
+.bd-lnk{position:absolute;right:-12px;top:-12px;width:28px;height:28px;border-radius:50%;background:#2D57C8;color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.2);z-index:2}
+.bd-lock{position:absolute;left:-10px;top:-10px;font-size:14px}
+.bd [contenteditable="true"]{cursor:text;user-select:text;-webkit-user-select:text}
+.bd-selbox{position:absolute;pointer-events:none;outline:2px solid #2D57C8}
+.bd-selbox.bd-multi{outline-style:dashed}
+.bd-hdl{position:absolute;background:#fff;border:2px solid #2D57C8;border-radius:3px;pointer-events:auto}
+.bd-marq{position:absolute;border:1px solid #2D57C8;background:rgba(45,87,200,.08);pointer-events:none}
+.bd-panel{position:absolute;background:#fff;border-radius:12px;box-shadow:0 2px 10px rgba(20,30,60,.10),0 0 0 1px rgba(20,30,60,.06);z-index:10}
+.bd-top{left:12px;top:12px;display:flex;align-items:center;gap:4px;padding:6px 8px}
+.bd-top input{border:0;font:600 16px var(--f-ui);color:#1F2C55;padding:6px 8px;border-radius:8px;width:240px;background:transparent}
+.bd-top input:hover,.bd-top input:focus{background:#F0F2F6;outline:none}
+.bd-saved{font-size:12px;color:#66718D;margin-left:4px;white-space:nowrap}
+.bd-ib{border:0;background:none;width:36px;height:36px;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-size:16px;color:#1F2C55;padding:0}
+.bd-ib:hover{background:#F0F2F6}.bd-ib.bd-on{background:#E8EEFC;color:#2D57C8}.bd-ib:disabled{opacity:.35;cursor:default}
+.bd-ib svg{width:22px;height:22px}
+.bd-tools{left:12px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:2px;padding:6px}
+.bd-sep{height:1px;background:#DDE3EE;margin:4px 6px}
+.bd-zoom{right:12px;bottom:12px;display:flex;align-items:center;gap:2px;padding:4px}
+.bd-zoom span{min-width:52px;text-align:center;font-size:13px;color:#5B6888;cursor:pointer}
+.bd-tr{right:12px;top:12px;display:flex;gap:4px;padding:6px}
+.bd-tb{border:1px solid #DDE3EE;background:#fff;border-radius:8px;padding:6px 12px;cursor:pointer;font:500 13px var(--f-ui);color:#1F2C55}
+.bd-tb:hover{border-color:#66718D}
+.bd-frames{right:12px;top:66px;width:230px;max-height:calc(100% - 140px);overflow:auto;padding:8px}
+.bd-frames h3{margin:4px 6px 8px;font-size:12px;color:#66718D;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.bd-fr{display:flex;align-items:center;gap:8px;width:100%;border:0;background:none;padding:6px;border-radius:8px;cursor:pointer;text-align:left;font:inherit;color:inherit}
+.bd-fr:hover{background:#F0F2F6}
+.bd-fr i{width:54px;height:30px;border-radius:4px;box-shadow:0 0 0 1px #DDE3EE;background:#fff center/cover;flex:none}
+.bd-fr span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bd-empty{padding:8px 10px;color:#66718D;margin:0}
+.bd-pop{position:fixed;z-index:70;background:#fff;border-radius:12px;box-shadow:0 2px 10px rgba(20,30,60,.10),0 0 0 1px rgba(20,30,60,.06);padding:6px;display:flex;flex-direction:column;gap:2px;min-width:200px}
+.bd-pop button{border:0;background:none;text-align:left;padding:7px 10px;border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;gap:16px;font:inherit;color:#1F2C55}
+.bd-pop button:hover{background:#F0F2F6}.bd-pop kbd{color:#66718D;font:12px var(--f-ui)}
+.bd-ctx{position:absolute;z-index:15;background:#fff;border-radius:10px;box-shadow:0 2px 10px rgba(20,30,60,.12),0 0 0 1px rgba(20,30,60,.06);display:flex;align-items:center;gap:2px;padding:4px;white-space:nowrap}
+.bd-ctx .bd-ib{width:32px;height:32px;font-size:14px}
+.bd-sw{width:22px;height:22px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px #DDE3EE;cursor:pointer;margin:0 1px;display:inline-block}
+.bd-sw.bd-on{box-shadow:0 0 0 2px #2D57C8}
+.bd-vs{width:1px;height:22px;background:#DDE3EE;margin:0 3px}
+.bd-fs{font-size:12px;min-width:26px;text-align:center;color:#5B6888}
+.bd-hint{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);background:#1F2C55;color:#fff;padding:8px 14px;border-radius:10px;font-size:13px;z-index:30;pointer-events:none;opacity:0;transition:opacity .2s}
+.bd-hint.bd-on{opacity:1}
+@media (max-width:700px){.bd-top input{width:110px}.bd-saved{display:none}.bd-frames{width:180px}}
+/* разработка в комнате: каждый фрейм — страница */
+.rdeck{overflow:hidden;background:#fff}
+.rdeck .bd-st{position:absolute;left:0;top:0;transform-origin:0 0}
+.rdeck .bd-ftitle{display:none}
+.rdeck .bd-it{pointer-events:none}
+/* список разработок в материалах */
+.bgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
+.bcard{border:1px solid var(--line);background:var(--card);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
+.bprev{height:120px;background:#EEF1F6 center/cover no-repeat;border:0;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink-3);font:inherit}
+.binf{padding:10px 12px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.binf b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.binf small{color:var(--ink-3)}
+.bbtns{display:flex;gap:6px;flex-wrap:wrap}
 @media print{.room{display:none}}
 </style>
 
@@ -3749,7 +3819,7 @@ function demoState0(){
 let S;
 /* старые версии данных приводятся к текущей; сюжет по умолчанию — «Любой», оформление — одно из четырёх */
 function prepState(s){if(!s||!Array.isArray(s.students))return null;
-  if(!s.customTopics)s.customTopics=exampleTopics();if(!s.attempts)s.attempts=[];if(!s.assignments)s.assignments=[];for(const k of ['lessons','payments','saved','reports'])if(!Array.isArray(s[k]))s[k]=[];if(!s.profile)s.profile={};migrate(s);
+  if(!s.customTopics)s.customTopics=exampleTopics();if(!s.attempts)s.attempts=[];if(!s.assignments)s.assignments=[];for(const k of ['lessons','payments','saved','reports','boards'])if(!Array.isArray(s[k]))s[k]=[];if(!s.profile)s.profile={};migrate(s);
   if(s.designAny!==2){for(const st of s.students){const d=st.design||{};st.design={lv:+d.lv||2,theme:'random',bw:!!d.bw}}s.designAny=2}
   return s}
 const emptyState=()=>prepState({v:3,students:[],attempts:[],assignments:[],customTopics:exampleTopics()});
@@ -5217,7 +5287,7 @@ async function openFile(r){const w=window.open('about:blank','_blank');
   catch(e){if(w)w.close();toast('Не удалось открыть файл')}}
 const fileKind=n=>{const x=(n.split('.').pop()||'').toLowerCase();return /^(png|jpe?g|webp|gif|heic)$/.test(x)?'IMG':x==='pdf'?'PDF':/^(docx?|odt|rtf)$/.test(x)?'DOC':/^(pptx?|key)$/.test(x)?'PPT':/^(xlsx?|csv)$/.test(x)?'XLS':'FILE'};
 const fsize=b=>b>1e6?(b/1e6).toFixed(1).replace('.',',')+' МБ':Math.max(1,Math.round(b/1e3))+' КБ';
-function folders(){return [...new Set([...S.saved.map(m=>m.folder),...(FILES||[]).map(f=>f.folder)].filter(Boolean))].sort((a,b)=>a.localeCompare(b,'ru'))}
+function folders(){return [...new Set([...S.saved.map(m=>m.folder),...(FILES||[]).map(f=>f.folder)].filter(f=>f&&f!=='__board'))].sort((a,b)=>a.localeCompare(b,'ru'))}
 function pickStudent(title,cb,pre){
   if(!S.students.length){toast('Сначала добавьте ученика');return}
   if(S.students.length===1)return cb(S.students[0]);
@@ -5266,7 +5336,7 @@ function viewMaterials(){
   if(tab==='files'&&ACC.user&&FILES===null)loadFiles();
   const inF=x=>fl==='*'||(x.folder||'')===fl;
   const mine=S.customTopics.filter(c=>!c.review&&!c.sheet);
-  const sv=S.saved.filter(inF),fs=(FILES||[]).filter(inF);
+  const sv=S.saved.filter(inF),fs=(FILES||[]).filter(f=>f.folder!=='__board').filter(inF);
   const fchips=folders();
   const card=m=>{const st=student(m.sid);return `<div class="mcard"><button class="mc-main" data-open="${m.id}"><span class="mc-k">${esc(m.kind||'Лист')}</span><b>${esc(m.name)}</b>
       <small>${m.grade?gradeWord(m.grade)+' · ':''}${st?'для '+esc(st.name)+' · ':''}${ago(m.date)}</small></button>
@@ -5280,14 +5350,27 @@ function viewMaterials(){
       ${FILES_ERR?`<p class="hint" style="color:var(--pen)">${FILES_ERR}</p>`:''}
       ${FILES===null?'<p class="empty">Загружаю…</p>':fs.length?`<div class="flist">${fs.map(f=>`<div class="frow"><button class="fr-main" data-fo="${f.id}"><span class="fk fk-${fileKind(f.name||f.file)}">${fileKind(f.name||f.file)}</span><span class="fr-t"><b>${esc(f.name||f.file)}</b><small>${ago(new Date(f.created.replace(' ','T')).getTime())}</small></span></button>
         ${f.folder?`<span class="chip">${esc(f.folder)}</span>`:''}<button class="ibtn" data-ff="${f.id}" aria-label="В папку">${icon('materials')}</button><button class="ibtn${V.delF===f.id?' on':''}" data-fd="${f.id}" aria-label="Удалить">${V.delF===f.id?'Удалить?':'✕'}</button></div>`).join('')}</div>`:'<p class="empty">Файлов пока нет.</p>'}`}
+  if(tab==='boards'){const bl=[...(S.boards||[])].sort((a,b)=>(b.at||0)-(a.at||0));
+    const prev=b=>{const f=BD.frames(b.items||[])[0];const im=(f&&f.src)||((b.items||[]).find(x=>x.t==='image')||{}).src;return im?`style="background-image:url('${BD.srcURL(im)}')${f&&!f.src?'':''}"`:f?`style="background:${f.fill||'#fff'}"`:''};
+    body=`<div class="lact" style="display:flex;gap:8px;margin-bottom:14px"><button class="btn primary" id="bdNew">+ Новая разработка</button></div>
+      ${bl.length?`<div class="bgrid">${bl.map(b=>`<div class="bcard"><button class="bprev" data-bo="${b.id}" ${prev(b)}>${prev(b)?'':'Пустая'}</button>
+        <div class="binf"><b>${esc(b.name)}</b><small>${BD.frames(b.items||[]).length} ${plural(BD.frames(b.items||[]).length,['фрейм','фрейма','фреймов'])} · ${ago(b.at||Date.now())}</small>
+        <div class="bbtns"><button class="btn small" data-bo="${b.id}">Открыть</button><button class="btn small quiet" data-bc="${b.id}">Копия</button><button class="btn small quiet" data-bd="${b.id}">${V.delB===b.id?'Удалить?':'Удалить'}</button></div></div></div>`).join('')}</div>`
+      :`<div class="empty-first big-empty">${emptyArt('cheburashka-1')}<div><h2>Разработок пока нет</h2><p>Разработка — это доска как в Miro: фреймы, картинки, текст, стикеры, фигуры. Сделайте один раз и открывайте на уроке в комнате любого ученика.</p></div></div>`}`}
   if(tab==='topics')body=`${mine.length?`<div class="flist">${mine.map(c=>`<div class="frow"><button class="fr-main" data-tp="${c.id}"><span class="fk">${c.grade}</span><span class="fr-t"><b>${esc(c.t)}</b><small>${SUBJ[c.subject]||''} · ${gradeWord(c.grade)} · ${c.L.length} ${plural(c.L.length,['уровень','уровня','уровней'])}</small></span></button></div>`).join('')}</div>`:'<p class="empty">Своих тем пока нет.</p>'}
     <button class="btn" id="newTopic">+ Своя тема</button><p class="hint">Своя тема встаёт в маршрут ученика того класса, для которого её сделали.</p>`;
   app.innerHTML=`<div class="head"><div><h1>Мои материалы</h1><p>Сохранённые листы, свои темы и файлы к урокам.</p></div></div>
-    <div class="panel"><div class="tabs">${[['sheets','Листы',S.saved.length],['files','Файлы',FILES?FILES.length:''],['topics','Свои темы',mine.length]].map(([k,n,c])=>`<button class="tab${k===tab?' on':''}" data-tab="${k}">${n}${c?` <span class="tc">${c}</span>`:''}</button>`).join('')}</div>
+    <div class="panel"><div class="tabs">${[['sheets','Листы',S.saved.length],['boards','Разработки',(S.boards||[]).length],['files','Файлы',FILES?FILES.filter(f=>f.folder!=='__board').length:''],['topics','Свои темы',mine.length]].map(([k,n,c])=>`<button class="tab${k===tab?' on':''}" data-tab="${k}">${n}${c?` <span class="tc">${c}</span>`:''}</button>`).join('')}</div>
       ${tab!=='topics'&&fchips.length?`<div class="fchips"><button class="${fl==='*'?'on':''}" data-fl="*">Все</button>${fchips.map(f=>`<button class="${f===fl?'on':''}" data-fl="${esc(f)}">${esc(f)}</button>`).join('')}</div>`:''}
       <div class="mbody">${body}</div></div>`;
   const $=id=>document.getElementById(id);
-  app.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>go({mtab:b.dataset.tab,delM:null,delF:null}));
+  app.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>go({mtab:b.dataset.tab,delM:null,delF:null,delB:null}));
+  if($('bdNew'))$('bdNew').onclick=()=>{const b=BD.newBoard();S.boards=S.boards||[];S.boards.unshift(b);save();BD.open(b.id)};
+  app.querySelectorAll('[data-bo]').forEach(b=>b.onclick=()=>BD.open(b.dataset.bo));
+  app.querySelectorAll('[data-bc]').forEach(b=>b.onclick=()=>{const o=S.boards.find(x=>x.id===b.dataset.bc);const n={...JSON.parse(JSON.stringify(o)),id:BD.newBoard().id,name:o.name+' (копия)',at:Date.now()};S.boards.unshift(n);save();render()});
+  app.querySelectorAll('[data-bd]').forEach(b=>b.onclick=()=>{if(V.delB!==b.dataset.bd){V.delB=b.dataset.bd;render();return}S.boards=S.boards.filter(x=>x.id!==b.dataset.bd);V.delB=null;save();render()});
+  /* превью картинок из «Файлов» открываются по временному ключу: получаем его и перерисовываем один раз */
+  if(tab==='boards'&&ACC.user&&!viewMaterials.tok){viewMaterials.tok=1;BD.token().then(()=>{if(V.screen==='materials'&&V.mtab==='boards')render()})}
   app.querySelectorAll('[data-fl]').forEach(b=>b.onclick=()=>go({mfolder:b.dataset.fl}));
   app.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>openSaved(S.saved.find(m=>m.id===b.dataset.open)));
   app.querySelectorAll('[data-mf]').forEach(b=>b.onclick=()=>{const m=S.saved.find(x=>x.id===b.dataset.mf);folderModal(m.folder,f=>{m.folder=f;save();render()})});
@@ -5631,7 +5714,7 @@ const INK_COL={t:'#D5402F',s:'#2D57C8'};
 const R_LIVE_MAX=3*3600e3;
 const roomLive=st=>!!(st&&st.live&&Date.now()-(st.liveAt||0)<R_LIVE_MAX);
 const rTitle=t=>String(t||'').replace(/\.(pdf|png|jpe?g|webp|gif|heic)$/i,'').replace(/[_]+/g,' ').replace(/\s+/g,' ').trim()||'Файл';
-const R_KIND={sheet:'Лист',pdf:'PDF',img:'Картинка',board:'Доска',note:'Объяснение',link:'Ссылка'};
+const R_KIND={deck:'Разработка',sheet:'Лист',pdf:'PDF',img:'Картинка',board:'Доска',note:'Объяснение',link:'Ссылка'};
 const rAnswerable=it=>it&&!['mor','snt'].includes(it.type)&&!(it.type==='sort'&&!it.opts)&&!(it.type==='line'&&it.noLine)&&it.ans!=null&&String(it.ans)!=='';
 /* числа сверяются без пробелов: «18 000» и «18000» — один ответ */
 const rOk=(it,v)=>{const a=norm(it.ans),b=norm(v);return a===b||(/^[\d\s\u00a0]+$/.test(a+b)&&a.replace(/[\s\u00a0]/g,'')===b.replace(/[\s\u00a0]/g,''))};
@@ -5749,7 +5832,7 @@ function viewRoom(){
   stage.addEventListener('pointermove',e=>{if(R.role!=='t'||R.tool!=='hand'||e.pointerType==='touch')return;const pg=e.target.closest('.rpg');if(!pg)return;
     const r=pg.getBoundingClientRect();roomPulse({m:R.st.cur,pg:+pg.dataset.pg,x:+((e.clientX-r.left)/r.width).toFixed(4),y:+((e.clientY-r.top)/r.width).toFixed(4)})});
   stage.addEventListener('pointerleave',()=>{if(R.role==='t')roomPulse({x:null})});
-  let lastW=stage.clientWidth;const ro=new ResizeObserver(()=>{const w=stage.clientWidth;if(Math.abs(w-lastW)>30){lastW=w;R.stageKey='';roomStage()}else roomInkAll()});
+  let lastW=stage.clientWidth;const ro=new ResizeObserver(()=>{const w=stage.clientWidth;if(Math.abs(w-lastW)>30){lastW=w;R.stageKey='';roomStage()}else{roomDeckScale();roomInkAll()}});
   ro.observe(stage);R.obs.push(ro);
 }
 function roomUpdate(){if(!R.on||!document.getElementById('rmTop'))return;roomTop();roomSide();roomTools();roomStage()}
@@ -5879,6 +5962,9 @@ function roomStage(){
   }else if(m.k==='pdf'){pages.innerHTML='<p class="hint">Открываю PDF…</p>';roomPdf(pages,m,key).then(()=>{if(R.stageKey===key)done()}).catch(()=>{if(R.stageKey===key)pages.innerHTML='<p class="empty">PDF не открылся. Проверьте интернет.</p>'})}
   else if(m.k==='img'){roomFileURL(m.f).then(u=>{if(R.stageKey!==key)return;pages.innerHTML=`<div class="rpg rimg"><img src="${esc(u)}" alt="${esc(m.t)}"></div>`;
     const im=pages.querySelector('img');im.onload=done;im.onerror=()=>{pages.innerHTML='<p class="empty">Картинка не загрузилась.</p>'}}).catch(()=>{pages.innerHTML='<p class="empty">Нет связи.</p>'})}
+  else if(m.k==='deck'){roomFileURL('x').then(()=>{if(R.stageKey!==key)return;const url=s=>s&&s.startsWith('d:')?R.pb.files.getURL(R.rec,s.slice(2),{token:FTOK.t}):s;
+    pages.innerHTML=BD.frames(m.items||[]).map(f=>`<div class="rpg rdeck" style="aspect-ratio:${f.w}/${f.h}"><div class="bd-st" data-w="${f.w}" style="width:${f.w}px;height:${f.h}px">${BD.frameHTML(m.items,f,url)}</div></div>`).join('')||'<p class="empty">В разработке нет фреймов.</p>';
+    roomDeckScale();done()}).catch(()=>{pages.innerHTML='<p class="empty">Нет связи.</p>'})}
   else if(m.k==='board'){pages.innerHTML=Array.from({length:m.n||1},()=>`<div class="rpg rbd bg-${m.bg||'grid'}"></div>`).join('');done()}
   else if(m.k==='note'){pages.innerHTML=`<div class="rpg rnote"><div class="rn-in"><span class="rn-k">Объяснение</span><h3>${esc(m.t)}</h3>${(m.txt||'').split(/\n+/).map(x=>`<p>${esc(x)}</p>`).join('')}${m.ex?`<p class="rn-ex">${esc(m.ex)}</p>`:''}</div></div>`;done()}
   else if(m.k==='link'){let host2='';try{host2=new URL(m.url).hostname}catch(e){}
@@ -6171,16 +6257,35 @@ function roomPicker(){
   const it=(a,b,s)=>`<button class="rq" data-a="${a}"><b>${b}</b><small>${s}</small></button>`;
   modal(`<h2>Добавить в урок</h2><div class="rm-pick">
       ${t?`<button class="rq main" data-a="lesson"><b>Урок по теме</b><small>${esc(t.t)} · правило, разминка, задачи</small></button>`:''}
-      ${it('topic','Лист по теме','любая тема и уровень')}${it('saved','Из моих материалов','сохранённые листы и файлы')}
+      ${it('deck','Разработка','ваша доска с фреймами, как в Miro')}${it('topic','Лист по теме','любая тема и уровень')}${it('saved','Из моих материалов','сохранённые листы и файлы')}
       ${it('file','Файл или фото','PDF, картинка, фото страницы учебника')}${it('board','Чистая доска','в клетку, в линейку или белая')}
       ${it('note','Объяснение','правило темы или свой текст')}${it('link','Ссылка','видео, игра, сайт')}</div>
     <p class="hint" style="margin:0">Скриншот можно вставить прямо в комнату: Ctrl+V. Ученик видит материал, только когда вы его покажете.</p>
     <div class="modal-actions"><button class="btn quiet" id="cl">Отмена</button></div>`,()=>{
     document.getElementById('cl').onclick=close;
     document.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{const a=b.dataset.a;
-      if(a==='lesson'){close();roomAddLesson()}else if(a==='topic')roomTopicPick();else if(a==='saved')roomSavedPick();
+      if(a==='lesson'){close();roomAddLesson()}else if(a==='deck')roomDeckPick();else if(a==='topic')roomTopicPick();else if(a==='saved')roomSavedPick();
       else if(a==='file')roomFilePick();else if(a==='board')roomBoardPick();else if(a==='note')roomNoteEdit();else if(a==='link')roomLinkEdit()})});
 }
+/* разработка в комнату: копия доски, картинки переезжают в комнату ученика, каждый фрейм — страница */
+function roomDeckPick(){const bl=[...(S.boards||[])].sort((a,b)=>(b.at||0)-(a.at||0));
+  modal(`<h2>Разработка</h2>${bl.length?`<div class="picks">${bl.map(b=>`<button class="pick" data-b="${b.id}"><b>${esc(b.name)}</b><small>${BD.frames(b.items||[]).length} ${plural(BD.frames(b.items||[]).length,['фрейм','фрейма','фреймов'])}</small></button>`).join('')}</div>`
+    :'<p style="margin:0">Разработок пока нет. Их делают в «Моих материалах» → «Разработки».</p>'}
+    <div class="modal-actions"><button class="btn quiet" id="cl">Назад</button></div>`,()=>{
+    document.getElementById('cl').onclick=roomPicker;
+    document.querySelectorAll('[data-b]').forEach(x=>x.onclick=()=>{close();roomAddDeck(S.boards.find(b=>b.id===x.dataset.b))})});
+}
+async function roomAddDeck(b){
+  if(!b)return;const items=JSON.parse(JSON.stringify(b.items||[]));const srcs=[...new Set(items.map(x=>x.src).filter(Boolean))];
+  if(!BD.frames(items).length){toast('В разработке нет фреймов: добавьте хотя бы один фрейм');return}
+  toast(srcs.length?'Переношу картинки в комнату…':'Добавляю разработку');await BD.token();const map={};
+  for(const s of srcs){try{const bl=await (await fetch(BD.srcURL(s))).blob();const before=new Set(R.rec.docs||[]);const fd=new FormData();fd.append('docs+',bl,'board.'+((bl.type.split('/')[1]||'png').replace('jpeg','jpg')));
+    const r=await R.pb.collection('rooms').update(R.rec.id,fd);R.rec=r;const fn=(r.docs||[]).find(x=>!before.has(x));if(fn)map[s]='d:'+fn}catch(e){}}
+  items.forEach(x=>{if(x.src&&map[x.src])x.src=map[x.src]});
+  if(srcs.some(s=>!map[s]))toast('Часть картинок не перенеслась: проверьте интернет');
+  roomAdd({k:'deck',t:b.name,bid:b.id,items});
+}
+function roomDeckScale(){document.querySelectorAll('#rmPages > .rdeck').forEach(pg=>{const st=pg.querySelector('.bd-st');if(st)st.style.transform=`scale(${pg.clientWidth/(+st.dataset.w)})`})}
 function roomTopicPick(){
   const st=roomStudent(),subj=roomSubj(),pos=trackPos(st,subj);
   const near=pos.i>=0?[pos.tr[pos.i-1],pos.tr[pos.i],pos.tr[pos.i+1]].filter(Boolean):[];
@@ -6621,6 +6726,303 @@ function studentSummary(st,subj){
     ${ids.length?`<div class="sum-g">${grp('bad','Не усвоено')}${grp('warn','В работе')}${grp('ok','Усвоено')}</div>`:''}
     ${reps.length?`<div class="sum-r"><span class="label">Уроки</span>${reps.map(r=>{const p=r.n?Math.round(r.k/r.n*100):0;return `<button class="sum-rep" data-rp="${r.id}"><span>${dayTxt(r.date)}</span>${resChip(r.k,Math.max(1,r.n))}<small>${r.topics.filter(t=>t.st==='bad'||t.st==='warn').length?'есть слабые темы':'всё усвоено'}</small></button>`}).join('')}</div>`:''}</section>`;
 }
+
+/* ---------- Разработки: доска как в Miro ----------
+   Отдельный блок: всё внутри BD, стили с приставкой bd-. Доска хранится в рабочей среде (S.boards),
+   картинки — в «Файлах» аккаунта в скрытой папке __board (без аккаунта — прямо в доске).
+   Объекты лежат в мировых координатах, вид — сдвиг и масштаб. Порядок в массиве — это слои. */
+const BD=(()=>{
+  const COLORS=['#FFF59D','#FFCC80','#F8BBD0','#CE93D8','#90CAF9','#80DEEA','#A5D6A7','#FFFFFF'];
+  const INK=['#1F2C55','#D5402F','#2D57C8','#2C8A57','#E8A317','#FFFFFF'];
+  const DEF={frame:[1600,900],text:[420,44],sticky:[240,240],shape:[280,180]};
+  const uid=()=>Math.random().toString(36).slice(2,10);
+  let EDITDONE=null,B=null,SEL=new Set(),TOOL='select',SHAPE='rect',EDIT=null,DRAG=null,SPACE=false,PENC='#1F2C55',pickCb=null,OPEN=false,root=null;
+  const VIEW={x:0,y:0,s:1},HIST={st:[],i:-1},EL=new Map();
+  const q=id=>root.querySelector('#'+id);
+  /* ---------- адреса картинок: f: файлы репетитора, d: файлы комнаты, data: прямо в доске ---------- */
+  let TOK={t:'',at:0};
+  async function token(){if(!pbT||!ACC.user)return'';if(!TOK.t||Date.now()-TOK.at>100000){try{TOK={t:await pbT.files.getToken(),at:Date.now()}}catch(e){}}return TOK.t}
+  const srcURL=s=>!s?'':s.startsWith('f:')?`${API}/api/files/files/${s.slice(2)}?token=${TOK.t}`:s;
+  /* ---------- как выглядит объект: общий код для редактора и для комнаты ---------- */
+  function shapeBg(it){const f=it.fill||'#FFFFFF',s=it.stroke||'#1F2C55',sw=it.sw??2;
+    if(it.k==='ellipse')return `<svg class="bd-bg" viewBox="0 0 100 100" preserveAspectRatio="none"><ellipse cx="50" cy="50" rx="49" ry="49" fill="${f}" stroke="${s}" stroke-width="${sw}" vector-effect="non-scaling-stroke"/></svg>`;
+    if(it.k==='cloud')return `<svg class="bd-bg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M10 6h80a8 8 0 018 8v52a8 8 0 01-8 8H40l-16 18 2-18H10a8 8 0 01-8-8V14a8 8 0 018-8z" fill="${f}" stroke="${s}" stroke-width="${sw}" vector-effect="non-scaling-stroke"/></svg>`;
+    if(it.k==='arrow')return `<svg class="bd-bg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M2 35h62V12l34 38-34 38V65H2z" fill="${f}" stroke="${s}" stroke-width="${sw}" stroke-linejoin="round" vector-effect="non-scaling-stroke"/></svg>`;
+    return `<div class="bd-bg" style="background:${f};border:${sw}px solid ${s};border-radius:${it.k==='round'?Math.min(it.w,it.h)*.18:4}px"></div>`}
+  function look(it,url){
+    const tx=(fs,al)=>`<div class="bd-tx" style="font-size:${it.fs||fs}px;color:${it.color||'#1F2C55'};font-weight:${it.b?700:400};text-align:${it.al||al}">${esc(it.text||'')}</div>`;
+    let style=`left:${it.x}px;top:${it.y}px;width:${it.w}px;${it.t==='text'?`min-height:${it.h}px`:`height:${it.h}px`};`,html='';
+    if(it.t==='frame'){style+=`background-color:${it.fill||'#fff'};${it.src?`background-image:url('${url(it.src)}');`:''}`;html=`<div class="bd-ftitle">${esc(it.text||'Фрейм')}</div>`}
+    else if(it.t==='text')html=tx(32,'left');
+    else if(it.t==='sticky'){style+=`background:${it.fill||'#FFF59D'};`;html=tx(24,'center')}
+    else if(it.t==='shape')html=shapeBg(it)+tx(24,'center');
+    else if(it.t==='image')html=`<img src="${url(it.src)}" alt="" draggable="false">`;
+    else if(it.t==='pen'){const p=it.pts||[];let d='';for(let i=0;i<p.length;i+=2)d+=(i?'L':'M')+(+p[i]).toFixed(1)+' '+(+p[i+1]).toFixed(1);
+      html=`<svg viewBox="0 0 ${it.vw||it.w} ${it.vh||it.h}" preserveAspectRatio="none"><path d="${d}" fill="none" stroke="${it.color||'#1F2C55'}" stroke-width="${it.sw||4}" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/></svg>`}
+    return{cls:'bd-it bd-'+it.t,style,html}}
+  /* фрейм для комнаты: фон и всё, что на нём лежит, в координатах фрейма */
+  function frameHTML(items,f,url){const inside=items.filter(x=>x!==f&&x.t!=='frame'&&x.x+x.w/2>=f.x&&x.x+x.w/2<=f.x+f.w&&x.y+x.h/2>=f.y&&x.y+x.h/2<=f.y+f.h);
+    const bg=look({...f,x:0,y:0},url);
+    return `<div class="${bg.cls}" style="${bg.style}"></div>`+inside.map(it=>{const l=look({...it,x:it.x-f.x,y:it.y-f.y},url);return `<div class="${l.cls}" style="${l.style}">${l.html}</div>`}).join('')}
+  /* ---------- открыть и закрыть редактор ---------- */
+  async function open(id){
+    B=(S.boards||[]).find(b=>b.id===id);if(!B)return;await token();
+    build();OPEN=true;root.hidden=false;document.body.classList.add('bd-open');SEL.clear();HIST.st=[];HIST.i=-1;snap();
+    q('bdName').value=B.name;EL.clear();q('bdWorld').innerHTML='';renderAll();fitTo(bounds(B.items));setTool('select');
+    clearInterval(open.t);open.t=setInterval(()=>{if(OPEN)token()},60000);
+  }
+  function close(){if(!OPEN)return;OPEN=false;flush();root.hidden=true;document.body.classList.remove('bd-open');closePop();clearInterval(open.t);go({screen:'materials',mtab:'boards'})}
+  function build(){if(root)return;root=document.createElement('div');root.className='bd';root.hidden=true;root.innerHTML=`
+    <div class="bd-vp" id="bdVp"><div class="bd-world" id="bdWorld"></div></div>
+    <div class="bd-panel bd-top"><button class="bd-ib" id="bdBack" title="Готово, к материалам" aria-label="Назад">←</button>
+      <input id="bdName" aria-label="Название разработки" maxlength="80">
+      <button class="bd-ib" id="bdUndo" title="Отменить (Ctrl+Z)" aria-label="Отменить">↶</button><button class="bd-ib" id="bdRedo" title="Вернуть (Ctrl+Shift+Z)" aria-label="Вернуть">↷</button>
+      <span class="bd-saved" id="bdSaved">Сохранено</span></div>
+    <div class="bd-panel bd-tools" id="bdTools"></div>
+    <div class="bd-panel bd-tr"><button class="bd-tb" id="bdFr">Фреймы</button><button class="bd-tb" id="bdHelp" title="Клавиши">?</button></div>
+    <div class="bd-panel bd-frames" id="bdFrames" hidden></div>
+    <div class="bd-panel bd-zoom"><button class="bd-ib" id="bdZo" aria-label="Уменьшить">−</button><span id="bdZv" title="Показать всё">100%</span><button class="bd-ib" id="bdZi" aria-label="Увеличить">+</button></div>
+    <div class="bd-ctx" id="bdCtx" hidden></div><div class="bd-hint" id="bdHint"></div>
+    <input type="file" id="bdFile" accept="image/*" multiple hidden>`;
+    document.body.appendChild(root);bind()}
+  /* ---------- инструменты ---------- */
+  const IC={
+    select:'<svg viewBox="0 0 24 24"><path d="M5 3l14 8-6.5 1.5L10 19z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>',
+    hand:'<svg viewBox="0 0 24 24"><path d="M8 12V5.5a1.5 1.5 0 013 0V11m0-1V4.5a1.5 1.5 0 013 0V11m0-.5V6a1.5 1.5 0 013 0v8a7 7 0 01-7 7h-.5A6.5 6.5 0 015 17.5L3.5 13a1.5 1.5 0 012.6-1.4L8 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    frame:'<svg viewBox="0 0 24 24"><path d="M7 3v18M17 3v18M3 7h18M3 17h18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
+    text:'<svg viewBox="0 0 24 24"><path d="M5 5h14M12 5v14M9 19h6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>',
+    sticky:'<svg viewBox="0 0 24 24"><path d="M5 4h14v10l-5 6H5z M14 20v-6h5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>',
+    shape:'<svg viewBox="0 0 24 24"><rect x="3" y="9" width="10" height="10" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="16" cy="8" r="5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>',
+    pen:'<svg viewBox="0 0 24 24"><path d="M4 20l1-4L16 5l3 3L8 19zM14 7l3 3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>',
+    image:'<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="9" cy="10" r="1.8" fill="currentColor"/><path d="M4 18l5-5 4 4 3-3 4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>'};
+  const TOOLS=[['select','Выделение (V)'],['hand','Рука: двигать доску (H или зажать пробел)'],'|',['frame','Фрейм (F)'],['text','Текст (T)'],['sticky','Стикер (N)'],['shape','Фигура (S)'],['pen','Карандаш (P)'],['image','Картинка (I)']];
+  function drawTools(){const t=q('bdTools');t.innerHTML=TOOLS.map(x=>x==='|'?'<div class="bd-sep"></div>':`<button class="bd-ib${TOOL===x[0]?' bd-on':''}" data-t="${x[0]}" title="${x[1]}" aria-label="${x[1]}">${IC[x[0]]}</button>`).join('');
+    t.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{const k=b.dataset.t;if(k==='image'){q('bdFile').click();return}if(k==='shape'){shapeMenu(b);return}if(k==='pen'){penMenu(b);return}setTool(k)})}
+  function setTool(t){TOOL=t;drawTools();q('bdVp').className='bd-vp'+(t==='hand'?' bd-pan':['frame','text','sticky','shape','pen'].includes(t)?' bd-make':'')}
+  function shapeMenu(b){const r=b.getBoundingClientRect();popup(r.right+8,r.top,[['Прямоугольник',()=>{SHAPE='rect';setTool('shape')}],['Скруглённый',()=>{SHAPE='round';setTool('shape')}],['Круг',()=>{SHAPE='ellipse';setTool('shape')}],['Облачко',()=>{SHAPE='cloud';setTool('shape')}],['Стрелка',()=>{SHAPE='arrow';setTool('shape')}]])}
+  function penMenu(b){const r=b.getBoundingClientRect();popup(r.right+8,r.top,INK.slice(0,5).map((c,k)=>[['Тёмно-синий','Красный','Синий','Зелёный','Жёлтый'][k],()=>{PENC=c;setTool('pen')}]))}
+  /* ---------- отрисовка ---------- */
+  function renderIt(it,el){const l=look(it,srcURL);el.className=l.cls;el.style.cssText=l.style;
+    let html=l.html;if(it.link)html+=`<span class="bd-lnk" data-link="${it.link}" title="Перейти к фрейму">↗</span>`;if(it.lock)html+='<span class="bd-lock" title="Закреплено">🔒</span>';
+    if(el._h!==html){el.innerHTML=html;el._h=html}}
+  function renderAll(){const w=q('bdWorld'),ids=new Set(B.items.map(i=>i.id));
+    for(const[id,el]of EL)if(!ids.has(id)){el.remove();EL.delete(id)}
+    B.items.forEach((it,k)=>{let el=EL.get(it.id);if(!el){el=document.createElement('div');el.dataset.id=it.id;EL.set(it.id,el);w.appendChild(el)}renderIt(it,el);el.style.zIndex=k+1});
+    drawSel();drawFrames();dirty()}
+  function applyView(){q('bdWorld').style.transform=`translate(${VIEW.x}px,${VIEW.y}px) scale(${VIEW.s})`;q('bdZv').textContent=Math.round(VIEW.s*100)+'%';
+    const vp=q('bdVp'),g=24*VIEW.s;vp.style.backgroundSize=`${g}px ${g}px`;vp.style.backgroundPosition=`${VIEW.x}px ${VIEW.y}px`;drawSel()}
+  const toW=(cx,cy)=>{const r=q('bdVp').getBoundingClientRect();return{x:(cx-r.left-VIEW.x)/VIEW.s,y:(cy-r.top-VIEW.y)/VIEW.s}};
+  function zoomAt(f,cx,cy){const r=q('bdVp').getBoundingClientRect(),s2=Math.max(.05,Math.min(8,VIEW.s*f)),px=cx-r.left,py=cy-r.top;
+    VIEW.x=px-(px-VIEW.x)*s2/VIEW.s;VIEW.y=py-(py-VIEW.y)*s2/VIEW.s;VIEW.s=s2;applyView()}
+  const hOf=it=>it.t==='text'&&EL.get(it.id)?EL.get(it.id).offsetHeight:it.h;
+  function bounds(list){if(!list.length)return null;let a=Infinity,b=Infinity,c=-Infinity,d=-Infinity;for(const it of list){a=Math.min(a,it.x);b=Math.min(b,it.y);c=Math.max(c,it.x+it.w);d=Math.max(d,it.y+hOf(it))}return{x:a,y:b,w:c-a,h:d-b}}
+  function fitTo(bb,anim){if(!bb)return;const r=q('bdVp').getBoundingClientRect(),pad=90,s=Math.min(4,Math.max(.05,Math.min((r.width-pad*2)/bb.w,(r.height-pad*2)/bb.h)));
+    const t={s,x:r.width/2-(bb.x+bb.w/2)*s,y:r.height/2-(bb.y+bb.h/2)*s};if(!anim){Object.assign(VIEW,t);applyView();return}
+    const f={...VIEW},t0=performance.now();const st=n=>{const k=Math.min(1,(n-t0)/450),e=1-Math.pow(1-k,3);VIEW.s=f.s+(t.s-f.s)*e;VIEW.x=f.x+(t.x-f.x)*e;VIEW.y=f.y+(t.y-f.y)*e;applyView();if(k<1)requestAnimationFrame(st)};requestAnimationFrame(st)}
+  /* ---------- выделение и панель над ним ---------- */
+  const byId=id=>B.items.find(i=>i.id===id);
+  const withGroup=id=>{const it=byId(id);return it&&it.g?B.items.filter(x=>x.g===it.g).map(x=>x.id):[id]};
+  function drawSel(){if(!root)return;root.querySelectorAll('.bd-selbox').forEach(x=>x.remove());const list=[...SEL].map(byId).filter(Boolean),ctx=q('bdCtx');
+    if(!list.length||EDIT){ctx.hidden=true;return}
+    const bb=bounds(list),box=document.createElement('div');box.className='bd-selbox'+(list.length>1?' bd-multi':'');
+    Object.assign(box.style,{left:bb.x+'px',top:bb.y+'px',width:bb.w+'px',height:bb.h+'px',outlineWidth:(2/VIEW.s)+'px',zIndex:99999});
+    if(!list.some(x=>x.lock))for(const h of ['nw','ne','sw','se']){const d=document.createElement('div');d.className='bd-hdl';d.dataset.h=h;
+      Object.assign(d.style,{width:12/VIEW.s+'px',height:12/VIEW.s+'px',borderWidth:2/VIEW.s+'px',[h[0]==='n'?'top':'bottom']:(-7/VIEW.s)+'px',[h[1]==='w'?'left':'right']:(-7/VIEW.s)+'px',cursor:h==='nw'||h==='se'?'nwse-resize':'nesw-resize'});box.appendChild(d)}
+    q('bdWorld').appendChild(box);drawCtx(list,bb)}
+  function drawCtx(list,bb){const ctx=q('bdCtx'),one=list.length===1?list[0]:null,t=one&&one.t;
+    const fills=list.every(x=>['sticky','shape','frame'].includes(x.t)),texts=list.every(x=>['sticky','shape','text'].includes(x.t)),inks=list.every(x=>['text','pen'].includes(x.t));
+    let h='';
+    if(fills)h+=COLORS.map(c=>`<span class="bd-sw${list.every(x=>x.fill===c)?' bd-on':''}" data-fill="${c}" style="background:${c}" title="Цвет"></span>`).join('')+'<span class="bd-vs"></span>';
+    if(inks)h+=INK.map(c=>`<span class="bd-sw${list.every(x=>(x.color||'#1F2C55')===c)?' bd-on':''}" data-ink="${c}" style="background:${c}" title="Цвет"></span>`).join('')+'<span class="bd-vs"></span>';
+    if(texts)h+=`<button class="bd-ib" data-a="fs-" title="Текст меньше">A−</button><span class="bd-fs">${one?one.fs||(t==='text'?32:24):''}</span><button class="bd-ib" data-a="fs+" title="Текст больше">A+</button><button class="bd-ib" data-a="bold" title="Жирный"><b>Ж</b></button><span class="bd-vs"></span>`;
+    if(t==='frame')h+=`<button class="bd-ib" data-a="bgimg" title="Картинка на фон">🖼</button>${one.src?'<button class="bd-ib" data-a="bgx" title="Убрать картинку фона">⨯</button>':''}<span class="bd-vs"></span>`;
+    h+=`<button class="bd-ib" data-a="front" title="Наверх (Ctrl+Shift+])">⤒</button><button class="bd-ib" data-a="fwd" title="На один вперёд (Ctrl+])">↑</button><button class="bd-ib" data-a="bwd" title="На один назад (Ctrl+[)">↓</button><button class="bd-ib" data-a="back" title="Вниз (Ctrl+Shift+[)">⤓</button><span class="bd-vs"></span>`;
+    if(list.length>1)h+=`<button class="bd-ib" data-a="group" title="Сгруппировать (Ctrl+G)">▣</button>`;
+    if(list.some(x=>x.g))h+=`<button class="bd-ib" data-a="ungroup" title="Разгруппировать (Ctrl+Shift+G)">◫</button>`;
+    h+=`<button class="bd-ib" data-a="link" title="Ссылка на фрейм">🔗</button><button class="bd-ib" data-a="lock" title="${list.some(x=>x.lock)?'Открепить':'Закрепить'}">${list.some(x=>x.lock)?'🔓':'🔒'}</button><button class="bd-ib" data-a="dup" title="Дублировать (Ctrl+D)">⧉</button><button class="bd-ib" data-a="del" title="Удалить (Delete)">🗑</button>`;
+    ctx.innerHTML=h;ctx.hidden=false;
+    const r=q('bdVp').getBoundingClientRect(),sx=bb.x*VIEW.s+VIEW.x,sy=bb.y*VIEW.s+VIEW.y,w=ctx.offsetWidth;
+    if(sx>r.width||sy>r.height||sx+bb.w*VIEW.s<0||sy+bb.h*VIEW.s<0){ctx.hidden=true;return}
+    ctx.style.left=Math.max(8,Math.min(r.width-w-8,sx+bb.w*VIEW.s/2-w/2))+'px';ctx.style.top=Math.max(64,sy-56)+'px';
+    ctx.querySelectorAll('[data-fill]').forEach(b=>b.onclick=()=>edit(()=>list.forEach(x=>x.fill=b.dataset.fill)));
+    ctx.querySelectorAll('[data-ink]').forEach(b=>b.onclick=()=>edit(()=>list.forEach(x=>x.color=b.dataset.ink)));
+    ctx.querySelectorAll('[data-a]').forEach(b=>b.onclick=e=>act(b.dataset.a,e))}
+  function act(a,e){const list=[...SEL].map(byId).filter(Boolean);if(!list.length)return;
+    if(a==='fs-'||a==='fs+')return edit(()=>list.forEach(x=>{const f=x.fs||(x.t==='text'?32:24);x.fs=Math.max(10,Math.min(240,Math.round(a==='fs+'?f*1.2:f/1.2)))}));
+    if(a==='bold')return edit(()=>{const v=!list.every(x=>x.b);list.forEach(x=>x.b=v)});
+    if(['front','back','fwd','bwd'].includes(a))return layer(a);
+    if(a==='group')return edit(()=>{const g=uid();list.forEach(x=>x.g=g)});
+    if(a==='ungroup')return edit(()=>list.forEach(x=>delete x.g));
+    if(a==='lock')return edit(()=>{const v=!list.some(x=>x.lock);list.forEach(x=>x.lock=v)});
+    if(a==='dup')return dup();if(a==='del')return del();
+    if(a==='bgimg'){pickCb=src=>edit(()=>list[0].src=src);q('bdFile').click();return}
+    if(a==='bgx')return edit(()=>delete list[0].src);
+    if(a==='link'){const fr=B.items.filter(x=>x.t==='frame'&&!list.includes(x)),r=e.currentTarget.getBoundingClientRect();
+      popup(r.left,r.bottom+6,[...fr.map(f=>[f.text||'Фрейм',()=>edit(()=>list.forEach(x=>x.link=f.id))]),...(list.some(x=>x.link)?[['Убрать ссылку',()=>edit(()=>list.forEach(x=>delete x.link))]]:[])],'Сначала создайте ещё один фрейм')}}
+  /* слои как в Miro: на один вперёд, наверх, на один назад, вниз */
+  function layer(a){edit(()=>{const ids=new Set(SEL),sel=B.items.filter(x=>ids.has(x.id)),rest=B.items.filter(x=>!ids.has(x.id)),arr=B.items;
+    /* объект не уходит под фрейм: фреймы — это подложки, всё остальное лежит выше них */
+    const fr=!sel.some(x=>x.t==='frame');
+    if(a==='front')B.items=[...rest,...sel];
+    else if(a==='back')B.items=fr?[...rest.filter(x=>x.t==='frame'),...sel,...rest.filter(x=>x.t!=='frame')]:[...sel,...rest];
+    else if(a==='fwd'){for(let i=arr.length-2;i>=0;i--)if(ids.has(arr[i].id)&&!ids.has(arr[i+1].id))[arr[i],arr[i+1]]=[arr[i+1],arr[i]]}
+    else for(let i=1;i<arr.length;i++)if(ids.has(arr[i].id)&&!ids.has(arr[i-1].id)&&!(fr&&arr[i-1].t==='frame'))[arr[i],arr[i-1]]=[arr[i-1],arr[i]]})}
+  /* ---------- история и сохранение ---------- */
+  function snap(){const s=JSON.stringify(B.items);if(HIST.st[HIST.i]===s)return;HIST.st=HIST.st.slice(0,HIST.i+1);HIST.st.push(s);if(HIST.st.length>80)HIST.st.shift();HIST.i=HIST.st.length-1;undoBtns()}
+  function edit(fn){fn();renderAll();snap()}
+  function undo(){if(HIST.i<=0)return;HIST.i--;B.items=JSON.parse(HIST.st[HIST.i]);SEL=new Set([...SEL].filter(byId));renderAll();undoBtns()}
+  function redo(){if(HIST.i>=HIST.st.length-1)return;HIST.i++;B.items=JSON.parse(HIST.st[HIST.i]);SEL=new Set([...SEL].filter(byId));renderAll();undoBtns()}
+  function undoBtns(){if(!root)return;q('bdUndo').disabled=HIST.i<=0;q('bdRedo').disabled=HIST.i>=HIST.st.length-1}
+  let saveT=null;function dirty(){if(!B)return;q('bdSaved').textContent='Сохраняю…';clearTimeout(saveT);saveT=setTimeout(flush,700)}
+  function flush(){clearTimeout(saveT);if(!B)return;B.at=Date.now();save();if(root)q('bdSaved').textContent='Сохранено'}
+  function del(){if(!SEL.size)return;edit(()=>{const ids=new Set(SEL);B.items=B.items.filter(x=>!ids.has(x.id)||x.lock);SEL.clear()})}
+  const CK2='kletka-board-clip';
+  function copy(){const list=B.items.filter(x=>SEL.has(x.id));if(!list.length)return;try{localStorage.setItem(CK2,JSON.stringify(list))}catch(e){}}
+  function paste(dx=30,dy=30,at){let c=null;try{c=localStorage.getItem(CK2)}catch(e){}if(!c)return;const list=JSON.parse(c),gm={},im={};
+    let ox=dx,oy=dy;if(at){const bb=bounds(list);ox=at.x-(bb.x+bb.w/2);oy=at.y-(bb.y+bb.h/2)}
+    edit(()=>{SEL.clear();list.forEach(x=>im[x.id]=uid());for(const x of list){const n={...x,id:im[x.id],x:x.x+ox,y:x.y+oy};if(n.g)n.g=gm[n.g]||(gm[n.g]=uid());if(n.link&&im[n.link])n.link=im[n.link];delete n.lock;
+      if(n.t==='frame')B.items.unshift(n);else B.items.push(n);SEL.add(n.id)}})}
+  function dup(){copy();paste()}
+  /* ---------- создание ---------- */
+  function make(t,x,y,w,h){const it={id:uid(),t,x,y,w,h};
+    if(t==='frame')Object.assign(it,{fill:'#FFFFFF',text:'Фрейм '+(B.items.filter(i=>i.t==='frame').length+1)});
+    if(t==='text')Object.assign(it,{text:'',fs:Math.round(32/Math.min(1,VIEW.s)),color:'#1F2C55',al:'left'});
+    const zf=1/Math.max(.35,Math.min(1.5,VIEW.s));
+    if(t==='sticky')Object.assign(it,{fill:'#FFF59D',text:'',fs:Math.round(24*zf)});
+    if(t==='shape')Object.assign(it,{k:SHAPE,fill:'#FFFFFF',stroke:'#1F2C55',sw:2,text:'',fs:Math.round(24*zf)});
+    if(t==='frame')B.items.unshift(it);else B.items.push(it);SEL=new Set([it.id]);renderAll();snap();
+    setTool('select');if(['text','sticky','shape'].includes(t))startEdit(it.id);return it}
+  /* картинки: сжимаем до 1600 px, в аккаунте кладём в «Файлы» (скрытая папка), без аккаунта — в доску */
+  function readImg(file){return new Promise(res=>{const fr=new FileReader();fr.onload=()=>{const src=fr.result,im=new Image();
+    im.onload=()=>{if(/gif/i.test(file.type)&&file.size<4e6)return res({blob:file,src,w:im.naturalWidth,h:im.naturalHeight});
+      const k=Math.min(1,1600/Math.max(im.naturalWidth,im.naturalHeight)),w=Math.round(im.naturalWidth*k),h=Math.round(im.naturalHeight*k);
+      const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(im,0,0,w,h);
+      c.toBlob(b=>{const r2=new FileReader();r2.onload=()=>res({blob:b,src:r2.result,w,h});r2.readAsDataURL(b)},'image/webp',.86)};im.src=src};fr.readAsDataURL(file)})}
+  async function store(im,name){if(!pbT||!ACC.user)return im.src;
+    try{const fd=new FormData();fd.append('owner',ACC.user.id);fd.append('file',im.blob,(name||'image').replace(/\.[^.]+$/,'')+(/gif/.test(im.blob.type)?'.gif':'.webp'));fd.append('name',name||'картинка');fd.append('folder','__board');
+      const r=await pbT.collection('files').create(fd);await token();return 'f:'+r.id+'/'+r.file}catch(e){hint('Картинка не загрузилась на сервер, сохраню её в доске');return im.src}}
+  async function addImages(files,at){const c=at||toW(innerWidth/2,innerHeight/2);let off=0;const ids=[];hint('Загружаю картинки…');
+    for(const f of files){if(!/^image\//.test(f.type))continue;const im=await readImg(f);const src=await store(im,f.name);
+      const k=Math.min(1,600/Math.max(im.w,im.h))/Math.max(.25,Math.min(1,VIEW.s)),w=Math.round(im.w*k),h=Math.round(im.h*k);
+      const it={id:uid(),t:'image',x:c.x-w/2+off,y:c.y-h/2+off,w,h,src};B.items.push(it);ids.push(it.id);off+=30}
+    if(ids.length){SEL=new Set(ids);renderAll();snap();setTool('select');hint('Готово')}}
+  /* ---------- текст по двойному щелчку ---------- */
+  function startEdit(id){const it=byId(id);if(!it||!['text','sticky','shape','frame'].includes(it.t)||it.lock)return;const el=EL.get(id),tx=el.querySelector(it.t==='frame'?'.bd-ftitle':'.bd-tx');if(!tx)return;
+    EDIT=id;drawSel();tx.contentEditable='true';tx.focus();const rg=document.createRange();rg.selectNodeContents(tx);const s=getSelection();s.removeAllRanges();s.addRange(rg);
+    const done=()=>{if(EDIT!==id)return;tx.contentEditable='false';tx.removeEventListener('blur',done);EDITDONE=null;const v=tx.innerText.replace(/\n$/,'');EDIT=null;
+      if(it.t==='text'&&!v.trim()){B.items=B.items.filter(x=>x.id!==id);SEL.delete(id);renderAll();snap();return}
+      it.text=v;el._h=null;if(it.t==='text')it.h=Math.max(DEF.text[1],el.offsetHeight);renderAll();snap()};
+    tx.addEventListener('blur',done);EDITDONE=done;
+    tx.onkeydown=e=>{e.stopPropagation();if(e.key==='Escape'||(e.key==='Enter'&&(e.metaKey||e.ctrlKey))||(it.t==='frame'&&e.key==='Enter')){e.preventDefault();tx.blur()}}}
+  function inFrame(f){return B.items.filter(x=>x!==f&&x.t!=='frame'&&x.x+x.w/2>=f.x&&x.x+x.w/2<=f.x+f.w&&x.y+hOf(x)/2>=f.y&&x.y+hOf(x)/2<=f.y+f.h)}
+  function penBox(it){const r=it.raw;let a=Infinity,b=Infinity,c=-Infinity,d=-Infinity;for(let i=0;i<r.length;i+=2){a=Math.min(a,r[i]);b=Math.min(b,r[i+1]);c=Math.max(c,r[i]);d=Math.max(d,r[i+1])}
+    it.x=a;it.y=b;it.w=Math.max(1,c-a);it.h=Math.max(1,d-b);it.vw=it.w;it.vh=it.h;it.pts=r.map((v,i)=>Math.round((i%2?v-b:v-a)*10)/10)}
+  /* ---------- мышь и палец ---------- */
+  function bind(){const vp=q('bdVp');
+    vp.addEventListener('pointerdown',e=>{
+      if(EDIT&&e.target.closest('[contenteditable="true"]'))return;if(EDIT&&EDITDONE)EDITDONE();
+      if(e.button===2)return;
+      closePop();const w=toW(e.clientX,e.clientY);vp.setPointerCapture(e.pointerId);
+      if(e.button===1||SPACE||TOOL==='hand'){DRAG={k:'pan',sx:e.clientX,sy:e.clientY,vx:VIEW.x,vy:VIEW.y};vp.classList.add('bd-panning');return}
+      const lk=e.target.closest('.bd-lnk');if(lk){const f=byId(lk.dataset.link);if(f)fitTo(bounds([f]),true);return}
+      if(TOOL==='pen'){const it={id:uid(),t:'pen',x:w.x,y:w.y,w:1,h:1,pts:[0,0],color:PENC,sw:4,raw:[w.x,w.y]};DRAG={k:'pen',it};B.items.push(it);renderAll();return}
+      if(['frame','text','sticky','shape'].includes(TOOL)){DRAG={k:'make',t:TOOL,sx:w.x,sy:w.y,box:null};return}
+      const h=e.target.closest('.bd-hdl');
+      if(h){const list=[...SEL].map(byId);DRAG={k:'size',h:h.dataset.h,bb:bounds(list),orig:list.map(x=>({...x,h:hOf(x)})),keep:list.length>1||list[0].t==='image'};return}
+      const el=e.target.closest('.bd-it');
+      if(el){const id=el.dataset.id,grp=withGroup(id);
+        if(e.shiftKey||e.metaKey||e.ctrlKey){const on=SEL.has(id);grp.forEach(g=>on?SEL.delete(g):SEL.add(g));drawSel();return}
+        if(!SEL.has(id))SEL=new Set(grp);
+        /* фрейм тянет за собой всё, что на нём лежит */
+        const moving=new Set(SEL);for(const sid of SEL){const f=byId(sid);if(f&&f.t==='frame')inFrame(f).forEach(x=>moving.add(x.id))}
+        DRAG={k:'move',sx:w.x,sy:w.y,orig:[...moving].map(byId).filter(x=>x&&!x.lock).map(x=>({id:x.id,x:x.x,y:x.y})),moved:false};drawSel();return}
+      if(!(e.shiftKey||e.metaKey||e.ctrlKey))SEL.clear();DRAG={k:'marq',sx:w.x,sy:w.y,base:new Set(SEL)};drawSel()});
+    vp.addEventListener('pointermove',e=>{if(!DRAG)return;const w=toW(e.clientX,e.clientY);
+      if(DRAG.k==='pan'){VIEW.x=DRAG.vx+e.clientX-DRAG.sx;VIEW.y=DRAG.vy+e.clientY-DRAG.sy;applyView();return}
+      if(DRAG.k==='move'){const dx=w.x-DRAG.sx,dy=w.y-DRAG.sy;if(Math.abs(dx)+Math.abs(dy)>1/VIEW.s)DRAG.moved=true;
+        for(const o of DRAG.orig){const it=byId(o.id);it.x=o.x+dx;it.y=o.y+dy;const el=EL.get(o.id);el.style.left=it.x+'px';el.style.top=it.y+'px'}drawSel();return}
+      if(DRAG.k==='size'){const{bb,h}=DRAG;let x0=bb.x,y0=bb.y,x1=bb.x+bb.w,y1=bb.y+bb.h;if(h.includes('w'))x0=Math.min(w.x,x1-10);else x1=Math.max(w.x,x0+10);if(h.includes('n'))y0=Math.min(w.y,y1-10);else y1=Math.max(w.y,y0+10);
+        let sx=(x1-x0)/bb.w,sy=(y1-y0)/bb.h;if(DRAG.keep||e.shiftKey){const s=Math.max(sx,sy);sx=sy=s;if(h.includes('w'))x0=x1-bb.w*s;if(h.includes('n'))y0=y1-bb.h*s}
+        for(const o of DRAG.orig){const it=byId(o.id);it.x=x0+(o.x-bb.x)*sx;it.y=y0+(o.y-bb.y)*sy;it.w=Math.max(8,o.w*sx);it.h=Math.max(8,o.h*sy);if(o.fs&&DRAG.orig.length>1)it.fs=Math.max(8,Math.round(o.fs*sx));renderIt(it,EL.get(it.id))}drawSel();return}
+      if(DRAG.k==='pen'){const it=DRAG.it,r=it.raw;if(Math.hypot(w.x-r[r.length-2],w.y-r[r.length-1])<2/VIEW.s)return;r.push(w.x,w.y);penBox(it);renderIt(it,EL.get(it.id));return}
+      if(DRAG.k==='make'||DRAG.k==='marq'){const x=Math.min(DRAG.sx,w.x),y=Math.min(DRAG.sy,w.y),ww=Math.abs(w.x-DRAG.sx),hh=Math.abs(w.y-DRAG.sy);
+        let m=root.querySelector('.bd-marq');if(!m){m=document.createElement('div');m.className='bd-marq';m.style.zIndex=99998;q('bdWorld').appendChild(m)}
+        Object.assign(m.style,{left:x+'px',top:y+'px',width:ww+'px',height:hh+'px',borderWidth:1/VIEW.s+'px'});DRAG.box={x,y,w:ww,h:hh};
+        if(DRAG.k==='marq'){SEL=new Set(DRAG.base);for(const it of B.items){if(it.x>=x&&it.y>=y&&it.x+it.w<=x+ww&&it.y+hOf(it)<=y+hh)withGroup(it.id).forEach(g=>SEL.add(g))}drawSel()}}});
+    const end=()=>{if(!DRAG)return;const d=DRAG;DRAG=null;vp.classList.remove('bd-panning');root.querySelectorAll('.bd-marq').forEach(m=>m.remove());
+      if(d.k==='move'){if(d.moved){renderAll();snap()}else drawSel()}
+      else if(d.k==='size'){renderAll();snap()}
+      else if(d.k==='pen'){const it=d.it;if(it.raw.length<4){it.raw.push(it.raw[0]+1,it.raw[1]+1);penBox(it)}delete it.raw;renderAll();snap()}
+      else if(d.k==='make'){const[dw,dh]=DEF[d.t],big=d.box&&d.box.w*VIEW.s>12&&d.box.h*VIEW.s>12,k=d.t==='frame'?1:1/Math.max(.35,Math.min(1.5,VIEW.s));
+        const w=big?d.box.w:dw*k,h=big?(d.t==='text'?DEF.text[1]*k:d.box.h):dh*k;
+        /* фрейм по щелчку встаёт справа от последнего, на свободное место, и вид переезжает к нему */
+        if(d.t==='frame'&&!big){const fr=frames(B.items),last=fr[fr.length-1];const nx=last?Math.max(...fr.map(f=>f.x+f.w))+200:d.sx-w/2,ny=last?last.y:d.sy-h/2;const it=make('frame',nx,ny,w,h);fitTo(bounds([it]),true);return}
+        make(d.t,big?d.box.x:d.sx-(d.t==='text'?0:w/2),big?d.box.y:d.sy-h/2,w,h)}
+      else drawSel()};
+    vp.addEventListener('pointerup',end);vp.addEventListener('pointercancel',end);
+    /* при захвате указателя событие приходит на холст, поэтому объект ищем по точке */
+    const hitAt=e=>{const t=document.elementFromPoint(e.clientX,e.clientY);return t&&t.closest('.bd-it')};
+    vp.addEventListener('dblclick',e=>{const el=hitAt(e);if(el){const it=byId(el.dataset.id);if(it.t==='frame'&&!e.target.closest('.bd-ftitle'))return;startEdit(el.dataset.id)}
+      else if(TOOL==='select'){const w=toW(e.clientX,e.clientY);make('text',w.x,w.y-22,DEF.text[0],DEF.text[1])}});
+    vp.addEventListener('contextmenu',e=>{e.preventDefault();const el=hitAt(e),w=toW(e.clientX,e.clientY);
+      if(el&&!SEL.has(el.dataset.id)){SEL=new Set(withGroup(el.dataset.id));drawSel()}
+      popup(e.clientX,e.clientY,SEL.size?[['Копировать',copy,'Ctrl+C'],['Вставить',()=>paste(0,0,w),'Ctrl+V'],['Дублировать',dup,'Ctrl+D'],'|',
+        ['Наверх',()=>layer('front'),'Ctrl+Shift+]'],['На один вперёд',()=>layer('fwd'),'Ctrl+]'],['На один назад',()=>layer('bwd'),'Ctrl+['],['Вниз',()=>layer('back'),'Ctrl+Shift+['],'|',
+        ['Сгруппировать',()=>act('group'),'Ctrl+G'],['Разгруппировать',()=>act('ungroup'),'Ctrl+Shift+G'],['Закрепить или открепить',()=>act('lock')],'|',['Удалить',del,'Delete']]
+        :[['Вставить',()=>paste(0,0,w),'Ctrl+V'],['Показать всё',()=>fitTo(bounds(B.items),true),'Shift+1']])});
+    /* колесо мыши — масштаб, как в Miro; тачпад: два пальца — сдвиг, щипок — масштаб */
+    vp.addEventListener('wheel',e=>{e.preventDefault();const mouse=e.deltaMode===1||(e.deltaX===0&&Math.abs(e.deltaY)>=50&&Number.isInteger(e.deltaY));
+      if(e.ctrlKey||e.metaKey||mouse)zoomAt(Math.exp(-e.deltaY*(mouse?.0018:.01)),e.clientX,e.clientY);else{VIEW.x-=e.deltaX;VIEW.y-=e.deltaY;applyView()}},{passive:false});
+    vp.addEventListener('dragover',e=>e.preventDefault());
+    vp.addEventListener('drop',e=>{e.preventDefault();addImages([...e.dataTransfer.files],toW(e.clientX,e.clientY))});
+    q('bdFile').onchange=async()=>{const fs=[...q('bdFile').files];q('bdFile').value='';
+      if(pickCb){const cb=pickCb;pickCb=null;if(fs[0]){hint('Загружаю картинку…');const im=await readImg(fs[0]);cb(await store(im,fs[0].name))}return}addImages(fs)};
+    q('bdBack').onclick=close;
+    q('bdName').oninput=()=>{B.name=q('bdName').value.trim()||'Без названия';dirty()};
+    q('bdUndo').onclick=undo;q('bdRedo').onclick=redo;
+    q('bdZi').onclick=()=>zoomAt(1.2,innerWidth/2,innerHeight/2);q('bdZo').onclick=()=>zoomAt(1/1.2,innerWidth/2,innerHeight/2);q('bdZv').onclick=()=>fitTo(bounds(B.items),true);
+    q('bdFr').onclick=()=>{q('bdFrames').hidden=!q('bdFrames').hidden;drawFrames()};
+    q('bdHelp').onclick=e=>{const r=e.currentTarget.getBoundingClientRect();popup(r.left-250,r.bottom+6,[
+      ['Двигать доску: пробел + мышь, или рука (H)',()=>{}],['Масштаб: колесо мыши или щипок',()=>{}],['Фрейм F · Текст T · Стикер N · Фигура S',()=>{}],['Карандаш P · Картинка I (или Ctrl+V)',()=>{}],
+      ['Изменить текст: двойной щелчок или Enter',()=>{}],['Копировать и вставить: Ctrl+C, Ctrl+V',()=>{}],['Дублировать: Ctrl+D',()=>{}],['Группа: Ctrl+G, разгруппировать: Ctrl+Shift+G',()=>{}],
+      ['Слои: Ctrl+] вперёд, Ctrl+[ назад, с Shift — до конца',()=>{}],['Показать всё: Shift+1',()=>{}]])};
+  }
+  /* ---------- клавиши как в Miro ---------- */
+  addEventListener('keydown',e=>{if(!OPEN||EDIT||e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;const k=e.key.toLowerCase(),m=e.metaKey||e.ctrlKey;
+    if(e.code==='Space'&&!SPACE){SPACE=true;q('bdVp').classList.add('bd-pan');e.preventDefault();return}
+    if(m&&k==='z'){e.preventDefault();e.shiftKey?redo():undo();return}if(m&&k==='y'){e.preventDefault();redo();return}
+    if(m&&k==='c'){copy();return}if(m&&k==='x'){copy();del();return}if(m&&k==='d'){e.preventDefault();dup();return}
+    if(m&&k==='a'){e.preventDefault();SEL=new Set(B.items.map(x=>x.id));drawSel();return}
+    if(m&&k==='g'){e.preventDefault();act(e.shiftKey?'ungroup':'group');return}
+    if(m&&(e.code==='BracketRight'||[']','}','ъ','Ъ'].includes(e.key))){e.preventDefault();layer(e.shiftKey?'front':'fwd');return}
+    if(m&&(e.code==='BracketLeft'||['[','{','х','Х'].includes(e.key))){e.preventDefault();layer(e.shiftKey?'back':'bwd');return}
+    if(e.key==='Delete'||e.key==='Backspace'){e.preventDefault();del();return}
+    if(e.key==='Escape'){SEL.clear();drawSel();setTool('select');closePop();return}
+    if(e.key==='Enter'&&SEL.size===1){e.preventDefault();startEdit([...SEL][0]);return}
+    if(e.key.startsWith('Arrow')&&SEL.size){e.preventDefault();const d=e.shiftKey?10:1;edit(()=>B.items.filter(x=>SEL.has(x.id)&&!x.lock).forEach(x=>{if(k==='arrowleft')x.x-=d;if(k==='arrowright')x.x+=d;if(k==='arrowup')x.y-=d;if(k==='arrowdown')x.y+=d}));return}
+    if(e.shiftKey&&e.code==='Digit1'){fitTo(bounds(B.items),true);return}
+    if(m&&(k==='='||k==='+')){e.preventDefault();zoomAt(1.2,innerWidth/2,innerHeight/2);return}if(m&&k==='-'){e.preventDefault();zoomAt(1/1.2,innerWidth/2,innerHeight/2);return}
+    if(m)return;const map={v:'select',h:'hand',f:'frame',t:'text',n:'sticky',s:'shape',p:'pen'};if(map[k]){setTool(map[k]);return}if(k==='i')q('bdFile').click()});
+  addEventListener('keyup',e=>{if(OPEN&&e.code==='Space'){SPACE=false;setTool(TOOL)}});
+  addEventListener('paste',e=>{if(!OPEN||EDIT)return;const fs=[...(e.clipboardData&&e.clipboardData.files||[])].filter(f=>/^image\//.test(f.type));
+    if(fs.length){e.preventDefault();addImages(fs);return}paste()});
+  addEventListener('resize',()=>{if(OPEN)drawSel()});
+  addEventListener('pointerdown',e=>{if(OPEN&&!e.target.closest('.bd-pop')&&!e.target.closest('#bdTools'))closePop()},true);
+  /* ---------- фреймы, меню, подсказки ---------- */
+  function drawFrames(){if(!root)return;const p=q('bdFrames');if(p.hidden)return;const fr=frames(B.items);
+    p.innerHTML=`<h3>Фреймы</h3>${fr.map(f=>`<button class="bd-fr" data-f="${f.id}"><i style="background-color:${f.fill||'#fff'};${f.src?`background-image:url('${srcURL(f.src)}')`:''}"></i><span>${esc(f.text||'Фрейм')}</span></button>`).join('')||'<p class="bd-empty">Фреймов нет</p>'}`;
+    p.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{const f=byId(b.dataset.f);SEL=new Set([f.id]);fitTo(bounds([f]),true);drawSel()})}
+  function popup(x,y,items,empty){closePop();const p=document.createElement('div');p.className='bd-pop';p.id='bdPop';
+    p.innerHTML=items.length?items.map((it,i)=>it==='|'?'<div class="bd-sep"></div>':`<button data-i="${i}">${esc(it[0])}${it[2]?`<kbd>${it[2]}</kbd>`:''}</button>`).join(''):`<div class="bd-empty">${esc(empty||'')}</div>`;
+    root.appendChild(p);p.style.left=Math.max(8,Math.min(x,innerWidth-p.offsetWidth-8))+'px';p.style.top=Math.max(8,Math.min(y,innerHeight-p.offsetHeight-8))+'px';
+    p.querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>{closePop();items[+b.dataset.i][1]()})}
+  function closePop(){const p=root&&root.querySelector('#bdPop');if(p)p.remove()}
+  let hintT=null;function hint(t){if(!root)return;const h=q('bdHint');h.textContent=t;h.classList.add('bd-on');clearTimeout(hintT);hintT=setTimeout(()=>h.classList.remove('bd-on'),2400)}
+  /* фреймы по порядку: сверху вниз, слева направо */
+  const frames=items=>items.filter(x=>x.t==='frame').sort((a,b)=>Math.abs(a.y-b.y)>a.h/2?a.y-b.y:a.x-b.x);
+  function newBoard(name){return{id:'b'+uid(),name:name||'Новая разработка',at:Date.now(),items:[{id:uid(),t:'frame',x:0,y:0,w:1600,h:900,fill:'#FFFFFF',text:'Фрейм 1'}]}}
+  return{open,close,newBoard,frameHTML,frames,srcURL,token,isOpen:()=>OPEN};
+})();
 
 /* ---------- кабинет ученика: комната ---------- */
 async function loadCabRoom(){
