@@ -1297,6 +1297,19 @@ body.bd-open{overflow:hidden}
 .rdeck .r-rev{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);pointer-events:auto;border:0;border-radius:10px;background:#1F2C55;color:#fff;font:600 22px var(--f-ui);padding:10px 18px;cursor:pointer;opacity:1}
 .rdeck .r-ghost .r-rev{opacity:1}
 .rdeck [contenteditable="true"]{cursor:text;outline:2px solid #2D57C8;border-radius:4px;background:rgba(255,255,255,.6)}
+
+.bd-lib{left:64px;top:70px;bottom:70px;width:300px;display:flex;flex-direction:column;padding:8px;z-index:12}
+.bd-lt{display:flex;gap:4px;align-items:center;margin-bottom:6px}.bd-lt .bd-ib{margin-left:auto}
+.bd-lg{overflow:auto;display:flex;flex-wrap:wrap;gap:6px;align-content:flex-start}
+.bd-lh{width:100%;font-size:12px;color:#66718D;margin:6px 2px 0}
+.bd-lg img{width:86px;height:86px;object-fit:contain;background:#F5F6F8;border-radius:8px;cursor:grab;padding:4px}
+.bd-lg img:hover,.bd-emo:hover{background:#E8EEFC}
+.bd-emo{width:52px;height:52px;font-size:32px;display:flex;align-items:center;justify-content:center;border-radius:8px;cursor:grab;background:#F5F6F8}
+.rdeck .r-lnk{position:absolute;right:-14px;top:-14px;width:36px;height:36px;border-radius:50%;background:#2D57C8;color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;pointer-events:auto;z-index:3}
+.rx-g .rt{font-size:18px;padding:4px 6px;min-height:32px}
+.rx-fly{position:fixed;bottom:60px;z-index:80;pointer-events:none;animation:rxfly 2.2s ease-out forwards;opacity:0}
+@keyframes rxfly{0%{transform:translateY(0) scale(.6);opacity:0}15%{opacity:1}100%{transform:translateY(-55vh) scale(1.2);opacity:0}}
+@media (max-width:700px){.bd-lib{left:8px;right:8px;width:auto;top:auto;height:45%}}
 @media print{.room{display:none}}
 </style>
 
@@ -5785,7 +5798,7 @@ async function roomConnect(id){
   const pb=R.pb,f=pb.filter('room = {:r}',{r:id}),alive=()=>R.on&&R.rec.id===id;
   try{const ink=await pb.collection('ink').getFullList({filter:f,sort:'created'});if(alive()){R.ink=ink;roomInkAll()}}catch(e){}
   try{const ps=await pb.collection('pulse').getFullList({filter:f});if(!alive())return;
-    R.myPulse=ps.find(p=>p.who===R.role)||null;const o=ps.find(p=>p.who!==R.role);if(o&&Date.now()-Date.parse(o.updated.replace(' ','T'))<40000){R.other=o.d;R.otherAt=Date.now()}}catch(e){}
+    R.myPulse=ps.find(p=>p.who===R.role)||null;const o=ps.find(p=>p.who!==R.role);R.rxSeen=o&&o.d&&o.d.rx?o.d.rx.i:null;if(o&&Date.now()-Date.parse(o.updated.replace(' ','T'))<40000){R.other=o.d;R.otherAt=Date.now()}}catch(e){}
   if(alive()&&R.other)setTimeout(()=>{if(alive())callOnSig(R.other)},300);
   if(!alive())return;
   if(!R.myPulse)try{R.myPulse=await pb.collection('pulse').create({room:id,who:R.role,d:{at:Date.now()}})}catch(e){}
@@ -5828,6 +5841,7 @@ function roomOnPulse(e){
   if(R.other.gone&&(C.st!=='idle'||C.offer))callEnd(false,R.role==='t'?'Ученик вышел из комнаты':'Репетитор вышел из комнаты');else callOnSig(R.other);
   if(R.role==='s')roomLaser(R.other);
   deckRemoteDrag(R.other.dg);
+  if(R.other.rx&&R.other.rx.i!==R.rxSeen){R.rxSeen=R.other.rx.i;rxShow(R.other.rx.e,false)}
   clearTimeout(R.topT);R.topT=setTimeout(roomTop,120);
 }
 const roomHere=()=>R.otherAt&&Date.now()-R.otherAt<40000;
@@ -5943,7 +5957,7 @@ function roomTools(){
       <div class="rt-g"><button class="rt${R.st.pen?' on':''}" id="rmPen">${R.st.pen?'Ручка у ученика':'Дать ручку'}</button>
         ${m&&m.k==='sheet'&&m.tid&&TOPICS[m.tid]?'<button class="rt" id="rmTune">Настроить лист</button>':''}
         ${m&&m.k==='sheet'?`<button class="rt${R.keys?' on':''}" id="rmKeys">Ответы</button>${m.tid&&TOPICS[m.tid]?'<button class="rt" id="rmHw">В домашку</button>':''}`:''}
-        ${m&&m.k==='board'?'<button class="rt" id="rmPg">+ Страница</button>':''}</div>`;
+        ${m&&m.k==='board'?'<button class="rt" id="rmPg">+ Страница</button>':''}</div>${rxBar()}`;
     const $=id=>document.getElementById(id);
     $('rmLead').onclick=()=>{const c=R.mats.find(x=>x.id===R.st.cur);if(c&&!c.vis&&roomLive(R.st)){c.vis=true;roomSaveMats()}roomSet({lead:true,pg:R.pgNow});roomUpdate()};
     $('rmFree').onclick=()=>{roomSet({lead:false});roomUpdate()};
@@ -5955,12 +5969,12 @@ function roomTools(){
     if($('rmPg'))$('rmPg').onclick=()=>{m.n=(m.n||1)+1;roomSaveMats();R.stageKey='';roomStage();setTimeout(()=>roomScrollPg(m.n-1),60)};
   }else{
     const pen=!!R.st.pen&&roomLive(R.st);if(!pen&&R.tool!=='hand')R.tool='hand';
-    el.innerHTML=pen?`<div class="rt-g">${tb('hand','Листать')}${tb('pen','Маркер')}<button class="rt" id="rmUndo">↶ Отменить</button></div><span class="rt-note">Ручку дал репетитор</span>`
-      :(m&&m.k==='sheet'&&roomItems(m).some(rAnswerable)?'<span class="rt-note">Нажми на окошко и впиши ответ</span>':'');
+    el.innerHTML=(pen?`<div class="rt-g">${tb('hand','Листать')}${tb('pen','Маркер')}<button class="rt" id="rmUndo">↶ Отменить</button></div><span class="rt-note">Ручку дал репетитор</span>`
+      :(m&&m.k==='sheet'&&roomItems(m).some(rAnswerable)?'<span class="rt-note">Нажми на окошко и впиши ответ</span>':m&&m.k==='deck'?'<span class="rt-note">Двигай карточки, пиши в стикеры и поля</span>':''))+(roomLive(R.st)?rxBar():'');
     const u=document.getElementById('rmUndo');if(u)u.onclick=roomUndo;
   }
   el.querySelectorAll('[data-tool]').forEach(b=>b.onclick=()=>{R.tool=b.dataset.tool;roomTools();roomDrawMode()});
-  roomDrawMode();
+  rxBind(el);roomDrawMode();
 }
 function roomDrawMode(){const s=document.getElementById('rmStage');if(s)s.classList.toggle('drawing',R.tool!=='hand')}
 
@@ -6304,7 +6318,7 @@ function roomDeckPick(){const bl=[...(S.boards||[])].sort((a,b)=>(b.at||0)-(a.at
     document.querySelectorAll('[data-b]').forEach(x=>x.onclick=()=>{close();roomAddDeck(S.boards.find(b=>b.id===x.dataset.b))})});
 }
 async function roomAddDeck(b){
-  if(!b)return;const items=JSON.parse(JSON.stringify(b.items||[]));const srcs=[...new Set(items.map(x=>x.src).filter(Boolean))];
+  if(!b)return;const items=JSON.parse(JSON.stringify(b.items||[]));const srcs=[...new Set(items.map(x=>x.src).filter(x=>x&&(x.startsWith('f:')||x.startsWith('data:'))))];
   if(!BD.frames(items).length){toast('В разработке нет фреймов: добавьте хотя бы один фрейм');return}
   toast(srcs.length?'Переношу картинки в комнату…':'Добавляю разработку');await BD.token();const map={};
   for(const s of srcs){try{const bl=await (await fetch(BD.srcURL(s))).blob();const before=new Set(R.rec.docs||[]);const fd=new FormData();fd.append('docs+',bl,'board.'+((bl.type.split('/')[1]||'png').replace('jpeg','jpg')));
@@ -6780,7 +6794,7 @@ const BD=(()=>{
   /* ---------- адреса картинок: f: файлы репетитора, d: файлы комнаты, data: прямо в доске ---------- */
   let TOK={t:'',at:0};
   async function token(){if(!pbT||!ACC.user)return'';if(!TOK.t||Date.now()-TOK.at>100000){try{TOK={t:await pbT.files.getToken(),at:Date.now()}}catch(e){}}return TOK.t}
-  const srcURL=s=>!s?'':s.startsWith('f:')?`${API}/api/files/files/${s.slice(2)}?token=${TOK.t}`:s;
+  const srcURL=s=>!s?'':s.startsWith('f:')?`${API}/api/files/files/${s.slice(2)}?token=${TOK.t}`:s.startsWith('art:')?ART_BASE+s.slice(4):s;
   /* ---------- как выглядит объект: общий код для редактора и для комнаты ---------- */
   function shapeBg(it){const f=it.fill||'#FFFFFF',s=it.stroke||'#1F2C55',sw=it.sw??2;
     if(it.k==='ellipse')return `<svg class="bd-bg" viewBox="0 0 100 100" preserveAspectRatio="none"><ellipse cx="50" cy="50" rx="49" ry="49" fill="${f}" stroke="${s}" stroke-width="${sw}" vector-effect="non-scaling-stroke"/></svg>`;
@@ -6834,10 +6848,12 @@ const BD=(()=>{
     shape:'<svg viewBox="0 0 24 24"><rect x="3" y="9" width="10" height="10" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="16" cy="8" r="5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>',
     pen:'<svg viewBox="0 0 24 24"><path d="M4 20l1-4L16 5l3 3L8 19zM14 7l3 3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>',
     image:'<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="9" cy="10" r="1.8" fill="currentColor"/><path d="M4 18l5-5 4 4 3-3 4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>',
+    lib:'<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="7" cy="4.8" r="1.4" fill="currentColor"/><circle cx="11" cy="4.8" r="1.4" fill="currentColor"/><path d="M4 20c.5-4 2.5-6 5-6s4.5 2 5 6M15 11l1.5-3 1.5 3 3 .4-2.2 2 .6 3-2.9-1.5-2.9 1.5.6-3-2.2-2z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>',
     answer:'<svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="10" rx="3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-dasharray="3 2"/><path d="M7 12h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>'};
-  const TOOLS=[['select','Выделение (V)'],['hand','Рука: двигать доску (H или зажать пробел)'],'|',['frame','Фрейм (F)'],['text','Текст (T)'],['sticky','Стикер (N)'],['shape','Фигура (S)'],['pen','Карандаш (P)'],['image','Картинка (I)'],'|',['answer','Поле ответа для ученика (A)']];
+  const LIB_EMO=['⭐','❤️','👍','🎉','🏆','🥇','🌟','✅','❌','❓','💡','🎁','🍎','🍊','🥥','🍕','🍬','🐱','🐶','🐰','🦊','🐻','🐸','🦄','🌈','☀️','🌙','⛄','🎈','🚀','✏️','📚','🔔','👀','😊','😎'];
+  const TOOLS=[['select','Выделение (V)'],['hand','Рука: двигать доску (H или зажать пробел)'],'|',['frame','Фрейм (F)'],['text','Текст (T)'],['sticky','Стикер (N)'],['shape','Фигура (S)'],['pen','Карандаш (P)'],['image','Картинка (I)'],'|',['answer','Поле ответа для ученика (A)'],['lib','Библиотека: персонажи и наклейки (L)']];
   function drawTools(){const t=q('bdTools');t.innerHTML=TOOLS.map(x=>x==='|'?'<div class="bd-sep"></div>':`<button class="bd-ib${TOOL===x[0]?' bd-on':''}" data-t="${x[0]}" title="${x[1]}" aria-label="${x[1]}">${IC[x[0]]}</button>`).join('');
-    t.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{const k=b.dataset.t;if(k==='image'){q('bdFile').click();return}if(k==='shape'){shapeMenu(b);return}if(k==='pen'){penMenu(b);return}setTool(k)})}
+    t.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{const k=b.dataset.t;if(k==='image'){q('bdFile').click();return}if(k==='lib'){libToggle();return}if(k==='shape'){shapeMenu(b);return}if(k==='pen'){penMenu(b);return}setTool(k)})}
   function setTool(t){TOOL=t;drawTools();q('bdVp').className='bd-vp'+(t==='hand'?' bd-pan':['frame','text','sticky','shape','pen','answer'].includes(t)?' bd-make':'')}
   function shapeMenu(b){const r=b.getBoundingClientRect();popup(r.right+8,r.top,[['Прямоугольник',()=>{SHAPE='rect';setTool('shape')}],['Скруглённый',()=>{SHAPE='round';setTool('shape')}],['Круг',()=>{SHAPE='ellipse';setTool('shape')}],['Облачко',()=>{SHAPE='cloud';setTool('shape')}],['Стрелка',()=>{SHAPE='arrow';setTool('shape')}]])}
   function penMenu(b){const r=b.getBoundingClientRect();popup(r.right+8,r.top,INK.slice(0,5).map((c,k)=>[['Тёмно-синий','Красный','Синий','Зелёный','Жёлтый'][k],()=>{PENC=c;setTool('pen')}]))}
@@ -6973,6 +6989,19 @@ const BD=(()=>{
       const k=Math.min(1,600/Math.max(im.w,im.h))/Math.max(.25,Math.min(1,VIEW.s)),w=Math.round(im.w*k),h=Math.round(im.h*k);
       const it={id:uid(),t:'image',x:c.x-w/2+off,y:c.y-h/2+off,w,h,src};B.items.push(it);ids.push(it.id);off+=30}
     if(ids.length){SEL=new Set(ids);renderAll();snap();setTool('select');hint('Готово')}}
+  /* библиотека: персонажи «Клетки» и наклейки; нажать — положить в центр, или перетащить на доску */
+  let LIBT='art';
+  function libToggle(){let p=q('bdLib');if(p){p.remove();return}p=document.createElement('div');p.className='bd-panel bd-lib';p.id='bdLib';root.appendChild(p);libDraw()}
+  function libDraw(){const p=q('bdLib');if(!p)return;const arts=THEMES.filter(t=>artList(t).length);
+    p.innerHTML=`<div class="bd-lt"><button class="bd-tb bd-tb2${LIBT==='art'?' bd-on':''}" data-lt="art">Персонажи</button><button class="bd-tb bd-tb2${LIBT==='emo'?' bd-on':''}" data-lt="emo">Наклейки</button><button class="bd-ib" data-lt="x" aria-label="Закрыть">✕</button></div>
+      <div class="bd-lg">${LIBT==='art'?arts.map(t=>`<b class="bd-lh">${esc(t.n)}</b>`+artList(t).flatMap(a=>['top','mid','bot'].map(k=>a+'-'+k+'.webp')).map(f=>`<img src="${ART_BASE+f}" data-art="${f}" draggable="true" alt="" loading="lazy">`).join('')).join('')
+        :LIB_EMO.map(e=>`<span class="bd-emo" data-emo="${e}" draggable="true">${e}</span>`).join('')}</div>`;
+    p.querySelectorAll('[data-lt]').forEach(b=>b.onclick=()=>{if(b.dataset.lt==='x'){p.remove();return}LIBT=b.dataset.lt;libDraw()});
+    p.querySelectorAll('[data-art],[data-emo]').forEach(x=>{x.onclick=()=>libAdd(x.dataset,null);x.ondragstart=e=>e.dataTransfer.setData('text/kletka-lib',JSON.stringify(x.dataset))})}
+  function libAdd(d,at){const c=at||toW(innerWidth/2,innerHeight/2);
+    if(d.emo){const k=1/Math.max(.25,Math.min(1,VIEW.s)),sz=Math.round(140*k);const it={id:uid(),t:'text',x:c.x-sz/2,y:c.y-sz/2,w:sz,h:sz,text:d.emo,fs:Math.round(110*k),al:'center',color:'#1F2C55'};B.items.push(it);SEL=new Set([it.id]);renderAll();snap();return}
+    const im=new Image();im.onload=()=>{const k=Math.min(1,420/Math.max(im.naturalWidth,im.naturalHeight))/Math.max(.25,Math.min(1,VIEW.s)),w=Math.round(im.naturalWidth*k),h=Math.round(im.naturalHeight*k);
+      const it={id:uid(),t:'image',x:c.x-w/2,y:c.y-h/2,w,h,src:'art:'+d.art};B.items.push(it);SEL=new Set([it.id]);renderAll();snap()};im.src=ART_BASE+d.art}
   /* верный ответ для поля: если пусто, поле просто для записи */
   function ansAsk(it){closePop();const p=document.createElement('div');p.className='bd-pop';p.id='bdPop';
     p.innerHTML=`<label class="bd-empty" for="bdAns">Верный ответ (можно оставить пустым)</label><input id="bdAns" class="bd-in" value="${esc(it.ans||'')}" placeholder="например, 12"><button data-ok>Готово</button>`;
@@ -7047,7 +7076,7 @@ const BD=(()=>{
     vp.addEventListener('wheel',e=>{e.preventDefault();const mouse=e.deltaMode===1||(e.deltaX===0&&Math.abs(e.deltaY)>=50&&Number.isInteger(e.deltaY));
       if(e.ctrlKey||e.metaKey||mouse)zoomAt(Math.exp(-e.deltaY*(mouse?.0018:.01)),e.clientX,e.clientY);else{VIEW.x-=e.deltaX;VIEW.y-=e.deltaY;applyView()}},{passive:false});
     vp.addEventListener('dragover',e=>e.preventDefault());
-    vp.addEventListener('drop',e=>{e.preventDefault();addImages([...e.dataTransfer.files],toW(e.clientX,e.clientY))});
+    vp.addEventListener('drop',e=>{e.preventDefault();const lib=e.dataTransfer.getData('text/kletka-lib');if(lib){libAdd(JSON.parse(lib),toW(e.clientX,e.clientY));return}addImages([...e.dataTransfer.files],toW(e.clientX,e.clientY))});
     q('bdFile').onchange=async()=>{const fs=[...q('bdFile').files];q('bdFile').value='';
       if(pickCb){const cb=pickCb;pickCb=null;if(fs[0]){hint('Загружаю картинку…');const im=await readImg(fs[0]);cb(await store(im,fs[0].name))}return}addImages(fs)};
     q('bdBack').onclick=close;
@@ -7075,7 +7104,7 @@ const BD=(()=>{
     if(e.key.startsWith('Arrow')&&SEL.size){e.preventDefault();const d=e.shiftKey?10:1;edit(()=>B.items.filter(x=>SEL.has(x.id)&&!x.lock).forEach(x=>{if(k==='arrowleft')x.x-=d;if(k==='arrowright')x.x+=d;if(k==='arrowup')x.y-=d;if(k==='arrowdown')x.y+=d}));return}
     if(e.shiftKey&&e.code==='Digit1'){fitTo(bounds(B.items),true);return}
     if(m&&(k==='='||k==='+')){e.preventDefault();zoomAt(1.2,innerWidth/2,innerHeight/2);return}if(m&&k==='-'){e.preventDefault();zoomAt(1/1.2,innerWidth/2,innerHeight/2);return}
-    if(m)return;const map={v:'select',h:'hand',f:'frame',t:'text',n:'sticky',s:'shape',p:'pen',a:'answer'};if(map[k]){setTool(map[k]);return}if(k==='i')q('bdFile').click()});
+    if(m)return;if(k==='l'){libToggle();return}const map={v:'select',h:'hand',f:'frame',t:'text',n:'sticky',s:'shape',p:'pen',a:'answer'};if(map[k]){setTool(map[k]);return}if(k==='i')q('bdFile').click()});
   addEventListener('keyup',e=>{if(OPEN&&e.code==='Space'){SPACE=false;setTool(TOOL)}});
   addEventListener('paste',e=>{if(!OPEN||EDIT)return;const fs=[...(e.clipboardData&&e.clipboardData.files||[])].filter(f=>/^image\//.test(f.type));
     if(fs.length){e.preventDefault();addImages(fs);return}paste()});
@@ -7105,7 +7134,7 @@ function deckEff(m){const a=R.ans[m.id]||{},P=a.p||{},X=a.x||{},Vv=a.v||{};
   return (m.items||[]).map(it=>{const e={...it};const p=P[it.id];if(p&&p[2]>(it.mt||0)){e.x=p[0];e.y=p[1]}const x=X[it.id];if(x&&x[1]>(it.tt||0))e.text=x[0];if(it.t==='answer')e.text=Vv[it.id]||'';return e})}
 const deckIn=(x,f)=>x.t!=='frame'&&x.x+x.w/2>=f.x&&x.x+x.w/2<=f.x+f.w&&x.y+x.h/2>=f.y&&x.y+x.h/2<=f.y+f.h;
 const zoneAt=(it,zs)=>zs.find(z=>it.x+it.w/2>=z.x&&it.x+it.w/2<=z.x+z.w&&it.y+it.h/2>=z.y&&it.y+it.h/2<=z.y+z.h);
-const deckURL=s=>s&&s.startsWith('d:')?R.pb.files.getURL(R.rec,s.slice(2),{token:FTOK.t}):s;
+const deckURL=s=>s&&s.startsWith('d:')?R.pb.files.getURL(R.rec,s.slice(2),{token:FTOK.t}):s&&s.startsWith('art:')?ART_BASE+s.slice(4):s;
 /* проверка: поле ответа и карточка в зоне */
 function deckCheck(it,items){if(it.t==='answer'&&it.ans&&it.text)return rOk({ans:it.ans},it.text)?'ok':'bad';
   if(it.tgt){const z=zoneAt(it,items.filter(x=>x.zone&&x.id!==it.id));if(z)return z.id===it.tgt?'ok':'bad'}return ''}
@@ -7114,7 +7143,7 @@ function deckInner(m,f){const items=deckEff(m),show=R.role==='t'||R.st.chk!==fal
   for(const it of items.filter(x=>deckIn(x,f))){const hid=it.hide&&!it.shown;if(hid&&R.role==='s')continue;
     const l=BD.look({...it,x:it.x-f.x,y:it.y-f.y},deckURL);let cls=l.cls;
     if(!it.lock)cls+=' r-dr';if(hid)cls+=' r-ghost';const c=deckCheck(it,items);if(c&&show)cls+=c==='ok'?' r-good':' r-badd';
-    h+=`<div class="${cls}" data-id="${it.id}" style="${l.style}">${l.html}${R.role==='t'&&it.hide?`<button class="r-rev" data-rev="${it.id}">${hid?'Показать':'Спрятать'}</button>`:''}${c&&show?`<i class="r-mark">${c==='ok'?'✓':'✗'}</i>`:''}</div>`}
+    h+=`<div class="${cls}" data-id="${it.id}" style="${l.style}">${l.html}${it.link?`<span class="r-lnk" data-link="${it.link}" title="Перейти">↗</span>`:''}${R.role==='t'&&it.hide?`<button class="r-rev" data-rev="${it.id}">${hid?'Показать':'Спрятать'}</button>`:''}${c&&show?`<i class="r-mark">${c==='ok'?'✓':'✗'}</i>`:''}</div>`}
   return h}
 function roomDeckPaint(){const m=roomMat();if(!m||m.k!=='deck')return;
   document.querySelectorAll('#rmPages > .rdeck').forEach(pg=>{if(R.deckBusy&&pg.contains(R.deckBusy))return;const f=(m.items||[]).find(x=>x.id===pg.dataset.f);const st=pg.querySelector('.bd-st');if(f&&st){const h=deckInner(m,f);if(st._h!==h){st.innerHTML=h;st._h=h}}})}
@@ -7125,7 +7154,9 @@ function deckSave(m,it,patch){const now=Date.now();
   roomDeckPaint();roomSide()}
 /* перетаскивание: второй участник видит движение через pulse, сохраняем при отпускании */
 function deckBind(stage){
-  stage.addEventListener('pointerdown',e=>{if(R.tool!=='hand')return;const rv=e.target.closest('.r-rev');if(rv&&R.role==='t'){e.preventDefault();const m=roomMat(),o=m.items.find(x=>x.id===rv.dataset.rev);o.shown=!o.shown;roomSaveMats();roomDeckPaint();return}
+  stage.addEventListener('pointerdown',e=>{if(R.tool!=='hand')return;
+    const lk=e.target.closest('.r-lnk');if(lk){e.preventDefault();e.stopPropagation();const m=roomMat();const i=BD.frames(m.items||[]).findIndex(f=>f.id===lk.dataset.link);if(i>=0){if(R.role==='s')R.away=true;roomScrollPg(i)}return}
+    const rv=e.target.closest('.r-rev');if(rv&&R.role==='t'){e.preventDefault();const m=roomMat(),o=m.items.find(x=>x.id===rv.dataset.rev);o.shown=!o.shown;roomSaveMats();roomDeckPaint();return}
     const el=e.target.closest('.rdeck .r-dr');if(!el||el.querySelector('[contenteditable="true"]'))return;const m=roomMat();if(!m||m.k!=='deck')return;
     const pg=el.closest('.rdeck'),f=m.items.find(x=>x.id===pg.dataset.f),it=deckEff(m).find(x=>x.id===el.dataset.id);if(!f||!it)return;
     e.preventDefault();try{el.setPointerCapture(e.pointerId)}catch(_){}const k=pg.clientWidth/f.w,sx=e.clientX,sy=e.clientY;let moved=false;R.deckBusy=el;el.classList.add('r-drag');
@@ -7150,6 +7181,14 @@ function deckReport(m){const items=deckEff(m);let n=0,k=0;const mm=[];
   for(const it of items){if(it.t==='answer'&&it.ans&&it.text){n++;if(rOk({ans:it.ans},it.text))k++;else mm.push({q:'Поле ответа',g:it.text,a:it.ans})}
     if(it.tgt){const c=deckCheck(it,items);if(c){n++;if(c==='ok')k++;else mm.push({q:(it.text||'Карточка')+' — не в той зоне',g:'',a:(m.items.find(z=>z.id===it.tgt)||{}).text||''})}}}
   return n?{tid:null,t:'Разработка «'+rTitle(m.t)+'»',blk:'',k,n,mm,st:topicStatus(k,n),pct:Math.round(k/n*100),before:null}:null}
+
+
+/* реакции: 👍 ❤️ ⭐ 🎉 всплывают у обоих */
+const RX=['👍','❤️','⭐','🎉','😂','🤔'];
+function rxBar(){return `<div class="rt-g rx-g">${RX.map(e=>`<button class="rt rx" data-rx="${e}" aria-label="Реакция ${e}">${e}</button>`).join('')}</div>`}
+function rxBind(el){el.querySelectorAll('[data-rx]').forEach(b=>b.onclick=()=>{const e=b.dataset.rx;rxShow(e,true);roomPulse({rx:{e,i:RID(5)}},true)})}
+function rxShow(e,mine){for(let k=0;k<5;k++){const s=document.createElement('span');s.className='rx-fly';s.textContent=e;
+  s.style.left=(mine?70:20)+Math.random()*20+'%';s.style.animationDelay=k*90+'ms';s.style.fontSize=28+Math.random()*22+'px';document.body.appendChild(s);setTimeout(()=>s.remove(),2400)}}
 
 /* ---------- кабинет ученика: комната ---------- */
 async function loadCabRoom(){
