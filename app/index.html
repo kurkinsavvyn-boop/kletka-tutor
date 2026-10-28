@@ -1100,6 +1100,7 @@ button.mchip:hover{background:rgba(255,255,255,.24)}
 .cab-room.live b::before{content:"";display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--ok);margin-right:8px;animation:rlive 1.6s infinite}
 @keyframes rlive{50%{opacity:.35}}
 .cr-act{display:flex;gap:8px}
+.cr-warn{flex-basis:100%;margin:0;font-size:14px;color:var(--bad)}
 body.inroom .wrap{max-width:1360px}
 @media (max-width:900px){
   .rm-body{grid-template-columns:minmax(0,1fr)}
@@ -6476,7 +6477,7 @@ async function callMedia(){
   const audio={echoCancellation:true,noiseSuppression:true,autoGainControl:true};
   const video={width:{ideal:640},height:{ideal:480},frameRate:{ideal:24,max:30},facingMode:'user'};
   try{return await navigator.mediaDevices.getUserMedia({audio,video})}
-  catch(e){if(e&&e.name==='NotAllowedError'){C.msg='Браузер не дал доступ к камере и микрофону. Разрешите их в адресной строке (значок замка) и позвоните снова.';throw e}}
+  catch(e){if(e&&(e.name==='NotAllowedError'||e.name==='SecurityError')){C.msg='';mediaHelp();throw e}}
   try{const s=await navigator.mediaDevices.getUserMedia({audio});C.msg='Камера не найдена: звонок только с голосом.';return s}catch(e){}
   C.msg='Камера и микрофон не найдены: вас не видно и не слышно, но вы видите собеседника.';return new MediaStream();
 }
@@ -6502,11 +6503,37 @@ function callGather(pc){return new Promise(res=>{if(pc.iceGatheringState==='comp
 function callSend(sig){if(sig)sig.i=RID(6);roomPulse({sig,call:C.st==='idle'?null:C.n},true);return sig&&sig.i}
 
 /* ---------- репетитор звонит ---------- */
+/* ---------- камера и микрофон: спрашиваем прямо по нажатию ----------
+   Браузер показывает своё окно «Разрешить» надёжно только в момент нажатия кнопки. Поэтому ученик получает
+   запрос по «Войти», репетитор — по «Начать урок». Если доступ запрещён, показываем, где его включить. */
+let MEDIA_P=null;
+function mediaAsk(){if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia)return null;
+  if(C.loc&&C.loc.getTracks().some(t=>t.readyState==='live'))return Promise.resolve(C.loc);
+  if(MEDIA_P)return MEDIA_P;MEDIA_P=callMedia().then(st=>{C.loc=st;return st}).finally(()=>{setTimeout(()=>MEDIA_P=null,0)});MEDIA_P.catch(()=>{});return MEDIA_P}
+async function mediaState(){try{const [c,m]=await Promise.all(['camera','microphone'].map(n=>navigator.permissions.query({name:n})));return c.state==='denied'||m.state==='denied'?'denied':c.state==='granted'&&m.state==='granted'?'granted':'prompt'}catch(e){return 'unknown'}}
+function mediaHowTo(){const ua=navigator.userAgent;
+  if(/iPhone|iPad|iPod/.test(ua))return['Откройте «Настройки» iPhone → Safari (или ваш браузер) → «Камера» и «Микрофон» → «Спрашивать» или «Разрешить».','Вернитесь сюда и нажмите «Попробовать снова».'];
+  if(/Android/.test(ua))return['Нажмите на значок замка или настроек слева от адреса сайта.','Откройте «Разрешения» и включите «Камера» и «Микрофон».','Нажмите «Попробовать снова».'];
+  if(/Safari/.test(ua)&&!/Chrome|YaBrowser|Edg/.test(ua))return['В меню Safari → «Настройки для этого сайта» (или «Safari» → «Настройки» → «Веб-сайты»).','Для «Камера» и «Микрофон» выберите «Разрешить».','Нажмите «Попробовать снова».'];
+  if(/Firefox/.test(ua))return['Нажмите на значок камеры с крестиком слева от адреса сайта.','Уберите блокировку камеры и микрофона.','Нажмите «Попробовать снова».'];
+  return['Нажмите на значок слева от адреса сайта (замок или камера с крестиком).','Для «Камера» и «Микрофон» выберите «Разрешить».','Нажмите «Попробовать снова». Если окно не появится — обновите страницу.']}
+function mediaHelp(){if(document.getElementById('mediaHelp'))return;
+  modal(`<div id="mediaHelp"><h2>Включите камеру и микрофон</h2>
+    <p style="margin:0">Браузер не дал доступ к камере и микрофону, поэтому видеозвонок не начался. Это делается один раз.</p>
+    <ol class="imp-steps">${mediaHowTo().map(x=>`<li>${esc(x)}</li>`).join('')}</ol>
+    <p class="hint" style="margin:0" id="mhSt"></p>
+    <div class="modal-actions"><button class="btn quiet" id="cl">Без видео</button><button class="btn primary" id="mhGo">Попробовать снова</button></div></div>`,()=>{
+    document.getElementById('cl').onclick=close;
+    document.getElementById('mhGo').onclick=async()=>{const st=document.getElementById('mhSt');st.textContent='Спрашиваю у браузера…';
+      try{C.loc=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true},video:{width:{ideal:640},height:{ideal:480},frameRate:{ideal:24,max:30},facingMode:'user'}});close();
+        if(!R.on)return;if(R.role==='t'&&C.st==='idle'&&roomLive(R.st)){C.declined=false;callStart()}else if(R.role==='s'&&C.offer&&C.st==='idle')callAccept(true);else if(R.role==='s'&&C.st==='idle'){C.joinSent=false;callOnSig(R.other)}}
+      catch(e){st.textContent='Доступа всё ещё нет. Проверьте шаги выше и обновите страницу.'}}});
+}
 async function callStart(again){
   if(C.st!=='idle'&&!again)return;
   if(!navigator.mediaDevices||!window.RTCPeerConnection){toast('Этот браузер не умеет видеозвонки. Откройте Клетку в Chrome, Яндекс Браузере, Safari или Firefox');return}
   C.n=again&&C.n||RID(8);C.st='calling';C.msg='';C.r=0;callUI();
-  try{if(!C.loc)C.loc=await callMedia()}catch(e){C.st='idle';callUI();return}
+  try{if(!C.loc)C.loc=await (MEDIA_P||callMedia())}catch(e){C.st='idle';callUI();return}
   try{sessionStorage.setItem(CALL_KEY,C.n)}catch(e){}
   await callOffer(false);
 }
@@ -6519,7 +6546,8 @@ async function callOffer(restart){
 /* ---------- ученик: звонок пришёл ---------- */
 async function callAccept(auto){
   const o=C.offer;if(!o)return;C.st='connecting';C.n=o.n;C.msg='';callUI();
-  try{if(!C.loc)C.loc=await callMedia()}catch(e){C.st='idle';callSend({n:o.n,t:'bye'});callUI();return}
+  /* без доступа к камере звонок не обрываем: репетитор ждёт, пока ученик разрешит */
+  try{if(!C.loc)C.loc=await (MEDIA_P||callMedia())}catch(e){C.st='idle';callUI();return}
   try{sessionStorage.setItem(CALL_KEY,C.n)}catch(e){}
   await callAnswer(o);
 }
@@ -7198,10 +7226,12 @@ async function loadCabRoom(){
   if(V.screen==='cab')render();
 }
 function cabRoomHTML(){const r=CAB.room;if(!r)return'';const st=r.st||{},live=roomLive(st),n=(r.mats||[]).filter(m=>m.vis).length;
-  if(live)return `<div class="cab-room live"><div><b>Урок идёт</b><span>Репетитор ждёт тебя в комнате</span></div><div class="cr-act">${st.call?'<button class="btn" id="crCall">Звонок</button>':''}<button class="btn primary" id="crGo">Войти</button></div></div>`;
+  if(live)return `<div class="cab-room live"><div><b>Урок идёт</b><span>Репетитор ждёт тебя в комнате</span></div><div class="cr-act">${st.call?'<button class="btn" id="crCall">Звонок</button>':''}<button class="btn primary" id="crGo">Войти</button></div>
+    <p class="cr-warn" id="crWarn" hidden>Камера или микрофон заблокированы в браузере. <button class="btn link">Как включить</button></p></div>`;
   return n?`<div class="cab-room"><div><b>Моя тетрадь</b><span>Материалы с уроков: ${n}</span></div><div class="cr-act"><button class="btn" id="crGo">Открыть</button></div></div>`:'';
 }
-function bindCabRoom(){const g=document.getElementById('crGo');if(g)g.onclick=()=>openRoomCab(CAB.room.id);
+function bindCabRoom(){const g=document.getElementById('crGo');if(g)g.onclick=()=>{if(roomLive(CAB.room.st))mediaAsk();openRoomCab(CAB.room.id)};
+  const w=document.getElementById('crWarn');if(w)mediaState().then(st=>{if(st==='denied'){w.hidden=false;w.querySelector('button').onclick=mediaHelp}});
   const c=document.getElementById('crCall');if(c)c.onclick=()=>window.open(CAB.room.st.call,'_blank','noopener')}
 
 let STUDENT_MODE=false;
