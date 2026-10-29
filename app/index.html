@@ -2,13 +2,13 @@
 <html lang="ru">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Клетка для репетитора</title>
+<title>Кабинет репетитора</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1F2C55">
 <link rel="apple-touch-icon" id="ati" href="../icons/app-180.png">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=Unbounded:wght@600;700&family=Caveat:wght@500;700&family=Comfortaa:wght@500;700&family=PT+Serif:wght@400;700&family=Neucha&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=Unbounded:wght@600;700&family=Caveat:wght@500;700&family=Comfortaa:wght@500;700&family=PT+Serif:wght@400;700&family=Neucha&family=Pangolin&display=swap">
 <style>
 /* Layout: тетрадь в клетку. Рабочие панели лежат на сетке, красная ручка учителя — только для ошибок, ключа и «сейчас проходим». */
 :root{
@@ -834,6 +834,29 @@ body.cabinet .top{display:none}
 .bd-lsel{outline-style:dashed!important;outline-color:rgba(45,87,200,.35)!important}
 .bd-lph{border-radius:50%;background:#fff;border:2px solid #2D57C8;box-sizing:border-box}.bd-lpc{background:#2D57C8}
 .bd-vp.bd-erase{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Ccircle cx='12' cy='12' r='9' fill='white' stroke='%231F2C55' stroke-width='2'/%3E%3C/svg%3E") 12 12,crosshair}
+/* ---------- стиль «Тетрадь»: как бумажный рабочий лист ---------- */
+.sheet.lv5 .fr,.sheet.lv5 .deco{display:none}
+.sheet.lv5 .sh-items,.sheet.lv5 .sh-head{background-image:none !important;box-shadow:none !important;background-color:#fff}
+.sheet.lv5 .sh-items{font-family:'Comfortaa',var(--f-ui);font-size:3.1cqw}
+.sheet.lv5 .sh-title{font-family:'Pangolin','Neucha',cursive;color:var(--p1);font-weight:400}
+.sheet.lv5 .grp{font-family:'Pangolin','Neucha',cursive;font-size:calc(var(--c) * .95);color:var(--p1);border-bottom:0;background:none;box-shadow:none}
+.sheet.lv5 .grp.g0{color:var(--p4)}
+.sheet.lv5 .grp b{color:inherit}
+.sheet.lv5 .grp .gn{display:inline;background:none;color:inherit;width:auto;height:auto;font-size:inherit;margin-right:.3em;vertical-align:baseline}
+/* на белом листе примеры пишутся обычной строкой, а не по клеткам; окошко ответа остаётся прямоугольником */
+.sheet.lv5 .crow>.c:not(.circ){width:auto;min-width:.55em;padding:0 .06em}
+.sheet.lv5 .crow>.c:empty{min-width:.35em}
+.sheet.lv5 .grp .gn::after{content:'.'}
+.sheet.lv5 .cbox{box-shadow:inset 0 0 0 .25cqw var(--p1);border-radius:0}
+.sheet.lv5 .box{border-radius:0;border-color:var(--p1)}
+.sheet.lv5 .wq2{background:none}
+.sheet.lv5 .wq2 .sol2{overflow:visible}
+.wq-pic{position:absolute;right:calc(var(--c) * -.5);bottom:calc(var(--c) * -1.2);height:calc(var(--c) * 7.5);width:auto;max-width:40%;object-fit:contain;pointer-events:none;z-index:2}
+.sheet.lv5 .mood{display:flex;align-items:center;gap:calc(var(--c) * 1.5);font-family:'Pangolin','Neucha',cursive;color:var(--p1);font-size:calc(var(--c) * .72);margin-top:var(--c)}
+.mood .md{display:inline-flex;align-items:center;gap:calc(var(--c) * .3)}
+.mood .md i{font-style:normal;font-size:calc(var(--c) * .5);color:#5b6684}
+.mood .md-pic{height:calc(var(--c) * 3);width:auto}
+.mood .md-box{width:calc(var(--c) * .8);height:calc(var(--c) * .8);border:.25cqw solid var(--p1);display:inline-block}
 .ctasks{display:flex;flex-direction:column;gap:10px}
 .ct-x{display:flex;justify-content:flex-end;gap:14px;margin:-6px 6px 2px;font-size:13px;flex-wrap:wrap}
 .ct-rv{margin:-4px 6px 0;font-size:14px;color:var(--ink)}
@@ -2262,7 +2285,7 @@ const PALETTES=[
   ['#F4A73B','#E8573F','#FFF4DC','#3A86C8'],['#2BB39A','#F2B23E','#E6F7F2','#E8573F'],['#D9467A','#8E5BD9','#FCE8F1','#E8A93B'],['#2E7FD8','#20AFB8','#E5F1FD','#F59E3C'],
   ['#4A9B4F','#C98A2E','#EBF6E8','#D9534F'],['#7A5AF8','#E8609E','#F0ECFF','#25A897'],['#F0699A','#3BA9D6','#FFF0F5','#E8A520'],['#E8573F','#E8A520','#FFEDE6','#3D5A98']];
 const FRAMES=['solid','dashed','double','dots','stripes'];
-const LEVELS=[['1','Сказка'],['2','Яркий'],['3','Спокойный'],['4','Строгий']];
+const LEVELS=[['1','Сказка'],['2','Яркий'],['3','Спокойный'],['4','Строгий'],['5','Тетрадь']];
 /* рисованные сюжеты: у темы до трёх наборов, набор выбирается по номеру варианта.
    top — сверху слева (смотрит вправо), bot — снизу справа (смотрит влево), char — самостоятельная картинка для «Яркого» */
 /* пропорции картинок (ширина / высота), чтобы заранее знать их высоту на листе */
@@ -4293,7 +4316,7 @@ function snapCells(root){(root||document).querySelectorAll('.sheet').forEach(sh=
   /* клетка на весь лист: сетка листа проходит через начало заданий, шапка встаёт на те же линии */
 })}
 function sheetParts(items,{topic,level,seed,studentName,answers,design}){
-  const D=design&&!answers&&design.lv<4?design:null;
+  const D=design&&!answers&&design.lv!==4?design:null;
   const kind=items[0]&&items[0].type;
   const ownLen=Math.max(0,...items.filter(x=>x.type==='own').map(x=>x.q.length+(x.svg?40:0)));
   const mixed=new Set(items.map(x=>x.type)).size>1||items.some(x=>x.src);
@@ -4335,11 +4358,17 @@ function sheetParts(items,{topic,level,seed,studentName,answers,design}){
   const pieces=items.map((it,i)=>{
     const tt=TOPICS[it.src]?TOPICS[it.src].t:'';
     const head=it.lbl?it.lbl+(tt?' · '+tt:''):mixed?tt:'';
-    const grp=newGroup(it,i)?`<div class="grp"><span class="gn">${bno[i]}</span>${head?`<b>${esc(head)}.</b> `:''}${esc(instr(it))}</div>`:'';
+    const grp=newGroup(it,i)?`<div class="grp g${bno[i]%2}"><span class="gn">${bno[i]}</span>${head?`<b>${esc(head)}.</b> `:''}${esc(instr(it))}</div>`:'';
     if(cellable(it))return grp+`<div class="it ci" style="width:calc(var(--c) * ${kOf[gid[i]]})">${cellItemHTML(it,i,answers)}</div>`;
     return grp+richItemHTML(it,i,answers).replace('<div class="it rich','<div data-g="'+gid[i]+'" class="it rich')});
   items.forEach((it,i)=>{if(it.type!=='sort'||it.m)return;const nx=items[i+1];if(nx&&nx.type==='sort'&&nx.blk===it.blk)return;
     let a=i;while(a>0&&items[a-1].type==='sort'&&items[a-1].blk===it.blk)a--;it.tbl=true;pieces[i]+=sortTable(items.slice(a,i+1),answers)});
+  /* «Тетрадь»: лист белый, клетка только там, где пишут; персонаж стоит на краю сетки решения, как в бумажных рабочих листах */
+  if(D&&D.lv===5&&D.img){const imgs=[D.img.bot,D.img.char,D.img.top].filter(Boolean);let wk=0;
+    pieces.forEach((h,i)=>{if(!/class="sol2"/.test(h)||wk>=2){if(/class="sol2"/.test(h))wk++;return}
+      pieces[i]=h.replace('<div class="sol2">',`<div class="sol2">${artImg(imgs[wk%imgs.length],'wq-pic')}`);wk++});
+    if(!answers){const other=artSet(D.theme,(seed||0)+1);
+      pieces.push(`<div class="it rich span mood"><b>Моё настроение:</b><span class="md">${artImg(D.img.char,'md-pic')}<i>Получилось!</i><span class="md-box"></span></span><span class="md">${artImg(other&&other.char||D.img.top,'md-pic')}<i>Было трудно</i><span class="md-box"></span></span></div>`)}}
   /* «Сказка»: картинка слева сверху, справа название и сразу первые задания;
      внизу справа вторая картинка, задания слева от неё. Всё на одной сетке клеток */
   let heroIn=false;
@@ -4426,7 +4455,7 @@ function sheetParts(items,{topic,level,seed,studentName,answers,design}){
       h+=shuffle(r,slots).slice(0,D.lv===1?5:2).map(([x,y,z])=>stkSVG(pick(r,D.theme.stk),'deco-stk',`left:${x}%;top:${y}%;width:${z}cqw;height:${z}cqw;transform:translate(-50%,-50%) rotate(${ri(r,-18,18)}deg)`)).join('')}
     return `<div class="deco" aria-hidden="true">${h}</div>`};
   /* картинки для пустых мест внизу печатных страниц */
-  const pics=D&&D.img&&D.lv<=2?[D.img.bot,D.img.char,D.img.top].filter(Boolean):[];
+  const pics=D&&D.img&&(D.lv<=2||D.lv===5)?[D.img.bot,D.img.char,D.img.top].filter(Boolean):[];
   return{head:heroIn?fields+rule:head,pics,mini,cols,gridStyle,pieces,cls,style,deco,footL:esc(topic.section),footR:`Проверить онлайн: код варианта ${seed}`};
 }
 function sheetHTML(items,o){
@@ -5241,7 +5270,7 @@ const designOf=st=>st.design||(st.design={lv:2,theme:'random',bw:false});
 function designBox(st,seed){const d=designOf(st),R=resolveDesign(st,seed);
   return `<div class="field design"><span class="label">Оформление</span>
     <div class="seg dseg" id="dlv">${LEVELS.map(([k,l])=>`<button type="button" data-lv="${k}" class="${String(d.lv)===k?'on':''}">${l}</button>`).join('')}</div>
-    ${+d.lv<4?`<div class="drow"><select id="dth" aria-label="Сюжет"><option value="random"${d.theme==='random'?' selected':''}>Любой сюжет</option>${THEMES.map(t=>`<option value="${t.id}"${d.theme===t.id?' selected':''}>${esc(t.n)}</option>`).join('')}</select>
+    ${+d.lv!==4?`<div class="drow"><select id="dth" aria-label="Сюжет"><option value="random"${d.theme==='random'?' selected':''}>Любой сюжет</option>${THEMES.map(t=>`<option value="${t.id}"${d.theme===t.id?' selected':''}>${esc(t.n)}</option>`).join('')}</select>
       <label class="bwl"><input type="checkbox" id="dbw"${d.bw?' checked':''}> Ч/Б</label><button type="button" class="btn link" id="dgal">все сюжеты</button></div>
     ${d.bw?'':`<div class="drow dpal" id="dpal" role="group" aria-label="Цвета листа"><button type="button" data-pal="random" class="dp-any${d.pal==null||d.pal==='random'?' on':''}" title="Случайные цвета">?</button>${PALETTES.map((p,k)=>`<button type="button" data-pal="${k}" class="${String(d.pal)===String(k)?'on':''}" aria-label="Цвета ${k+1}">${p.map(c=>`<i style="background:${c}"></i>`).join('')}</button>`).join('')}</div>`}
     <div class="drow"><select id="dfr" aria-label="Ободок"><option value="random"${!d.frame||d.frame==='random'?' selected':''}>Ободок: любой</option>${FRAMES.map(f=>`<option value="${f}"${d.frame===f?' selected':''}>Ободок: ${FRAME_N[f]}</option>`).join('')}</select></div>
@@ -7883,11 +7912,11 @@ let STUDENT_MODE=false;
  if(m){STUDENT_MODE=true;document.body.classList.add('student-mode');
   try{const d=b64d(m[1]);
     P={h:{code:d.c,level:0},t:{t:d.t,grade:d.g,sheet:d.mix},name:d.n,remote:true,items:generate(d.p,d.s),i:0,input:'',correct:0,streak:0,score:0,mistakes:[],log:[],start:Date.now(),fb:null,lock:false};
-    V={screen:'player'};document.title=d.t+' · Клетка'}
+    V={screen:'player'};document.title=d.t+' · Кабинет ученика'}
   catch(e){V={screen:'badlink'}}}}
 document.getElementById('home').onclick=()=>{if(!STUDENT_MODE&&(ACC.user||ACC.demo))go({screen:'today'})};
 if(CABINET){
-  STUDENT_MODE=true;document.body.classList.add('cabinet');document.title='Мои задания';document.getElementById('ati').href='../icons/u-180.png';
+  STUDENT_MODE=true;document.body.classList.add('cabinet');document.title='Кабинет ученика';document.getElementById('ati').href='../icons/u-180.png';
   addEventListener('focus',()=>{if(V.screen==='cab'&&pbS.authStore.isValid)loadCab()});
   if(pbS&&pbS.authStore.isValid&&pbS.authStore.record&&pbS.authStore.record.collectionName==='students'){V={screen:'cab'};render();loadCab()}
   else{V={screen:'cablogin'};render()}
