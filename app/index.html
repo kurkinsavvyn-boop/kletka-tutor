@@ -8,7 +8,7 @@
 <link rel="apple-touch-icon" id="ati" href="../icons/app-180.png">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=Unbounded:wght@600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=Unbounded:wght@600;700&family=Caveat:wght@500;700&family=Comfortaa:wght@500;700&family=PT+Serif:wght@400;700&family=Neucha&display=swap">
 <style>
 /* Layout: тетрадь в клетку. Рабочие панели лежат на сетке, красная ручка учителя — только для ошибок, ключа и «сейчас проходим». */
 :root{
@@ -821,6 +821,18 @@ body.cabinet .top{display:none}
 .bd-sh-bar{position:fixed;left:50%;bottom:8px;transform:translateX(-50%);display:flex;gap:8px;align-items:center;background:rgba(255,255,255,.12);color:#fff;border-radius:12px;padding:4px 8px;font:14px var(--f-ui);cursor:default}
 .bd-sh-bar button{border:0;background:none;color:#fff;font-size:20px;width:34px;height:30px;cursor:pointer;border-radius:8px}.bd-sh-bar button:hover{background:rgba(255,255,255,.15)}
 .bd-lbl{font-size:12px;color:#5b6684;margin:0 2px}.bd-swr{background:#fff!important;border:4px solid}
+.bd-palp{min-width:0;width:252px}.bd-pg{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;padding:4px}.bd-pg .bd-sw{width:30px;height:30px;margin:0}
+.bd-pt{font-size:12px;color:#5B6888;padding:4px 4px 0}.bd-prow{display:flex;gap:6px;padding:6px 4px 2px;flex-wrap:wrap}
+.bd-pbtn{border:1px solid #DDE3EE;background:#fff;border-radius:8px;padding:5px 9px;font:13px/1.2 var(--f-ui);display:inline-flex;align-items:center;gap:4px;color:#1F2C55;cursor:pointer;position:relative;overflow:hidden}
+.bd-pbtn input[type=color]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.bd-pal{display:inline-flex;align-items:center;gap:6px}.bd-pal i{width:16px;height:16px;border-radius:50%;box-shadow:0 0 0 1px #DDE3EE;display:inline-block;box-sizing:border-box}
+.bd-ff{font:13px var(--f-ui);border:1px solid #DDE3EE;border-radius:8px;padding:4px 6px;background:#fff;color:#1F2C55;max-width:120px}
+.bd-fsi{width:48px;font:13px var(--f-ui);text-align:center;border:1px solid #DDE3EE;border-radius:8px;padding:4px 2px}
+.bd-del{color:#B83526}
+.bd-line{pointer-events:none}.bd-line svg{display:block;overflow:visible}.bd-line .bd-lhit{pointer-events:stroke;cursor:pointer}.rdeck .bd-line .bd-lhit{pointer-events:none}
+.bd-lsel{outline-style:dashed!important;outline-color:rgba(45,87,200,.35)!important}
+.bd-lph{border-radius:50%;background:#fff;border:2px solid #2D57C8;box-sizing:border-box}.bd-lpc{background:#2D57C8}
+.bd-vp.bd-erase{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Ccircle cx='12' cy='12' r='9' fill='white' stroke='%231F2C55' stroke-width='2'/%3E%3C/svg%3E") 12 12,crosshair}
 .ctasks{display:flex;flex-direction:column;gap:10px}
 .ct-x{display:flex;justify-content:flex-end;gap:14px;margin:-6px 6px 2px;font-size:13px;flex-wrap:wrap}
 .ct-rv{margin:-4px 6px 0;font-size:14px;color:var(--ink)}
@@ -7124,8 +7136,13 @@ function studentSummary(st,subj){
    картинки — в «Файлах» аккаунта в скрытой папке __board (без аккаунта — прямо в доске).
    Объекты лежат в мировых координатах, вид — сдвиг и масштаб. Порядок в массиве — это слои. */
 const BD=(()=>{
-  const COLORS=['#FFF59D','#FFCC80','#F8BBD0','#CE93D8','#90CAF9','#80DEEA','#A5D6A7','#FFFFFF'];
-  const INK=['#1F2C55','#D5402F','#2D57C8','#2C8A57','#E8A317','#FFFFFF'];
+  /* цвета: стикеры и заливки — 18 светлых и ярких, чернила — 12; свои цвета доски хранятся в B.colors */
+  const COLORS=['#FFF59D','#FFE082','#FFCC80','#FFAB91','#F8BBD0','#F48FB1','#E1BEE7','#CE93D8','#B39DDB','#90CAF9','#81D4FA','#80DEEA','#A5D6A7','#C5E1A5','#E6EE9C','#FFFFFF','#ECEFF1','#BCAAA4'];
+  const INK=['#1F2C55','#000000','#5B6888','#D5402F','#E8573F','#E8A317','#2C8A57','#20AFB8','#2D57C8','#7A5AF8','#D9467A','#FFFFFF'];
+  const FONTS=[['','Обычный','var(--f-ui)'],['disp','Заголовок','var(--f-disp)'],['hand','Рукописный',"'Caveat', cursive"],['round','Круглый',"'Comfortaa', sans-serif"],['book','Книжный',"'PT Serif', serif"],['kid','Детский',"'Neucha', cursive"]];
+  const fontOf=k=>(FONTS.find(f=>f[0]===(k||''))||FONTS[0])[2];
+  const DASH={solid:'',dash:'Пунктир',dot:'Точки'};
+  let STICKC='#FFF59D';
   const DEF={frame:[1600,900],text:[420,44],sticky:[240,240],shape:[280,180],answer:[300,72]};
   const uid=()=>Math.random().toString(36).slice(2,10);
   let EDITDONE=null,B=null,SEL=new Set(),TOOL='select',SHAPE='rect',EDIT=null,DRAG=null,SPACE=false,PENC='#1F2C55',pickCb=null,OPEN=false,root=null;
@@ -7142,7 +7159,7 @@ const BD=(()=>{
     if(it.k==='arrow')return `<svg class="bd-bg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M2 35h62V12l34 38-34 38V65H2z" fill="${f}" stroke="${s}" stroke-width="${sw}" stroke-linejoin="round" vector-effect="non-scaling-stroke"/></svg>`;
     return `<div class="bd-bg" style="background:${f};border:${sw}px ${it.zone?'dashed':'solid'} ${s};border-radius:${it.k==='round'||it.zone?Math.min(it.w,it.h)*.12:4}px"></div>`}
   function look(it,url){
-    const tx=(fs,al)=>`<div class="bd-tx" style="font-size:${it.fs||fs}px;color:${it.color||'#1F2C55'};font-weight:${it.b?700:400};text-align:${it.al||al}">${esc(it.text||'')}</div>`;
+    const tx=(fs,al)=>`<div class="bd-tx" style="font-size:${it.fs||fs}px;color:${it.color||'#1F2C55'};font-weight:${it.b?700:400};text-align:${it.al||al};${it.ff?`font-family:${fontOf(it.ff)};`:''}">${esc(it.text||'')}</div>`;
     let style=`left:${it.x}px;top:${it.y}px;width:${it.w}px;${it.t==='text'?`min-height:${it.h}px`:`height:${it.h}px`};`,html='';
     if(it.t==='frame'){style+=`background-color:${it.fill||'#fff'};${it.src?`background-image:url('${url(it.src)}');`:''}`;html=`<div class="bd-ftitle">${esc(it.text||'Фрейм')}</div>`}
     else if(it.t==='text')html=tx(32,'left');
@@ -7155,8 +7172,20 @@ const BD=(()=>{
       let head='';if(it.arr&&p.length>=4){const n=p.length,x2=+p[n-2],y2=+p[n-1],x1=+p[n-4],y1=+p[n-3],a=Math.atan2(y2-y1,x2-x1),L=Math.max(14,(it.sw||4)*5)*((it.vw||it.w)/Math.max(1,it.w));
         const pt=k=>`${(x2-L*Math.cos(a+k)).toFixed(1)} ${(y2-L*Math.sin(a+k)).toFixed(1)}`;head=`<path d="M${pt(.45)}L${x2} ${y2}L${pt(-.45)}" fill="none" stroke="${it.color||'#1F2C55'}" stroke-width="${it.sw||4}" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>`}
       html=`<svg viewBox="0 0 ${it.vw||it.w} ${it.vh||it.h}" preserveAspectRatio="none" overflow="visible"><path d="${d}" fill="none" stroke="${it.color||'#1F2C55'}" stroke-width="${it.sw||4}" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>${head}</svg>`}
+    else if(it.t==='line')html=lineSVG(it);
     if(it.rot&&it.t!=='frame')style+=`transform:rotate(${it.rot}deg);`;if(it.op!=null&&it.op<1)style+=`opacity:${it.op};`;
     return{cls:'bd-it bd-'+it.t,style,html}}
+  /* ---------- линия: прямая или кривая, сплошная, пунктир или точки, наконечники с любой стороны ----------
+     Точки хранятся долями рамки (p: x1,y1, cx,cy, x2,y2 от 0 до 1), поэтому линия двигается и тянется как любой объект. */
+  function linePts(it){const p=it.p||[0,0,.5,.5,1,1];return[it.x+p[0]*it.w,it.y+p[1]*it.h,it.x+p[2]*it.w,it.y+p[3]*it.h,it.x+p[4]*it.w,it.y+p[5]*it.h]}
+  function setLine(it,P){const xs=[P[0],P[2],P[4]],ys=[P[1],P[3],P[5]];const x=Math.min(...xs),y=Math.min(...ys),w=Math.max(1,Math.max(...xs)-x),h=Math.max(1,Math.max(...ys)-y);
+    Object.assign(it,{x,y,w,h,p:P.map((v,i)=>Math.round((i%2?(v-y)/h:(v-x)/w)*10000)/10000)})}
+  function lineSVG(it){const[x1,y1,cx,cy,x2,y2]=linePts(it).map((v,i)=>i%2?v-it.y:v-it.x),sw=+it.sw||4,col=it.color||'#1F2C55';
+    const da=it.dash==='dash'?`stroke-dasharray="${sw*3} ${sw*2}"`:it.dash==='dot'?`stroke-dasharray="0.1 ${sw*2.2}"`:'';
+    const head=(px,py,qx,qy)=>{const a=Math.atan2(py-qy,px-qx),L=Math.max(12,sw*4.5),pt=k=>`${(px-L*Math.cos(a+k)).toFixed(1)} ${(py-L*Math.sin(a+k)).toFixed(1)}`;
+      return `<path d="M${pt(.42)}L${px.toFixed(1)} ${py.toFixed(1)}L${pt(-.42)}" fill="none" stroke="${col}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round"/>`};
+    const d=`M${x1.toFixed(1)} ${y1.toFixed(1)}Q${cx.toFixed(1)} ${cy.toFixed(1)} ${x2.toFixed(1)} ${y2.toFixed(1)}`;
+    return `<svg width="${it.w}" height="${it.h}" viewBox="0 0 ${it.w} ${it.h}" overflow="visible"><path class="bd-lhit" d="${d}" fill="none" stroke="transparent" stroke-width="${Math.max(18,sw+14)}"/><path d="${d}" fill="none" stroke="${col}" stroke-width="${sw}" stroke-linecap="round" ${da}/>${it.a2!==false?head(x2,y2,cx,cy):''}${it.a1?head(x1,y1,cx,cy):''}</svg>`}
   /* фрейм для комнаты: фон и всё, что на нём лежит, в координатах фрейма */
   function frameHTML(items,f,url){const inside=items.filter(x=>x!==f&&x.t!=='frame'&&x.x+x.w/2>=f.x&&x.x+x.w/2<=f.x+f.w&&x.y+x.h/2>=f.y&&x.y+x.h/2<=f.y+f.h);
     const bg=look({...f,x:0,y:0},url);
@@ -7184,6 +7213,7 @@ const BD=(()=>{
     document.body.appendChild(root);bind()}
   /* ---------- инструменты ---------- */
   const IC={
+    erase:'<svg viewBox="0 0 24 24"><path d="M8.5 19.5h11M3.8 14.2l8.5-8.5a2 2 0 012.8 0l4.2 4.2a2 2 0 010 2.8l-7.1 7.1H8.6l-4.8-4.8a.6.6 0 010-.8zM9 9l6 6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>',
     line:'<svg viewBox="0 0 24 24"><path d="M5 19L19 5M11 5h8v8" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>',
     select:'<svg viewBox="0 0 24 24"><path d="M5 3l14 8-6.5 1.5L10 19z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>',
     hand:'<svg viewBox="0 0 24 24"><path d="M8 12V5.5a1.5 1.5 0 013 0V11m0-1V4.5a1.5 1.5 0 013 0V11m0-.5V6a1.5 1.5 0 013 0v8a7 7 0 01-7 7h-.5A6.5 6.5 0 015 17.5L3.5 13a1.5 1.5 0 012.6-1.4L8 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
@@ -7196,17 +7226,29 @@ const BD=(()=>{
     lib:'<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="7" cy="4.8" r="1.4" fill="currentColor"/><circle cx="11" cy="4.8" r="1.4" fill="currentColor"/><path d="M4 20c.5-4 2.5-6 5-6s4.5 2 5 6M15 11l1.5-3 1.5 3 3 .4-2.2 2 .6 3-2.9-1.5-2.9 1.5.6-3-2.2-2z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>',
     answer:'<svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="10" rx="3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-dasharray="3 2"/><path d="M7 12h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>'};
   const LIB_EMO=['⭐','❤️','👍','🎉','🏆','🥇','🌟','✅','❌','❓','💡','🎁','🍎','🍊','🥥','🍕','🍬','🐱','🐶','🐰','🦊','🐻','🐸','🦄','🌈','☀️','🌙','⛄','🎈','🚀','✏️','📚','🔔','👀','😊','😎'];
-  const TOOLS=[['select','Выделение (V)'],['hand','Рука: двигать доску (H или зажать пробел)'],'|',['frame','Фрейм (F)'],['text','Текст (T)'],['sticky','Стикер (N)'],['shape','Фигура (S)'],['pen','Карандаш (P)'],['line','Линия со стрелкой (D)'],['image','Картинка (I)'],'|',['answer','Поле ответа для ученика (A)'],['lib','Библиотека: персонажи и наклейки (L)']];
+  const TOOLS=[['select','Выделение (V)'],['hand','Рука: двигать доску (H или зажать пробел)'],'|',['frame','Фрейм (F)'],['text','Текст (T)'],['sticky','Стикер (N)'],['shape','Фигура (S)'],['pen','Карандаш (P)'],['line','Стрелка или линия (D)'],['erase','Ластик: стирает карандаш и линии (E)'],['image','Картинка (I)'],'|',['answer','Поле ответа для ученика (A)'],['lib','Библиотека: персонажи и наклейки (L)']];
   function drawTools(){const t=q('bdTools');t.innerHTML=TOOLS.map(x=>x==='|'?'<div class="bd-sep"></div>':`<button class="bd-ib${TOOL===x[0]?' bd-on':''}" data-t="${x[0]}" title="${x[1]}" aria-label="${x[1]}">${IC[x[0]]}</button>`).join('');
-    t.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{const k=b.dataset.t;if(k==='image'){q('bdFile').click();return}if(k==='lib'){libToggle();return}if(k==='shape'){shapeMenu(b);return}if(k==='pen'){penMenu(b);return}setTool(k)})}
-  function setTool(t){TOOL=t;drawTools();q('bdVp').className='bd-vp'+(t==='hand'?' bd-pan':['frame','text','sticky','shape','pen','line','answer'].includes(t)?' bd-make':'')}
+    t.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{const k=b.dataset.t;if(k==='image'){q('bdFile').click();return}if(k==='lib'){libToggle();return}if(k==='shape'){shapeMenu(b);return}if(k==='pen'||k==='line'){penMenu(b,k);return}if(k==='sticky'){stickyMenu(b);return}setTool(k)})}
+  function setTool(t){TOOL=t;drawTools();q('bdVp').className='bd-vp'+(t==='hand'?' bd-pan':['frame','text','sticky','shape','pen','line','answer'].includes(t)?' bd-make':t==='erase'?' bd-erase':'')}
   function shapeMenu(b){const r=b.getBoundingClientRect();popup(r.right+8,r.top,[['Прямоугольник',()=>{SHAPE='rect';setTool('shape')}],['Скруглённый',()=>{SHAPE='round';setTool('shape')}],['Круг',()=>{SHAPE='ellipse';setTool('shape')}],['Облачко',()=>{SHAPE='cloud';setTool('shape')}],['Стрелка',()=>{SHAPE='arrow';setTool('shape')}]])}
-  function penMenu(b){const r=b.getBoundingClientRect();popup(r.right+8,r.top,INK.slice(0,5).map((c,k)=>[['Тёмно-синий','Красный','Синий','Зелёный','Жёлтый'][k],()=>{PENC=c;setTool('pen')}]))}
+  /* палитра: готовые цвета, ваши цвета, свой цвет и пипетка (где браузер умеет) */
+  function palPop(anchor,list,cur,cb,title,side){closePop();const r=anchor.getBoundingClientRect(),own=(B.colors||[]).filter(c=>!list.includes(c));
+    const p=document.createElement('div');p.className='bd-pop bd-palp';p.id='bdPop';
+    const sw=c=>`<span class="bd-sw${c===cur?' bd-on':''}" data-c="${c}" style="background:${c}" title="${c}"></span>`;
+    p.innerHTML=`${title?`<div class="bd-pt">${esc(title)}</div>`:''}<div class="bd-pg">${list.map(sw).join('')}</div>${own.length?`<div class="bd-pt">Ваши цвета</div><div class="bd-pg">${own.map(sw).join('')}</div>`:''}
+      <div class="bd-prow"><label class="bd-pbtn">＋ Свой цвет<input type="color" value="${/^#[0-9a-f]{6}$/i.test(cur||'')?cur:'#3366cc'}"></label>${window.EyeDropper?'<button class="bd-pbtn" data-eye>💧 Пипетка</button>':''}</div>`;
+    root.appendChild(p);p.style.left=Math.max(8,Math.min(side?r.right+8:r.left,innerWidth-p.offsetWidth-8))+'px';p.style.top=Math.max(8,Math.min(side?r.top:r.bottom+6,innerHeight-p.offsetHeight-8))+'px';
+    const keep=c=>{c=c.toUpperCase();if(!list.includes(c)){B.colors=[c,...(B.colors||[]).filter(x=>x!==c)].slice(0,12);snap()}};
+    p.querySelectorAll('[data-c]').forEach(x=>x.onclick=()=>{closePop();cb(x.dataset.c)});
+    const ci=p.querySelector('input[type=color]');ci.onchange=()=>{keep(ci.value);closePop();cb(ci.value.toUpperCase())};
+    const ey=p.querySelector('[data-eye]');if(ey)ey.onclick=async()=>{closePop();try{const r2=await new EyeDropper().open();keep(r2.sRGBHex);cb(r2.sRGBHex.toUpperCase())}catch(e){}}}
+  function penMenu(b,k){palPop(b,INK,PENC,c=>{PENC=c;setTool(k)},k==='line'?'Цвет стрелки':'Цвет карандаша',true)}
+  function stickyMenu(b){palPop(b,COLORS,STICKC,c=>{STICKC=c;setTool('sticky');hint('Щёлкните на доске, чтобы поставить стикер, или растяните рамку')},'Цвет стикера',true)}
   /* ---------- отрисовка ---------- */
   function renderIt(it,el){const l=look(it,srcURL);el.className=l.cls;el.style.cssText=l.style;
     let html=l.html;if(it.link)html+=`<span class="bd-lnk" data-link="${it.link}" title="Перейти к фрейму">↗</span>`;if(it.lock)html+='<span class="bd-lock" title="Закреплено">🔒</span>';
     /* значки урока: зона, куда класть, шторка, верный ответ */
-    const z=it.tgt&&byId(it.tgt);let tag=[];if(it.zone)tag.push('Зона');if(z)tag.push('🎯 в «'+(z.text||'зону')+'»');if(it.hide)tag.push('Шторка');if(it.t==='answer'&&it.ans)tag.push('✓ '+it.ans);
+    const z=it.tgt&&byId(it.tgt);let tag=[];if(it.zone)tag.push('Зона');if(z)tag.push('🎯 в «'+(z.text||'зону')+'»');if(it.hide)tag.push('🙈 Скрыто от ученика');if(it.t==='answer'&&it.ans)tag.push('✓ '+it.ans);
     if(tag.length)html+=`<span class="bd-tag">${esc(tag.join(' · '))}</span>`;
     if(el._h!==html){el.innerHTML=html;el._h=html}}
   function renderAll(){const w=q('bdWorld'),ids=new Set(B.items.map(i=>i.id));
@@ -7226,46 +7268,71 @@ const BD=(()=>{
   /* ---------- выделение и панель над ним ---------- */
   const byId=id=>B.items.find(i=>i.id===id);
   const withGroup=id=>{const it=byId(id);return it&&it.g?B.items.filter(x=>x.g===it.g).map(x=>x.id):[id]};
-  function drawSel(){if(!root)return;root.querySelectorAll('.bd-selbox').forEach(x=>x.remove());const list=[...SEL].map(byId).filter(Boolean),ctx=q('bdCtx');
+  function drawSel(){if(!root)return;root.querySelectorAll('.bd-selbox,.bd-lph').forEach(x=>x.remove());const list=[...SEL].map(byId).filter(Boolean),ctx=q('bdCtx');
     if(!list.length||EDIT){ctx.hidden=true;return}
     const bb=bounds(list),box=document.createElement('div');box.className='bd-selbox'+(list.length>1?' bd-multi':'');
     Object.assign(box.style,{left:bb.x+'px',top:bb.y+'px',width:bb.w+'px',height:bb.h+'px',outlineWidth:(2/VIEW.s)+'px',zIndex:99999});
-    if(!list.some(x=>x.lock))for(const h of ['nw','ne','sw','se']){const d=document.createElement('div');d.className='bd-hdl';d.dataset.h=h;
+    const ln=list.length===1&&list[0].t==='line'&&!list[0].lock?list[0]:null;
+    if(ln){box.classList.add('bd-lsel');const P=linePts(ln),mid=[.25*P[0]+.5*P[2]+.25*P[4],.25*P[1]+.5*P[3]+.25*P[5]];
+      for(const[k,x,y]of[['b',P[0],P[1]],['c',mid[0],mid[1]],['e',P[4],P[5]]]){const d=document.createElement('div');d.className='bd-hdl bd-lph'+(k==='c'?' bd-lpc':'');d.dataset.lp=k;d.dataset.id=ln.id;d.title=k==='c'?'Потяните, чтобы изогнуть':'Потяните конец';
+        const z=14/VIEW.s;Object.assign(d.style,{position:'absolute',width:z+'px',height:z+'px',borderWidth:2/VIEW.s+'px',left:(x-z/2)+'px',top:(y-z/2)+'px',zIndex:100000,cursor:'grab'});q('bdWorld').appendChild(d)}}
+    else if(!list.some(x=>x.lock))for(const h of ['nw','ne','sw','se']){const d=document.createElement('div');d.className='bd-hdl';d.dataset.h=h;
       Object.assign(d.style,{width:12/VIEW.s+'px',height:12/VIEW.s+'px',borderWidth:2/VIEW.s+'px',[h[0]==='n'?'top':'bottom']:(-7/VIEW.s)+'px',[h[1]==='w'?'left':'right']:(-7/VIEW.s)+'px',cursor:h==='nw'||h==='se'?'nwse-resize':'nesw-resize'});box.appendChild(d)}
     q('bdWorld').appendChild(box);drawCtx(list,bb)}
   function drawCtx(list,bb){const ctx=q('bdCtx'),one=list.length===1?list[0]:null,t=one&&one.t;
-    const fills=list.every(x=>['sticky','shape','frame'].includes(x.t)),texts=list.every(x=>['sticky','shape','text'].includes(x.t)),inks=list.every(x=>['text','pen'].includes(x.t));
+    const fills=list.every(x=>['sticky','shape','frame'].includes(x.t)),texts=list.every(x=>['sticky','shape','text'].includes(x.t)),inks=list.every(x=>['text','pen','line'].includes(x.t));
     let h='';
-    if(fills)h+=COLORS.map(c=>`<span class="bd-sw${list.every(x=>x.fill===c)?' bd-on':''}" data-fill="${c}" style="background:${c}" title="Цвет"></span>`).join('')+'<span class="bd-vs"></span>';
-    if(inks)h+=INK.map(c=>`<span class="bd-sw${list.every(x=>(x.color||'#1F2C55')===c)?' bd-on':''}" data-ink="${c}" style="background:${c}" title="Цвет"></span>`).join('')+'<span class="bd-vs"></span>';
-    if(texts)h+=`<button class="bd-ib" data-a="fs-" title="Текст меньше">A−</button><span class="bd-fs">${one?one.fs||(t==='text'?32:24):''}</span><button class="bd-ib" data-a="fs+" title="Текст больше">A+</button><button class="bd-ib" data-a="bold" title="Жирный"><b>Ж</b></button><span class="bd-vs"></span>`;
-    if(list.every(x=>x.t==='shape'))h+=`<span class="bd-lbl">Рамка</span>`+INK.slice(0,5).map(c=>`<span class="bd-sw bd-swr${list.every(x=>(x.stroke||'#1F2C55')===c)?' bd-on':''}" data-stroke="${c}" style="border-color:${c}" title="Цвет рамки"></span>`).join('')+`<button class="bd-ib" data-a="sw" title="Толщина рамки: ${one?one.sw??2:''}">▭</button><span class="bd-vs"></span>`;
+    const f0=list[0];
+    if(fills)h+=`<button class="bd-tb bd-pal" data-pal="fill" title="Цвет: 18 готовых, свой и пипетка"><i style="background:${f0.fill||(f0.t==='sticky'?'#FFF59D':'#FFFFFF')}"></i>Цвет ▾</button>`;
+    if(inks)h+=`<button class="bd-tb bd-pal" data-pal="ink" title="Цвет ${t==='text'||texts?'текста':'линии'}"><i style="background:${f0.color||'#1F2C55'}"></i>${list.every(x=>x.t==='text')?'Цвет ▾':'Линия ▾'}</button>`;
+    if(texts&&!inks)h+=`<button class="bd-tb bd-pal" data-pal="ink" title="Цвет текста"><i style="background:${f0.color||'#1F2C55'};border-radius:2px"></i>Текст ▾</button>`;
+    if(fills||inks)h+='<span class="bd-vs"></span>';
+    if(texts||list.every(x=>x.t==='text')){const fsz=one?one.fs||(t==='text'?32:24):'';
+      h+=`<select class="bd-ff" data-a="ff" title="Шрифт">${FONTS.map(([k,n,css])=>`<option value="${k}" style="font-family:${css.replace(/"/g,"'")}"${(f0.ff||'')===k?' selected':''}>${n}</option>`).join('')}</select>
+        <button class="bd-ib" data-a="fs-" title="Текст меньше">A−</button><input class="bd-fsi" type="number" min="8" max="240" value="${fsz}" title="Размер текста: впишите число" aria-label="Размер текста"><button class="bd-ib" data-a="fs+" title="Текст больше">A+</button><button class="bd-ib${list.every(x=>x.b)?' bd-on':''}" data-a="bold" title="Жирный"><b>Ж</b></button><span class="bd-vs"></span>`}
+    if(list.every(x=>x.t==='shape'))h+=`<button class="bd-tb bd-pal" data-pal="stroke" title="Цвет рамки"><i style="background:#fff;border:3px solid ${f0.stroke||'#1F2C55'}"></i>Рамка ▾</button><button class="bd-ib" data-a="sw" title="Толщина рамки: ${one?one.sw??2:''}">▭</button><span class="bd-vs"></span>`;
     if(list.every(x=>x.t==='pen'))h+=`<button class="bd-ib${list.every(x=>x.arr)?' bd-on':''}" data-a="arr" title="Стрелка на конце">→</button><button class="bd-ib" data-a="lw" title="Толщина линии">≡</button><span class="bd-vs"></span>`;
+    if(list.every(x=>x.t==='line'))h+=`<button class="bd-ib" data-a="lw" title="Толщина">≡</button>
+      <button class="bd-ib${list.every(x=>!x.dash)?' bd-on':''}" data-a="dash" data-v="" title="Сплошная">━</button><button class="bd-ib${list.every(x=>x.dash==='dash')?' bd-on':''}" data-a="dash" data-v="dash" title="Пунктир">╍</button><button class="bd-ib${list.every(x=>x.dash==='dot')?' bd-on':''}" data-a="dash" data-v="dot" title="Точки">┈</button>
+      <button class="bd-ib${list.every(x=>x.a1)?' bd-on':''}" data-a="a1" title="Наконечник в начале">⟵</button><button class="bd-ib${list.every(x=>x.a2!==false)?' bd-on':''}" data-a="a2" title="Наконечник в конце">⟶</button>
+      <button class="bd-tb" data-a="lstr" title="Сделать прямой">Прямая</button><span class="bd-vs"></span>`;
     if(!list.some(x=>x.t==='frame'))h+=`<button class="bd-ib" data-a="op" title="Прозрачность">◐</button><button class="bd-ib" data-a="rl" title="Повернуть влево на 15° (с Shift — на 90°)">⟲</button><button class="bd-ib" data-a="rr" title="Повернуть вправо на 15° (с Shift — на 90°)">⟳</button>${list.some(x=>x.rot)?'<button class="bd-ib" data-a="r0" title="Вернуть прямо">⊥</button>':''}<span class="bd-vs"></span>`;
     if(t==='frame')h+=`<button class="bd-ib" data-a="bgimg" title="Картинка на фон">🖼</button>${one.src?'<button class="bd-ib" data-a="bgx" title="Убрать картинку фона">⨯</button>':''}<span class="bd-vs"></span>`;
     /* урок: верный ответ, зона, куда положить, шторка */
     if(t==='answer')h+=`<button class="bd-tb bd-tb2" data-a="ans">Верный ответ${one.ans?': '+esc(one.ans):''}</button><span class="bd-vs"></span>`;
     if(t==='shape')h+=`<button class="bd-tb bd-tb2${one.zone?' bd-on':''}" data-a="zone" title="Сюда ученик кладёт карточки">Зона</button>`;
     if(!list.some(x=>x.t==='frame')){if(B.items.some(x=>x.zone&&!list.includes(x)))h+=`<button class="bd-tb bd-tb2${list.some(x=>x.tgt)?' bd-on':''}" data-a="tgt" title="В какую зону ученик должен положить">Куда положить</button>`;
-      h+=`<button class="bd-tb bd-tb2${list.every(x=>x.hide)?' bd-on':''}" data-a="hide" title="Ученик не видит, пока вы не откроете на уроке">Шторка</button><span class="bd-vs"></span>`}
-    h+=`<button class="bd-ib" data-a="front" title="Наверх (Ctrl+Shift+])">⤒</button><button class="bd-ib" data-a="fwd" title="На один вперёд (Ctrl+])">↑</button><button class="bd-ib" data-a="bwd" title="На один назад (Ctrl+[)">↓</button><button class="bd-ib" data-a="back" title="Вниз (Ctrl+Shift+[)">⤓</button><span class="bd-vs"></span>`;
+      h+=`<button class="bd-tb bd-tb2${list.every(x=>x.hide)?' bd-on':''}" data-a="hide" title="Ученик не видит этот объект, пока вы не нажмёте «Показать» на уроке">${list.every(x=>x.hide)?'🙈 Скрыто от ученика':'🙈 Скрыть от ученика'}</button><span class="bd-vs"></span>`}
+    h+=`<button class="bd-tb" data-a="layers" title="Слои: выше или ниже других">Слои ▾</button>`;
     if(list.length>1)h+=`<button class="bd-ib" data-a="group" title="Сгруппировать (Ctrl+G)">▣</button>`;
     if(list.some(x=>x.g))h+=`<button class="bd-ib" data-a="ungroup" title="Разгруппировать (Ctrl+Shift+G)">◫</button>`;
-    h+=`<button class="bd-ib" data-a="link" title="Ссылка на фрейм">🔗</button><button class="bd-ib" data-a="lock" title="${list.some(x=>x.lock)?'Открепить':'Закрепить'}">${list.some(x=>x.lock)?'🔓':'🔒'}</button><button class="bd-ib" data-a="dup" title="Дублировать (Ctrl+D)">⧉</button><button class="bd-ib" data-a="del" title="Удалить (Delete)">🗑</button>`;
+    /* подписи словами: значки без слов непонятны */
+    h+=`<button class="bd-tb${list.some(x=>x.link)?' bd-on':''}" data-a="link" title="Нажмёшь на объект на уроке — доска перейдёт к выбранному фрейму">${list.some(x=>x.link)?'↗ Переход':'↗ Переход к фрейму'}</button>
+      <button class="bd-tb${list.some(x=>x.lock)?' bd-on':''}" data-a="lock" title="Закреплённый объект нельзя сдвинуть ни вам, ни ученику">${list.some(x=>x.lock)?'🔒 Закреплено':'🔓 Закрепить'}</button>
+      <button class="bd-tb" data-a="dup" title="Ctrl+D">Копия</button><button class="bd-tb bd-del" data-a="del" title="Delete">Удалить</button>`;
     ctx.innerHTML=h;ctx.hidden=false;
     const r=q('bdVp').getBoundingClientRect(),sx=bb.x*VIEW.s+VIEW.x,sy=bb.y*VIEW.s+VIEW.y,w=ctx.offsetWidth;
     if(sx>r.width||sy>r.height||sx+bb.w*VIEW.s<0||sy+bb.h*VIEW.s<0){ctx.hidden=true;return}
     ctx.style.left=Math.max(8,Math.min(r.width-w-8,sx+bb.w*VIEW.s/2-w/2))+'px';ctx.style.top=Math.max(64,sy-ctx.offsetHeight-14)+'px';
     ctx.querySelectorAll('[data-fill]').forEach(b=>b.onclick=()=>edit(()=>list.forEach(x=>x.fill=b.dataset.fill)));
     ctx.querySelectorAll('[data-ink]').forEach(b=>b.onclick=()=>edit(()=>list.forEach(x=>x.color=b.dataset.ink)));
+    ctx.querySelectorAll('[data-pal]').forEach(b=>b.onclick=()=>{const k=b.dataset.pal,f=list[0];
+      palPop(b,k==='fill'?COLORS:INK,k==='fill'?f.fill:k==='stroke'?f.stroke||'#1F2C55':f.color||'#1F2C55',c=>edit(()=>list.forEach(x=>{if(k==='fill')x.fill=c;else if(k==='stroke')x.stroke=c;else x.color=c})),k==='fill'?'Цвет':k==='stroke'?'Цвет рамки':'Цвет')});
+    const fsi=ctx.querySelector('.bd-fsi');if(fsi){fsi.onkeydown=e=>{e.stopPropagation();if(e.key==='Enter')fsi.blur()};fsi.onchange=()=>{const v=Math.round(+fsi.value);if(v>=8&&v<=240)edit(()=>list.forEach(x=>x.fs=v))}}
+    const ff=ctx.querySelector('.bd-ff');if(ff)ff.onchange=()=>edit(()=>list.forEach(x=>{if(ff.value)x.ff=ff.value;else delete x.ff}));
     ctx.querySelectorAll('[data-stroke]').forEach(b=>b.onclick=()=>edit(()=>list.forEach(x=>x.stroke=b.dataset.stroke)));
-    ctx.querySelectorAll('[data-a]').forEach(b=>b.onclick=e=>act(b.dataset.a,e))}
+    ctx.querySelectorAll('button[data-a]').forEach(b=>b.onclick=e=>act(b.dataset.a,e))}
   function act(a,e){const list=[...SEL].map(byId).filter(Boolean);if(!list.length)return;
     if(a==='fs-'||a==='fs+')return edit(()=>list.forEach(x=>{const f=x.fs||(x.t==='text'?32:24);x.fs=Math.max(10,Math.min(240,Math.round(a==='fs+'?f*1.2:f/1.2)))}));
     if(a==='bold')return edit(()=>{const v=!list.every(x=>x.b);list.forEach(x=>x.b=v)});
     if(a==='sw')return edit(()=>{const cyc=[0,2,4,8],c=list[0].sw??2,n=cyc[(cyc.indexOf(c)+1)%cyc.length];list.forEach(x=>x.sw=n)});
     if(a==='lw')return edit(()=>{const cyc=[2,4,8,14],c=list[0].sw||4,n=cyc[(cyc.indexOf(c)+1)%cyc.length];list.forEach(x=>x.sw=n)});
     if(a==='arr')return edit(()=>{const v=!list.every(x=>x.arr);list.forEach(x=>x.arr=v)});
+    if(a==='dash'){const v=e.currentTarget.dataset.v;return edit(()=>list.forEach(x=>{if(v)x.dash=v;else delete x.dash}))}
+    if(a==='a1')return edit(()=>{const v=!list.every(x=>x.a1);list.forEach(x=>x.a1=v)});
+    if(a==='a2')return edit(()=>{const v=!list.every(x=>x.a2!==false);list.forEach(x=>x.a2=v)});
+    if(a==='lstr')return edit(()=>list.forEach(x=>{const P=linePts(x);P[2]=(P[0]+P[4])/2;P[3]=(P[1]+P[5])/2;delete x.curve;setLine(x,P)}));
+    if(a==='layers'){const r=e.currentTarget.getBoundingClientRect();popup(r.left,r.bottom+6,[['Наверх, поверх всех',()=>layer('front'),'Ctrl+Shift+]'],['На один выше',()=>layer('fwd'),'Ctrl+]'],['На один ниже',()=>layer('bwd'),'Ctrl+['],['Вниз, под всеми',()=>layer('back'),'Ctrl+Shift+[']]);return}
     if(a==='op')return edit(()=>{const cyc=[1,.7,.4],c=list[0].op??1,n=cyc[(cyc.indexOf(c)+1)%cyc.length];list.forEach(x=>{if(n===1)delete x.op;else x.op=n})});
     if(a==='rl'||a==='rr')return edit(()=>{const d=(e&&e.shiftKey?90:15)*(a==='rl'?-1:1);list.forEach(x=>{x.rot=(((x.rot||0)+d)%360+360)%360;if(!x.rot)delete x.rot})});
     if(a==='r0')return edit(()=>list.forEach(x=>delete x.rot));
@@ -7312,7 +7379,7 @@ const BD=(()=>{
     if(t==='frame')Object.assign(it,{fill:'#FFFFFF',text:'Фрейм '+(B.items.filter(i=>i.t==='frame').length+1)});
     if(t==='text')Object.assign(it,{text:'',fs:Math.round(32/Math.min(1,VIEW.s)),color:'#1F2C55',al:'left'});
     const zf=1/Math.max(.35,Math.min(1.5,VIEW.s));
-    if(t==='sticky')Object.assign(it,{fill:'#FFF59D',text:'',fs:Math.round(24*zf)});
+    if(t==='sticky')Object.assign(it,{fill:STICKC,text:'',fs:Math.round(24*zf)});
     if(t==='shape')Object.assign(it,{k:SHAPE,fill:'#FFFFFF',stroke:'#1F2C55',sw:2,text:'',fs:Math.round(24*zf)});
     if(t==='answer'){Object.assign(it,{text:'',ans:'',fs:Math.round(32*zf)});B.items.push(it);SEL=new Set([it.id]);renderAll();snap();setTool('select');setTimeout(()=>ansAsk(it),30);return it}
     if(t==='frame')B.items.unshift(it);else B.items.push(it);SEL=new Set([it.id]);renderAll();snap();
@@ -7383,9 +7450,11 @@ const BD=(()=>{
       if(e.button===1||SPACE||TOOL==='hand'){DRAG={k:'pan',sx:e.clientX,sy:e.clientY,vx:VIEW.x,vy:VIEW.y};vp.classList.add('bd-panning');return}
       const lk=e.target.closest('.bd-lnk');if(lk){const f=byId(lk.dataset.link);if(f)fitTo(bounds([f]),true);return}
       if(TOOL==='pen'){const it={id:uid(),t:'pen',x:w.x,y:w.y,w:1,h:1,pts:[0,0],color:PENC,sw:4,raw:[w.x,w.y]};DRAG={k:'pen',it};B.items.push(it);renderAll();return}
-      if(TOOL==='line'){const it={id:uid(),t:'pen',arr:true,x:w.x,y:w.y,w:1,h:1,pts:[0,0,1,1],color:PENC,sw:4,raw:[w.x,w.y,w.x+1,w.y+1]};DRAG={k:'pen',it,line:true};B.items.push(it);renderAll();return}
+      if(TOOL==='line'){const it={id:uid(),t:'line',color:PENC,sw:4,a2:true};setLine(it,[w.x,w.y,w.x,w.y,w.x+1,w.y+1]);DRAG={k:'line',it,sx:w.x,sy:w.y};B.items.push(it);renderAll();return}
+      if(TOOL==='erase'){DRAG={k:'erase',gone:new Set()};eraseAt(e,DRAG);return}
       if(['frame','text','sticky','shape','answer'].includes(TOOL)){DRAG={k:'make',t:TOOL,sx:w.x,sy:w.y,box:null};return}
       const h=e.target.closest('.bd-hdl');
+      if(h&&h.dataset.lp){const it=byId(h.dataset.id);if(it)DRAG={k:'lpt',it,which:h.dataset.lp};return}
       if(h){const list=[...SEL].map(byId);DRAG={k:'size',h:h.dataset.h,bb:bounds(list),orig:list.map(x=>({...x,h:hOf(x)})),keep:list.length>1||list[0].t==='image'};return}
       const el=e.target.closest('.bd-it');
       if(el){const id=el.dataset.id,grp=withGroup(id);
@@ -7402,6 +7471,14 @@ const BD=(()=>{
       if(DRAG.k==='size'){const{bb,h}=DRAG;let x0=bb.x,y0=bb.y,x1=bb.x+bb.w,y1=bb.y+bb.h;if(h.includes('w'))x0=Math.min(w.x,x1-10);else x1=Math.max(w.x,x0+10);if(h.includes('n'))y0=Math.min(w.y,y1-10);else y1=Math.max(w.y,y0+10);
         let sx=(x1-x0)/bb.w,sy=(y1-y0)/bb.h;if(DRAG.keep||e.shiftKey){const s=Math.max(sx,sy);sx=sy=s;if(h.includes('w'))x0=x1-bb.w*s;if(h.includes('n'))y0=y1-bb.h*s}
         for(const o of DRAG.orig){const it=byId(o.id);it.x=x0+(o.x-bb.x)*sx;it.y=y0+(o.y-bb.y)*sy;it.w=Math.max(8,o.w*sx);it.h=Math.max(8,o.h*sy);if(o.fs&&DRAG.orig.length>1)it.fs=Math.max(8,Math.round(o.fs*sx));renderIt(it,EL.get(it.id))}drawSel();return}
+      if(DRAG.k==='erase'){eraseAt(e,DRAG);return}
+      if(DRAG.k==='line'||DRAG.k==='lpt'){const it=DRAG.it,P=linePts(it);let x=w.x,y=w.y;
+        const ax=DRAG.k==='line'||DRAG.which==='b'?P[0]:P[4],ay=DRAG.k==='line'||DRAG.which==='b'?P[1]:P[5];
+        if(e.shiftKey&&DRAG.which!=='c'){const dx=x-ax,dy=y-ay,a=Math.round(Math.atan2(dy,dx)/(Math.PI/4))*(Math.PI/4),L=Math.hypot(dx,dy);x=ax+L*Math.cos(a);y=ay+L*Math.sin(a)}
+        if(DRAG.k==='line'||DRAG.which==='e'){P[4]=x;P[5]=y}else if(DRAG.which==='b'){P[0]=x;P[1]=y}
+        /* средняя ручка тянет кривую: точка на линии идёт за мышью */
+        if(DRAG.which==='c'){P[2]=2*x-(P[0]+P[4])/2;P[3]=2*y-(P[1]+P[5])/2;it.curve=true}else if(!it.curve){P[2]=(P[0]+P[4])/2;P[3]=(P[1]+P[5])/2}
+        setLine(it,P);renderIt(it,EL.get(it.id));if(DRAG.k==='lpt')drawSel();return}
       if(DRAG.k==='pen'&&DRAG.line){const it=DRAG.it,r=it.raw;let x=w.x,y=w.y;
         /* с Shift — ровно по горизонтали, вертикали или под 45° */
         if(e.shiftKey){const dx=x-r[0],dy=y-r[1],a=Math.round(Math.atan2(dy,dx)/(Math.PI/4))*(Math.PI/4),L=Math.hypot(dx,dy);x=r[0]+L*Math.cos(a);y=r[1]+L*Math.sin(a)}
@@ -7415,6 +7492,10 @@ const BD=(()=>{
       if(d.k==='move'){if(d.moved){renderAll();snap()}else drawSel()}
       else if(d.k==='size'){renderAll();snap()}
       else if(d.k==='pen'){const it=d.it;if(it.raw.length<4){it.raw.push(it.raw[0]+1,it.raw[1]+1);penBox(it)}delete it.raw;renderAll();snap()}
+      else if(d.k==='line'){const it=d.it,P=linePts(it);if(Math.hypot(P[4]-P[0],P[5]-P[1])<6/VIEW.s){P[4]=P[0]+200/VIEW.s;P[5]=P[1];P[2]=(P[0]+P[4])/2;P[3]=P[1];setLine(it,P)}
+        renderAll();SEL=new Set([it.id]);setTool('select');drawSel();snap()}
+      else if(d.k==='lpt'){renderAll();drawSel();snap()}
+      else if(d.k==='erase'){if(d.gone.size){B.items=B.items.filter(x=>!d.gone.has(x.id));renderAll();snap()}}
       else if(d.k==='make'){const[dw,dh]=DEF[d.t],big=d.box&&d.box.w*VIEW.s>12&&d.box.h*VIEW.s>12,k=d.t==='frame'?1:1/Math.max(.35,Math.min(1.5,VIEW.s));
         const w=big?d.box.w:dw*k,h=big?(d.t==='text'?DEF.text[1]*k:d.box.h):dh*k;
         /* фрейм по щелчку встаёт справа от последнего, на свободное место, и вид переезжает к нему */
@@ -7465,7 +7546,7 @@ const BD=(()=>{
     if(e.key.startsWith('Arrow')&&SEL.size){e.preventDefault();const d=e.shiftKey?10:1;edit(()=>B.items.filter(x=>SEL.has(x.id)&&!x.lock).forEach(x=>{if(k==='arrowleft')x.x-=d;if(k==='arrowright')x.x+=d;if(k==='arrowup')x.y-=d;if(k==='arrowdown')x.y+=d}));return}
     if(e.shiftKey&&e.code==='Digit1'){fitTo(bounds(B.items),true);return}
     if(m&&(k==='='||k==='+')){e.preventDefault();zoomAt(1.2,innerWidth/2,innerHeight/2);return}if(m&&k==='-'){e.preventDefault();zoomAt(1/1.2,innerWidth/2,innerHeight/2);return}
-    if(m)return;if(k==='l'){libToggle();return}const map={v:'select',h:'hand',f:'frame',t:'text',n:'sticky',s:'shape',p:'pen',d:'line',a:'answer'};if(map[k]){setTool(map[k]);return}if(k==='i')q('bdFile').click()});
+    if(m)return;if(k==='l'){libToggle();return}const map={v:'select',h:'hand',f:'frame',t:'text',n:'sticky',s:'shape',p:'pen',d:'line',e:'erase',a:'answer'};if(map[k]){setTool(map[k]);return}if(k==='i')q('bdFile').click()});
   addEventListener('keyup',e=>{if(OPEN&&e.code==='Space'){SPACE=false;setTool(TOOL)}});
   addEventListener('paste',e=>{if(!OPEN||EDIT)return;const fs=[...(e.clipboardData&&e.clipboardData.files||[])].filter(f=>/^image\//.test(f.type));
     if(fs.length){e.preventDefault();addImages(fs);return}paste()});
@@ -7492,6 +7573,17 @@ const BD=(()=>{
     root.appendChild(p);p.style.left=Math.max(8,Math.min(x,innerWidth-p.offsetWidth-8))+'px';p.style.top=Math.max(8,Math.min(y,innerHeight-p.offsetHeight-8))+'px';
     p.querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>{closePop();items[+b.dataset.i][1]()})}
   function closePop(){const p=root&&root.querySelector('#bdPop');if(p)p.remove()}
+  /* ластик: стирает линию, если курсор прошёл рядом с самой линией, а не просто внутри её рамки */
+  function segD(px,py,ax,ay,bx,by){const dx=bx-ax,dy=by-ay,l=dx*dx+dy*dy;let t=l?((px-ax)*dx+(py-ay)*dy)/l:0;t=Math.max(0,Math.min(1,t));return Math.hypot(px-ax-t*dx,py-ay-t*dy)}
+  function nearLine(it,x,y,r){let P=[];
+    if(it.t==='line'){const[x1,y1,cx,cy,x2,y2]=linePts(it);for(let k=0;k<=24;k++){const t=k/24,u=1-t;P.push(u*u*x1+2*u*t*cx+t*t*x2,u*u*y1+2*u*t*cy+t*t*y2)}}
+    else{const q=it.pts||[],kx=it.w/(it.vw||it.w),ky=it.h/(it.vh||it.h);for(let i=0;i<q.length;i+=2)P.push(it.x+q[i]*kx,it.y+q[i+1]*ky)}
+    const tol=r+(+it.sw||4)/2;if(P.length===2)return Math.hypot(P[0]-x,P[1]-y)<=tol;
+    for(let i=0;i+3<P.length;i+=2)if(segD(x,y,P[i],P[i+1],P[i+2],P[i+3])<=tol)return true;return false}
+  function eraseAt(e,d){const w=toW(e.clientX,e.clientY),r=10/VIEW.s;
+    for(const it of B.items){if((it.t!=='pen'&&it.t!=='line')||it.lock||d.gone.has(it.id))continue;
+      if(w.x<it.x-r-20||w.x>it.x+it.w+r+20||w.y<it.y-r-20||w.y>it.y+it.h+r+20)continue;
+      if(nearLine(it,w.x,w.y,r)){d.gone.add(it.id);const el=EL.get(it.id);if(el)el.style.opacity='.15'}}}
   let hintT=null;function hint(t){if(!root)return;const h=q('bdHint');h.textContent=t;h.classList.add('bd-on');clearTimeout(hintT);hintT=setTimeout(()=>h.classList.remove('bd-on'),2400)}
   /* фреймы по порядку: сверху вниз, слева направо */
   const frames=items=>items.filter(x=>x.t==='frame').sort((a,b)=>Math.abs(a.y-b.y)>a.h/2?a.y-b.y:a.x-b.x);
