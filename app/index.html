@@ -730,9 +730,9 @@ button.wait-chip:hover{filter:brightness(.96)}
 .allt .search{padding:12px 0 0}
 .allt #pmain{margin:6px -18px -14px}
 
-.sh-items>.pfill{flex:0 0 100%;display:flex;justify-content:flex-end}
+.sh-items>.pfill{flex:0 0 100%;display:flex;justify-content:flex-end;align-items:flex-end;position:relative}
 .sh-items>.pfill.left{justify-content:flex-start}
-.pfill img.art.pic{height:100%;width:auto;max-width:60%;object-fit:contain}
+.pfill img.art.pic{height:100%;width:auto;max-width:60%;object-fit:contain;position:relative;z-index:2}
 
 /* ---------- аккаунт в шапке ---------- */
 .acct{margin-left:auto;display:flex;align-items:center;gap:10px}
@@ -837,8 +837,8 @@ body.cabinet .top{display:none}
 .sheet.lv5 .sh-foot{flex:none;border-top:0;justify-content:flex-end;font-size:2cqw;line-height:2.6cqw;height:2.6cqw;color:#9aa3b8;padding-top:0}
 .sheet.lv5 .sh-foot span:first-child{display:none}
 /* «Тетрадь»: клетка там, где она нужна по смыслу — фигуры на клетках (площадь, периметр, симметрия) */
-.sheet.lv5 .gfig.on{background-image:linear-gradient(#c9dcf0 1px,transparent 1px),linear-gradient(90deg,#c9dcf0 1px,transparent 1px);background-size:var(--c) var(--c);background-position:-1px -1px;box-shadow:0 0 0 1px #c9dcf0}
-.sheet.lv5 .grp{line-height:1.3 !important;min-height:0 !important;padding:calc(var(--c) * .3) 0}
+
+.sheet.lv5 .grp{line-height:var(--c) !important;min-height:var(--c) !important;padding:0;background:#fff;box-shadow:none}
 .sheet.lv5 .mood .md{gap:calc(var(--c) * .4)}
 .sheet.lv5 .mood .md-pic{width:auto;height:calc(var(--c) * 3.6);object-fit:contain}
 .sheet.lv5 .mood .md i{font-size:calc(var(--c) * .55);color:#1F2C55}
@@ -846,12 +846,13 @@ body.cabinet .top{display:none}
 .sheet.lv5 .wq2 .sl{color:var(--p1);font-weight:700;font-size:calc(var(--c) * .45)}
 .sheet.lv5 .aline span{color:var(--p1);font-weight:700}
 .sheet.lv5 .aline i{border-bottom-color:var(--p1)}
-.sheet.lv5 .wq2 .sol2,.sheet.lv5 .wq2 .kz,.sheet.lv5 .wq2 .aline{background-image:linear-gradient(color-mix(in srgb,var(--p4) 32%,#fff) 1px,transparent 1px),linear-gradient(90deg,color-mix(in srgb,var(--p4) 32%,#fff) 1px,transparent 1px) !important}
+.sheet.lv5 .wq2 .sol2,.sheet.lv5 .wq2 .kz,.sheet.lv5 .wq2 .aline{background:none !important}
 .sheet.lv5 .kz{border-bottom-color:color-mix(in srgb,var(--p1) 55%,#fff)}
 .gico5{width:calc(var(--c) * .95);height:calc(var(--c) * .95);display:inline-block;vertical-align:-.2em;margin-right:.35em}
 /* ---------- стиль «Тетрадь»: как бумажный рабочий лист ---------- */
 .sheet.lv5 .fr,.sheet.lv5 .deco{display:none}
-.sheet.lv5 .sh-items,.sheet.lv5 .sh-head{background-image:none !important;box-shadow:none !important;background-color:#fff}
+.sheet.lv5 .sh-head{background-image:none !important;box-shadow:none !important;background-color:#fff}
+.sheet.lv5 .sh-items{background-image:linear-gradient(color-mix(in srgb,var(--p4) 22%,#e8eef7) 1px,transparent 1px),linear-gradient(90deg,color-mix(in srgb,var(--p4) 22%,#e8eef7) 1px,transparent 1px) !important;box-shadow:0 0 0 1px color-mix(in srgb,var(--p4) 22%,#e8eef7) !important;background-color:#fff}
 .sheet.lv5 .sh-items{font-family:'Comfortaa',var(--f-ui);font-size:3.6cqw}
 .sheet.lv5 .sheet-in,.sheet.lv5 .sh-items,.sheet.lv5 .sh-head{--c:3.3cqw}
 .sheet.lv5 .sheet-in{padding:5cqw 4.5cqw}
@@ -862,8 +863,7 @@ body.cabinet .top{display:none}
 .sheet.lv5 .grp b{color:inherit}
 .sheet.lv5 .grp .gn{display:inline;background:none;color:inherit;width:auto;height:auto;font-size:inherit;margin-right:.3em;vertical-align:baseline}
 /* на белом листе примеры пишутся обычной строкой, а не по клеткам; окошко ответа остаётся прямоугольником */
-.sheet.lv5 .crow>.c:not(.circ){width:auto;min-width:.55em;padding:0 .06em}
-.sheet.lv5 .crow>.c:empty{min-width:.35em}
+
 .sheet.lv5 .grp .gn::after{content:'.'}
 .sheet.lv5 .cbox{box-shadow:inset 0 0 0 .25cqw var(--p1);border-radius:0}
 .sheet.lv5 .box{border-radius:0;border-color:var(--p1)}
@@ -4560,7 +4560,13 @@ function picPad(src){if(PICF[src])return Promise.resolve(PICF[src]);return new P
 /* персонаж в правом нижнем углу сетки решения: правый край рисунка — у края листа, низ — на линии ответа.
    Сетка идёт на всю ширину; белое только прямо под персонажем (на полторы клетки уже рисунка), поэтому
    над ним клетки продолжаются и он заходит на них. Размер — около трети ширины, но в пределах высоты решения. */
-function fitPics(root){(root||document).querySelectorAll('.wq-row .wq-pic').forEach(img=>{const go=()=>picPad(img.src).then(f=>{
+function fitFree(root){(root||document).querySelectorAll('.sheet.lv5 .pfill img.pic').forEach(img=>{const go=()=>picPad(img.src).then(f=>{
+  const sh=img.closest('.sheet'),cell=sh.clientWidth*cellOf(sh)/100,box=img.parentNode,H=box.clientHeight/Math.max(.3,1-f.t-f.b),W=H*f.ar;
+  Object.assign(img.style,{height:H+'px',width:W+'px',maxWidth:'none',marginRight:(-f.r*W)+'px',marginBottom:(-f.b*H)+'px'});
+  let c=box.querySelector('.wq-cut');if(!c){c=document.createElement('div');c.className='wq-cut';box.insertBefore(c,img)}
+  Object.assign(c.style,{width:Math.max(0,W*(1-f.l-f.r)-1.5*cell)+'px',height:Math.max(0,box.clientHeight-1.5*cell)+'px'})});
+  img.complete&&img.naturalWidth?go():img.addEventListener('load',go,{once:true})})}
+function fitPics(root){fitFree(root);(root||document).querySelectorAll('.wq-row .wq-pic').forEach(img=>{const go=()=>picPad(img.src).then(f=>{
   const sh=img.closest('.sheet'),cell=sh?sh.clientWidth*cellOf(sh)/100:16,row=img.closest('.wq-row'),rw=row.clientWidth,rh=row.clientHeight,fv=Math.max(.2,1-f.l-f.r),fh=Math.max(.2,1-f.t-f.b);
   const kz=row.closest('.rb')&&row.closest('.rb').querySelector('.kz'),room=rh+(kz?kz.offsetHeight*.8:0);
   let H=Math.max(7*cell,Math.min(.36*rw/(fv*f.ar),room/fh*.95,13*cell/fh));const W=H*f.ar,vis=W*fv,visH=H*fh,cut=Math.max(0,vis-1.5*cell);
