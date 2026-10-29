@@ -846,13 +846,17 @@ body.cabinet .top{display:none}
 .sheet.lv5 .wq2 .sl{color:var(--p1);font-weight:700;font-size:calc(var(--c) * .45)}
 .sheet.lv5 .aline span{color:var(--p1);font-weight:700}
 .sheet.lv5 .aline i{border-bottom-color:var(--p1)}
-.sheet.lv5 .wq2 .sol2,.sheet.lv5 .wq2 .kz,.sheet.lv5 .wq2 .aline{background:none !important}
+.sheet.lv5 .wq2 .sol2,.sheet.lv5 .wq2 .kz,.sheet.lv5 .wq2 .aline{background-color:transparent !important;background-image:linear-gradient(color-mix(in srgb,var(--p4) 22%,#e8eef7) 1px,transparent 1px),linear-gradient(90deg,color-mix(in srgb,var(--p4) 22%,#e8eef7) 1px,transparent 1px) !important;background-size:var(--c) var(--c) !important}
 .sheet.lv5 .kz{border-bottom-color:color-mix(in srgb,var(--p1) 55%,#fff)}
 .gico5{width:calc(var(--c) * .95);height:calc(var(--c) * .95);display:inline-block;vertical-align:-.2em;margin-right:.35em}
 /* ---------- стиль «Тетрадь»: как бумажный рабочий лист ---------- */
 .sheet.lv5 .fr,.sheet.lv5 .deco{display:none}
 .sheet.lv5 .sh-head{background-image:none !important;box-shadow:none !important;background-color:#fff}
-.sheet.lv5 .sh-items{background-image:linear-gradient(color-mix(in srgb,var(--p4) 22%,#e8eef7) 1px,transparent 1px),linear-gradient(90deg,color-mix(in srgb,var(--p4) 22%,#e8eef7) 1px,transparent 1px) !important;box-shadow:0 0 0 1px color-mix(in srgb,var(--p4) 22%,#e8eef7) !important;background-color:#fff}
+.sheet.lv5 .sh-items{background-image:none !important;box-shadow:none !important;background-color:#fff;position:relative}
+.sheet.lv5 .sh-items>*{position:relative;z-index:1}
+/* клетка только там, где пишут: под группой примеров (блок на всю ширину), под решением задачи, под фигурами */
+.sheet.lv5 .sh-items>.gbg{position:absolute;left:0;right:0;z-index:0;pointer-events:none;background-image:linear-gradient(color-mix(in srgb,var(--p4) 22%,#e8eef7) 1px,transparent 1px),linear-gradient(90deg,color-mix(in srgb,var(--p4) 22%,#e8eef7) 1px,transparent 1px);background-size:var(--c) var(--c)}
+.sheet.lv5 .gfig.on{background-image:linear-gradient(color-mix(in srgb,var(--p4) 22%,#e8eef7) 1px,transparent 1px),linear-gradient(90deg,color-mix(in srgb,var(--p4) 22%,#e8eef7) 1px,transparent 1px);background-size:var(--c) var(--c);background-position:-1px -1px}
 .sheet.lv5 .sh-items{font-family:'Comfortaa',var(--f-ui);font-size:3.6cqw}
 .sheet.lv5 .sheet-in,.sheet.lv5 .sh-items,.sheet.lv5 .sh-head{--c:3.3cqw}
 .sheet.lv5 .sheet-in{padding:5cqw 4.5cqw}
@@ -4543,6 +4547,7 @@ function paginate(host,items,o){
       if(last.classList.contains('mood')||last.classList.contains('pfill')){last.remove();continue}
       const nx=host.children[pi+1]||newPage(false),ng=nx.querySelector('.sh-items');ng.insertBefore(last,ng.firstChild);
       if(g.lastElementChild&&g.lastElementChild.classList.contains('grp')&&g.children.length>1)ng.insertBefore(g.lastElementChild,ng.firstChild)}}
+  if(host.querySelector('.sheet.lv5'))gridUnder(host);
   /* в «Тетради» внизу только номер страницы */
   const pages=[...host.children];pages.forEach((pg,k)=>pg.querySelector('.pg').textContent=pg.classList.contains('lv5')?(pages.length>1?`${k+1}`:''):`Страница ${k+1} из ${pages.length} · ${s.footR}`);
   fitPics(host);
@@ -4551,6 +4556,14 @@ function paginate(host,items,o){
 /* персонаж у сетки решения: у картинки прозрачные поля, поэтому находим, где начинается рисунок,
    и сдвигаем картинку так, чтобы рисунок заходил на клетки на полторы клетки */
 const PICF={};
+/* «Тетрадь»: клетка под каждой группой примеров — от первой строки до последней, на всю ширину, по линиям общей сетки */
+function gridUnder(host){host.querySelectorAll('.sheet.lv5').forEach(pg=>{const g=pg.querySelector('.sh-items');if(!g)return;g.querySelectorAll(':scope>.gbg').forEach(x=>x.remove());
+  const c=pg.clientWidth*cellOf(pg)/100,gr=g.getBoundingClientRect(),runs=[];let cur=null;
+  for(const el of g.children){const writes=el.classList.contains('ci')||(el.classList.contains('it')&&el.querySelector('.ccol,.cbox,.box')&&!el.classList.contains('wq2')&&!el.classList.contains('mood'));
+    if(writes){const r=el.getBoundingClientRect();if(!cur)runs.push(cur={t:r.top,b:r.bottom});cur.t=Math.min(cur.t,r.top);cur.b=Math.max(cur.b,r.bottom)}
+    else if(el.classList.contains('grp')||el.classList.contains('wq2')||el.classList.contains('pfill')||el.classList.contains('mood'))cur=null}
+  for(const r of runs){const top=Math.max(0,Math.floor((r.t-gr.top)/c-.5)*c),bot=Math.min(g.clientHeight,Math.ceil((r.b-gr.top)/c+.5)*c);
+    const d=document.createElement('div');d.className='gbg';d.style.top=top+'px';d.style.height=(bot-top)+'px';g.insertBefore(d,g.firstChild)}})}
 /* где у картинки начинается и кончается рисунок: доли ширины слева и справа, доля высоты снизу, пропорции */
 function picPad(src){if(PICF[src])return Promise.resolve(PICF[src]);return new Promise(res=>{const im=new Image();im.onload=()=>{let r={l:0,r:0,b:0,ar:im.naturalWidth/Math.max(1,im.naturalHeight)};try{
   const w=Math.min(240,im.naturalWidth),h=Math.max(1,Math.round(im.naturalHeight*w/im.naturalWidth)),c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');x.drawImage(im,0,0,w,h);
@@ -5197,7 +5210,8 @@ function showSearch(st,subj){
 }
 function openTopicSub(tid,over,name){openTopic(tid);if(over){V.over=over;V.subName=name||'выбранный вид';V.seed=newSeed();render()}}
 function openTopic(tid,extra){const m=mastery(V.studentId,tid);const lv=m.cls==='ok'?2:m.cls==='bad'?0:1;
-  go({screen:'topic',topicId:tid,level:Math.min(lv,TOPICS[tid].L.length-1),seed:newSeed(),over:null,subName:null,confirmDel:false,blocks:null,...(extra||{})})}
+  const o={screen:'topic',topicId:tid,level:lv,seed:newSeed(),over:null,subName:null,confirmDel:false,blocks:null,...(extra||{})};
+  o.level=Math.max(0,Math.min(o.level,TOPICS[tid].L.length-1));go(o)}
 
 function curParams(){const t=TOPICS[V.topicId];return{...t.L[V.level].p,...(V.over||{})}}
 
