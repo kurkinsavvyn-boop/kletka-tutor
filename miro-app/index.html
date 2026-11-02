@@ -1,0 +1,24 @@
+<!doctype html><meta charset="utf-8"><title>Клетка — перенос досок</title>
+<script src="https://miro.com/app/static/sdk/v2/miro.js"></script>
+<body style="font:14px sans-serif">Клетка: перенос доски (только чтение)
+<script>
+// Только чтение доски: порядок слоёв и картинки так, как они показаны (с обрезкой).
+// Данные уходят родительской странице сообщениями; доска не меняется.
+const send=m=>parent.postMessage(Object.assign({kletka:1},m),'*');
+let started=false;
+addEventListener('message',e=>{if(e.data&&e.data.kletkaStart&&!started){started=true;run(e.data.have||[]).catch(err=>send({t:'log',s:'ERR '+err.message}))}});
+async function run(have){
+  const info=await miro.board.getInfo();const bid=info.id;
+  const items=await miro.board.get();send({t:'log',board:bid,s:bid+': объектов '+items.length});
+  const layers={};
+  for(const it of items){try{layers[it.id]=await miro.board.getLayerIndex(it)}catch(e){}}
+  send({t:'layers',board:bid,layers});
+  const imgs=items.filter(i=>i.type==='image');let n=0;
+  for(const im of imgs){n++;if(have.includes(im.id))continue;
+    try{send({t:'img',board:bid,id:im.id,data:await im.getDataUrl()})}catch(e){send({t:'log',s:'ошибка '+im.id+' '+e.message})}
+    if(n%20==0)send({t:'log',s:'картинки '+n+' из '+imgs.length});
+    await new Promise(r=>setTimeout(r,30))}
+  send({t:'done',board:bid});
+}
+send({t:'ready'});
+</script>
