@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Опрос о листах Клетки</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@600;700&family=Nunito:wght@400;600;700&display=swap">
+<style>
+/* Лист в клетку: один столбец вопросов на тетрадной сетке, разделы как задания листа */
+:root{
+  --bg:#F7F9FC; --paper:#FFFFFF; --grid:#DCE7F2; --ink:#1F2A44; --muted:#4F5A78;
+  --accent:#0B7A68; --accent-ink:#FFFFFF; --violet:#5B44CF; --line:#C9D5E6; --soft:#E6F4F1;
+  --display:"Comfortaa",ui-rounded,"Arial Rounded MT Bold",system-ui,sans-serif;
+  --body:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root{
+  --bg:#121726; --paper:#1A2133; --grid:#232D45; --ink:#E8ECF6; --muted:#A3ADC6;
+  --accent:#3CC9B0; --accent-ink:#0E1A18; --violet:#A595FF; --line:#33405E; --soft:#17302C; color-scheme:dark}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 var(--body);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:20px 20px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:calc(28px + env(safe-area-inset-top,0px)) calc(64px + env(safe-area-inset-bottom,0px))}
+.wrap{max-width:740px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+h1{font:700 clamp(26px,5vw,34px)/1.2 var(--display);margin:0;text-wrap:balance}
+h2{font:700 21px/1.3 var(--display);margin:0;color:var(--accent);text-wrap:balance}
+h3{font:700 16.5px/1.35 var(--body);margin:0}
+p{margin:0}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:18px;min-width:0}
+.lead{color:var(--muted)}
+.done{background:var(--soft);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:4px}
+.done b{color:var(--accent)}
+.sn{font:700 13px var(--body);letter-spacing:.06em;text-transform:uppercase;color:var(--violet)}
+.said{border-left:3px solid var(--violet);padding:4px 0 4px 12px;color:var(--muted);font-size:15px}
+.said ul{margin:4px 0 0;padding-left:18px}
+.q{display:flex;flex-direction:column;gap:8px;padding-top:16px;border-top:1px dashed var(--line)}
+.q.first{border-top:0;padding-top:0}
+.hint{font-size:14.5px;color:var(--muted)}
+.opts{display:flex;flex-direction:column;gap:6px}
+label.opt{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border:1px solid var(--line);border-radius:10px;cursor:pointer}
+label.opt:has(input:checked){border-color:var(--accent);background:var(--soft)}
+label.opt input{margin-top:4px;accent-color:var(--accent);flex:none}
+textarea,input[type=text],input[type=number],select{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+textarea{min-height:60px;resize:vertical}
+textarea:focus,input:focus,select:focus,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.tbl{display:grid;grid-template-columns:minmax(0,1fr) 150px;gap:6px 10px;align-items:center}
+.tbl.three{grid-template-columns:minmax(0,1fr) 130px 90px}
+.tbl .h{font-size:13px;color:var(--muted);font-weight:700}
+@media (max-width:560px){.tbl,.tbl.three{grid-template-columns:1fr 1fr}.tbl .rl{grid-column:1/-1;font-weight:700;padding-top:6px}.tbl .h{display:none}}
+.progress{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:10px 14px;display:flex;gap:12px;align-items:center;font-size:14px}
+.bar{flex:1;height:8px;background:var(--grid);border-radius:4px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
+.actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+button{font:700 16px var(--body);border-radius:10px;padding:12px 18px;cursor:pointer;border:1px solid var(--line);background:var(--paper);color:var(--ink)}
+button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+button:disabled{opacity:.6;cursor:default}
+.status{font-size:15px}
+.status.ok{color:var(--accent);font-weight:700}
+.status.err{color:#B3261E}
+pre{white-space:pre-wrap;word-break:break-word;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px;font:13px/1.5 ui-monospace,Menlo,monospace;max-height:320px;overflow:auto;margin:0}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="card">
+    <h1>Опрос о рабочих листах</h1>
+    <p class="lead">Спасибо за подробный разбор! Мы прослушали все замечания. Чтобы переделать листы правильно с первого раза, нам нужны ваши ответы. Вопросов много, но почти везде достаточно отметить вариант. Поля для пояснений можно пропускать. Черновик сохраняется сам на этом устройстве: можно закрыть страницу и вернуться позже.</p>
+    <div class="done">
+      <p><b>Уже решили по вашим замечаниям:</b></p>
+      <p>• Число в блоке везде будет значить «примеров в задании», так и будет подписано. Вместо скрытых стрелок появятся кнопки − и +.</p>
+      <p>• Кнопки ↑ ↓ ✕ переедут в строку с названием темы.</p>
+      <p>• С листа уйдут подписи «Разминка», «Тема урока», «Бонус» и название темы. Останутся номер и формулировка задания.</p>
+      <p>• В геометрии появятся точные формулировки и поле в клетку без слова «Решение». Неизвестной будет то длина, то ширина.</p>
+      <p>• Герои будут на всех страницах. Обрезанные картинки исправим.</p>
+      <p>• Работаем по учебникам Моро.</p>
+    </div>
+    <div class="q first"><h3>Ваше имя</h3><input type="text" id="name" autocomplete="name" placeholder="Например, Анна"></div>
+  </section>
+  <div class="progress" aria-hidden="true"><span id="pct">Отвечено 0%</span><div class="bar"><i id="bar"></i></div></div>
+  <div id="form" class="wrap" style="gap:20px"></div>
+  <section class="card">
+    <h2>Отправка</h2>
+    <p class="lead">Можно отправить, даже если ответили не на всё. Если позже захотите что-то добавить, заполните ещё раз: мы прочитаем последний ответ.</p>
+    <div class="actions">
+      <button class="primary" id="send" type="button">Отправить ответы</button>
+      <button id="copy" type="button">Скопировать ответы текстом</button>
+    </div>
+    <p class="status" id="status" role="status"></p>
+    <pre id="out" hidden></pre>
+  </section>
+</div>
+<script>
+/* Анкета задаётся данными: раздел -> вопросы. Типы: one (один вариант), many (несколько), text, tbl (таблица выбора по строкам). */
+const S=[
+ {t:'О вашей работе',q:[
+  {id:'grades',h:'С какими классами вы работаете?',type:'many',o:['1 класс','2 класс','3 класс','4 класс','5 класс и старше']},
+  {id:'format_work',h:'Как проходят занятия?',type:'many',o:['Индивидуально очно','Индивидуально онлайн','В мини-группе очно','В мини-группе онлайн']},
+  {id:'use',h:'Для чего вам нужны листы?',type:'many',o:['Работа на уроке','Домашнее задание','Проверочная или контрольная','Повторение перед контрольной в школе','Пятиминутка в начале урока','Олимпиадные или развивающие задания']},
+  {id:'how_do',h:'Как ребёнок обычно выполняет лист?',type:'many',o:['Печатаю, решает ручкой','Решает на экране по ссылке','Вклеивает в тетрадь','Показываю на экране во время онлайн-урока, решает в тетради']},
+  {id:'print',h:'Как вы печатаете?',type:'one',hint:'Это важно для картинок: в чёрно-белой печати цветные герои выглядят серыми пятнами.',o:['Цветной принтер','Чёрно-белый принтер','Печатают родители','Почти не печатаю']},
+  {id:'freq',h:'Сколько листов вы делаете в неделю?',type:'one',o:['1–3','4–10','11–20','Больше 20']},
+  {id:'time',h:'Сколько времени сейчас уходит на один лист без Клетки?',type:'one',o:['До 10 минут','10–30 минут','30–60 минут','Больше часа']}]},
+ {t:'Уровни сложности',said:'Вы говорили: уровни сейчас отличаются набором единиц, а не глубиной. На сложном уровне масс одни переводы, а средний уровень в задачах на движение такой же лёгкий, как базовый: одно действие.',q:[
+  {id:'lv_rule',h:'Предлагаем общее правило для всех тем. Подходит?',type:'one',hint:'Базовый: одно действие, прямой вопрос, без перехода через разряд. Средний: обратная задача или два действия, с переходом через разряд. Сложный: два-три действия, косвенная формулировка, разные единицы, разные виды заданий вперемешку.',o:['Да, подходит','Подходит с поправками (напишу ниже)','Нужно по-другому (напишу ниже)'],note:''},
+  {id:'axes',h:'Что делает задание сложнее? Отметьте всё, что считаете важным',type:'many',hint:'Программа будет подбирать задания по этим признакам сама, во всех темах.',o:['Число действий: одно, два, три','Обратная задача: найти не результат, а одно из данных','Переход через разряд, нули в числе, остаток','Величина и разрядность чисел','Косвенная формулировка («это на 5 меньше, чем…»)','Разные единицы в одном задании (дм и см, т и кг)','Задания разных видов вперемешку','Лишние или недостающие данные в задаче','Нужно самому составить выражение или схему','Неизвестное стоит в начале (□ + 5 = 12)']},
+  {id:'axes_top',h:'Какие три признака самые важные?',type:'text',hint:'Своими словами или номерами из списка выше.'},
+  {id:'lv_meaning',h:'Как уровни связаны с ребёнком?',type:'one',o:['Базовый — для слабого ученика, сложный — для сильного, тема одна','Уровни — это шаги: сначала базовый, потом средний, потом сложный для одного и того же ребёнка','И то и другое']},
+  {id:'lv_mix',h:'Нужна «лесенка» внутри одного задания: первые примеры лёгкие, последние сложнее?',type:'one',o:['Да, всегда','Да, но как отдельный выбор','Нет, весь блок одного уровня']},
+  {id:'lv_school',h:'Сложный уровень может выходить за программу класса?',type:'one',o:['Нет, только программа класса','Немного, на один шаг вперёд','Да, для сильных учеников это нормально']},
+  {id:'lv_bad',h:'В каких темах уровни сейчас хуже всего?',type:'text',hint:'Напишите тему и как должно быть. Хватит одного-двух примеров заданий.'}]},
+ {t:'Задачи на движение',q:[
+  {id:'mv_kinds',h:'Какие виды задач на движение нужны в 4 классе?',type:'many',o:['Найти расстояние','Найти скорость','Найти время','Встречное движение','Движение в противоположных направлениях','Движение вдогонку','Движение с отставанием','Два участка пути с разной скоростью','Средняя скорость']},
+  {id:'mv_circle',h:'Круговое движение нужно?',type:'one',o:['Нет, это не программа начальной школы','Да, для сильных учеников','Не знаю, посмотрю по Моро']},
+  {id:'mv_scheme',h:'Нужен ли чертёж (схема) к задачам на движение?',type:'one',o:['Да, готовый чертёж','Да, ребёнок чертит сам, нужно место','Только краткая запись или таблица','Не нужен']}]},
+ {t:'Величины: масса, длина, время, площадь',q:[
+  {id:'kinds',h:'Какие виды заданий с величинами добавить?',type:'many',hint:'Сейчас есть только перевод: 5 т 8 ц = □ кг.',o:['Перевод: 5 т 8 ц = □ кг','Сравнение: 3 т 2 ц ◯ 3020 кг','Сложение и вычитание: 5 т 8 ц + 2 т 5 ц','Умножение и деление на число: 2 т 4 ц × 3','Расставить по порядку от меньшей к большей','Текстовые задачи с величинами','Найди ошибку в переводе','Заполни таблицу единиц','Выбери подходящую единицу (масса слона — 4 □)']},
+  {id:'time_kinds',h:'Что нужно по времени?',type:'many',o:['Перевод единиц','Определи время по часам (картинка)','Сколько времени прошло (начало, конец, продолжительность)','Календарь: дни, месяцы, век','Время от 0 до 24 часов']},
+  {id:'kinds_note',h:'Пример задания с величинами, которого не хватает',type:'text'}]},
+ {t:'Геометрия',said:'Вы говорили: «Впиши ответ» непонятно куда, ребёнку нужно поле в клетку для чертежа и вычислений, задания однотипные.',q:[
+  {id:'geo_kinds',h:'Какие виды геометрических заданий нужны?',type:'many',o:['Начерти фигуру по размерам и найди площадь или периметр','Найди площадь или периметр по готовому чертежу','Найди сторону по площади или периметру','Сравни площади двух фигур','Фигура из прямоугольников (составная)','Палетка: посчитай клетки','Задачи на площадь в быту (комната, ковёр, участок)','Перевод единиц площади']},
+  {id:'geo_draw',h:'Чертёж к задаче',type:'one',o:['Даём готовый чертёж','Ребёнок чертит сам в клетках','По-разному, хочу выбирать']},
+  {id:'geo_space',h:'Сколько места оставлять для решения?',type:'one',o:['Примерно 5 клеток в высоту','Примерно 10 клеток','Сколько нужно по задаче, программа решает сама']}]},
+ {t:'Вычисления в столбик и выражения',q:[
+  {id:'col_view',h:'Как давать примеры в столбик?',type:'one',o:['Уже записанные в столбик, ребёнок решает','Записанные в строку, ребёнок сам переписывает в столбик','По-разному, хочу выбирать']},
+  {id:'col_check',h:'Нужно ли задание «выполни проверку» к делению и умножению?',type:'one',o:['Да','Иногда','Нет']},
+  {id:'expr_order',h:'Порядок действий: нужно ли место над знаками, чтобы ребёнок ставил номера действий?',type:'one',o:['Да','Нет']},
+  {id:'calc',h:'Задания на калькуляторе нужны?',type:'one',o:['Да, как в листе','Редко','Нет, лучше убрать']}]},
+ {t:'Текстовые задачи и краткая запись',q:[
+  {id:'kz',h:'Краткую запись включать и выключать',type:'one',o:['Для каждой задачи отдельно','Для блока задач сразу','Для всего листа, но переключатель на виду']},
+  {id:'kz_def',h:'По умолчанию краткая запись',type:'one',o:['Включена','Выключена','Зависит от уровня']},
+  {id:'kz_form',h:'Какая форма краткой записи нужна?',type:'many',o:['Строками (Было — …, Стало — …)','Таблица (цена, количество, стоимость; скорость, время, расстояние)','Схема или чертёж','Пустое поле в клетку, ребёнок решает сам']},
+  {id:'sol_form',h:'Как ребёнок записывает решение?',type:'many',o:['По действиям','По действиям с пояснениями','Выражением','Как хочет ребёнок, поле просто в клетку']},
+  {id:'ans_form',h:'Строка «Ответ:»',type:'one',o:['Нужна всегда','Нужна, но с подсказкой единиц (Ответ: ___ км)','Не нужна, ребёнок пишет ответ сам']},
+  {id:'word_kinds',h:'Каких задач не хватает?',type:'many',o:['Цена, количество, стоимость','Работа (производительность)','Задачи на доли','Задачи на нахождение неизвестного по двум разностям','Логические задачи','Задачи с лишними данными','Составь задачу по схеме или выражению','Измени вопрос задачи']}]},
+ {t:'Формат листа и размер',said:'Вы говорили: на A4 сейчас помещается всего 2 задания, шрифт слишком крупный. Ваш образец был на половине A4 (A5). Вклейки и пятиминутки в 3–4 раза меньше A4. Короткие примеры можно ставить в 2 столбика. Лист на 3–4 страницы ребёнку слишком много. Сейчас клетка на листе около 7 мм, в тетради 5 мм.',q:[
+  {id:'fmt',h:'Какие форматы нужны и как часто?',type:'tbl',rows:['A4, целый лист','A5, половина A4','Вклейка, треть A4','Вклейка, четверть A4','Пятиминутка'],cols:['Часто','Иногда','Не нужен'],num:'Заданий обычно'},
+  {id:'fmt_main',h:'Какой формат открывать по умолчанию?',type:'one',o:['A4','A5','Вклейка']},
+  {id:'five',h:'Что такое пятиминутка в вашей работе?',type:'text',hint:'Сколько заданий, каких, сколько времени на неё.'},
+  {id:'glue',h:'Вклейки и пятиминутки: как печатать?',type:'one',o:['Несколько одинаковых копий на одном A4 с линиями разреза','Разные варианты на одном A4 с линиями разреза','Одна вклейка на листе, лишнее отрежу сама']},
+  {id:'cell',h:'Размер клетки',type:'one',o:['5 мм, как в тетради','Чуть крупнее, около 6 мм, для младших','Хочу выбирать при создании листа']},
+  {id:'font_grade',h:'Шрифт и клетка крупнее для 1 класса, мельче для 4?',type:'one',o:['Да, по классу автоматически','Нет, везде одинаково']},
+  {id:'pages',h:'Сколько страниц A4 максимум у одного листа?',type:'one',o:['1 страница','1 лист с двух сторон','До 3 страниц','Не ограничивать']},
+  {id:'cols',h:'Столбики для коротких примеров',type:'one',o:['Всегда 2 столбика','Сколько влезет по ширине, 2–3','Хочу выбирать сама']},
+  {id:'variants',h:'Нужны варианты (1 и 2 вариант) для проверочных?',type:'one',o:['Да, 2 варианта','Да, до 4 вариантов','Нет']},
+  {id:'key',h:'Лист с ответами для вас',type:'one',o:['Нужен отдельной страницей','Нужен только на экране','Не нужен']}]},
+ {t:'Оформление и герои',q:[
+  {id:'heroes',h:'Сколько героев на одну страницу?',type:'one',o:['Ни одного, лист без картинок','1','2','3 и больше']},
+  {id:'hplace',h:'Где героям лучше стоять?',type:'many',o:['У края поля для решения (как сейчас)','В углах страницы','Рядом с заданием, не заходя на клетки','Внизу страницы','В шапке рядом с названием']},
+  {id:'hero_age',h:'Герои для 4 класса',type:'one',o:['Мультфильмы подходят всем классам','Для 3–4 класса лучше спокойнее или старше (космос, спорт, природа)','Пусть выбирает ребёнок']},
+  {id:'mood',h:'Блок «Моё настроение» внизу листа',type:'one',o:['Оставить','Оставить, но заменить на самооценку (понял, были ошибки, нужна помощь)','Убрать']},
+  {id:'head',h:'Что должно быть в шапке листа?',type:'many',o:['Имя','Дата','Класс','Название листа','Оценка или баллы','Ничего, только задания']},
+  {id:'instr',h:'Формулировки заданий',type:'one',o:['Коротко, как в учебнике: «Реши задачу»','Подробнее: «Реши задачу, запиши краткую запись и ответ»','Как в учебнике Моро, дословно']}]},
+ {t:'Работа в программе',q:[
+  {id:'tpl',h:'Какие виды листа полезны?',type:'tbl',rows:['Тренировка: одна тема','Урок: разминка, тема, задачи, бонус','Проверочная','Домашка','Свой лист из блоков'],cols:['Пользуюсь','Попробую','Не нужен']},
+  {id:'tpl_lesson',h:'Из чего должен состоять лист «Урок»?',type:'text',hint:'Например: устный счёт, повторение прошлой темы, новая тема, задача, геометрия.'},
+  {id:'confuse',h:'Что ещё в программе было непонятно или неудобно?',type:'text'},
+  {id:'prio',h:'Что сделать в первую очередь?',type:'tbl',rows:['Нормальные уровни сложности','Форматы A5 и вклейки, клетка как в тетради','Больше видов заданий','Помощник-чат: надиктовать лист голосом','Загрузить фото образца и сделать лист по нему','Удобный редактор блоков'],cols:['Срочно','Потом','Не нужно']}]},
+ {t:'Помощник-чат',said:'Вы просили: надиктовать или напечатать «нужен лист, столько-то заданий, такие-то», приложить фото образцов и править результат в диалоге.',q:[
+  {id:'ai_in',h:'Как удобнее давать задание помощнику?',type:'many',o:['Голосом','Текстом','Фото образца','Файл (PDF, Word)','Скрин страницы учебника']},
+  {id:'ai_out',h:'Что помощник должен выдавать?',type:'many',o:['Готовый лист сразу','Сначала план листа, потом лист','Отдельные задания, которые я добавлю в лист сама']},
+  {id:'ai_edit',h:'Как править результат?',type:'many',o:['Словами в чате («сделай задачу сложнее»)','Руками прямо на листе','Кнопками: «другое число», «заменить задание»']},
+  {id:'ai_example',h:'Опишите один реальный запрос, который вы бы дали помощнику',type:'text',hint:'Как если бы вы писали коллеге.'}]},
+ {t:'Напоследок',q:[
+  {id:'samples',h:'Есть листы, которые вы считаете идеальными?',type:'text',hint:'Напишите, откуда они. Сами файлы пришлите в мессенджере.'},
+  {id:'free',h:'Что ещё важно?',type:'text'}]}
+];
+const $=id=>document.getElementById(id),esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let qn=0;
+$('form').innerHTML=S.map((s,si)=>`<section class="card"><p class="sn">Раздел ${si+1} из ${S.length}</p><h2>${esc(s.t)}</h2>${s.said?`<p class="said">${esc(s.said)}</p>`:''}
+ ${s.q.map((q,i)=>{qn++;const hint=q.hint?`<p class="hint">${esc(q.hint)}</p>`:'';let body='';
+  if(q.type==='one'||q.type==='many')body=`<div class="opts" data-q="${q.id}">${q.o.map(o=>`<label class="opt"><input type="${q.type==='one'?'radio':'checkbox'}" name="${q.id}" value="${esc(o)}"> ${esc(o)}</label>`).join('')}</div><textarea id="${q.id}_note" rows="1" placeholder="Пояснение (не обязательно)"></textarea>`;
+  else if(q.type==='text')body=`<textarea id="${q.id}" rows="3"></textarea>`;
+  else body=`<div class="tbl${q.num?' three':''}"><span class="h"></span><span class="h">Ответ</span>${q.num?`<span class="h">${esc(q.num)}</span>`:''}${q.rows.map((r,k)=>`<span class="rl">${esc(r)}</span><select id="${q.id}_${k}" aria-label="${esc(r)}"><option value="">—</option>${q.cols.map(c=>`<option>${esc(c)}</option>`).join('')}</select>${q.num?`<input type="number" min="1" max="40" id="${q.id}_n${k}" placeholder="шт." aria-label="${esc(q.num)}: ${esc(r)}">`:''}`).join('')}</div>`;
+  return `<div class="q${i?'':' first'}"><h3>${qn}. ${esc(q.h)}</h3>${hint}${body}</div>`}).join('')}</section>`).join('');
+
+const fields=()=>[...document.querySelectorAll('textarea,input[type=text],input[type=number],select')];
+function collect(){const d={};fields().forEach(e=>{if(e.value.trim())d[e.id]=e.value.trim()});
+  document.querySelectorAll('.opts').forEach(g=>{const v=[...g.querySelectorAll('input:checked')].map(i=>i.value);if(v.length)d[g.dataset.q]=v});return d}
+function restore(d){fields().forEach(e=>{if(d[e.id]!=null)e.value=d[e.id]});
+  document.querySelectorAll('.opts').forEach(g=>{const v=d[g.dataset.q]||[];g.querySelectorAll('input').forEach(i=>{i.checked=v.includes(i.value)})})}
+function answered(q,d){if(q.type==='text')return!!d[q.id];if(q.type==='tbl')return q.rows.some((_,k)=>d[q.id+'_'+k]);return!!d[q.id]}
+function progress(){const d=collect();let n=0,a=0;S.forEach(s=>s.q.forEach(q=>{n++;if(answered(q,d))a++}));const p=Math.round(a/n*100);$('pct').textContent='Отвечено '+p+'%';$('bar').style.width=p+'%'}
+function asText(d){const L=['ОПРОС О ЛИСТАХ КЛЕТКИ','Имя: '+(d.name||'—')];let k=0;
+  S.forEach(s=>{L.push('','== '+s.t.toUpperCase()+' ==');s.q.forEach(q=>{k++;let v;
+    if(q.type==='text')v=d[q.id]||'—';
+    else if(q.type==='tbl')v='\n'+q.rows.map((r,i)=>'   • '+r+': '+(d[q.id+'_'+i]||'—')+(q.num&&d[q.id+'_n'+i]?', заданий: '+d[q.id+'_n'+i]:'')).join('\n');
+    else v=(d[q.id]||['—']).join('; ')+(d[q.id+'_note']?' | '+d[q.id+'_note']:'');
+    L.push(k+'. '+q.h+': '+v)})});return L.join('\n')}
+const KEY='kletka-opros-v2';
+try{const s=localStorage.getItem(KEY);if(s)restore(JSON.parse(s))}catch(e){}
+progress();
+const keep=()=>{try{localStorage.setItem(KEY,JSON.stringify(collect()))}catch(e){}progress()};
+document.addEventListener('input',keep);document.addEventListener('change',keep);
+function showText(){const o=$('out');o.textContent=asText(collect());o.hidden=false;return o.textContent}
+$('copy').addEventListener('click',()=>{const t=showText(),st=$('status');
+  (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>{st.className='status ok';st.textContent='Скопировано. Пришлите этот текст в мессенджере.'},
+  ()=>{const r=document.createRange();r.selectNodeContents($('out'));const s=getSelection();s.removeAllRanges();s.addRange(r);st.className='status';st.textContent='Текст выделен: скопируйте его и пришлите в мессенджере.'})});
+const API='https://153-76-170-187.sslip.io/api/collections/survey/records';
+$('send').addEventListener('click',async()=>{const d=collect(),st=$('status'),b=$('send');
+  b.disabled=true;st.className='status';st.textContent='Отправляем…';
+  try{const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:(d.name||'').slice(0,200),answers:d,text:asText(d)})});
+    if(!r.ok)throw new Error(r.status);st.className='status ok';st.textContent='Ответы отправлены. Спасибо!'}
+  catch(e){showText();st.className='status err';st.textContent='Не получилось отправить. Нажмите «Скопировать ответы текстом» и пришлите текст в мессенджере.'}
+  finally{b.disabled=false}});
+</script>
+</body>
+</html>
