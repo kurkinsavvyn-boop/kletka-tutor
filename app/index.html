@@ -840,8 +840,8 @@ body.cabinet .top{display:none}
 /* «Тетрадь»: клетка там, где она нужна по смыслу — фигуры на клетках (площадь, периметр, симметрия) */
 
 .sheet.lv5 .grp{line-height:var(--c) !important;min-height:var(--c) !important;padding:0;background:#fff;box-shadow:none}
-.sheet.lv5 .mood .md{gap:calc(var(--c) * .4)}
-.sheet.lv5 .mood .md-pic{width:auto;height:calc(var(--c) * 3.6);object-fit:contain}
+.sheet.lv5 .mood .md{gap:calc(var(--c) * .3)}
+.sheet.lv5 .mood .md-pic{width:calc(var(--c) * 4.5);height:calc(var(--c) * 3.6);object-fit:contain}
 .sheet.lv5 .mood .md i{font-size:calc(var(--c) * .55);color:#1F2C55}
 /* «Тетрадь»: цвет сюжета в подписях, линии ответа и сетке решения */
 .sheet.lv5 .wq2 .sl{color:var(--p1);font-weight:700;font-size:calc(var(--c) * .45)}
@@ -885,9 +885,12 @@ body.cabinet .top{display:none}
 .wq-cut{position:absolute;right:0;bottom:0;background:#fff;z-index:1;pointer-events:none}
 .wq-row .wq-pic{position:absolute;right:0;bottom:0;height:calc(var(--c) * 7);width:auto;max-width:none;object-fit:contain;pointer-events:none;z-index:2}
 .sheet.lv5 .mood{display:flex;align-items:center;gap:calc(var(--c) * 1.5);font-family:'Pangolin','Neucha',cursive;color:var(--p1);font-size:calc(var(--c) * .72);margin-top:var(--c)}
-.mood .md{display:inline-flex;align-items:center;gap:calc(var(--c) * .3)}
+/* два варианта — одинаковые колонки: картинка по центру, под ней подпись и клетка */
+.mood .md{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:calc(var(--c) * .3)}
+.mood .md-l{display:inline-flex;align-items:center;gap:calc(var(--c) * .3)}
+.mood>b{align-self:center}
 .mood .md i{font-style:normal;font-size:calc(var(--c) * .5);color:#5b6684}
-.mood .md-pic{height:calc(var(--c) * 3);width:auto}
+.mood .md-pic{height:calc(var(--c) * 3);width:calc(var(--c) * 3.8);object-fit:contain}
 .mood .md-box{width:calc(var(--c) * .8);height:calc(var(--c) * .8);border:.25cqw solid var(--p1);display:inline-block}
 .ctasks{display:flex;flex-direction:column;gap:10px}
 .ct-x{display:flex;justify-content:flex-end;gap:14px;margin:-6px 6px 2px;font-size:13px;flex-wrap:wrap}
@@ -4408,7 +4411,7 @@ function sheetParts(items,{topic,level,seed,studentName,answers,design}){
       pieces[i]=h.slice(0,k).replace('class="it rich span wq2"',`class="it rich span wq2 wq-has${/class="kz"/.test(h)?' kzon':''}"`)+'<div class="wq-row"><div class="wq-work">'+h.slice(k,e)+`</div>${artImg(imgs[wk%imgs.length],'wq-pic')}</div>`+h.slice(e);wk++});
     if(!answers){const other=artSet(D.theme,(seed||0)+1);
       const md=ART_MOOD.has(D.theme.art)?[`${ART_BASE}${D.theme.art}-happy.webp`,`${ART_BASE}${D.theme.art}-sad.webp`]:[D.img.char,other&&other.char||D.img.top];
-      pieces.push(`<div class="it rich span mood"><b>Моё настроение:</b><span class="md">${artImg(md[0],'md-pic')}<i>Получилось!</i><span class="md-box"></span></span><span class="md">${artImg(md[1],'md-pic')}<i>Было трудно</i><span class="md-box"></span></span></div>`)}}
+      pieces.push(`<div class="it rich span mood"><b>Моё настроение</b><span class="md">${artImg(md[0],'md-pic')}<span class="md-l"><i>Получилось!</i><span class="md-box"></span></span></span><span class="md">${artImg(md[1],'md-pic')}<span class="md-l"><i>Было трудно</i><span class="md-box"></span></span></span></div>`)}}
   /* «Сказка»: картинка слева сверху, справа название и сразу первые задания;
      внизу справа вторая картинка, задания слева от неё. Всё на одной сетке клеток */
   let heroIn=false;
@@ -4496,7 +4499,7 @@ function sheetParts(items,{topic,level,seed,studentName,answers,design}){
     return `<div class="deco" aria-hidden="true">${h}</div>`};
   /* картинки для пустых мест внизу печатных страниц */
   const pics=D&&D.img&&(D.lv<=2||D.lv===5)?[D.img.bot,D.img.char,D.img.top].filter(Boolean):[];
-  return{head:heroIn?fields+rule:head,pics,mini,cols,gridStyle,pieces,cls,style,deco,footL:esc(topic.section),footR:`Проверить онлайн: код варианта ${seed}`};
+  return{head:heroIn?fields+rule:head,pics,mini,cols,gridStyle,pieces,cls,style,deco,footL:esc(topic.section),footR:''};
 }
 function sheetHTML(items,o){
   const s=sheetParts(items,o);
