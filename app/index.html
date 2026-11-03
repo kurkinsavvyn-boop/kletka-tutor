@@ -7582,13 +7582,13 @@ const BD=(()=>{
       const want=it.th&&(w*dpr<=400||!full&&cur!=='full')?'th':'full';if(cur===want)continue;
       im.dataset.k=want;im.setAttribute('src',srcURL(want==='th'?it.th:it.src))}}
   function applyView(){q('bdWorld').style.transform=`translate(${VIEW.x}px,${VIEW.y}px) scale(${VIEW.s})`;q('bdZv').textContent=Math.round(VIEW.s*100)+'%';
-    const vp=q('bdVp'),g=24*VIEW.s;vp.style.backgroundSize=`${g}px ${g}px`;vp.style.backgroundPosition=`${VIEW.x}px ${VIEW.y}px`;drawSel();lod()}
+    const vp=q('bdVp'),g=24*VIEW.s;vp.style.backgroundSize=`${g}px ${g}px`;vp.style.backgroundImage=g<6?'none':'';vp.style.backgroundPosition=`${VIEW.x}px ${VIEW.y}px`;drawSel();lod()}
   const toW=(cx,cy)=>{const r=q('bdVp').getBoundingClientRect();return{x:(cx-r.left-VIEW.x)/VIEW.s,y:(cy-r.top-VIEW.y)/VIEW.s}};
-  function zoomAt(f,cx,cy){const r=q('bdVp').getBoundingClientRect(),s2=Math.max(.05,Math.min(8,VIEW.s*f)),px=cx-r.left,py=cy-r.top;
+  function zoomAt(f,cx,cy){const r=q('bdVp').getBoundingClientRect(),s2=Math.max(.01,Math.min(8,VIEW.s*f)),px=cx-r.left,py=cy-r.top;
     VIEW.x=px-(px-VIEW.x)*s2/VIEW.s;VIEW.y=py-(py-VIEW.y)*s2/VIEW.s;VIEW.s=s2;applyView()}
   const hOf=it=>it.t==='text'&&EL.get(it.id)?EL.get(it.id).offsetHeight:it.h;
   function bounds(list){if(!list.length)return null;let a=Infinity,b=Infinity,c=-Infinity,d=-Infinity;for(const it of list){a=Math.min(a,it.x);b=Math.min(b,it.y);c=Math.max(c,it.x+it.w);d=Math.max(d,it.y+hOf(it))}return{x:a,y:b,w:c-a,h:d-b}}
-  function fitTo(bb,anim){if(!bb)return;const r=q('bdVp').getBoundingClientRect(),pad=90,s=Math.min(4,Math.max(.05,Math.min((r.width-pad*2)/bb.w,(r.height-pad*2)/bb.h)));
+  function fitTo(bb,anim){if(!bb)return;const r=q('bdVp').getBoundingClientRect(),pad=90,s=Math.min(4,Math.max(.01,Math.min((r.width-pad*2)/bb.w,(r.height-pad*2)/bb.h)));
     const t={s,x:r.width/2-(bb.x+bb.w/2)*s,y:r.height/2-(bb.y+bb.h/2)*s};if(!anim){Object.assign(VIEW,t);applyView();return}
     const f={...VIEW},t0=performance.now();const st=n=>{const k=Math.min(1,(n-t0)/450),e=1-Math.pow(1-k,3);VIEW.s=f.s+(t.s-f.s)*e;VIEW.x=f.x+(t.x-f.x)*e;VIEW.y=f.y+(t.y-f.y)*e;applyView();if(k<1)requestAnimationFrame(st)};requestAnimationFrame(st)}
   /* ---------- выделение и панель над ним ---------- */
