@@ -8,7 +8,8 @@
 <link rel="apple-touch-icon" id="ati" href="../icons/app-180.png">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=Unbounded:wght@600;700&family=Caveat:wght@500;700&family=Comfortaa:wght@500;700&family=PT+Serif:wght@400;700&family=Neucha&family=Pangolin&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=Unbounded:wght@600;700&family=Caveat:wght@500;700&family=Comfortaa:wght@500;700&family=PT+Serif:wght@400;700&family=Neucha&family=Pangolin&family=Noto+Sans:wght@400;700&family=PT+Mono&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&family=PT+Sans+Narrow:wght@400;700&family=PT+Sans:wght@400;700&family=Roboto:wght@400;700&family=Roboto+Slab:wght@400;700&family=EB+Garamond:wght@400;700&family=IBM+Plex+Serif:wght@400;700&family=IBM+Plex+Sans:wght@400;700&family=IBM+Plex+Mono:wght@400;700&family=Roboto+Mono:wght@400;700&family=Fredoka+One&family=Rammetto+One&family=Gravitas+One&family=Permanent+Marker&family=Titan+One&family=Abril+Fatface&family=Nixie+One&display=swap">
 <style>
 /* Layout: тетрадь в клетку. Рабочие панели лежат на сетке, красная ручка учителя — только для ошибок, ключа и «сейчас проходим». */
 :root{
@@ -1344,9 +1345,10 @@ body.bd-open{overflow:hidden}
 .bd-tx{white-space:pre-wrap;word-break:break-word;line-height:1.3;outline:none;min-height:1em}
 .bd-sticky{box-shadow:0 6px 12px rgba(20,30,60,.16);display:flex;align-items:center;justify-content:center;padding:14px}
 .bd-sticky .bd-tx,.bd-shape .bd-tx{width:100%;line-height:1.25;position:relative}
+.bd-tx p{margin:0}.bd-tx ul,.bd-tx ol{margin:0;padding-left:1.3em}.bd-tx a{color:#2D57C8;text-decoration:underline}
 .bd-shape{display:flex;align-items:center;justify-content:center;padding:10px}
 .bd-shape .bd-bg{position:absolute;inset:0}
-.bd-image img{width:100%;height:100%;display:block;pointer-events:none;-webkit-user-drag:none}
+.bd-image img{width:100%;height:100%;display:block;border-radius:inherit;pointer-events:none;-webkit-user-drag:none}
 .bd-pen svg{width:100%;height:100%;overflow:visible;display:block}
 .bd-lnk{position:absolute;right:-12px;top:-12px;width:28px;height:28px;border-radius:50%;background:#2D57C8;color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.2);z-index:2}
 .bd-lock{position:absolute;left:-10px;top:-10px;font-size:14px}
@@ -5955,7 +5957,7 @@ function viewMaterials(){
         ${f.folder?`<span class="chip">${esc(f.folder)}</span>`:''}<button class="ibtn" data-ff="${f.id}" aria-label="В папку">${icon('materials')}</button><button class="ibtn${V.delF===f.id?' on':''}" data-fd="${f.id}" aria-label="Удалить">${V.delF===f.id?'Удалить?':'✕'}</button></div>`).join('')}</div>`:'<p class="empty">Файлов пока нет.</p>'}`}
   if(tab==='boards'){const bl=[...(S.boards||[])].sort((a,b)=>(b.at||0)-(a.at||0));
     const prev=b=>{const f=BD.frames(b.items||[])[0];const im=(f&&f.src)||((b.items||[]).find(x=>x.t==='image')||{}).src;return im?`style="background-image:url('${BD.srcURL(im)}')${f&&!f.src?'':''}"`:f?`style="background:${f.fill||'#fff'}"`:''};
-    body=`<div class="lact" style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap"><button class="btn primary" id="bdNew">+ Новая разработка</button><button class="btn" id="bdImp">Импорт из Miro: PDF или картинки</button><input type="file" id="bdImpF" accept=".pdf,application/pdf,image/*" multiple hidden></div>
+    body=`<div class="lact" style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap"><button class="btn primary" id="bdNew">+ Новая разработка</button><button class="btn" id="bdImp">Импорт из Miro: PDF или картинки</button><input type="file" id="bdImpF" accept=".pdf,application/pdf,image/*" multiple hidden><button class="btn" id="bdImpM" title="Папка с доской, которую подготовил перенос из Miro: board.json и картинки">Перенос доски Miro: папка</button><input type="file" id="bdImpD" webkitdirectory multiple hidden></div>
       ${bl.length?`<div class="bgrid">${bl.map(b=>`<div class="bcard"><button class="bprev" data-bo="${b.id}" ${prev(b)}>${prev(b)?'':'Пустая'}</button>
         <div class="binf"><b>${esc(b.name)}</b><small>${BD.frames(b.items||[]).length} ${plural(BD.frames(b.items||[]).length,['фрейм','фрейма','фреймов'])} · ${ago(b.at||Date.now())}</small>
         <div class="bbtns"><button class="btn small" data-bo="${b.id}">Открыть</button><button class="btn small quiet" data-bc="${b.id}">Копия</button><button class="btn small quiet" data-bd="${b.id}">${V.delB===b.id?'Удалить?':'Удалить'}</button></div></div></div>`).join('')}</div>`
@@ -5972,6 +5974,10 @@ function viewMaterials(){
     modal(`<h2>Импортирую…</h2><p class="hint" id="impSt" style="margin:0">Готовлю файлы</p>`);
     try{const b=await BD.importFiles(fs,t=>{const e=document.getElementById('impSt');if(e)e.textContent=t});S.boards=S.boards||[];S.boards.unshift(b);save();close();BD.open(b.id)}
     catch(e){close();toast(e&&e.message==='empty'?'В файлах нет страниц или картинок':'Не получилось открыть файл. Попробуйте PDF или картинки PNG и JPG')}}}
+  if($('bdImpM')){$('bdImpM').onclick=()=>$('bdImpD').click();$('bdImpD').onchange=async()=>{const fs=[...$('bdImpD').files];$('bdImpD').value='';if(!fs.length)return;
+    modal(`<h2>Переношу доску…</h2><p class="hint" id="impSt" style="margin:0">Читаю папку</p>`);
+    try{const b=await BD.importMiro(fs,t=>{const e=document.getElementById('impSt');if(e)e.textContent=t});S.boards=S.boards||[];S.boards.unshift(b);save();close();BD.open(b.id)}
+    catch(e){close();toast(e&&e.message==='nojson'?'В папке нет board.json: выберите папку доски целиком':'Не получилось перенести доску')}}}
   if($('bdNew'))$('bdNew').onclick=()=>{const b=BD.newBoard();S.boards=S.boards||[];S.boards.unshift(b);save();BD.open(b.id)};
   app.querySelectorAll('[data-bo]').forEach(b=>b.onclick=()=>BD.open(b.dataset.bo));
   app.querySelectorAll('[data-bc]').forEach(b=>b.onclick=()=>{const o=S.boards.find(x=>x.id===b.dataset.bc);const n={...JSON.parse(JSON.stringify(o)),id:BD.newBoard().id,name:o.name+' (копия)',at:Date.now()};S.boards.unshift(n);save();render()});
@@ -7427,8 +7433,14 @@ const BD=(()=>{
   /* цвета: стикеры и заливки — 18 светлых и ярких, чернила — 12; свои цвета доски хранятся в B.colors */
   const COLORS=['#FFF59D','#FFE082','#FFCC80','#FFAB91','#F8BBD0','#F48FB1','#E1BEE7','#CE93D8','#B39DDB','#90CAF9','#81D4FA','#80DEEA','#A5D6A7','#C5E1A5','#E6EE9C','#FFFFFF','#ECEFF1','#BCAAA4'];
   const INK=['#1F2C55','#000000','#5B6888','#D5402F','#E8573F','#E8A317','#2C8A57','#20AFB8','#2D57C8','#7A5AF8','#D9467A','#FFFFFF'];
-  const FONTS=[['','Обычный','var(--f-ui)'],['disp','Заголовок','var(--f-disp)'],['hand','Рукописный',"'Caveat', cursive"],['round','Круглый',"'Comfortaa', sans-serif"],['book','Книжный',"'PT Serif', serif"],['kid','Детский',"'Neucha', cursive"]];
-  const fontOf=k=>(FONTS.find(f=>f[0]===(k||''))||FONTS[0])[2];
+  const FONTS=[['','Обычный','var(--f-ui)'],['disp','Заголовок','var(--f-disp)'],['hand','Рукописный',"'Caveat', cursive"],['round','Круглый',"'Comfortaa', sans-serif"],['book','Книжный',"'PT Serif', serif"],['kid','Детский',"'Neucha', cursive"],['noto','Простой',"'Noto Sans', sans-serif"],['mono','Моноширинный',"'PT Mono', monospace"]];
+  /* шрифты досок, перенесённых из Miro: в списке выбора их нет, но текст выглядит и переносится как в Miro.
+     Где у шрифта нет кириллицы, буквы берутся из Open Sans, как у Miro */
+  const XFONTS={open:"'Open Sans',sans-serif",narrow:"'PT Sans Narrow',sans-serif",ptsans:"'PT Sans',sans-serif",roboto:"Roboto,sans-serif",arial:"Arial,'Open Sans',sans-serif",
+    georgia:"Georgia,'PT Serif',serif",slab:"'Roboto Slab',serif",garamond:"'EB Garamond',serif",plexserif:"'IBM Plex Serif',serif",plexsans:"'IBM Plex Sans',sans-serif",
+    plexmono:"'IBM Plex Mono',monospace",robomono:"'Roboto Mono',monospace",fredoka:"'Fredoka One','Open Sans',sans-serif",rammetto:"'Rammetto One','Open Sans',sans-serif",
+    gravitas:"'Gravitas One','Open Sans',serif",marker:"'Permanent Marker','Open Sans',sans-serif",titan:"'Titan One','Open Sans',sans-serif",abril:"'Abril Fatface','Open Sans',serif",nixie:"'Nixie One','Open Sans',sans-serif"};
+  const fontOf=k=>XFONTS[k]||(FONTS.find(f=>f[0]===(k||''))||FONTS[0])[2];
   const DASH={solid:'',dash:'Пунктир',dot:'Точки'};
   let STICKC='#FFF59D';
   const DEF={frame:[1600,900],text:[420,44],sticky:[240,240],shape:[280,180],answer:[300,72]};
@@ -7441,19 +7453,32 @@ const BD=(()=>{
   async function token(){if(!pbT||!ACC.user)return'';if(!TOK.t||Date.now()-TOK.at>100000){try{TOK={t:await pbT.files.getToken(),at:Date.now()}}catch(e){}}return TOK.t}
   const srcURL=s=>!s?'':s.startsWith('f:')?`${API}/api/files/files/${s.slice(2)}?token=${TOK.t}`:s.startsWith('art:')?ART_BASE+s.slice(4):s;
   /* ---------- как выглядит объект: общий код для редактора и для комнаты ---------- */
-  function shapeBg(it){const f=it.fill||'#FFFFFF',s=it.stroke||'#1F2C55',sw=it.sw??2;
-    if(it.k==='ellipse')return `<svg class="bd-bg" viewBox="0 0 100 100" preserveAspectRatio="none"><ellipse cx="50" cy="50" rx="49" ry="49" fill="${f}" stroke="${s}" stroke-width="${sw}" vector-effect="non-scaling-stroke"/></svg>`;
+  function shapeBg(it){const f=it.fill||'#FFFFFF',s=it.stroke||'#1F2C55',sw=it.sw??2,da=it.dash==='dash'?`stroke-dasharray="${sw*3} ${sw*2}"`:it.dash==='dot'?`stroke-dasharray="${sw} ${sw*1.6}"`:'';
+    const poly={star:'50,2 61,37 98,37 68,59 79,95 50,73 21,95 32,59 2,37 39,37',tri:'50,2 98,98 2,98',rhomb:'50,2 98,50 50,98 2,50'}[it.k];
+    if(poly)return `<svg class="bd-bg" viewBox="0 0 100 100" preserveAspectRatio="none"><polygon points="${poly}" fill="${f}" stroke="${s}" stroke-width="${sw}" stroke-linejoin="round" vector-effect="non-scaling-stroke" ${da}/></svg>`;
+    if(it.k==='ellipse')return `<svg class="bd-bg" viewBox="0 0 100 100" preserveAspectRatio="none"><ellipse cx="50" cy="50" rx="49" ry="49" fill="${f}" stroke="${s}" stroke-width="${sw}" vector-effect="non-scaling-stroke" ${da}/></svg>`;
     if(it.k==='cloud')return `<svg class="bd-bg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M10 6h80a8 8 0 018 8v52a8 8 0 01-8 8H40l-16 18 2-18H10a8 8 0 01-8-8V14a8 8 0 018-8z" fill="${f}" stroke="${s}" stroke-width="${sw}" vector-effect="non-scaling-stroke"/></svg>`;
     if(it.k==='arrow')return `<svg class="bd-bg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M2 35h62V12l34 38-34 38V65H2z" fill="${f}" stroke="${s}" stroke-width="${sw}" stroke-linejoin="round" vector-effect="non-scaling-stroke"/></svg>`;
-    return `<div class="bd-bg" style="background:${f};border:${sw}px ${it.zone?'dashed':'solid'} ${s};border-radius:${it.k==='round'||it.zone?Math.min(it.w,it.h)*.12:4}px"></div>`}
+    return `<div class="bd-bg" style="background:${f};border:${sw}px ${it.zone||it.dash==='dash'?'dashed':it.dash==='dot'?'dotted':'solid'} ${s};border-radius:${it.k==='round'||it.zone?Math.min(it.w,it.h)*.12:4}px"></div>`}
+  /* текст с оформлением (из Miro): только безопасные теги — абзацы, жирный, курсив, подчёркнутый, цвет, списки и ссылки */
+  const RICH_OK={P:1,BR:1,STRONG:1,B:1,EM:1,I:1,U:1,S:1,SPAN:1,A:1,UL:1,OL:1,LI:1};
+  function richHTML(h){const doc=new DOMParser().parseFromString('<div>'+String(h)+'</div>','text/html'),root=doc.body.firstChild;
+    const walk=n=>{[...n.childNodes].forEach(c=>{if(c.nodeType===3)return;if(c.nodeType!==1||!RICH_OK[c.tagName]){if(c.nodeType===1){walk(c);c.replaceWith(...c.childNodes)}else c.remove();return}
+      const keep={};if(c.tagName==='A'){const u=c.getAttribute('href')||'';if(/^https?:\/\//i.test(u))keep.href=u}
+      const st=c.getAttribute('style')||'',col=st.match(/(?:^|;)\s*color\s*:\s*(#[0-9a-f]{3,8}|rgba?\([\d.,\s%]+\))/i),bg=st.match(/background-color\s*:\s*(#[0-9a-f]{3,8}|rgba?\([\d.,\s%]+\))/i);
+      [...c.attributes].forEach(a=>c.removeAttribute(a.name));if(keep.href){c.setAttribute('href',keep.href);c.setAttribute('target','_blank');c.setAttribute('rel','noopener')}
+      if(col||bg)c.setAttribute('style',(col?`color:${col[1]};`:'')+(bg?`background-color:${bg[1]};`:''));walk(c)})};
+    walk(root);return root.innerHTML}
   function look(it,url){
-    const tx=(fs,al)=>`<div class="bd-tx" style="font-size:${it.fs||fs}px;color:${it.color||'#1F2C55'};font-weight:${it.b?700:400};text-align:${it.al||al};${it.ff?`font-family:${fontOf(it.ff)};`:''}">${esc(it.text||'')}</div>`;
+    const tx=(fs,al)=>`<div class="bd-tx" style="font-size:${it.fs||fs}px;color:${it.color||'#1F2C55'};font-weight:${it.b?700:400};text-align:${it.al||al};${it.ff?`font-family:${fontOf(it.ff)};`:''}${it.va==='top'?'align-self:flex-start;':it.va==='bottom'?'align-self:flex-end;':''}${it.bg?`background:${it.bg};`:''}">${it.html?richHTML(it.html):esc(it.text||'')}</div>`;
     let style=`left:${it.x}px;top:${it.y}px;width:${it.w}px;${it.t==='text'?`min-height:${it.h}px`:`height:${it.h}px`};`,html='';
     if(it.t==='frame'){style+=`background-color:${it.fill||'#fff'};${it.src?`background-image:url('${url(it.src)}');`:''}`;html=`<div class="bd-ftitle">${esc(it.text||'Фрейм')}</div>`}
     else if(it.t==='text')html=tx(32,'left');
     else if(it.t==='sticky'){style+=`background:${it.fill||'#FFF59D'};`;html=tx(24,'center')}
     else if(it.t==='shape')html=shapeBg(it)+tx(24,'center');
-    else if(it.t==='image')html=`<img src="${url(it.src)}" alt="" draggable="false">`;
+    else if(it.t==='image'){html=`<img src="${url(it.src)}" alt="" draggable="false">`;
+      /* рамка и скругление картинки (перенос из Miro): обводка поверх краёв картинки */
+      if(it.br)style+=`border-radius:${it.br}px;`;if(it.bw&&it.bc)style+=`outline:${it.bw}px solid ${it.bc};outline-offset:-${it.bw}px;`}
     else if(it.t==='answer')html=it.text?tx(32,'center'):`<div class="bd-tx bd-ph" style="font-size:${it.fs||32}px">ответ</div>`;
     else if(it.t==='pen'){const p=it.pts||[];let d='';for(let i=0;i<p.length;i+=2)d+=(i?'L':'M')+(+p[i]).toFixed(1)+' '+(+p[i+1]).toFixed(1);
       /* стрелка на конце: наконечник в координатах линии, длина ~5 толщин */
@@ -7534,17 +7559,30 @@ const BD=(()=>{
   function stickyMenu(b){palPop(b,COLORS,STICKC,c=>{STICKC=c;setTool('sticky');hint('Щёлкните на доске, чтобы поставить стикер, или растяните рамку')},'Цвет стикера',true)}
   /* ---------- отрисовка ---------- */
   function renderIt(it,el){const l=look(it,srcURL);el.className=l.cls;el.style.cssText=l.style;
+    if(it.t==='image')l.html=`<img alt="" draggable="false" data-s="${esc(it.src||'')}">`;
     let html=l.html;if(it.link)html+=`<span class="bd-lnk" data-link="${it.link}" title="Перейти к фрейму">↗</span>`;if(it.lock)html+='<span class="bd-lock" title="Закреплено">🔒</span>';
     /* значки урока: зона, куда класть, шторка, верный ответ */
     const z=it.tgt&&byId(it.tgt);let tag=[];if(it.zone)tag.push('Зона');if(z)tag.push('🎯 в «'+(z.text||'зону')+'»');if(it.hide)tag.push('🙈 Скрыто от ученика');if(it.t==='answer'&&it.ans)tag.push('✓ '+it.ans);
     if(tag.length)html+=`<span class="bd-tag">${esc(tag.join(' · '))}</span>`;
-    if(el._h!==html){el.innerHTML=html;el._h=html}}
+    if(el._h!==html){el.innerHTML=html;el._h=html;if(it.t==='image')lod()}}
   function renderAll(){const w=q('bdWorld'),ids=new Set(B.items.map(i=>i.id));
     for(const[id,el]of EL)if(!ids.has(id)){el.remove();EL.delete(id)}
     B.items.forEach((it,k)=>{let el=EL.get(it.id);if(!el){el=document.createElement('div');el.dataset.id=it.id;EL.set(it.id,el);w.appendChild(el)}renderIt(it,el);el.style.zIndex=k+1});
-    drawSel();drawFrames();dirty()}
+    drawSel();drawFrames();dirty();lodNow(false);lod()}
+  /* на доске бывают тысячи картинок (перенос из Miro): за краем экрана картинка не грузится,
+     мелкая на экране показывается уменьшенной копией (it.th), крупная — оригиналом */
+  let LODT=0,LODF=0;
+  function lod(){if(LODF)return;LODF=requestAnimationFrame(()=>{LODF=0;lodNow(false)});clearTimeout(LODT);LODT=setTimeout(()=>lodNow(true),180)}
+  function lodNow(full){const vp=q('bdVp');if(!vp||!B)return;const W=vp.clientWidth,H=vp.clientHeight,m=Math.max(W,H)*.5,dpr=devicePixelRatio||1;
+    for(const it of B.items){if(it.t!=='image')continue;const el=EL.get(it.id),im=el&&el.firstElementChild;if(!im||im.tagName!=='IMG')continue;
+      const x=it.x*VIEW.s+VIEW.x,y=it.y*VIEW.s+VIEW.y,w=it.w*VIEW.s,h=(it.h||it.w)*VIEW.s;
+      const out=!it.rot&&(x>W+m||y>H+m||x+w<-m||y+h<-m);
+      /* пока масштаб меняется, оригинал не подставляем: только после остановки */
+      const cur=im.dataset.k||'';if(out)continue;
+      const want=it.th&&(w*dpr<=400||!full&&cur!=='full')?'th':'full';if(cur===want)continue;
+      im.dataset.k=want;im.setAttribute('src',srcURL(want==='th'?it.th:it.src))}}
   function applyView(){q('bdWorld').style.transform=`translate(${VIEW.x}px,${VIEW.y}px) scale(${VIEW.s})`;q('bdZv').textContent=Math.round(VIEW.s*100)+'%';
-    const vp=q('bdVp'),g=24*VIEW.s;vp.style.backgroundSize=`${g}px ${g}px`;vp.style.backgroundPosition=`${VIEW.x}px ${VIEW.y}px`;drawSel()}
+    const vp=q('bdVp'),g=24*VIEW.s;vp.style.backgroundSize=`${g}px ${g}px`;vp.style.backgroundPosition=`${VIEW.x}px ${VIEW.y}px`;drawSel();lod()}
   const toW=(cx,cy)=>{const r=q('bdVp').getBoundingClientRect();return{x:(cx-r.left-VIEW.x)/VIEW.s,y:(cy-r.top-VIEW.y)/VIEW.s}};
   function zoomAt(f,cx,cy){const r=q('bdVp').getBoundingClientRect(),s2=Math.max(.05,Math.min(8,VIEW.s*f)),px=cx-r.left,py=cy-r.top;
     VIEW.x=px-(px-VIEW.x)*s2/VIEW.s;VIEW.y=py-(py-VIEW.y)*s2/VIEW.s;VIEW.s=s2;applyView()}
@@ -7691,13 +7729,31 @@ const BD=(()=>{
           const blob=await new Promise(r=>c.toBlob(r,'image/webp',.85));await add(blob,c.width,c.height,'Страница '+(n+1))}}
       else if(/^image\//.test(f.type)){prog&&prog('Картинка: '+f.name);const im=await readImg(f);await add(im.blob,im.w,im.h,rTitle(f.name))}}
     if(!n)throw new Error('empty');return b}
+  /* перенос доски Miro: папка от tools/miro2kletka.py — board.json и картинки img/<id>.*; объекты доски те же, что в Miro, картинки загружаются в файлы аккаунта */
+  async function importMiro(files,prog){
+    const bj=files.find(f=>/(^|\/)board\.json$/.test(f.webkitRelativePath||f.name));if(!bj)throw new Error('nojson');
+    const d=JSON.parse(await bj.text());if(!Array.isArray(d.items))throw new Error('nojson');
+    const img={};files.forEach(f=>{const m=(f.webkitRelativePath||f.name).match(/(?:^|\/)([cx]?\d+)\.(png|jpe?g|gif|webp|svg)$/i);if(m)img[m[1]]=f});
+    const ids=[...new Set(d.items.filter(x=>x.t==='image'&&/^miro:/.test(x.src)).map(x=>x.src.slice(5)))],map={};let n=0;
+    /* картинок бывают тысячи: загружаем по шесть сразу */
+    const th={};let next=0;const one=async()=>{while(next<ids.length){const id=ids[next++];const f=img[id];
+      if(f)try{const im=await readImg(f);map[id]=await store(im,'miro-'+id);const s=/^f:/.test(map[id])&&await small(im);if(s)th[id]=await store(s,'miro-'+id+'-s')}catch(e){}
+      n++;prog&&prog(`Картинки: ${n} из ${ids.length}`)}};
+    await Promise.all(Array.from({length:6},one));
+    const items=d.items.filter(x=>x.t!=='image'||!/^miro:/.test(x.src)||map[x.src.slice(5)]).map(x=>{if(x.t!=='image'||!/^miro:/.test(x.src))return x;const k=x.src.slice(5),o={...x,src:map[k]};if(th[k])o.th=th[k];return o});
+    return{id:'b'+uid(),name:d.title||'Доска из Miro',at:Date.now(),from:'miro',items}}
+  /* уменьшенная копия для мелкого показа на доске: до 320 точек по длинной стороне; маленькой картинке не нужна */
+  function small(im){if(Math.max(im.w,im.h)<=480||/gif/.test(im.blob.type))return null;
+    return new Promise(res=>{const i=new Image();i.onload=()=>{const k=320/Math.max(im.w,im.h),w=Math.round(im.w*k),h=Math.round(im.h*k);
+      const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(i,0,0,w,h);
+      c.toBlob(b=>{if(!b)return res(null);const r=new FileReader();r.onload=()=>res({blob:b,src:r.result,w,h});r.readAsDataURL(b)},'image/webp',.8)};i.onerror=()=>res(null);i.src=im.src})}
   async function store(im,name){if(!pbT||!ACC.user)return im.src||await toData(im.blob);
     try{const fd=new FormData();fd.append('owner',ACC.user.id);fd.append('file',im.blob,(name||'image').replace(/\.[^.]+$/,'')+(/gif/.test(im.blob.type)?'.gif':'.webp'));fd.append('name',name||'картинка');fd.append('folder','__board');
       const r=await pbT.collection('files').create(fd);await token();return 'f:'+r.id+'/'+r.file}catch(e){hint('Картинка не загрузилась на сервер, сохраню её в доске');return im.src}}
   async function addImages(files,at){const c=at||toW(innerWidth/2,innerHeight/2);let off=0;const ids=[];hint('Загружаю картинки…');
-    for(const f of files){if(!/^image\//.test(f.type))continue;const im=await readImg(f);const src=await store(im,f.name);
+    for(const f of files){if(!/^image\//.test(f.type))continue;const im=await readImg(f);const src=await store(im,f.name);const sm=/^f:/.test(src)&&await small(im);
       const k=Math.min(1,600/Math.max(im.w,im.h))/Math.max(.25,Math.min(1,VIEW.s)),w=Math.round(im.w*k),h=Math.round(im.h*k);
-      const it={id:uid(),t:'image',x:c.x-w/2+off,y:c.y-h/2+off,w,h,src};B.items.push(it);ids.push(it.id);off+=30}
+      const it={id:uid(),t:'image',x:c.x-w/2+off,y:c.y-h/2+off,w,h,src};if(sm)it.th=await store(sm,f.name+'-s');B.items.push(it);ids.push(it.id);off+=30}
     if(ids.length){SEL=new Set(ids);renderAll();snap();setTool('select');hint('Готово')}}
   /* библиотека: персонажи «Клетки» и наклейки; нажать — положить в центр, или перетащить на доску */
   let LIBT='art';
@@ -7723,7 +7779,7 @@ const BD=(()=>{
     EDIT=id;drawSel();tx.contentEditable='true';tx.focus();const rg=document.createRange();rg.selectNodeContents(tx);const s=getSelection();s.removeAllRanges();s.addRange(rg);
     const done=()=>{if(EDIT!==id)return;tx.contentEditable='false';tx.removeEventListener('blur',done);EDITDONE=null;const v=tx.innerText.replace(/\n$/,'');EDIT=null;
       if(it.t==='text'&&!v.trim()){B.items=B.items.filter(x=>x.id!==id);SEL.delete(id);renderAll();snap();return}
-      it.text=v;el._h=null;if(it.t==='text')it.h=Math.max(DEF.text[1],el.offsetHeight);renderAll();snap()};
+      it.text=v;if(it.html)it.html=richHTML(tx.innerHTML);el._h=null;if(it.t==='text')it.h=Math.max(DEF.text[1],el.offsetHeight);renderAll();snap()};
     tx.addEventListener('blur',done);EDITDONE=done;
     tx.onkeydown=e=>{e.stopPropagation();if(e.key==='Escape'||(e.key==='Enter'&&(e.metaKey||e.ctrlKey))||(it.t==='frame'&&e.key==='Enter')){e.preventDefault();tx.blur()}}}
   function inFrame(f){return B.items.filter(x=>x!==f&&x.t!=='frame'&&x.x+x.w/2>=f.x&&x.x+x.w/2<=f.x+f.w&&x.y+hOf(x)/2>=f.y&&x.y+hOf(x)/2<=f.y+f.h)}
@@ -7876,7 +7932,7 @@ const BD=(()=>{
   /* фреймы по порядку: сверху вниз, слева направо */
   const frames=items=>items.filter(x=>x.t==='frame').sort((a,b)=>Math.abs(a.y-b.y)>a.h/2?a.y-b.y:a.x-b.x);
   function newBoard(name){return{id:'b'+uid(),name:name||'Новая разработка',at:Date.now(),items:[{id:uid(),t:'frame',x:0,y:0,w:1600,h:900,fill:'#FFFFFF',text:'Фрейм 1'}]}}
-  return{open,close,newBoard,frameHTML,frames,srcURL,token,look,importFiles,isOpen:()=>OPEN};
+  return{open,close,newBoard,frameHTML,frames,srcURL,token,look,importFiles,importMiro,isOpen:()=>OPEN};
 })();
 
 
