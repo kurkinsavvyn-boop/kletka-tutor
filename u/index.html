@@ -2326,6 +2326,8 @@ const ART_AR={"bremen-1-mid":2.386,"bremen-1-top":2.048,"bremen-2-mid":2.444,"br
 /* сервис живёт в /app/, картинки общие с главной страницей — в /art/ */
 const ART_BASE=/\/(app|u)\/(index\.html)?$/.test(location.pathname)?'../art/':'art/';
 const ART_SAY={'prostokvashino-1':ART_BASE+'prostokvashino-1-say.webp'};
+/* герой темы радостный и грустный — для блока «Моё настроение»; у остальных тем пока обычные картинки */
+const ART_MOOD=new Set(['cheburashka','prostokvashino','pooh','forest','leopold']);
 const artList=t=>t.art?Object.keys(ART_AR).filter(k=>k.startsWith(t.art+'-')&&/^[a-z]+-\d+-top$/.test(k)).map(k=>k.slice(0,-4)).sort():[];
 const artSet=(t,k)=>{const L=artList(t);if(!L.length)return null;const a=L[((k%L.length)+L.length)%L.length];
   return{id:a,arTop:ART_AR[a+'-top']||0.8,arBot:ART_AR[a+'-mid']||1,top:`${ART_BASE}${a}-top.webp`,bot:`${ART_BASE}${a}-mid.webp`,char:`${ART_BASE}${a}-bot.webp`,say:ART_SAY[a]||''}};
@@ -4405,7 +4407,8 @@ function sheetParts(items,{topic,level,seed,studentName,answers,design}){
       const k=h.indexOf('<div class="sol2">'),e=h.lastIndexOf('</div></div>');if(k<0||e<0)return;
       pieces[i]=h.slice(0,k).replace('class="it rich span wq2"',`class="it rich span wq2 wq-has${/class="kz"/.test(h)?' kzon':''}"`)+'<div class="wq-row"><div class="wq-work">'+h.slice(k,e)+`</div>${artImg(imgs[wk%imgs.length],'wq-pic')}</div>`+h.slice(e);wk++});
     if(!answers){const other=artSet(D.theme,(seed||0)+1);
-      pieces.push(`<div class="it rich span mood"><b>Моё настроение:</b><span class="md">${artImg(D.img.char,'md-pic')}<i>Получилось!</i><span class="md-box"></span></span><span class="md">${artImg(other&&other.char||D.img.top,'md-pic')}<i>Было трудно</i><span class="md-box"></span></span></div>`)}}
+      const md=ART_MOOD.has(D.theme.art)?[`${ART_BASE}${D.theme.art}-happy.webp`,`${ART_BASE}${D.theme.art}-sad.webp`]:[D.img.char,other&&other.char||D.img.top];
+      pieces.push(`<div class="it rich span mood"><b>Моё настроение:</b><span class="md">${artImg(md[0],'md-pic')}<i>Получилось!</i><span class="md-box"></span></span><span class="md">${artImg(md[1],'md-pic')}<i>Было трудно</i><span class="md-box"></span></span></div>`)}}
   /* «Сказка»: картинка слева сверху, справа название и сразу первые задания;
      внизу справа вторая картинка, задания слева от неё. Всё на одной сетке клеток */
   let heroIn=false;
