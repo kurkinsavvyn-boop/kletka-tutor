@@ -5976,8 +5976,8 @@ function viewMaterials(){
     catch(e){close();toast(e&&e.message==='empty'?'В файлах нет страниц или картинок':'Не получилось открыть файл. Попробуйте PDF или картинки PNG и JPG')}}}
   if($('bdImpM')){$('bdImpM').onclick=()=>$('bdImpD').click();$('bdImpD').onchange=async()=>{const fs=[...$('bdImpD').files];$('bdImpD').value='';if(!fs.length)return;
     modal(`<h2>Переношу доску…</h2><p class="hint" id="impSt" style="margin:0">Читаю папку</p>`);
-    try{const b=await BD.importMiro(fs,t=>{const e=document.getElementById('impSt');if(e)e.textContent=t});S.boards=S.boards||[];S.boards.unshift(b);save();close();BD.open(b.id)}
-    catch(e){close();toast(e&&e.message==='nojson'?'В папке нет board.json: выберите папку доски целиком':'Не получилось перенести доску')}}}
+    try{const b=await BD.importMiro(fs,t=>{const e=document.getElementById('impSt');if(e)e.textContent=t});const bad=b.bad;delete b.bad;S.boards=S.boards||[];S.boards.unshift(b);save();close();BD.open(b.id);if(bad)toast(`Не загрузилось картинок: ${bad}. Их нет на доске`)}
+    catch(e){close();toast(e&&e.message==='nojson'?'В папке нет board.json: выберите папку доски целиком':e&&e.message==='many'?'Выбрано несколько досок сразу: выберите папку одной доски':'Не получилось перенести доску')}}}
   if($('bdNew'))$('bdNew').onclick=()=>{const b=BD.newBoard();S.boards=S.boards||[];S.boards.unshift(b);save();BD.open(b.id)};
   app.querySelectorAll('[data-bo]').forEach(b=>b.onclick=()=>BD.open(b.dataset.bo));
   app.querySelectorAll('[data-bc]').forEach(b=>b.onclick=()=>{const o=S.boards.find(x=>x.id===b.dataset.bc);const n={...JSON.parse(JSON.stringify(o)),id:BD.newBoard().id,name:o.name+' (копия)',at:Date.now()};S.boards.unshift(n);save();render()});
@@ -7731,25 +7731,29 @@ const BD=(()=>{
     if(!n)throw new Error('empty');return b}
   /* перенос доски Miro: папка от tools/miro2kletka.py — board.json и картинки img/<id>.*; объекты доски те же, что в Miro, картинки загружаются в файлы аккаунта */
   async function importMiro(files,prog){
-    const bj=files.find(f=>/(^|\/)board\.json$/.test(f.webkitRelativePath||f.name));if(!bj)throw new Error('nojson');
+    const bjs=files.filter(f=>/(^|\/)board\.json$/.test(f.webkitRelativePath||f.name)),bj=bjs[0];if(!bj)throw new Error('nojson');if(bjs.length>1)throw new Error('many');
     const d=JSON.parse(await bj.text());if(!Array.isArray(d.items))throw new Error('nojson');
     const img={};files.forEach(f=>{const m=(f.webkitRelativePath||f.name).match(/(?:^|\/)([cx]?\d+)\.(png|jpe?g|gif|webp|svg)$/i);if(m)img[m[1]]=f});
     const ids=[...new Set(d.items.filter(x=>x.t==='image'&&/^miro:/.test(x.src)).map(x=>x.src.slice(5)))],map={};let n=0;
-    /* картинок бывают тысячи: загружаем по шесть сразу */
+    /* картинок бывают тысячи: загружаем по три сразу; не загрузившаяся картинка не попадает в доску (тысячи картинок внутри доски её не сохранят) */
     const th={};let next=0;const one=async()=>{while(next<ids.length){const id=ids[next++];const f=img[id];
-      if(f)try{const im=await readImg(f);map[id]=await store(im,'miro-'+id);const s=/^f:/.test(map[id])&&await small(im);if(s)th[id]=await store(s,'miro-'+id+'-s')}catch(e){}
+      if(f)try{const im=await readImg(f);const u=await store(im,'miro-'+id,true);if(u)map[id]=u;else bad++;const s=u&&/^f:/.test(u)&&await small(im);const ts=s&&await store(s,'miro-'+id+'-s',true);if(ts)th[id]=ts}catch(e){bad++}
       n++;prog&&prog(`Картинки: ${n} из ${ids.length}`)}};
-    await Promise.all(Array.from({length:6},one));
+    let bad=0;await Promise.all(Array.from({length:3},one));
+
     const items=d.items.filter(x=>x.t!=='image'||!/^miro:/.test(x.src)||map[x.src.slice(5)]).map(x=>{if(x.t!=='image'||!/^miro:/.test(x.src))return x;const k=x.src.slice(5),o={...x,src:map[k]};if(th[k])o.th=th[k];return o});
-    return{id:'b'+uid(),name:d.title||'Доска из Miro',at:Date.now(),from:'miro',items}}
+    return{id:'b'+uid(),name:d.title||'Доска из Miro',at:Date.now(),from:'miro',items,bad}}
   /* уменьшенная копия для мелкого показа на доске: до 320 точек по длинной стороне; маленькой картинке не нужна */
   function small(im){if(Math.max(im.w,im.h)<=480||/gif/.test(im.blob.type))return null;
     return new Promise(res=>{const i=new Image();i.onload=()=>{const k=320/Math.max(im.w,im.h),w=Math.round(im.w*k),h=Math.round(im.h*k);
       const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(i,0,0,w,h);
       c.toBlob(b=>{if(!b)return res(null);const r=new FileReader();r.onload=()=>res({blob:b,src:r.result,w,h});r.readAsDataURL(b)},'image/webp',.8)};i.onerror=()=>res(null);i.src=im.src})}
-  async function store(im,name){if(!pbT||!ACC.user)return im.src||await toData(im.blob);
-    try{const fd=new FormData();fd.append('owner',ACC.user.id);fd.append('file',im.blob,(name||'image').replace(/\.[^.]+$/,'')+(/gif/.test(im.blob.type)?'.gif':'.webp'));fd.append('name',name||'картинка');fd.append('folder','__board');
-      const r=await pbT.collection('files').create(fd);await token();return 'f:'+r.id+'/'+r.file}catch(e){hint('Картинка не загрузилась на сервер, сохраню её в доске');return im.src}}
+  async function store(im,name,strict){if(!pbT||!ACC.user)return im.src||await toData(im.blob);
+    /* сервер ограничивает частоту запросов (429): ждём и пробуем снова */
+    for(let a=0;a<8;a++){try{return await store1(im,name)}catch(e){if(e&&e.status!==429&&e.status!==0||a===7){if(strict)return null;hint('Картинка не загрузилась на сервер, сохраню её в доске');return im.src}
+      await new Promise(r=>setTimeout(r,1000*Math.min(20,2**a)+Math.random()*500))}}}
+  async function store1(im,name){{const fd=new FormData();fd.append('owner',ACC.user.id);fd.append('file',im.blob,(name||'image').replace(/\.[^.]+$/,'')+(/gif/.test(im.blob.type)?'.gif':'.webp'));fd.append('name',name||'картинка');fd.append('folder','__board');
+      const r=await pbT.collection('files').create(fd);await token();return 'f:'+r.id+'/'+r.file}}
   async function addImages(files,at){const c=at||toW(innerWidth/2,innerHeight/2);let off=0;const ids=[];hint('Загружаю картинки…');
     for(const f of files){if(!/^image\//.test(f.type))continue;const im=await readImg(f);const src=await store(im,f.name);const sm=/^f:/.test(src)&&await small(im);
       const k=Math.min(1,600/Math.max(im.w,im.h))/Math.max(.25,Math.min(1,VIEW.s)),w=Math.round(im.w*k),h=Math.round(im.h*k);
@@ -7800,7 +7804,9 @@ const BD=(()=>{
       const h=e.target.closest('.bd-hdl');
       if(h&&h.dataset.lp){const it=byId(h.dataset.id);if(it)DRAG={k:'lpt',it,which:h.dataset.lp};return}
       if(h){const list=[...SEL].map(byId);DRAG={k:'size',h:h.dataset.h,bb:bounds(list),orig:list.map(x=>({...x,h:hOf(x)})),keep:list.length>1||list[0].t==='image'};return}
-      const el=e.target.closest('.bd-it');
+      let el=e.target.closest('.bd-it');
+      /* фрейм, как в Miro, выделяется щелчком по названию; щелчок по пустому месту фрейма снимает выделение и начинает рамку выделения */
+      if(el&&el.classList.contains('bd-frame')&&!e.target.closest('.bd-ftitle')&&!SEL.has(el.dataset.id))el=null;
       if(el){const id=el.dataset.id,grp=withGroup(id);
         if(e.shiftKey||e.metaKey||e.ctrlKey){const on=SEL.has(id);grp.forEach(g=>on?SEL.delete(g):SEL.add(g));drawSel();return}
         if(!SEL.has(id))SEL=new Set(grp);
