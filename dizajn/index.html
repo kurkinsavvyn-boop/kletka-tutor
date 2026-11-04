@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Оформление листов Клетки</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@500;700&family=Pangolin&family=Golos+Text:wght@400;500;600&display=swap">
+<style>
+:root{--ink:#1F2C55;--ink2:#56627d;--bg:#eef0f4;--p1:#E2553D;--p2:#F4A73B;--p3:#3E9A5F;--p4:#3479BF}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Golos Text',system-ui,sans-serif;line-height:1.5}
+.wrap{max-width:1000px;margin:0 auto;padding:32px 16px 56px}
+h1{font-family:Pangolin,cursive;font-weight:400;font-size:clamp(28px,5vw,40px);line-height:1.15;margin:0 0 10px}
+.lead{font-size:17px;max-width:720px;margin:0 0 8px}
+.note{color:var(--ink2);max-width:720px;margin:0}
+.lv{margin-top:56px}
+.lv h2{font-family:Pangolin,cursive;font-weight:400;font-size:clamp(24px,4vw,30px);line-height:1.2;margin:0 0 6px;display:flex;gap:12px;align-items:baseline;flex-wrap:wrap}
+.lv h2 small{font-family:'Golos Text';font-size:15px;color:var(--ink2);font-weight:500}
+.lv p{margin:0 0 6px;max-width:720px}
+.lv ul{margin:0 0 18px;padding-left:20px;max-width:720px}
+.lv li{margin:2px 0}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media (max-width:760px){.pair{grid-template-columns:1fr}}
+.cap{font-size:13px;color:var(--ink2);margin:6px 0 0;text-align:center}
+.cmp{width:100%;border-collapse:collapse;background:#fff;font-size:15px;margin-top:14px}
+.cmp th,.cmp td{border:1px solid #d6dbe5;padding:8px 10px;text-align:left;vertical-align:top}
+.cmp th{background:#f5f7fa;font-weight:600}
+.tbl{overflow-x:auto}
+footer{margin-top:48px;color:var(--ink2);font-size:14px}
+
+/* лист A4: 30 клеток по 7 мм в ширину */
+.sheet{position:relative;aspect-ratio:210/297;background:#fff;container-type:inline-size;overflow:hidden;
+  box-shadow:0 1px 2px rgba(20,30,60,.12),0 10px 28px rgba(20,30,60,.10);--c:calc(100cqw/30);
+  --grid:#cddff0;--h:var(--p1);--bx:var(--p1);--t:var(--p1)}
+.grid{position:absolute;left:var(--c);top:var(--c);width:calc(var(--c)*28);height:calc(var(--c)*40);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:var(--c) var(--c);background-position:-.5px -.5px}
+.at{position:absolute;height:var(--c);line-height:var(--c);white-space:nowrap}
+.tx{font-family:Comfortaa,sans-serif;font-weight:500;font-size:calc(var(--c)*.62)}
+.fld{font-family:'Golos Text';font-size:calc(var(--c)*.5);color:var(--ink)}
+.fld u{display:inline-block;text-decoration:none;border-bottom:1px solid var(--ink);vertical-align:bottom;height:calc(var(--c)*.75)}
+.ttl{font-family:Pangolin,cursive;font-size:calc(var(--c)*1.35);height:calc(var(--c)*2);line-height:calc(var(--c)*2);color:var(--t)}
+.sub{font-family:'Golos Text';font-size:calc(var(--c)*.5);color:var(--ink2)}
+.grp{font-family:Pangolin,cursive;font-size:calc(var(--c)*.9);color:var(--h);display:flex;align-items:center;gap:calc(var(--c)*.25)}
+.grp svg{width:calc(var(--c)*1.3);height:calc(var(--c)*1.3);margin:calc(var(--c)*-.15) 0;flex:none}
+.cl{font-family:Comfortaa,sans-serif;font-weight:700;font-size:calc(var(--c)*.78);display:flex;color:var(--ink)}
+.cl i{font-style:normal;width:var(--c);text-align:center}
+.bx{display:block;height:var(--c);box-shadow:inset 0 0 0 calc(var(--c)*.09) var(--bx);border-radius:calc(var(--c)*.12)}
+.ring{width:var(--c);display:grid;place-items:center}
+.ring:before{content:"";width:calc(var(--c)*.8);height:calc(var(--c)*.8);border-radius:50%;box-shadow:inset 0 0 0 calc(var(--c)*.08) var(--bx)}
+.lbl{font-family:'Golos Text';font-size:calc(var(--c)*.48);color:var(--ink2)}
+.ans{font-family:Comfortaa,sans-serif;font-weight:700;font-size:calc(var(--c)*.6);color:var(--h);border-bottom:calc(var(--c)*.07) solid var(--h)}
+.dot{width:var(--c);display:grid;place-items:center}
+.dot:before{content:"";width:calc(var(--c)*.28);height:calc(var(--c)*.28);border-radius:50%;background:var(--ink)}
+.pg{font-family:'Golos Text';font-size:calc(var(--c)*.45);color:var(--ink2)}
+.pic{position:absolute;object-fit:contain}
+.plate{position:absolute;background:#FFF1D6;border-radius:calc(var(--c)*.6)}
+.frame{position:absolute;left:calc(var(--c)*.5);top:calc(var(--c)*.5);right:calc(var(--c)*.5);bottom:calc(var(--c)*.5);
+  border:calc(var(--c)*.22) solid var(--p2);border-radius:calc(var(--c)*.9);pointer-events:none}
+.mood{font-family:Pangolin,cursive;font-size:calc(var(--c)*.9);color:var(--h)}
+.mo{position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:flex-end}
+.mo img,.mo svg{flex:1;min-height:0;width:100%;object-fit:contain}
+.mo span{height:var(--c);line-height:var(--c);display:flex;align-items:center;gap:calc(var(--c)*.3);font-family:Comfortaa,sans-serif;font-weight:700;font-size:calc(var(--c)*.58);color:var(--ink)}
+.mo b{display:block;width:calc(var(--c)*.8);height:calc(var(--c)*.8);box-shadow:inset 0 0 0 calc(var(--c)*.08) var(--bx);border-radius:calc(var(--c)*.1)}
+/* уровни */
+.l3 .sheet{--h:var(--p4);--bx:var(--p4);--t:var(--p4)}
+.l4 .sheet{--h:var(--ink);--bx:var(--ink);--t:var(--ink);--grid:#dcdfe5}
+</style></head><body>
+<div class="wrap">
+<h1>Как могут выглядеть листы «Клетки»</h1>
+<p class="lead">Четыре варианта оформления в одном стиле: лист в клетку, как школьная тетрадь. Клетка 7 мм, каждая цифра и знак стоят в своей клетке, ученик пишет прямо на листе.</p>
+<p class="note">Задания во всех вариантах одинаковые, меняется только оформление: сколько на листе картинок и цвета. Каждый вариант показан как работа на два листа. Первый вариант самый детский, последний самый строгий.</p>
+<div id="levels"></div>
+<section class="lv">
+<h2>Сравнение</h2>
+<div class="tbl"><table class="cmp">
+<tr><th></th><th>1. Сказка</th><th>2. Весёлая</th><th>3. Спокойная</th><th>4. Строгая</th></tr>
+<tr><td>Герои</td><td>Большие, на каждом листе и во всех свободных местах</td><td>У первых заданий на каждом листе</td><td>Один маленький в углу первого листа</td><td>Нет</td></tr>
+<tr><td>Цвет</td><td>Три цвета и цветная рамка</td><td>Два цвета</td><td>Один цвет</td><td>Тёмно-синий, хорошо печатается на ч/б принтере</td></tr>
+<tr><td>Значки у заданий</td><td>Картинки из мультфильма</td><td>Картинки из мультфильма</td><td>Только номер</td><td>Только номер</td></tr>
+<tr><td>«Моё настроение»</td><td>Герой радостный и грустный</td><td>Герой радостный и грустный</td><td>Нарисованные смайлики</td><td>Две клетки с подписями</td></tr>
+<tr><td>Для кого</td><td>1 класс, первые занятия</td><td>1–2 класс, обычная работа</td><td>3 класс, самостоятельные</td><td>4 класс, проверочные, подготовка к ВПР</td></tr>
+</table></div>
+</section>
+<footer>Герои и задания здесь для примера. Тему мультфильма репетитор выбирает для каждого ученика сам.</footer>
+</div>
+<script>
+const A='../art/cheburashka';
+const C=v=>`calc(var(--c)*${v})`;
+const at=(r,c,inner,cls='',st='')=>`<div class="at ${cls}" style="top:${C(r)};left:${C(c)};${st}">${inner}</div>`;
+const sym=s=>[...s].map(ch=>ch==='□'?`<b class="bx" style="width:${C(1)}"></b>`:ch==='○'?'<span class="ring"></span>':`<i>${ch}</i>`).join('');
+const ex=(r,c,s,n)=>at(r,c,sym(s)+(n?`<b class="bx" style="width:${C(n)}"></b>`:''),'cl');
+const pic=(f,r,c,w,h,pos='center')=>`<img class="pic" src="img/${f}.webp" alt="" style="top:${C(r)};left:${C(c)};width:${C(w)};height:${C(h)};object-position:${pos}">`;
+const line=(r,c,w,txt='')=>at(r,c,txt,'ans',`width:${C(w)}`);
+/* значки темы, как в программе */
+const sg=b=>`<svg viewBox="0 0 40 40"><g stroke="#1F2C55" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">${b}</g></svg>`;
+const star=(()=>{let d='';for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,r=i%2?7:16;d+=(i?'L':'M')+(20+r*Math.cos(a)).toFixed(1)+' '+(21+r*Math.sin(a)).toFixed(1)}return d+'Z'})();
+const STK=[
+ sg('<circle cx="20" cy="22" r="13" fill="#f39a2f"/><path d="M20 9 q4 -6 10 -4 q-4 6 -10 4z" fill="#5fae4f"/>'),
+ sg('<rect x="4" y="12" width="10" height="18" rx="2" fill="#d9534f"/><rect x="26" y="12" width="10" height="18" rx="2" fill="#d9534f"/><path d="M14 12 l3 18 l3 -18 l3 18 l3 -18" fill="#f6c443"/>'),
+ sg('<path d="M6 20 l14 -12 l14 12z" fill="#e8504a"/><rect x="9" y="20" width="22" height="14" fill="#f6d9a8"/><rect x="17" y="25" width="6" height="9" fill="#a0673a"/>'),
+ sg(`<path d="${star}" fill="#f6c443"/>`)];
+const face=happy=>`<svg viewBox="0 0 40 40"><g fill="none" stroke="var(--h)" stroke-width="2.2" stroke-linecap="round"><circle cx="20" cy="20" r="16"/><circle cx="14" cy="16" r="1.6" fill="var(--h)"/><circle cx="26" cy="16" r="1.6" fill="var(--h)"/><path d="${happy?'M12 23 q8 8 16 0':'M12 28 q8 -7 16 0'}"/></g></svg>`;
+
+const LV=[
+ {k:'l1',n:'1. Сказка',who:'1 класс, первые занятия',
+  d:'Самый детский вариант. Хорошо подходит для первых занятий, когда ребёнка нужно увлечь.',
+  li:['заголовок на цветной плашке, рядом большой герой;','герои на каждом листе, во всех свободных местах;','у каждого задания картинка из мультфильма и свой цвет, вокруг листа цветная рамка.'],
+  cols:['var(--p1)','var(--p4)','var(--p3)'],stk:true,frame:true,plate:true,mood:'hero',
+  p1:[pic('1-bot',2,20,8,6.5),pic('1-top',9,21,6,8.3),pic('3-top',27.5,19,9,6.5)],
+  p2:[pic('3-mid',3,19,9,7),pic('3-bot',10.5,19.5,8,6.7),pic('2-top',17.6,19.5,7.5,6.4)]},
+ {k:'l2',n:'2. Весёлая',who:'1–2 класс, обычная работа',
+  d:'Так выглядит сегодняшний вариант «Тетрадь». Картинок меньше, ребёнок не отвлекается от заданий.',
+  li:['герои стоят у первых заданий на каждом листе;','два цвета: заголовки заданий чередуются;','у номеров заданий картинки из мультфильма.'],
+  cols:['var(--p1)','var(--p4)'],stk:true,mood:'hero',
+  p1:[pic('1-mid',9.3,20,8,6.4),pic('3-top',17.6,19.5,8.5,6.1)],
+  p2:[pic('3-bot',3,20,7.5,6.3)]},
+ {k:'l3',n:'3. Спокойная',who:'3 класс, самостоятельные работы',
+  d:'Почти как обычная тетрадь, но с одним маленьким героем, чтобы лист оставался «своим».',
+  li:['один маленький герой в углу первого листа;','один цвет на всём листе;','у заданий только номер, в «Моём настроении» нарисованные смайлики.'],
+  cols:['var(--p4)'],mood:'face',
+  p1:[pic('1-bot',2,23.5,4,3.3,'right top')],p2:[]},
+ {k:'l4',n:'4. Строгая',who:'4 класс, проверочные, подготовка к ВПР',
+  d:'Без картинок и цвета, как настоящая контрольная. Хорошо печатается на чёрно-белом принтере.',
+  li:['картинок нет;','всё тёмно-синее, клетка серая;','в «Моём настроении» две клетки с подписями.'],
+  cols:['var(--ink)'],mood:'box',p1:[],p2:[]}
+];
+
+function sheets(L){
+  let gi=0;
+  const grp=(r,t)=>{const i=gi++;return at(r,2,(L.stk?STK[i%4]:'')+`<span>${i+1}. ${t}</span>`,'grp',`--h:${L.cols[i%L.cols.length]}`)};
+  const moodH=()=>{
+    if(L.mood==='box')return at(31,2,'Моё настроение','mood')+
+      `<div class="mo" style="top:${C(33)};left:${C(3)};width:${C(11)};height:${C(1)}"><span>Получилось <b></b></span></div>`+
+      `<div class="mo" style="top:${C(33)};left:${C(16)};width:${C(11)};height:${C(1)}"><span>Было трудно <b></b></span></div>`;
+    const pic=h=>L.mood==='hero'?`<img src="${A}-${h?'happy':'sad'}.webp" alt="">`:face(h);
+    const hgt=L.mood==='hero'?5:4;
+    return at(31,2,'Моё настроение','mood')+
+      `<div class="mo" style="top:${C(37-hgt)};left:${C(3)};width:${C(11)};height:${C(hgt)}">${pic(1)}<span>Получилось! <b></b></span></div>`+
+      `<div class="mo" style="top:${C(37-hgt)};left:${C(16)};width:${C(11)};height:${C(hgt)}">${pic(0)}<span>Было трудно <b></b></span></div>`;
+  };
+  const head=`<div class="grid"></div>${L.frame?'<div class="frame"></div>':''}`;
+  const p1=head+
+    at(2,2,`Имя: <u style="width:${C(6)}"></u>&nbsp;&nbsp; Дата: <u style="width:${C(4)}"></u>`,'fld')+
+    (L.plate?`<div class="plate" style="top:${C(3.6)};left:${C(1.6)};width:${C(17)};height:${C(3.8)}"></div>`:'')+
+    at(4,2,'Сложение и вычитание','ttl')+at(6,2,'2 класс · в пределах 20','sub')+
+    grp(8,'Реши примеры.')+
+    ex(10,3,'6+7=',2)+ex(10,11,'15−8=',1)+ex(12,3,'9+4=',2)+ex(12,11,'13−6=',1)+
+    ex(14,3,'8+5=',2)+ex(14,11,'17−9=',1)+ex(16,3,'7+7=',2)+ex(16,11,'12−5=',1)+
+    grp(18,'Сравни: поставь &gt;, &lt; или =.')+
+    ex(20,3,'7+5○12')+ex(20,11,'9−4○6')+ex(22,3,'8+6○15')+ex(22,11,'13−5○9')+
+    grp(24,'Реши задачу.')+
+    at(25,2,'У Чебурашки было 8 апельсинов.','tx')+at(26,2,'Гена принёс ещё 6. Сколько','tx')+at(27,2,'апельсинов стало у Чебурашки?','tx')+
+    at(29,2,'Краткая запись','lbl')+at(32,2,'Решение','lbl')+at(34,2,'Ответ:','tx')+line(34,5,13)+
+    L.p1.join('')+at(39,23,'Лист 1 из 2','pg');
+  const p2=head+
+    at(2,2,'Сложение и вычитание · продолжение','sub')+
+    grp(4,'Вставь пропущенное число.')+
+    ex(6,3,'□+4=9')+ex(6,11,'12−□=7')+ex(8,3,'□−3=8')+ex(8,11,'6+□=14')+
+    grp(10,'Начерти отрезки.')+
+    at(11,2,'Первый 6 см, второй на 2 см короче.','tx')+
+    at(13,2,'1)','tx')+at(13,3,'','dot')+at(15,2,'2)','tx')+at(15,3,'','dot')+
+    grp(17,'Задача на смекалку.')+
+    at(18,2,'На столе лежали апельсины.','tx')+at(19,2,'Чебурашка съел 2, и осталось 5.','tx')+at(20,2,'Сколько апельсинов было?','tx')+
+    at(22,2,'Ответ:','tx')+line(22,5,9)+
+    grp(24,'Посчитай и запиши.')+
+    ex(26,3,'10+5−3=',2)+ex(26,14,'14−4+6=',2)+ex(28,3,'8+2+7=',2)+ex(28,14,'16−6−5=',1)+
+    moodH()+
+    L.p2.join('')+at(39,23,'Лист 2 из 2','pg');
+  return `<div><div class="sheet">${p1}</div><p class="cap">Лист 1</p></div><div><div class="sheet">${p2}</div><p class="cap">Лист 2</p></div>`;
+}
+document.getElementById('levels').innerHTML=LV.map(L=>`<section class="lv ${L.k}">
+  <h2>${L.n} <small>${L.who}</small></h2><p>${L.d}</p><ul>${L.li.map(x=>`<li>${x}</li>`).join('')}</ul>
+  <div class="pair">${sheets(L)}</div></section>`).join('');
+</script>
+</body></html>

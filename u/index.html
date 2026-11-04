@@ -1477,6 +1477,8 @@ const pick=(r,arr)=>arr[Math.floor(r()*arr.length)];
 const fmt=n=>typeof n==='number'?(Math.abs(n)>=10000?n.toLocaleString('ru-RU'):String(n)):n;
 const TR={а:'a',б:'b',в:'v',г:'g',д:'d',е:'e',ё:'e',ж:'zh',з:'z',и:'i',й:'y',к:'k',л:'l',м:'m',н:'n',о:'o',п:'p',р:'r',с:'s',т:'t',у:'u',ф:'f',х:'h',ц:'ts',ч:'ch',ш:'sh',щ:'sch',ъ:'',ы:'y',ь:'',э:'e',ю:'yu',я:'ya'};
 const translit=s=>s.toLowerCase().split('').map(c=>TR[c]??c).join('').replace(/[^a-z0-9]/g,'')||'uchenik';
+const int=(v,max)=>{v=Math.round(Number(v));return Number.isFinite(v)?Math.min(Math.max(v,0),max):0};
+const str=(v,max)=>v==null?'':String(v).slice(0,max);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 /* ---------- движок «Арифметика» ---------- */
@@ -4229,7 +4231,7 @@ function mastery(sid,tid){
   const pct=Math.round(sv/sw*100);
   return{cls:pct>=85?'ok':pct>=60?'warn':'bad',pct,n,low:n<MIN_EVIDENCE,at};
 }
-const mNote=m=>m.at.length?`по ${m.at.length} ${plural(m.at.length,['работе','работам','работам'])}: ${m.at.map(a=>a.correct+' из '+a.total+(TOPICS[a.topicId]&&TOPICS[a.topicId].L.length>1?' ('+LV[Math.min(a.level||0,2)].toLowerCase()+')':'')).join(', ')}`:'';
+const mNote=m=>m.at.length?`по ${m.at.length} ${plural(m.at.length,['работе','работам','работам'])}: ${m.at.map(a=>int(a.correct,500)+' из '+int(a.total,500)+(TOPICS[a.topicId]&&TOPICS[a.topicId].L.length>1?' ('+LV[Math.min(a.level||0,2)].toLowerCase()+')':'')).join(', ')}`:'';
 const student=id=>S.students.find(s=>s.id===id);
 const initials=n=>n.split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase();
 const ago=t=>{const d=Math.floor((Date.now()-t)/86400000);return d<=0?'сегодня':d===1?'вчера':d<5?d+' дня назад':d+' дней назад'};
@@ -4680,7 +4682,7 @@ async function syncResults(force){
 /* ---------- аккаунт ученика: логин и пароль создаются при добавлении ---------- */
 const firstName=st=>st.first||st.name.split(/\s+/)[0];
 const genLogin=st=>(translit(firstName(st)).slice(0,10)||'uchenik')+'-'+(1000+Math.floor(Math.random()*9000));
-const genPin=()=>String(100000+Math.floor(Math.random()*900000));
+const genPin=()=>{const a=new Uint32Array(1);crypto.getRandomValues(a);return String(100000+a[0]%900000)};
 async function ensureAccount(st){
   if(!ACC.user)return null;if(st.acc&&st.acc.id)return st.acc;
   for(let k=0;k<6;k++){
@@ -4804,8 +4806,8 @@ function viewCab(){
   const card=r=>{const d=r.payload||{},done=r.status==='done',res=r.result||{},rv=r.review||{},ph=(r.photos||[]).length;const a=pick(d.s||7);
     return `<button class="ctask${done?' done':''}" data-id="${r.id}"${done?' disabled':''}>
       <span class="ct-pic">${a?`<img src="${a.char}" alt="" loading="lazy">`:''}</span>
-      <span class="ct-t"><b>${esc(r.title||d.t||'Задание')}</b><small>${done?(res.n?`Сделано · ${res.k} из ${res.n}`:'Репетитор проверил'):rv.at?'Репетитор проверил фото':ph?`Фото отправлены: ${ph}`:`Новое · ${ago(Date.parse(r.created))}`}</small></span>
-      ${done&&res.n?`<span class="ct-score num">${Math.round(res.k/res.n*100)}%</span>`:rv.mark&&rv.mark!=='✓'?`<span class="ct-score num">${esc(rv.mark)}</span>`:done?'':'<span class="btn primary small">Решать</span>'}</button>
+      <span class="ct-t"><b>${esc(r.title||d.t||'Задание')}</b><small>${done?(res.n?`Сделано · ${int(res.k,500)} из ${int(res.n,500)}`:'Репетитор проверил'):rv.at?'Репетитор проверил фото':ph?`Фото отправлены: ${ph}`:`Новое · ${ago(Date.parse(r.created))}`}</small></span>
+      ${done&&res.n?`<span class="ct-score num">${Math.round(int(res.k,500)/Math.max(1,int(res.n,500))*100)}%</span>`:rv.mark&&rv.mark!=='✓'?`<span class="ct-score num">${esc(rv.mark)}</span>`:done?'':'<span class="btn primary small">Решать</span>'}</button>
       ${rv.mark||rv.note?`<div class="ct-rv">Репетитор${rv.mark?`: отметка <b>${esc(rv.mark)}</b>`:''}${rv.note?` — ${esc(rv.note)}`:''}</div>`:''}
       <div class="ct-x"><button class="btn link" data-ph="${r.id}">📷 ${ph?`Фото работы: ${ph}`:'Сфотографировать работу'}</button><button class="btn link" data-pr="${r.id}">Распечатать</button></div>`};
   const fresh=CAB.items.filter(r=>r.status!=='done'),done=CAB.items.filter(r=>r.status==='done');
@@ -5073,7 +5075,7 @@ function viewStudent(){
 }
 
 /* ---------- работы и домашки ученика ---------- */
-const resChip=(c,t)=>{const p=Math.round(c/t*100);return `<span class="chip ${p>=85?'ok':p>=60?'warn':'bad'} num">${c} из ${t}</span>`};
+const resChip=(c,t)=>{c=int(c,500);t=Math.max(1,int(t,500));const p=Math.round(c/t*100);return `<span class="chip ${p>=85?'ok':p>=60?'warn':'bad'} num">${c} из ${t}</span>`};
 function viewWorks(){
   const st=student(V.studentId);
   const hs=S.assignments.filter(a=>a.studentId===st.id&&TOPICS[a.topicId]).sort((a,b)=>b.date-a.date);
@@ -5098,7 +5100,7 @@ function viewWork(){
     return `<div class="wrow ${done?(ok?'ok':'bad'):''}"><span class="wn">${i+1}</span><span class="wq2">${esc(plainQ(it))}</span>
       <span class="wa2">${done?(ok?`<b>${esc(r.answers[i])}</b> ✓`:`<s>${esc(r.answers[i])}</s> → <b>${esc(fmt(it.ans))}</b>`):`<span class="hint">ответ: ${esc(fmt(it.ans))}</span>`}</span></div>`}).join('');
   app.innerHTML=`<div class="head"><div><span class="label">${esc(st.name)} · код ${esc(h.code)}</span><h1>${esc(t.sheet||t.review?t.L[0].n+': '+t.t:t.t)}</h1>
-    <p>${r?`Результат ${r.correct} из ${r.total}${r.answered<r.total?`, решено ${r.answered}`:''} · ${Math.floor(r.time/60)} мин ${r.time%60} с · сдано ${ago(r.date)}`:h.paper?`Сделано на бумаге, проверено по фото${h.review&&h.review.mark?' · отметка '+esc(h.review.mark):''}`:h.status==='сдано'?'Сдано до этой версии: подробных ответов нет.':'Ученик ещё не сдал работу. Ниже задания с правильными ответами.'}</p></div>
+    <p>${r?`Результат ${int(r.correct,500)} из ${int(r.total,500)}${int(r.answered,500)<int(r.total,500)?`, решено ${int(r.answered,500)}`:''} · ${Math.floor(int(r.time,86400)/60)} мин ${int(r.time,86400)%60} с · сдано ${ago(r.date)}`:h.paper?`Сделано на бумаге, проверено по фото${h.review&&h.review.mark?' · отметка '+esc(h.review.mark):''}`:h.status==='сдано'?'Сдано до этой версии: подробных ответов нет.':'Ученик ещё не сдал работу. Ниже задания с правильными ответами.'}</p></div>
     ${h.status==='выдано'?'<button class="btn" id="as">Решить здесь как ученик</button>':''}</div>
     ${(h.photos||[]).length||h.rid?`<div class="panel wpaper"><h2 class="pr-h">Работа на бумаге</h2>
       ${(h.photos||[]).length?`<div class="ph-grid" id="wph"><p class="hint">Загружаем фото…</p></div>`:'<p class="hint" style="margin:0 0 10px">Ученик может сфотографировать работу в своём кабинете: «📷 Сфотографировать работу». Фото появятся здесь.</p>'}
@@ -6077,7 +6079,14 @@ function hwPayload(h){const t=TOPICS[h.topicId];
   return{v:1,c:h.code,n:student(h.studentId).name,t:t.t,g:t.grade,mix:!!(t.review||t.sheet),p:{...t.L[h.level].p,...(h.over||{})},s:h.seed}}
 function hwLink(h){return SITE+'app/#hw='+b64e(hwPayload(h))}
 /* результат записывается одинаково и с экрана ученика в этом браузере, и из кода результата */
+/* результат приходит от ученика (сервер или код KL-): только числа и короткие строки */
+function cleanResult(r){
+  const total=int(r.total,500),log=(Array.isArray(r.log)?r.log:[]).slice(0,500).map(x=>Array.isArray(x)?[str(x[0],40),x[1]?1:0,x[2]==null?null:str(x[2],60)]:['',0,null]);
+  const mistakes=(Array.isArray(r.mistakes)?r.mistakes:[]).slice(0,30).filter(m=>m&&typeof m==='object').map(m=>({q:str(m.q,200),given:str(m.given,60),ans:str(m.ans,60),src:str(m.src,40)}));
+  return {total,correct:Math.min(int(r.correct,500),total),answered:Math.min(int(r.answered,500),total),time:int(r.time,86400),log,mistakes};
+}
 function recordResult(h,r){
+  r=cleanResult(r);
   const t=TOPICS[h.topicId];const base={studentId:h.studentId,time:r.time,date:Date.now()};const id='a'+Date.now();
   if(t&&(t.review||t.sheet)){
     const by={};for(const[src,ok]of r.log){by[src]=by[src]||{c:0,n:0};by[src].n++;if(ok)by[src].c++}
