@@ -1188,6 +1188,26 @@ button.mchip:hover{background:rgba(255,255,255,.24)}
 .rm-pn.on{background:#EAF1FF;color:var(--blue);border-color:var(--blue)}
 .rm-del{border:0;background:none;color:#D5402F;font:inherit;font-size:15px;cursor:pointer;padding:4px 6px;border-radius:8px;white-space:nowrap}
 .rm-del:hover,.rm-del.on{background:#D5402F;color:#fff}
+.rm-hideall{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px;font-size:14px}
+.rm-hideall svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.rm-hideall.off{background:#D5402F;color:#fff;border-color:#D5402F}
+.rm-hidn{color:#D5402F;margin:6px 2px 0}
+.rm-floats{position:fixed;inset:0;z-index:30;pointer-events:none}
+.rm-fl{position:fixed;display:flex;flex-direction:column;background:#fff;border-radius:12px;box-shadow:0 10px 36px rgba(15,25,50,.28),0 0 0 1px rgba(15,25,50,.12);pointer-events:auto;overflow:hidden;min-width:120px;min-height:80px;z-index:30;color:#1A1F2E}
+.rm-fl .fl-h{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:5px 6px 5px 12px;font-size:12.5px;background:#EEF2FA;flex:none;user-select:none}
+.rm-fl .fl-h b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rm-fl.t .fl-h{cursor:grab;touch-action:none}
+.rm-fl .fl-x{width:22px;height:22px;border-radius:50%;border:0;background:#D5402F;color:#fff;font-size:12px;line-height:1;cursor:pointer;flex:none}
+.rm-fl .fl-in{flex:1;min-height:0;overflow:auto;container-type:inline-size}
+.fl-rs{position:absolute;touch-action:none;z-index:2}
+.fl-rs.r{top:32px;right:0;bottom:16px;width:8px;cursor:ew-resize}
+.fl-rs.b{left:0;right:16px;bottom:0;height:8px;cursor:ns-resize}
+.fl-rs.c{right:0;bottom:0;width:18px;height:18px;cursor:nwse-resize;background:linear-gradient(135deg,transparent 50%,#9AA6BF 50%)}
+.rx-dock{position:fixed;left:16px;bottom:16px;z-index:44;display:flex;gap:4px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:5px 7px;box-shadow:0 6px 22px rgba(15,25,50,.18)}
+.rx-b{width:42px;height:42px;border:0;background:none;border-radius:50%;cursor:pointer;padding:4px;transition:transform .14s}
+.rx-b:hover{transform:translateY(-4px) scale(1.18)}
+.rx-b svg{display:block;width:100%;height:100%}
+.rx-fly svg{display:block;width:100%;height:100%}
 .rm-seeb{display:inline-flex;align-items:center;gap:7px}
 .rm-seeb svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .rm-seeb.off{background:#D5402F;color:#fff;border-color:#D5402F}
@@ -1221,7 +1241,7 @@ button.mchip:hover{background:rgba(255,255,255,.24)}
 .rm-scr video{flex:1;min-height:0;width:100%;object-fit:contain;background:#000}
 .rm-scr-show{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:39}
 .rm-share{position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:70;display:flex;align-items:center;gap:12px;background:#3E9A5F;color:#fff;border-radius:999px;padding:6px 8px 6px 16px;font-size:14px;box-shadow:0 4px 14px rgba(20,30,60,.3)}
-.rm-up{position:fixed;left:16px;bottom:16px;z-index:60;background:#1F2C55;color:#fff;border-radius:999px;padding:8px 16px;font-size:13px;box-shadow:0 4px 14px rgba(20,30,60,.3)}
+.rm-up{position:fixed;left:50%;transform:translateX(-50%);bottom:16px;z-index:60;background:#1F2C55;color:#fff;border-radius:999px;padding:8px 16px;font-size:13px;box-shadow:0 4px 14px rgba(20,30,60,.3)}
 .rimg img{display:block;width:100%;height:auto}
 .rbd{aspect-ratio:210/297}
 .bg-grid{background-image:linear-gradient(#c9dcf0 1px,transparent 1px),linear-gradient(90deg,#c9dcf0 1px,transparent 1px);background-size:3.4cqw 3.4cqw}
@@ -6446,7 +6466,7 @@ function roomStart(pb,role,rec,info){
   roomRemember(role,rec,info);roomConnect(rec.id);
 }
 function roomStop(){
-  if(!R.on)return;roomForget();if(C.st!=='idle'||C.offer)callEnd(true,null,'left');R.on=false;
+  if(!R.on)return;roomForget();{const f=document.getElementById('rmFloat');if(f)f.remove();const d=document.getElementById('rxDock');if(d)d.remove()}if(C.st!=='idle'||C.offer)callEnd(true,null,'left');R.on=false;
   (R.unsub||[]).forEach(u=>{try{u()}catch(e){}});(R.timers||[]).forEach(clearInterval);(R.obs||[]).forEach(o=>o.disconnect());
   clearTimeout(R.stT);clearTimeout(R.ansT);
   if(R.myPulse)R.pb.collection('pulse').update(R.myPulse.id,{d:{at:Date.now(),gone:true}}).catch(()=>{});
@@ -6542,7 +6562,7 @@ function viewRoom(){
   let lastW=stage.clientWidth;const ro=new ResizeObserver(()=>{const w=stage.clientWidth;if(Math.abs(w-lastW)>30){lastW=w;R.stageKey='';roomStage()}else{roomDeckScale();roomInkAll()}});
   ro.observe(stage);R.obs.push(ro);
 }
-function roomUpdate(){if(!R.on||!document.getElementById('rmTop'))return;roomTop();roomSide();roomTools();roomStage()}
+function roomUpdate(){if(!R.on||!document.getElementById('rmTop'))return;roomTop();roomSide();roomTools();roomStage();roomFloatPaint()}
 /* ---------- несколько материалов рядом ----------
    Репетитор открывает до трёх материалов (st.open). Раскладка выбирается сама: два рядом, три в ряд, а если среди трёх есть объяснение, оно ложится сверху.
    У каждого окна своя прокрутка. «Активное» окно то, в которое последним нажали: именно оно получает ручку, ответы и страницу «Веду я». */
@@ -6550,7 +6570,7 @@ const R_NOPANE=['deck','link'];
 function roomMulti(){const o=R.st.open;if(!o||o.length<2)return null;
   if(R.role==='s'&&R.st.hide&&roomLive(R.st))return null;
   if(R.role==='s'&&(!roomFollow()||R.away))return null;
-  const ids=o.filter(id=>{const m=R.mats.find(x=>x.id===id);return m&&(R.role==='t'||m.vis)&&!R_NOPANE.includes(m.k)});
+  const ids=o.filter(id=>{const m=R.mats.find(x=>x.id===id);return m&&!m.fl&&(R.role==='t'||m.vis)&&!R_NOPANE.includes(m.k)});
   return ids.length>1?ids:null}
 function roomMat(){
   if(R.forceMat){const f=R.mats.find(x=>x.id===R.forceMat);if(f)return f}
@@ -6579,11 +6599,47 @@ function roomToggleOpen(id){
   else{if(o.length>=3){toast('Рядом можно открыть до трёх материалов. Закройте одно окно крестиком');return}o.push(id)}
   if(roomLive(R.st)&&!m.vis){m.vis=true;roomSaveMats()}
   roomSet({open:o,cur:o.includes(R.st.cur)?R.st.cur:o[o.length-1],foc:null});roomUpdate()}
+/* ---------- правило поверх всего ----------
+   Объяснение можно вынести отдельным окном поверх любого листа: его двигают за заголовок и тянут за правый, нижний край или угол,
+   высота и ширина меняются независимо. Положение хранится в долях экрана, ученик видит окно там же. Двигает только репетитор. */
+function roomToggleFloat(id){
+  const m=R.mats.find(x=>x.id===id);if(!m||m.k!=='note')return;
+  if(m.fl)m.fl=null;
+  else{m.fl={x:.56,y:.16,w:.38,h:.42};if(roomLive(R.st))m.vis=true;
+    const o=(R.st.open||[]).filter(x=>x!==id);
+    if(R.st.cur===id){const nx=[...R.mats].reverse().find(x=>x.id!==id&&!x.fl&&!R_NOPANE.includes(x.k));roomSet({cur:nx?nx.id:null,pg:0,open:nx?[nx.id]:[],foc:null})}
+    else roomSet({open:o})}
+  roomSaveMats();roomUpdate()}
+function roomFloatPaint(){
+  let L=document.getElementById('rmFloat');
+  const list=R.on?R.mats.filter(m=>m.k==='note'&&m.fl&&(R.role==='t'||(m.vis&&!(R.st.hide&&roomLive(R.st))))):[];
+  if(!list.length){if(L)L.remove();return}
+  if(!L){L=document.createElement('div');L.id='rmFloat';L.className='rm-floats';document.body.appendChild(L);
+    L.addEventListener('click',e=>{const x=e.target.closest('[data-fx]');if(x&&R.role==='t')roomToggleFloat(x.closest('.rm-fl').dataset.id)});
+    L.addEventListener('pointerdown',roomFloatDown)}
+  const ids=new Set(list.map(m=>m.id));[...L.children].forEach(c=>{if(!ids.has(c.dataset.id))c.remove()});
+  list.forEach(m=>{let el=L.querySelector(`[data-id="${m.id}"]`);const sig=m.t+'|'+m.txt+'|'+m.ex+'|'+R.role;
+    if(!el){el=document.createElement('div');el.className='rm-fl';el.dataset.id=m.id;L.appendChild(el)}
+    if(el._sig!==sig){el._sig=sig;
+      el.innerHTML=`<div class="fl-h"><b>${esc(rTitle(m.t))}</b>${R.role==='t'?'<button class="fl-x" data-fx aria-label="Убрать окно" title="Убрать окно: материал останется в списке">✕</button>':''}</div><div class="fl-in"><div class="rn-in"><span class="rn-k">Объяснение</span><h3>${esc(m.t)}</h3>${(m.txt||'').split(/\n+/).map(x=>`<p>${esc(x)}</p>`).join('')}${m.ex?`<p class="rn-ex">${esc(m.ex)}</p>`:''}</div></div>${R.role==='t'?'<i class="fl-rs r" data-rs="r"></i><i class="fl-rs b" data-rs="b"></i><i class="fl-rs c" data-rs="c"></i>':''}`}
+    el.classList.toggle('t',R.role==='t');const f=m.fl;
+    el.style.left=f.x*100+'vw';el.style.top=f.y*100+'vh';el.style.width=f.w*100+'vw';el.style.height=f.h*100+'vh'})}
+function roomFloatDown(e){
+  if(R.role!=='t')return;const el=e.target.closest('.rm-fl');if(!el)return;const m=R.mats.find(x=>x.id===el.dataset.id);if(!m||!m.fl)return;
+  R.flz=(R.flz||30)+1;el.style.zIndex=R.flz;
+  const rs=e.target.closest('[data-rs]'),hd=e.target.closest('.fl-h');if((!rs&&!hd)||e.target.closest('[data-fx]'))return;e.preventDefault();
+  const cl=(v,a,b)=>Math.max(a,Math.min(b,v)),sx=e.clientX,sy=e.clientY,f0={...m.fl},W=innerWidth,H=innerHeight;let moved=false;
+  const mv=ev=>{const dx=(ev.clientX-sx)/W,dy=(ev.clientY-sy)/H;moved=true;const f=m.fl;
+    if(rs){const k=rs.dataset.rs;if(k!=='b')f.w=+cl(f0.w+dx,.12,1).toFixed(4);if(k!=='r')f.h=+cl(f0.h+dy,.1,1).toFixed(4)}
+    else{f.x=+cl(f0.x+dx,-f0.w+.12,.92).toFixed(4);f.y=+cl(f0.y+dy,0,.92).toFixed(4)}
+    el.style.left=f.x*100+'vw';el.style.top=f.y*100+'vh';el.style.width=f.w*100+'vw';el.style.height=f.h*100+'vh'};
+  const up=()=>{removeEventListener('pointermove',mv);removeEventListener('pointerup',up);removeEventListener('pointercancel',up);if(moved)roomSaveMats()};
+  addEventListener('pointermove',mv);addEventListener('pointerup',up);addEventListener('pointercancel',up)}
 function roomPaneClose(id){const o=(R.st.open||[]).filter(x=>x!==id);roomSet({open:o,cur:o.includes(R.st.cur)?R.st.cur:o[0]||R.st.cur,foc:null});roomUpdate()}
 function roomMat1(){
-  if(R.role==='t')return R.mats.find(m=>m.id===R.st.cur)||null;
+  if(R.role==='t'){const c=R.mats.find(m=>m.id===R.st.cur);return c&&!c.fl?c:null}
   if(R.st.hide&&roomLive(R.st))return null;
-  const vis=R.mats.filter(m=>m.vis);const id=roomFollow()&&!R.away?R.st.cur:(R.myCur||R.st.cur);
+  const vis=R.mats.filter(m=>m.vis&&!m.fl);const id=roomFollow()&&!R.away?R.st.cur:(R.myCur||R.st.cur);
   return vis.find(m=>m.id===id)||vis[vis.length-1]||null;
 }
 function roomTop(){
@@ -6597,7 +6653,7 @@ function roomTop(){
       <div class="rm-who"><b>${esc(R.info.name)}</b><span class="rm-pres${roomHere()?' on':out?' out':''}">${roomHere()?esc(where):out?'Ученик вышел из комнаты':live?'Ученик ещё не пришёл':'не в комнате'}</span></div>
       <div class="rm-act">${live&&C.st==='idle'?'<button class="btn small" id="rmVideo">Позвонить снова</button>':''}${R.st.call?'<button class="btn small quiet" id="rmCall">Ссылка</button>':''}
         <button class="ibtn" id="rmHelpBtn" aria-label="Как работает комната" title="Как работает комната">?</button><button class="ibtn" id="rmSet" aria-label="Настройки комнаты">⋯</button>
-        ${live?`<button class="btn small rm-seeb${R.st.hide?' off':''}" id="rmSee" title="${R.st.hide?'Ученик сейчас ничего не видит. Нажмите, чтобы показать ему материалы':'Ученик видит то, что на экране. Нажмите, чтобы скрыть всё от ученика'}">${R.st.hide?'<svg viewBox="0 0 24 24"><path d="M3 3l18 18M10.6 6.2A9.6 9.6 0 0 1 12 6c5 0 8.5 4.2 9.5 6-.4.8-1.4 2.2-2.9 3.5M6.5 7.6C4.3 9 2.9 11 2.5 12c1 1.8 4.5 6 9.5 6 1.4 0 2.7-.3 3.8-.8"/></svg>Ученик не видит':'<svg viewBox="0 0 24 24"><path d="M2.5 12C3.5 10.2 7 6 12 6s8.5 4.2 9.5 6c-1 1.8-4.5 6-9.5 6s-8.5-4.2-9.5-6z"/><circle cx="12" cy="12" r="2.8"/></svg>Ученик видит'}</button><button class="btn small rm-start" id="rmEnd">Завершить урок</button>`:'<button class="btn small rm-start" id="rmLive">Начать урок</button>'}</div>`;
+        ${live?`<button class="btn small rm-start" id="rmEnd">Завершить урок</button>`:'<button class="btn small rm-start" id="rmLive">Начать урок</button>'}</div>`;
     const $=id=>document.getElementById(id);
     $('rmBack').onclick=()=>{
       if(!roomLive(R.st)){go({screen:'student'});return}
@@ -6609,7 +6665,6 @@ function roomTop(){
     $('rmSet').onclick=roomSettings;$('rmHelpBtn').onclick=()=>roomHelp('t');
     if($('rmLive'))$('rmLive').onclick=roomBegin;
     if($('rmEnd'))$('rmEnd').onclick=roomFinish;
-    if($('rmSee'))$('rmSee').onclick=()=>{roomSet({hide:!R.st.hide});roomUpdate()};
   }else{
     const away=roomFollow()&&R.away;
     el.innerHTML=`${live?'':'<button class="btn quiet small" id="rmBack">← Мои задания</button>'}
@@ -6639,19 +6694,21 @@ function roomSide(){
   const d0=dayStart(Date.now());const today=list.filter(m=>(m.at||0)>=d0),past=list.filter(m=>(m.at||0)<d0);
   const open=R.st.open||[],multi=open.length>1;
   const row=m=>`<div class="rm-mat${cur&&cur.id===m.id?' on':''}"><button class="rm-mb" data-m="${m.id}"><span class="rmk">${R_KIND[m.k]||''}</span><b>${esc(rTitle(m.t))}</b>${m.k==='sheet'?`<small>${roomProg(m)}</small>`:''}</button>
-    ${t?`${!R_NOPANE.includes(m.k)?`<button class="rm-pn${multi&&open.includes(m.id)?' on':''}" data-pn="${m.id}" title="${multi&&open.includes(m.id)?'Убрать из окон рядом':'Открыть рядом с тем, что уже на экране'}">${multi&&open.includes(m.id)?'✓ рядом':'+ рядом'}</button>`:''}<button class="rm-del${R.delM===m.id?' on':''}" data-del="${m.id}" aria-label="Убрать" title="Убрать материал из комнаты">${R.delM===m.id?'Убрать?':'✕'}</button>`:''}</div>`;
+    ${t?`${m.k==='note'?`<button class="rm-pn${m.fl?' on':''}" data-fl="${m.id}" title="${m.fl?'Вернуть правило обратно в список материалов':'Показать правило отдельным окном поверх листа: его можно двигать и менять размер'}">${m.fl?'✓ поверх':'поверх'}</button>`:''}${!R_NOPANE.includes(m.k)&&!m.fl?`<button class="rm-pn${multi&&open.includes(m.id)?' on':''}" data-pn="${m.id}" title="${multi&&open.includes(m.id)?'Убрать из окон рядом':'Открыть рядом с тем, что уже на экране'}">${multi&&open.includes(m.id)?'✓ рядом':'+ рядом'}</button>`:''}<button class="rm-del${R.delM===m.id?' on':''}" data-del="${m.id}" aria-label="Убрать" title="Убрать материал из комнаты">${R.delM===m.id?'Убрать?':'✕'}</button>`:''}</div>`;
   const byDay={};past.forEach(m=>{const k=dkey(m.at||0);(byDay[k]=byDay[k]||[]).push(m)});
   const days=Object.keys(byDay).sort().reverse();
   el.innerHTML=`<div class="rm-sh">${t?'Сегодня':'Тетрадь'}</div>
     ${today.length?today.map(row).join(''):`<p class="empty">${t?'На сегодня материалов нет.':'Сегодня пока ничего.'}</p>`}
-    ${t?'<button class="btn wide" id="rmAdd">+ Материал</button><p class="hint rm-paste">Скриншот или фото можно вставить прямо сюда: Ctrl+V. Если лист открыт, картинка ляжет на него.</p>':''}
+    ${t?`<button class="btn wide" id="rmAdd">+ Материал</button>${roomLive(R.st)?`<button class="btn wide rm-hideall${R.st.hide?' off':''}" id="rmSee" title="${R.st.hide?'Ученик сейчас ничего не видит. Нажмите, чтобы показать ему материалы':'Ученик перестанет видеть все материалы, пока вы не нажмёте ещё раз. Удобно, пока вы готовите следующий'}"><svg viewBox="0 0 24 24">${R.st.hide?'<path d="M2.5 12C3.5 10.2 7 6 12 6s8.5 4.2 9.5 6c-1 1.8-4.5 6-9.5 6s-8.5-4.2-9.5-6z"/><circle cx="12" cy="12" r="2.8"/>':'<path d="M3 3l18 18M10.6 6.2A9.6 9.6 0 0 1 12 6c5 0 8.5 4.2 9.5 6-.4.8-1.4 2.2-2.9 3.5M6.5 7.6C4.3 9 2.9 11 2.5 12c1 1.8 4.5 6 9.5 6 1.4 0 2.7-.3 3.8-.8"/>'}</svg>${R.st.hide?'Показать материалы ученику':'Скрыть все материалы'}</button>${R.st.hide?'<p class="hint rm-hidn">Ученик сейчас не видит материалов.</p>':''}`:''}<p class="hint rm-paste">Скриншот или фото можно вставить прямо сюда: Ctrl+V. Если лист открыт, картинка ляжет на него.</p>`:''}
     ${days.length?`<details class="rm-past"${R.pastOpen?' open':''}><summary>Прошлые уроки · ${days.length}</summary>${days.map(k=>`<div class="rm-day">${dayTxt(atOf(k))}</div>${byDay[k].map(row).join('')}`).join('')}</details>`:''}`;
   el.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>roomOpenMat(b.dataset.m));
   el.querySelectorAll('[data-pn]').forEach(b=>b.onclick=()=>roomToggleOpen(b.dataset.pn));
+  el.querySelectorAll('[data-fl]').forEach(b=>b.onclick=()=>roomToggleFloat(b.dataset.fl));
   el.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{const id=b.dataset.del;if(R.delM!==id){R.delM=id;roomSide();return}
     R.delM=null;R.mats=R.mats.filter(m=>m.id!==id);if(R.st.cur===id)roomSet({cur:R.mats.length?R.mats[R.mats.length-1].id:null,pg:0});roomSaveMats();roomUpdate()});
   const pd=el.querySelector('.rm-past');if(pd)pd.ontoggle=()=>{R.pastOpen=pd.open};
   const add=document.getElementById('rmAdd');if(add)add.onclick=roomPicker;
+  const see=document.getElementById('rmSee');if(see)see.onclick=()=>{roomSet({hide:!R.st.hide});roomUpdate()};
 }
 function roomOpenMat(id){
   if(R.role==='t'){const m=R.mats.find(x=>x.id===id);
@@ -6681,8 +6738,8 @@ function roomTools(){
         ${m.k==='sheet'&&m.tid&&TOPICS[m.tid]?'<button class="rt" id="rmTune" title="Сменить уровень, число заданий, вариант">Настроить лист</button><button class="rt" id="rmHw" title="Выдать такой же лист как домашку">В домашку</button>':''}
         ${m.k==='board'?`<span class="rt-lbl">Фон</span><span class="seg rt-sg">${[['grid','Клетка'],['lines','Линейка'],['white','Белый']].map(([v,n])=>`<button data-bg="${v}" class="${(m.bg||'grid')===v?'on':''}">${n}</button>`).join('')}</span><button class="rt" id="rmPg" title="Добавить ещё одну страницу к доске">+ Страница</button>`:''}
         <button class="rt" id="rmImg" title="Положить фото или скриншот на страницу. Работает и Ctrl+V">+ Картинка</button></div></div>`:''}
-      <div class="rt-sec"><span class="rt-cap">Масштаб</span><div class="rt-g rt-z"><button class="rt" id="rmZm" aria-label="Уменьшить" title="Уменьшить">−</button><button class="rt" id="rmZr" title="Вернуть по ширине">${Math.round((R.zoom||1)*100)}%</button><button class="rt" id="rmZp" aria-label="Увеличить" title="Увеличить">+</button></div></div>
-      <div class="rt-sec"><span class="rt-cap">Реакции</span>${rxBar()}</div>`;
+      <div class="rt-sec"><span class="rt-cap">${roomMulti()?'Масштаб окна':'Масштаб'}</span><div class="rt-g rt-z"><button class="rt" id="rmZm" aria-label="Уменьшить" title="Уменьшить">−</button><button class="rt" id="rmZr" title="Вернуть по ширине">${Math.round(roomZoomCur()*100)}%</button><button class="rt" id="rmZp" aria-label="Увеличить" title="Увеличить">+</button></div></div>
+`;
     const $=id=>document.getElementById(id);
     $('rmLead').onclick=()=>{const c=R.mats.find(x=>x.id===R.st.cur);if(c&&!c.vis&&roomLive(R.st)){c.vis=true;roomSaveMats()}roomSet({lead:true,pg:R.pgNow});roomUpdate()};
     $('rmFree').onclick=()=>{roomSet({lead:false});roomUpdate()};
@@ -6698,17 +6755,17 @@ function roomTools(){
   }else{
     const pen=!!R.st.pen&&roomLive(R.st);if(!pen&&R.tool!=='hand')R.tool='hand';
     el.innerHTML=(pen?`<div class="rt-sec"><span class="rt-cap">Рисование</span><div class="rt-g">${tb('hand','Листать')}${tb('pen','Маркер')}${tb('hl','Выделитель')}${tb('er','Ластик')}<button class="rt" id="rmUndo">↶</button></div></div>${inkSwatches()?`<div class="rt-sec"><span class="rt-cap">Цвет</span>${inkSwatches()}</div>`:''}`
-      :(m&&m.k==='sheet'&&roomItems(m).some(rAnswerable)?'<span class="rt-note">Нажми на окошко и впиши ответ</span>':m&&m.k==='deck'?'<span class="rt-note">Двигай карточки, пиши в стикеры и поля</span>':''))+(roomLive(R.st)?`<div class="rt-sec"><span class="rt-cap">Реакции</span>${rxBar()}</div>`:'');
+      :(m&&m.k==='sheet'&&roomItems(m).some(rAnswerable)?'<span class="rt-note">Нажми на окошко и впиши ответ</span>':m&&m.k==='deck'?'<span class="rt-note">Двигай карточки, пиши в стикеры и поля</span>':''))+'';
     const u=document.getElementById('rmUndo');if(u)u.onclick=roomUndo;
   }
-  const z=R.zoom||1;if(R.role!=='t')el.insertAdjacentHTML('beforeend',`<div class="rt-sec"><span class="rt-cap">Масштаб</span><div class="rt-g rt-z"><button class="rt" id="rmZm" aria-label="Уменьшить" title="Уменьшить">−</button><button class="rt" id="rmZr" title="Вернуть по ширине">${Math.round(z*100)}%</button><button class="rt" id="rmZp" aria-label="Увеличить" title="Увеличить">+</button></div></div>`);
-  const ZS=[.5,.67,.8,1,1.25,1.5,2,3],zset=v=>{roomZoomSet(v);const l=document.getElementById('rmZr');if(l)l.textContent=Math.round((R.zoom||1)*100)+'%'};
-  document.getElementById('rmZm').onclick=()=>zset([...ZS].reverse().find(v=>v<(R.zoom||1)-.01)||ZS[0]);
-  document.getElementById('rmZp').onclick=()=>zset(ZS.find(v=>v>(R.zoom||1)+.01)||ZS[ZS.length-1]);
+  const z=roomZoomCur();if(R.role!=='t')el.insertAdjacentHTML('beforeend',`<div class="rt-sec"><span class="rt-cap">${roomMulti()?'Масштаб окна':'Масштаб'}</span><div class="rt-g rt-z"><button class="rt" id="rmZm" aria-label="Уменьшить" title="Уменьшить">−</button><button class="rt" id="rmZr" title="Вернуть по ширине">${Math.round(z*100)}%</button><button class="rt" id="rmZp" aria-label="Увеличить" title="Увеличить">+</button></div></div>`);
+  const ZS=[.5,.67,.8,1,1.25,1.5,2,3],zset=v=>{roomZoomSet(v);const l=document.getElementById('rmZr');if(l)l.textContent=Math.round(roomZoomCur()*100)+'%'};
+  document.getElementById('rmZm').onclick=()=>zset([...ZS].reverse().find(v=>v<roomZoomCur()-.01)||ZS[0]);
+  document.getElementById('rmZp').onclick=()=>zset(ZS.find(v=>v>roomZoomCur()+.01)||ZS[ZS.length-1]);
   document.getElementById('rmZr').onclick=()=>zset(1);
   el.querySelectorAll('[data-tool]').forEach(b=>b.onclick=()=>{R.tool=b.dataset.tool;roomTools();roomDrawMode()});
   el.querySelectorAll('[data-ic]').forEach(b=>b.onclick=()=>{if(R.tool==='hl')R.hlC=+b.dataset.ic;else R.penC=+b.dataset.ic;roomTools()});
-  rxBind(el);roomDrawMode();
+  rxDock();roomDrawMode();
 }
 function roomDrawMode(){const s=document.getElementById('rmStage');if(s){s.classList.toggle('drawing',R.tool!=='hand');s.classList.toggle('er',R.tool==='er')}}
 
@@ -6749,18 +6806,24 @@ function roomStageMulti(host,ids){
   roomPaneMark();
 }
 /* масштаб: кнопки, щипок на тачпаде и сенсорном экране. Размер меняется на месте, лист не перерисовывается */
-function roomZoomApply(pages){const z=R.zoom||1;
+const roomZoomOf=pg=>pg.dataset.paneMat?((R.pz||{})[pg.dataset.paneMat]||1):(R.zoom||1);
+function roomZoomApply(pages){const z=roomZoomOf(pages);
   if(pages.dataset.paneMat)pages.style.width=(z===1?'':Math.round(z*100)+'%');else pages.style.width=z===1?'':`calc(min(100%,880px)*${z})`}
-function roomZoomSet(z){z=Math.max(.4,Math.min(3,+z.toFixed(3)));if(z===(R.zoom||1))return;R.zoom=z;
-  document.querySelectorAll('#rmStage .rm-pages').forEach(roomZoomApply);
-  clearTimeout(R.zT);R.zT=setTimeout(()=>{roomInkAll();const l=document.getElementById('rmZr');if(l)l.textContent=Math.round(R.zoom*100)+'%'},60)}
+const roomZoomTarget=()=>document.getElementById('rmPages');
+const roomZoomCur=()=>{const p=roomZoomTarget();return p?roomZoomOf(p):(R.zoom||1)};
+/* кнопки меняют масштаб главного окна, щипок и Ctrl+колесо то окно, над которым курсор */
+function roomZoomSet(z,pages){pages=pages||roomZoomTarget();if(!pages)return;z=Math.max(.4,Math.min(3,+z.toFixed(3)));if(z===roomZoomOf(pages))return;
+  if(pages.dataset.paneMat)(R.pz=R.pz||{})[pages.dataset.paneMat]=z;else R.zoom=z;
+  roomZoomApply(pages);clearTimeout(R.zT);R.zT=setTimeout(()=>{roomInkAll();const l=document.getElementById('rmZr');if(l)l.textContent=Math.round(roomZoomCur()*100)+'%'},60)}
 function roomZoomBind(stage){
-  stage.addEventListener('wheel',e=>{if(!(e.ctrlKey||e.metaKey))return;e.preventDefault();roomZoomSet((R.zoom||1)*Math.exp(-Math.max(-15,Math.min(15,e.deltaMode===1?e.deltaY*8:e.deltaY))*.01))},{passive:false});
+  const under=e=>(e.target.closest&&e.target.closest('.rm-pages'))||roomZoomTarget();
+  stage.addEventListener('wheel',e=>{if(!(e.ctrlKey||e.metaKey))return;e.preventDefault();const pg=under(e);if(!pg)return;
+    roomZoomSet(roomZoomOf(pg)*Math.exp(-Math.max(-15,Math.min(15,e.deltaMode===1?e.deltaY*8:e.deltaY))*.01),pg)},{passive:false});
   stage.addEventListener('gesturestart',e=>{e.preventDefault();R.gs=1});
-  stage.addEventListener('gesturechange',e=>{e.preventDefault();roomZoomSet((R.zoom||1)*e.scale/(R.gs||1));R.gs=e.scale});
-  let d0=0,z0=1;const dist=t=>Math.hypot(t[0].clientX-t[1].clientX,t[0].clientY-t[1].clientY);
-  stage.addEventListener('touchstart',e=>{if(e.touches.length===2){d0=dist(e.touches);z0=R.zoom||1}},{passive:true});
-  stage.addEventListener('touchmove',e=>{if(e.touches.length===2&&d0){e.preventDefault();roomZoomSet(z0*dist(e.touches)/d0)}},{passive:false});
+  stage.addEventListener('gesturechange',e=>{e.preventDefault();const pg=under(e);if(pg)roomZoomSet(roomZoomOf(pg)*e.scale/(R.gs||1),pg);R.gs=e.scale});
+  let d0=0,z0=1,tp=null;const dist=t=>Math.hypot(t[0].clientX-t[1].clientX,t[0].clientY-t[1].clientY);
+  stage.addEventListener('touchstart',e=>{if(e.touches.length===2){tp=under(e);if(tp){d0=dist(e.touches);z0=roomZoomOf(tp)}}},{passive:true});
+  stage.addEventListener('touchmove',e=>{if(e.touches.length===2&&d0&&tp){e.preventDefault();roomZoomSet(z0*dist(e.touches)/d0,tp)}},{passive:false});
   stage.addEventListener('touchend',()=>{d0=0},{passive:true})}
 /* содержимое одного материала: страницы листа, PDF, картинка, доска, объяснение */
 function roomFill(pages,m,key,act){
@@ -8425,10 +8488,23 @@ function deckReport(m){const items=deckEff(m);let n=0,k=0;const mm=[];
 
 /* реакции: 👍 ❤️ ⭐ 🎉 всплывают у обоих */
 const RX=['👍','❤️','⭐','🎉','😂','🤔'];
-function rxBar(){return `<div class="rt-g rx-g">${RX.map(e=>`<button class="rt rx" data-rx="${e}" aria-label="Реакция ${e}">${e}</button>`).join('')}</div>`}
+const RX_ART={
+ '👍':'<svg viewBox="0 0 40 40"><path d="M5 18h7v16H5z" fill="#5B8DEF"/><path d="M14 18l5.5-11.5c2.8-.2 4.4 2 3.7 4.8L21.8 16H31a3 3 0 0 1 2.9 3.7l-2.2 10A3.6 3.6 0 0 1 28.2 32H14z" fill="#FFC83D" stroke="#E5A21B" stroke-width="1.4" stroke-linejoin="round"/><path d="M17 20l3.5-7" stroke="#fff" stroke-opacity=".55" stroke-width="2" stroke-linecap="round"/></svg>',
+ '❤️':'<svg viewBox="0 0 40 40"><path d="M20 35C6 26 3.5 15.5 10 11.2c4.6-3 8.5-.8 10 2.3 1.5-3.1 5.4-5.3 10-2.3 6.500 4.300 4 14.800-10 23.800z" fill="#F0506E"/><ellipse cx="13" cy="14.500" rx="3.200" ry="2" transform="rotate(-35 13 14.500)" fill="#fff" fill-opacity=".45"/></svg>',
+ '⭐':'<svg viewBox="0 0 40 40">'+star5(20,21.5,16.5,7.2,'#FFC83D').replace('/>',' stroke="#E5A21B" stroke-width="1.5" stroke-linejoin="round"/>')+'<circle cx="16.500" cy="17" r="1.500" fill="#fff" fill-opacity=".7"/></svg>',
+ '🎉':'<svg viewBox="0 0 40 40"><path d="M5 35L12 13l15 15z" fill="#FF8A3D"/><path d="M5 35l3.500-10.500 8 8z" fill="#FFB067"/><path d="M12 13l3-2M16.500 17.500l3.500-2.500M21 22l3.800-3" stroke="#fff" stroke-opacity=".6" stroke-width="1.600" stroke-linecap="round"/><circle cx="24" cy="9" r="2.200" fill="#5B8DEF"/><circle cx="31" cy="15" r="2" fill="#F0506E"/><rect x="29" y="5" width="4" height="4" rx=".8" transform="rotate(25 31 7)" fill="#43B26B"/><path d="M17 6c2 2-2 4 0 6M33 24c-2 1 0 3-2 4" stroke="#B070E8" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="35" cy="31" r="1.600" fill="#FFC83D"/></svg>',
+ '😂':'<svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="16" fill="#FFD34D"/><path d="M10.500 16.500q2.800-3.500 5.600 0M23.900 16.500q2.800-3.500 5.600 0" stroke="#7A4B00" stroke-width="2.200" fill="none" stroke-linecap="round"/><path d="M9.500 22h21c0 6.500-4.500 11-10.500 11S9.500 28.500 9.500 22z" fill="#7A2E1A"/><path d="M14.500 29c2-2 9-2 11 0-2 2.600-9 2.600-11 0z" fill="#FF7A8A"/><path d="M5 20c-1.500 3 1 4 2 2.500C8 21 6 18 5 20zM35 20c1.500 3-1 4-2 2.500-1-1.500 1-4.500 2-2.500z" fill="#5CC8F2"/></svg>',
+ '🤔':'<svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="16" fill="#FFD34D"/><circle cx="14" cy="18" r="2.200" fill="#7A4B00"/><circle cx="26" cy="17.500" r="2.600" fill="#7A4B00"/><path d="M22 11.500l7 -1.800" stroke="#7A4B00" stroke-width="2" stroke-linecap="round"/><path d="M13.500 27q6-3 13 0" stroke="#7A4B00" stroke-width="2.200" fill="none" stroke-linecap="round"/><path d="M27 26.500c2.500-.5 4.500 1.500 3.800 4-.6 2-3.500 2.200-4.600.5z" fill="#F2B25A" stroke="#D68E2B" stroke-width="1.200"/></svg>'};
+function rxBar(){return ''}
+/* реакции живут внизу слева на всех экранах комнаты: нажали, и значки взлетают у обоих */
+function rxDock(){let d=document.getElementById('rxDock');const on=R.on&&(R.role==='t'||roomLive(R.st));
+  if(!on){if(d)d.remove();return}
+  if(d)return;d=document.createElement('div');d.id='rxDock';d.className='rx-dock';
+  d.innerHTML=RX.map(e=>`<button class="rx-b" data-rx="${e}" aria-label="Реакция" title="Отправить реакцию">${RX_ART[e]}</button>`).join('');document.body.appendChild(d);rxBind(d)}
 function rxBind(el){el.querySelectorAll('[data-rx]').forEach(b=>b.onclick=()=>{const e=b.dataset.rx;rxShow(e,true);roomPulse({rx:{e,i:RID(5)}},true)})}
-function rxShow(e,mine){for(let k=0;k<5;k++){const s=document.createElement('span');s.className='rx-fly';s.textContent=e;
-  s.style.left=(mine?70:20)+Math.random()*20+'%';s.style.animationDelay=k*90+'ms';s.style.fontSize=28+Math.random()*22+'px';document.body.appendChild(s);setTimeout(()=>s.remove(),2400)}}
+function rxShow(e,mine){const art=RX_ART[e];for(let k=0;k<5;k++){const s=document.createElement('span');s.className='rx-fly';
+  if(art){s.innerHTML=art;const z=34+Math.random()*26;s.style.width=s.style.height=z+'px'}else{s.textContent=e;s.style.fontSize=28+Math.random()*22+'px'}
+  s.style.left=(mine?3:10)+Math.random()*10+'%';s.style.animationDelay=k*90+'ms';document.body.appendChild(s);setTimeout(()=>s.remove(),2400)}}
 
 
 /* ---------- раздел «Комнаты»: все комнаты учеников в одном месте ---------- */
