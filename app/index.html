@@ -1177,13 +1177,28 @@ button.mchip:hover{background:rgba(255,255,255,.24)}
 .rm-panes.pn3.pnt .rm-pane:first-child{grid-column:1/-1}
 .rm-panes.pn3.pnt .rm-pane:first-child .rm-pages{max-height:32vh}
 @media (max-width:900px){.rm-panes.pn2,.rm-panes.pn3,.rm-panes.pn3.pnt{grid-template-columns:minmax(0,1fr)}}
-.rm-pane{min-width:0;border-radius:12px;border:2px solid var(--line);background:#fff;overflow:hidden}
-.rm-pane.on{border-color:var(--blue)}
-.rm-pane .rp-h{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 8px 6px 12px;font-size:13px;border-bottom:1px solid var(--line);background:var(--card)}
-.rm-pane .rp-h b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.rm-pane.on .rp-h{background:#EAF1FF}
-.rm-pane .rm-pages{max-width:none;margin:0;gap:12px;padding:10px;max-height:calc(100vh - 220px);overflow:auto;background:#F3F5F9}
-.rm-pn.on{background:#EAF1FF;color:var(--blue)}
+.rm-pane{position:relative;min-width:0}
+.rm-pane .rp-c{position:absolute;top:8px;right:8px;z-index:7;width:28px;height:28px;border-radius:50%;border:0;background:#D5402F;color:#fff;font-size:15px;line-height:1;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.25)}
+.rm-pane .rp-c:hover{background:#B83526}
+.rm-pane .rm-pages{max-width:none;margin:0;gap:14px;padding:0;max-height:calc(100vh - 230px);overflow:auto;box-shadow:inset 0 3px 0 transparent}
+.rm-pane.on .rm-pages{box-shadow:inset 0 3px 0 var(--blue)}
+.rm-mat{display:flex;align-items:center;gap:6px}
+.rm-pn{border:1px solid var(--line);background:var(--card);color:var(--ink-2);border-radius:8px;padding:4px 8px;font:inherit;font-size:12px;cursor:pointer;white-space:nowrap}
+.rm-pn:hover{border-color:var(--blue);color:var(--blue)}
+.rm-pn.on{background:#EAF1FF;color:var(--blue);border-color:var(--blue)}
+.rm-del{border:0;background:none;color:#D5402F;font:inherit;font-size:15px;cursor:pointer;padding:4px 6px;border-radius:8px;white-space:nowrap}
+.rm-del:hover,.rm-del.on{background:#D5402F;color:#fff}
+.rm-seeb{display:inline-flex;align-items:center;gap:7px}
+.rm-seeb svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.rm-seeb.off{background:#D5402F;color:#fff;border-color:#D5402F}
+.rpk{display:flex;flex-direction:column;gap:16px;margin-top:4px}
+.rpk-g{display:flex;flex-direction:column;gap:6px}
+.rpk-g>.rt-cap{padding-left:2px}
+.rpk-i{display:flex;align-items:center;gap:14px;text-align:left;border:1px solid var(--line);background:var(--card);border-radius:12px;padding:11px 14px;cursor:pointer;font:inherit;color:var(--ink)}
+.rpk-i:hover{border-color:var(--blue);background:var(--blue-soft)}
+.rpk-i.main{border-color:var(--blue);background:var(--blue-soft)}
+.rpk-i svg{width:26px;height:26px;flex:none;stroke:var(--blue);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.rpk-i b{display:block;font-weight:600;font-size:15px}.rpk-i small{display:block;font-size:13px;color:var(--ink-2);line-height:1.35}
 .rm-pane .rm-pages>*{flex-shrink:0}
 .rpg{position:relative;scroll-margin-top:120px;background:#fff;box-shadow:0 1px 3px rgba(20,30,60,.12);border-radius:4px;overflow:hidden}
 .rpg .r-ink{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:3}
@@ -6015,11 +6030,11 @@ function viewMaterials(){
         ${f.folder?`<span class="chip">${esc(f.folder)}</span>`:''}<button class="ibtn" data-ff="${f.id}" aria-label="В папку">${icon('materials')}</button><button class="ibtn${V.delF===f.id?' on':''}" data-fd="${f.id}" aria-label="Удалить">${V.delF===f.id?'Удалить?':'✕'}</button></div>`).join('')}</div>`:'<p class="empty">Файлов пока нет.</p>'}`}
   if(tab==='boards'){const bl=[...(S.boards||[])].sort((a,b)=>(b.at||0)-(a.at||0));
     const prev=b=>{const f=BD.frames(b.items||[])[0];const im=(f&&f.src)||((b.items||[]).find(x=>x.t==='image')||{}).src;return im?`style="background-image:url('${BD.srcURL(im)}')${f&&!f.src?'':''}"`:f?`style="background:${f.fill||'#fff'}"`:''};
-    body=`<div class="lact" style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap"><button class="btn primary" id="bdNew">+ Новая разработка</button><button class="btn" id="bdImp">Импорт из Miro: PDF или картинки</button><input type="file" id="bdImpF" accept=".pdf,application/pdf,image/*" multiple hidden><button class="btn" id="bdImpM" title="Папка с доской, которую подготовил перенос из Miro: board.json и картинки">Перенос доски Miro: папка</button><input type="file" id="bdImpD" webkitdirectory multiple hidden></div>
+    body=`<div class="lact" style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap"><button class="btn primary" id="bdNew">+ Новая разработка</button><button class="btn" id="bdImp">Импорт доски: PDF или картинки</button><input type="file" id="bdImpF" accept=".pdf,application/pdf,image/*" multiple hidden><button class="btn" id="bdImpM" title="Папка с подготовленной доской: board.json и картинки">Импорт доски: папка</button><input type="file" id="bdImpD" webkitdirectory multiple hidden></div>
       ${bl.length?`<div class="bgrid">${bl.map(b=>`<div class="bcard"><button class="bprev" data-bo="${b.id}" ${prev(b)}>${prev(b)?'':'Пустая'}</button>
         <div class="binf"><b>${esc(b.name)}</b><small>${BD.frames(b.items||[]).length} ${plural(BD.frames(b.items||[]).length,['фрейм','фрейма','фреймов'])} · ${ago(b.at||Date.now())}</small>
         <div class="bbtns"><button class="btn small" data-bo="${b.id}">Открыть</button><button class="btn small quiet" data-bc="${b.id}">Копия</button><button class="btn small quiet" data-bd="${b.id}">${V.delB===b.id?'Удалить?':'Удалить'}</button></div></div></div>`).join('')}</div>`
-      :`<div class="empty-first big-empty">${emptyArt('cheburashka-1')}<div><h2>Разработок пока нет</h2><p>Разработка — это доска как в Miro: фреймы, картинки, текст, стикеры, фигуры. Сделайте один раз и открывайте на уроке в комнате любого ученика.</p></div></div>`}`}
+      :`<div class="empty-first big-empty">${emptyArt('cheburashka-1')}<div><h2>Разработок пока нет</h2><p>Разработка — это ваш холст: фреймы, картинки, текст, стикеры, фигуры. Сделайте один раз и открывайте на уроке в комнате любого ученика.</p></div></div>`}`}
   if(tab==='topics')body=`${mine.length?`<div class="flist">${mine.map(c=>`<div class="frow"><button class="fr-main" data-tp="${c.id}"><span class="fk">${c.grade}</span><span class="fr-t"><b>${esc(c.t)}</b><small>${SUBJ[c.subject]||''} · ${gradeWord(c.grade)} · ${c.L.length} ${plural(c.L.length,['уровень','уровня','уровней'])}</small></span></button></div>`).join('')}</div>`:'<p class="empty">Своих тем пока нет.</p>'}
     <button class="btn" id="newTopic">+ Своя тема</button><p class="hint">Своя тема встаёт в маршрут ученика того класса, для которого её сделали.</p>`;
   app.innerHTML=`<div class="head"><div><h1>Мои материалы</h1><p>Сохранённые листы, свои темы и файлы к урокам.</p></div></div>
@@ -6519,6 +6534,7 @@ function viewRoom(){
   try{const k='kletka-room-help-'+R.role;if(!localStorage.getItem(k)){localStorage.setItem(k,'1');setTimeout(()=>roomHelp(R.role),600)}}catch(e){}
   const stage=document.getElementById('rmStage');
   stage.addEventListener('pointerdown',e=>{const p=e.target.closest('.rm-pane');if(p&&roomMulti())roomActivate(p.dataset.mat)},true);
+  roomZoomBind(stage);
   stage.addEventListener('click',roomStageClick);deckBind(stage);
   stage.addEventListener('pointermove',e=>{if(R.role!=='t'||R.tool!=='hand'||e.pointerType==='touch')return;const pg=e.target.closest('.rpg');if(!pg)return;
     const r=pg.getBoundingClientRect();roomPulse({m:(roomMatOfPg(pg)||{id:R.st.cur}).id,pg:+pg.dataset.pg,x:+((e.clientX-r.left)/r.width).toFixed(4),y:+((e.clientY-r.top)/r.width).toFixed(4)})});
@@ -6532,6 +6548,7 @@ function roomUpdate(){if(!R.on||!document.getElementById('rmTop'))return;roomTop
    У каждого окна своя прокрутка. «Активное» окно то, в которое последним нажали: именно оно получает ручку, ответы и страницу «Веду я». */
 const R_NOPANE=['deck','link'];
 function roomMulti(){const o=R.st.open;if(!o||o.length<2)return null;
+  if(R.role==='s'&&R.st.hide&&roomLive(R.st))return null;
   if(R.role==='s'&&(!roomFollow()||R.away))return null;
   const ids=o.filter(id=>{const m=R.mats.find(x=>x.id===id);return m&&(R.role==='t'||m.vis)&&!R_NOPANE.includes(m.k)});
   return ids.length>1?ids:null}
@@ -6560,11 +6577,12 @@ function roomToggleOpen(id){
   let o=base.filter(x=>R.mats.some(y=>y.id===x&&!R_NOPANE.includes(y.k)));
   if(o.includes(id)){if(o.length<2)return;o=o.filter(x=>x!==id)}
   else{if(o.length>=3){toast('Рядом можно открыть до трёх материалов. Закройте одно окно крестиком');return}o.push(id)}
-  if(R.st.lead!==false&&roomLive(R.st)&&!m.vis){m.vis=true;roomSaveMats()}
+  if(roomLive(R.st)&&!m.vis){m.vis=true;roomSaveMats()}
   roomSet({open:o,cur:o.includes(R.st.cur)?R.st.cur:o[o.length-1],foc:null});roomUpdate()}
 function roomPaneClose(id){const o=(R.st.open||[]).filter(x=>x!==id);roomSet({open:o,cur:o.includes(R.st.cur)?R.st.cur:o[0]||R.st.cur,foc:null});roomUpdate()}
 function roomMat1(){
   if(R.role==='t')return R.mats.find(m=>m.id===R.st.cur)||null;
+  if(R.st.hide&&roomLive(R.st))return null;
   const vis=R.mats.filter(m=>m.vis);const id=roomFollow()&&!R.away?R.st.cur:(R.myCur||R.st.cur);
   return vis.find(m=>m.id===id)||vis[vis.length-1]||null;
 }
@@ -6579,7 +6597,7 @@ function roomTop(){
       <div class="rm-who"><b>${esc(R.info.name)}</b><span class="rm-pres${roomHere()?' on':out?' out':''}">${roomHere()?esc(where):out?'Ученик вышел из комнаты':live?'Ученик ещё не пришёл':'не в комнате'}</span></div>
       <div class="rm-act">${live&&C.st==='idle'?'<button class="btn small" id="rmVideo">Позвонить снова</button>':''}${R.st.call?'<button class="btn small quiet" id="rmCall">Ссылка</button>':''}
         <button class="ibtn" id="rmHelpBtn" aria-label="Как работает комната" title="Как работает комната">?</button><button class="ibtn" id="rmSet" aria-label="Настройки комнаты">⋯</button>
-        ${live?'<button class="btn small rm-start" id="rmEnd">Завершить урок</button>':'<button class="btn small rm-start" id="rmLive">Начать урок</button>'}</div>`;
+        ${live?`<button class="btn small rm-seeb${R.st.hide?' off':''}" id="rmSee" title="${R.st.hide?'Ученик сейчас ничего не видит. Нажмите, чтобы показать ему материалы':'Ученик видит то, что на экране. Нажмите, чтобы скрыть всё от ученика'}">${R.st.hide?'<svg viewBox="0 0 24 24"><path d="M3 3l18 18M10.6 6.2A9.6 9.6 0 0 1 12 6c5 0 8.5 4.2 9.5 6-.4.8-1.4 2.2-2.9 3.5M6.5 7.6C4.3 9 2.9 11 2.5 12c1 1.8 4.5 6 9.5 6 1.4 0 2.7-.3 3.8-.8"/></svg>Ученик не видит':'<svg viewBox="0 0 24 24"><path d="M2.5 12C3.5 10.2 7 6 12 6s8.5 4.2 9.5 6c-1 1.8-4.5 6-9.5 6s-8.5-4.2-9.5-6z"/><circle cx="12" cy="12" r="2.8"/></svg>Ученик видит'}</button><button class="btn small rm-start" id="rmEnd">Завершить урок</button>`:'<button class="btn small rm-start" id="rmLive">Начать урок</button>'}</div>`;
     const $=id=>document.getElementById(id);
     $('rmBack').onclick=()=>{
       if(!roomLive(R.st)){go({screen:'student'});return}
@@ -6591,6 +6609,7 @@ function roomTop(){
     $('rmSet').onclick=roomSettings;$('rmHelpBtn').onclick=()=>roomHelp('t');
     if($('rmLive'))$('rmLive').onclick=roomBegin;
     if($('rmEnd'))$('rmEnd').onclick=roomFinish;
+    if($('rmSee'))$('rmSee').onclick=()=>{roomSet({hide:!R.st.hide});roomUpdate()};
   }else{
     const away=roomFollow()&&R.away;
     el.innerHTML=`${live?'':'<button class="btn quiet small" id="rmBack">← Мои задания</button>'}
@@ -6618,9 +6637,9 @@ function roomSide(){
   if(!t){el.classList.toggle('open',!!R.side);if(!R.side){el.innerHTML='';return}}
   const list=t?R.mats:R.mats.filter(m=>m.vis);
   const d0=dayStart(Date.now());const today=list.filter(m=>(m.at||0)>=d0),past=list.filter(m=>(m.at||0)<d0);
-  const row=m=>`<div class="rm-mat${cur&&cur.id===m.id?' on':''}${t&&!m.vis?' hid':''}"><button class="rm-mb" data-m="${m.id}"><span class="rmk">${R_KIND[m.k]||''}</span><b>${esc(rTitle(m.t))}</b>${m.k==='sheet'?`<small>${roomProg(m)}</small>`:''}</button>
-    ${t&&!R_NOPANE.includes(m.k)?`<button class="ibtn rm-pn${(R.st.open||[]).includes(m.id)&&(R.st.open||[]).length>1?' on':''}" data-pn="${m.id}" aria-label="Открыть рядом" title="Открыть рядом с другими материалами"><svg viewBox="0 0 24 24" width="16" height="16"><rect x="3" y="4" width="8" height="16" rx="1.6" fill="none" stroke="currentColor" stroke-width="2"/><rect x="13" y="4" width="8" height="16" rx="1.6" fill="none" stroke="currentColor" stroke-width="2"/></svg></button>`:''}
-    ${t?`<button class="ibtn rm-eye" data-eye="${m.id}" aria-label="${m.vis?'Скрыть от ученика':'Показать ученику'}" title="${m.vis?'Ученик видит':'Ученик не видит'}">${m.vis?'👁':'—'}</button><button class="ibtn${R.delM===m.id?' on':''}" data-del="${m.id}" aria-label="Убрать">${R.delM===m.id?'Убрать?':'✕'}</button>`:''}</div>`;
+  const open=R.st.open||[],multi=open.length>1;
+  const row=m=>`<div class="rm-mat${cur&&cur.id===m.id?' on':''}"><button class="rm-mb" data-m="${m.id}"><span class="rmk">${R_KIND[m.k]||''}</span><b>${esc(rTitle(m.t))}</b>${m.k==='sheet'?`<small>${roomProg(m)}</small>`:''}</button>
+    ${t?`${!R_NOPANE.includes(m.k)?`<button class="rm-pn${multi&&open.includes(m.id)?' on':''}" data-pn="${m.id}" title="${multi&&open.includes(m.id)?'Убрать из окон рядом':'Открыть рядом с тем, что уже на экране'}">${multi&&open.includes(m.id)?'✓ рядом':'+ рядом'}</button>`:''}<button class="rm-del${R.delM===m.id?' on':''}" data-del="${m.id}" aria-label="Убрать" title="Убрать материал из комнаты">${R.delM===m.id?'Убрать?':'✕'}</button>`:''}</div>`;
   const byDay={};past.forEach(m=>{const k=dkey(m.at||0);(byDay[k]=byDay[k]||[]).push(m)});
   const days=Object.keys(byDay).sort().reverse();
   el.innerHTML=`<div class="rm-sh">${t?'Сегодня':'Тетрадь'}</div>
@@ -6629,7 +6648,6 @@ function roomSide(){
     ${days.length?`<details class="rm-past"${R.pastOpen?' open':''}><summary>Прошлые уроки · ${days.length}</summary>${days.map(k=>`<div class="rm-day">${dayTxt(atOf(k))}</div>${byDay[k].map(row).join('')}`).join('')}</details>`:''}`;
   el.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>roomOpenMat(b.dataset.m));
   el.querySelectorAll('[data-pn]').forEach(b=>b.onclick=()=>roomToggleOpen(b.dataset.pn));
-  el.querySelectorAll('[data-eye]').forEach(b=>b.onclick=()=>{const m=R.mats.find(x=>x.id===b.dataset.eye);m.vis=!m.vis;roomSaveMats();roomSide()});
   el.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{const id=b.dataset.del;if(R.delM!==id){R.delM=id;roomSide();return}
     R.delM=null;R.mats=R.mats.filter(m=>m.id!==id);if(R.st.cur===id)roomSet({cur:R.mats.length?R.mats[R.mats.length-1].id:null,pg:0});roomSaveMats();roomUpdate()});
   const pd=el.querySelector('.rm-past');if(pd)pd.ontoggle=()=>{R.pastOpen=pd.open};
@@ -6637,7 +6655,7 @@ function roomSide(){
 }
 function roomOpenMat(id){
   if(R.role==='t'){const m=R.mats.find(x=>x.id===id);
-    if(R.st.lead!==false&&roomLive(R.st)&&m&&!m.vis){m.vis=true;roomSaveMats()}
+    if(roomLive(R.st)&&m&&!m.vis){m.vis=true;roomSaveMats()}
     const ids=roomMulti();
     if(ids&&m&&!R_NOPANE.includes(m.k)){
       if(ids.includes(id))roomActivate(id);
@@ -6656,12 +6674,12 @@ function roomTools(){
     el.innerHTML=`<div class="rt-sec"><span class="rt-cap">Показ</span><div class="seg rm-seg"><button class="${R.st.lead!==false?'on':''}" id="rmLead" title="Ученик видит то же, что вы: тот же материал и страницу">Веду я</button><button class="${R.st.lead===false?'on':''}" id="rmFree" title="Ученик листает сам, вы видите, где он">Свободно</button></div></div>
       <div class="rt-sec"><span class="rt-cap">Рисование</span><div class="rt-g">${tb('hand','Указка')}${tb('pen','Маркер')}${tb('hl','Выделитель')}${tb('er','Ластик')}<button class="rt" id="rmUndo" aria-label="Отменить свою линию" title="Отменить последнюю линию">↶</button><button class="rt" id="rmClr" title="Стереть все пометки этой страницы">Очистить</button></div></div>
       ${inkSwatches()?`<div class="rt-sec"><span class="rt-cap">Цвет</span>${inkSwatches()}</div>`:''}
-      <div class="rt-sec"><span class="rt-cap">Ученик</span><div class="rt-g"><button class="rt${R.st.pen?' on':''}" id="rmPen" title="Разрешить ученику рисовать маркером. Пока выключено, он только отвечает в окошках">${R.st.pen?'Ручка у ученика: есть':'Ручка у ученика: нет'}</button>
-        <span class="rt-lbl" title="Показывать ли ученику сразу, верно он ответил или нет. «Скрывать» подходит для проверочной: ответ встаёт в лист без отметки, а вы видите всё">Отметки ✓ ✗</span><span class="seg rt-sg"><button class="${chkOn?'on':''}" id="rmChk1" title="Ученик сразу видит, верно ли ответил">Видит</button><button class="${chkOn?'':'on'}" id="rmChk0" title="Ученик отметок не видит, только вы">Скрыты</button></span></div></div>
+      <div class="rt-sec"><span class="rt-cap">Ученик</span><div class="rt-g"><button class="rt${R.st.pen?' on':''}" id="rmPen" title="${R.st.pen?'Ручка у ученика есть. Нажмите, чтобы забрать':'Разрешить ученику рисовать маркером. Пока не дали, он только отвечает в окошках'}">${R.st.pen?'✓ ':''}Дать ручку ученику</button>
+        <span class="rt-lbl" title="Показывать ли ученику сразу, верно ли он ответил. «Скрыты» подходит для проверочной: ответ встаёт в лист без отметки, а вы видите всё">Ответы</span><span class="seg rt-sg"><button class="${chkOn?'on':''}" id="rmChk1" title="Ученик сразу видит, верно ли ответил">Видит</button><button class="${chkOn?'':'on'}" id="rmChk0" title="Ученик отметок не видит, только вы">Скрыты</button></span></div></div>
       ${mine?`<div class="rt-sec"><span class="rt-cap">Материал</span><div class="rt-g">
         ${m.k==='sheet'?`<button class="rt${R.keys?' on':''}" id="rmKeys" title="Показать правильные ответы только вам, ученик их не видит">Ключ ответов</button>`:''}
         ${m.k==='sheet'&&m.tid&&TOPICS[m.tid]?'<button class="rt" id="rmTune" title="Сменить уровень, число заданий, вариант">Настроить лист</button><button class="rt" id="rmHw" title="Выдать такой же лист как домашку">В домашку</button>':''}
-        ${m.k==='board'?'<button class="rt" id="rmPg" title="Добавить ещё одну страницу к доске">+ Страница</button>':''}
+        ${m.k==='board'?`<span class="rt-lbl">Фон</span><span class="seg rt-sg">${[['grid','Клетка'],['lines','Линейка'],['white','Белый']].map(([v,n])=>`<button data-bg="${v}" class="${(m.bg||'grid')===v?'on':''}">${n}</button>`).join('')}</span><button class="rt" id="rmPg" title="Добавить ещё одну страницу к доске">+ Страница</button>`:''}
         <button class="rt" id="rmImg" title="Положить фото или скриншот на страницу. Работает и Ctrl+V">+ Картинка</button></div></div>`:''}
       <div class="rt-sec"><span class="rt-cap">Масштаб</span><div class="rt-g rt-z"><button class="rt" id="rmZm" aria-label="Уменьшить" title="Уменьшить">−</button><button class="rt" id="rmZr" title="Вернуть по ширине">${Math.round((R.zoom||1)*100)}%</button><button class="rt" id="rmZp" aria-label="Увеличить" title="Увеличить">+</button></div></div>
       <div class="rt-sec"><span class="rt-cap">Реакции</span>${rxBar()}</div>`;
@@ -6671,6 +6689,7 @@ function roomTools(){
     $('rmPen').onclick=()=>{roomSet({pen:!R.st.pen});roomTools()};
     $('rmUndo').onclick=roomUndo;$('rmClr').onclick=roomClear;
     if($('rmImg'))$('rmImg').onclick=roomPinPick;
+    el.querySelectorAll('[data-bg]').forEach(b=>b.onclick=()=>{if(m.bg===b.dataset.bg)return;m.bg=b.dataset.bg;roomSaveMats();roomUpdate()});
     [1,0].forEach(v=>{if($('rmChk'+v))$('rmChk'+v).onclick=()=>{roomSet({chk:v===1});roomTools();roomAnsPaint()}});
     if($('rmKeys'))$('rmKeys').onclick=()=>{R.keys=!R.keys;roomTools();roomAnsPaint()};
     if($('rmHw'))$('rmHw').onclick=()=>roomHomework(m);
@@ -6683,7 +6702,7 @@ function roomTools(){
     const u=document.getElementById('rmUndo');if(u)u.onclick=roomUndo;
   }
   const z=R.zoom||1;if(R.role!=='t')el.insertAdjacentHTML('beforeend',`<div class="rt-sec"><span class="rt-cap">Масштаб</span><div class="rt-g rt-z"><button class="rt" id="rmZm" aria-label="Уменьшить" title="Уменьшить">−</button><button class="rt" id="rmZr" title="Вернуть по ширине">${Math.round(z*100)}%</button><button class="rt" id="rmZp" aria-label="Увеличить" title="Увеличить">+</button></div></div>`);
-  const ZS=[.5,.67,.8,1,1.25,1.5,2],zset=v=>{R.zoom=v;R.stageKey='';roomStage();roomTools()};
+  const ZS=[.5,.67,.8,1,1.25,1.5,2,3],zset=v=>{roomZoomSet(v);const l=document.getElementById('rmZr');if(l)l.textContent=Math.round((R.zoom||1)*100)+'%'};
   document.getElementById('rmZm').onclick=()=>zset([...ZS].reverse().find(v=>v<(R.zoom||1)-.01)||ZS[0]);
   document.getElementById('rmZp').onclick=()=>zset(ZS.find(v=>v>(R.zoom||1)+.01)||ZS[ZS.length-1]);
   document.getElementById('rmZr').onclick=()=>zset(1);
@@ -6704,7 +6723,7 @@ function roomStage(){
   const key=(m?(m.k==='deck'?m.id+'|deck|'+BD.frames(m.items||[]).map(f=>f.id+':'+f.w+'x'+f.h+(f.src||'')+(f.fill||'')).join(','):
     m.k==='pdf'&&m.n?m.id+'|pdfp|'+m.n+'|'+(R.local[m.id]&&R.local[m.id].doc?'L':'S'):
     m.k==='img'?m.id+'|img|'+(R.local[m.id]?'L':m.f||'')+(m.err?'E':''):
-    m.id+'|'+JSON.stringify({...m,pins:0})):'none')+'|z'+(R.zoom||1);
+    m.id+'|'+JSON.stringify({...m,pins:0})):'none');
   if(key===R.stageKey){roomAnsPaint();roomPdfSync(m);roomPinsPaint();return}
   R.stageKey=key;R.items=null;roomAnsClose();(R.pgObsAll||[]).forEach(o=>o.disconnect());R.pgObsAll=[];
   if(R.role==='s')roomPulse({m:m?m.id:null,pg:0});
@@ -6718,21 +6737,35 @@ function roomStage(){
 function roomPaneKey(m){return m.k==='pdf'&&m.n?m.id+'|pdfp|'+m.n+'|'+(R.local[m.id]&&R.local[m.id].doc?'L':'S'):m.k==='img'?m.id+'|img|'+(R.local[m.id]?'L':m.f||'')+(m.err?'E':''):m.id+'|'+JSON.stringify({...m,pins:0})}
 function roomStageMulti(host,ids){
   const ms=ids.map(id=>R.mats.find(x=>x.id===id));
-  const key='multi|'+ms.map(roomPaneKey).join('||')+'|z'+(R.zoom||1);
+  const key='multi|'+ms.map(roomPaneKey).join('||');
   if(key===R.stageKey){roomAnsPaint();ms.forEach(roomPdfSync);roomPinsPaint();roomPaneMark();return}
   R.stageKey=key;R.items=null;roomAnsClose();(R.pgObsAll||[]).forEach(o=>o.disconnect());R.pgObsAll=[];
   if(R.role==='s')roomPulse({m:(roomMat()||{}).id||null,pg:0});
   const note=ms.length===3?ms.find(x=>x.k==='note'):null,order=note?[note,...ms.filter(x=>x!==note)]:ms;
-  host.innerHTML=`<div class="rm-panes pn${ms.length}${note?' pnt':''}">${order.map(m=>`<div class="rm-pane" data-mat="${m.id}"><div class="rp-h"><b>${esc(rTitle(m.t))}</b>${R.role==='t'?`<button class="ibtn rp-c" data-pc="${m.id}" aria-label="Закрыть окно" title="Закрыть окно">✕</button>`:''}</div><div class="rm-pages"></div></div>`).join('')}</div>`;
+  host.innerHTML=`<div class="rm-panes pn${ms.length}${note?' pnt':''}">${order.map(m=>`<div class="rm-pane" data-mat="${m.id}" title="${esc(rTitle(m.t))}">${R.role==='t'?`<button class="rp-c" data-pc="${m.id}" aria-label="Закрыть это окно" title="Закрыть это окно">✕</button>`:''}<div class="rm-pages"></div></div>`).join('')}</div>`;
   host.querySelectorAll('.rp-c').forEach(b=>b.onclick=ev=>{ev.stopPropagation();roomPaneClose(b.dataset.pc)});
   const act=roomMat();
   order.forEach(m=>{const pages=host.querySelector(`.rm-pane[data-mat="${m.id}"] .rm-pages`);pages.dataset.paneMat=m.id;roomFill(pages,m,key,!!act&&act.id===m.id)});
   roomPaneMark();
 }
+/* масштаб: кнопки, щипок на тачпаде и сенсорном экране. Размер меняется на месте, лист не перерисовывается */
+function roomZoomApply(pages){const z=R.zoom||1;
+  if(pages.dataset.paneMat)pages.style.width=(z===1?'':Math.round(z*100)+'%');else pages.style.width=z===1?'':`calc(min(100%,880px)*${z})`}
+function roomZoomSet(z){z=Math.max(.4,Math.min(3,+z.toFixed(3)));if(z===(R.zoom||1))return;R.zoom=z;
+  document.querySelectorAll('#rmStage .rm-pages').forEach(roomZoomApply);
+  clearTimeout(R.zT);R.zT=setTimeout(()=>{roomInkAll();const l=document.getElementById('rmZr');if(l)l.textContent=Math.round(R.zoom*100)+'%'},60)}
+function roomZoomBind(stage){
+  stage.addEventListener('wheel',e=>{if(!(e.ctrlKey||e.metaKey))return;e.preventDefault();roomZoomSet((R.zoom||1)*Math.exp(-Math.max(-15,Math.min(15,e.deltaMode===1?e.deltaY*8:e.deltaY))*.01))},{passive:false});
+  stage.addEventListener('gesturestart',e=>{e.preventDefault();R.gs=1});
+  stage.addEventListener('gesturechange',e=>{e.preventDefault();roomZoomSet((R.zoom||1)*e.scale/(R.gs||1));R.gs=e.scale});
+  let d0=0,z0=1;const dist=t=>Math.hypot(t[0].clientX-t[1].clientX,t[0].clientY-t[1].clientY);
+  stage.addEventListener('touchstart',e=>{if(e.touches.length===2){d0=dist(e.touches);z0=R.zoom||1}},{passive:true});
+  stage.addEventListener('touchmove',e=>{if(e.touches.length===2&&d0){e.preventDefault();roomZoomSet(z0*dist(e.touches)/d0)}},{passive:false});
+  stage.addEventListener('touchend',()=>{d0=0},{passive:true})}
 /* содержимое одного материала: страницы листа, PDF, картинка, доска, объяснение */
 function roomFill(pages,m,key,act){
   roomPinMode(pages);
-  const z=R.zoom||1;if(pages.dataset.paneMat)pages.style.width=Math.round(z*100)+'%';else pages.style.maxWidth=Math.round(880*z)+'px';
+  roomZoomApply(pages);
   const done=()=>{if(R.stageKey!==key)return;[...pages.children].forEach((pg,k)=>roomSetupPage(pg,k));roomInkAll();roomAnsPaint();roomPinsPaint();roomTrackPages(pages);
     if(act&&roomFollow()&&!R.away)roomScrollPg(R.st.pg||0,true)};
   if(m.k==='sheet'){
@@ -7022,13 +7055,13 @@ function roomStudent(){return student(R.info.sid)}
 function roomSubj(){const st=roomStudent();return st.subjects.includes(V.subject)?V.subject:st.subjects[0]}
 function roomCurTopic(){const st=roomStudent(),pos=trackPos(st,roomSubj());return pos.i>=0?TOPICS[pos.tr[pos.i]]:null}
 function roomQuickHTML(){const t=roomCurTopic();
-  return `${t?`<button class="rq main" data-q="lesson"><b>Урок по теме</b><small>${esc(t.t)} · правило, разминка, задачи</small></button>`:''}
+  return `${t?`<button class="rq main" data-q="lesson"><b>Урок по текущей теме</b><small>${esc(t.t)} · правило, разминка, задачи</small></button>`:''}
     <button class="rq" data-q="pick"><b>Другой материал</b><small>лист, файл, доска, объяснение</small></button>`}
 function roomQuick(q){if(q==='lesson')roomAddLesson();else roomPicker()}
 function roomAdd(m,open=true){
   m.id=m.id||RID(10);m.at=Date.now();m.vis=false;
   const ids0=roomMulti(),prev=R.st.cur;R.mats.push(m);
-  if(open){if(R.st.lead!==false&&roomLive(R.st))m.vis=true;
+  if(open){if(roomLive(R.st))m.vis=true;
     let o=[m.id];if(ids0&&!R_NOPANE.includes(m.k)){o=R.st.open.slice();if(o.length<3)o.push(m.id);else{const i=o.indexOf(prev);o[i>=0?i:2]=m.id}}
     roomSet({cur:m.id,pg:0,foc:null,open:o});R.pgNow=0}
   roomSaveMats();roomUpdate();window.scrollTo({top:0});
@@ -7066,20 +7099,34 @@ function roomFromTopic(st,t,tpl,blocks){
   }else roomAdd(m);
   go({screen:'room'});
 }
+const RPK_IC={
+  lesson:'<svg viewBox="0 0 24 24"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H11v15H5.5A1.5 1.5 0 0 0 4 20.5zM20 5.5A1.5 1.5 0 0 0 18.5 4H13v15h5.5a1.5 1.5 0 0 1 1.5 1.5z"/></svg>',
+  topic:'<svg viewBox="0 0 24 24"><rect x="5" y="3.5" width="14" height="17" rx="2"/><path d="M8.5 8.5h7M8.5 12h7M8.5 15.5h4"/></svg>',
+  saved:'<svg viewBox="0 0 24 24"><path d="M3.5 7.5A1.5 1.5 0 0 1 5 6h4l2 2h8a1.5 1.5 0 0 1 1.5 1.5V17a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 17z"/></svg>',
+  file:'<svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><circle cx="9" cy="9.5" r="1.6"/><path d="M5 17l4.5-4.5 3 3L15 13l4 4"/></svg>',
+  board:'<svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 9.3h16M4 14.7h16M9.3 4v16M14.7 4v16"/></svg>',
+  note:'<svg viewBox="0 0 24 24"><path d="M5 6.5h14M5 11h14M5 15.5h9"/></svg>',
+  deck:'<svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="8" height="6" rx="1.2"/><rect x="12.5" y="5" width="8" height="6" rx="1.2"/><rect x="3.5" y="13" width="17" height="6" rx="1.2"/></svg>'};
 function roomPicker(){
   const t=roomCurTopic();
-  const it=(a,b,s)=>`<button class="rq" data-a="${a}"><b>${b}</b><small>${s}</small></button>`;
-  modal(`<h2>Добавить в урок</h2><div class="rm-pick">
-      ${t?`<button class="rq main" data-a="lesson"><b>Урок по теме</b><small>${esc(t.t)} · правило, разминка, задачи</small></button>`:''}
-      ${it('deck','Разработка','ваша доска с фреймами, как в Miro')}${it('topic','Лист по теме','любая тема и уровень')}${it('saved','Из моих материалов','сохранённые листы и файлы')}
-      ${it('file','Файл или фото','PDF, картинка, фото страницы учебника')}${it('board','Чистая доска','в клетку, в линейку или белая')}
-      ${it('note','Объяснение','правило темы или свой текст')}${it('link','Ссылка','видео, игра, сайт')}</div>
-    <p class="hint" style="margin:0">Скриншот можно вставить прямо в комнату: Ctrl+V. Ученик видит материал, только когда вы его покажете.</p>
+  const it=(a,b,sm,main)=>`<button class="rpk-i${main?' main':''}" data-a="${a}">${RPK_IC[a]}<span><b>${b}</b><small>${sm}</small></span></button>`;
+  modal(`<h2>Добавить в урок</h2><div class="rpk">
+      <div class="rpk-g"><span class="rt-cap">Задания</span>
+        ${t?it('lesson','Урок по текущей теме',esc(t.t)+': один готовый лист с правилом, разминкой и задачами, подобран по уровню ученика',true):''}
+        ${it('topic','Лист по любой теме','вы сами выбираете тему, уровень и вид листа')}</div>
+      <div class="rpk-g"><span class="rt-cap">Файлы</span>
+        ${it('file','Файл или фото','PDF, картинка, фото страницы учебника')}
+        ${it('saved','Из моих материалов','сохранённые листы и файлы')}</div>
+      <div class="rpk-g"><span class="rt-cap">Пустое</span>
+        ${it('board','Чистая доска','в клетку; фон можно поменять на панели')}
+        ${it('note','Объяснение','правило темы или свой текст')}
+        ${it('deck','Разработка','холст: ваша доска с фреймами')}</div></div>
+    <p class="hint" style="margin:0">Скриншот можно вставить прямо в комнату: Ctrl+V. Новый материал ученик видит сразу, если не нажата кнопка «Ученик не видит».</p>
     <div class="modal-actions"><button class="btn quiet" id="cl">Отмена</button></div>`,()=>{
     document.getElementById('cl').onclick=close;
     document.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{const a=b.dataset.a;
       if(a==='lesson'){close();roomAddLesson()}else if(a==='deck')roomDeckPick();else if(a==='topic')roomTopicPick();else if(a==='saved')roomSavedPick();
-      else if(a==='file')roomFilePick();else if(a==='board')roomBoardPick();else if(a==='note')roomNoteEdit();else if(a==='link')roomLinkEdit()})});
+      else if(a==='file')roomFilePick();else if(a==='board'){close();roomAdd({k:'board',bg:'grid',n:1,t:'Доска'})}else if(a==='note')roomNoteEdit()})});
 }
 /* разработка в комнату: копия доски, картинки переезжают в комнату ученика, каждый фрейм — страница */
 function roomDeckPick(){const bl=[...(S.boards||[])].sort((a,b)=>(b.at||0)-(a.at||0));
@@ -7783,8 +7830,8 @@ function viewReport(){
   if($('rpRevX'))$('rpRevX').onclick=()=>{st.revNext=[];save();render()};
 }
 /* как вынести доску из Miro: один раз через VPN, потом файл — в «Клетку» */
-function boardImportHelp(){modal(`<h2>Импорт из Miro</h2>
-  <ol class="imp-steps"><li>Откройте доску в Miro (из России — через VPN).</li><li>Меню доски → <b>Экспорт</b> → <b>PDF</b>, или выделите фреймы и сохраните их как картинки.</li><li>Здесь нажмите «Выбрать файлы» и укажите PDF или картинки.</li></ol>
+function boardImportHelp(){modal(`<h2>Импорт доски</h2>
+  <ol class="imp-steps"><li>Откройте доску в сервисе, где она хранится (из России может понадобиться VPN).</li><li>Меню доски → <b>Экспорт</b> → <b>PDF</b>, или выделите фреймы и сохраните их как картинки.</li><li>Здесь нажмите «Выбрать файлы» и укажите PDF или картинки.</li></ol>
   <p class="hint" style="margin:0">Каждая страница станет фреймом с этой страницей на фоне. Поверх можно поставить поля ответа, зоны, шторки, стикеры. До 60 страниц за раз.</p>
   <div class="modal-actions"><button class="btn quiet" id="cl">Отмена</button><button class="btn primary" id="go">Выбрать файлы</button></div>`,()=>{
   document.getElementById('cl').onclick=close;document.getElementById('go').onclick=()=>{close();document.getElementById('bdImpF').click()}})}
@@ -8117,7 +8164,7 @@ const BD=(()=>{
     let bad=0;await Promise.all(Array.from({length:3},one));
 
     const items=d.items.filter(x=>x.t!=='image'||!/^miro:/.test(x.src)||map[x.src.slice(5)]).map(x=>{if(x.t!=='image'||!/^miro:/.test(x.src))return x;const k=x.src.slice(5),o={...x,src:map[k]};if(th[k])o.th=th[k];return o});
-    return{id:'b'+uid(),name:d.title||'Доска из Miro',at:Date.now(),from:'miro',items,bad}}
+    return{id:'b'+uid(),name:d.title||'Импортированная доска',at:Date.now(),from:'miro',items,bad}}
   /* уменьшенная копия для мелкого показа на доске: до 320 точек по длинной стороне; маленькой картинке не нужна */
   function small(im){if(Math.max(im.w,im.h)<=480||/gif/.test(im.blob.type))return null;
     return new Promise(res=>{const i=new Image();i.onload=()=>{const k=320/Math.max(im.w,im.h),w=Math.round(im.w*k),h=Math.round(im.h*k);
@@ -8406,10 +8453,12 @@ function roomHelp(role){
     ['Свободно','Ученик листает сам, например на самостоятельной работе. Вы видите сверху, на каком материале и странице он сейчас.'],
     ['Указка','Ваш курсор виден ученику красной точкой. Удобно показывать «вот здесь». Нажатие на задание подсвечивает его у ученика.'],
     ['Маркер, выделитель, ластик','Рисуют поверх листа. Цвет выбирается рядом. Ластик стирает одну линию, «Очистить» — все пометки страницы.'],
-    ['Ручка у ученика','Разрешает ученику рисовать маркером. Пока выключено, ученик только отвечает в окошках.'],
-    ['Отметки ✓ ✗','Ученик пишет прямо в окошках листа, у вас ответ появляется сразу: верно зелёным, ошибка красным. «Видит» показывает ученику такую же отметку, «Скрыты» оставляет её только вам (удобно для проверочной).'],
+    ['Ученик видит','Кнопка вверху. Когда горит красным («Ученик не видит»), ученик не видит никаких материалов: удобно, пока вы готовите следующий. Нажмите ещё раз, и всё вернётся.'],
+    ['Дать ручку ученику','Разрешает ученику рисовать маркером. Пока не дали, ученик только отвечает в окошках.'],
+    ['Ответы: видит, скрыты','Ученик пишет прямо в окошках листа, у вас ответ появляется сразу: верно зелёным, ошибка красным. «Видит» показывает ученику такую же отметку, «Скрыты» оставляет её только вам (удобно для проверочной).'],
     ['Ключ ответов','Показывает правильные ответы только вам. Ученик их не видит.'],
-    ['Несколько материалов','Кнопка с двумя рамками у материала в списке открывает его рядом с другими, до трёх окон. Окно, в которое вы нажали, становится главным: в нём рисуете и по нему идёт «Веду я». Крестик в заголовке окна закрывает его.'],
+    ['Несколько материалов','Кнопка «+ рядом» у материала в списке открывает его рядом с другими, до трёх окон. Окно, в которое вы нажали, становится главным (сверху тонкая синяя линия): в нём рисуете и по нему идёт «Веду я». Красный крестик в углу окна закрывает его.'],
+    ['Масштаб','Кнопки «−» и «+» или щипок двумя пальцами по тачпаду и сенсорному экрану. Листать можно двумя пальцами.'],
     ['Картинка на листе','«+ Картинка» или Ctrl+V кладёт фото или скриншот на текущую страницу. Её можно двигать, менять размер угловой точкой и убирать крестиком, а писать поверх.'],
     ['Показ экрана','Кнопка с монитором в окне звонка. Браузер спросит, что показать: лучше выбрать вкладку. Ученик видит ваш экран, но управлять им не может.']];
   const S2=[['Урок','Когда репетитор начинает урок, нажми «Войти». Разреши камеру и микрофон — так вы будете видеть и слышать друг друга.'],
