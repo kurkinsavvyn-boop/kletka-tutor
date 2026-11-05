@@ -1167,7 +1167,18 @@ button.mchip:hover{background:rgba(255,255,255,.24)}
 .drawing .rpg .r-ink{pointer-events:auto;touch-action:none;cursor:crosshair}
 .r-laser{position:absolute;z-index:4;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;background:rgba(213,64,47,.75);box-shadow:0 0 0 6px rgba(213,64,47,.18);pointer-events:none;opacity:0;transition:opacity .25s,left .08s linear,top .08s linear}
 .r-laser.on{opacity:1}
-.rpg .r-bg{display:block;width:100%;height:100%}
+.rpg .r-bg{display:block;width:100%;height:100%;object-fit:contain}
+.rpg.rwait{display:grid;place-items:center;color:var(--ink-3);font-size:14px}
+.rpg.rpdf.rwait::after{content:"Страница загружается…"}
+.rpg.rimg.rwait{min-height:240px}
+.r-pins{position:absolute;inset:0;container-type:size;z-index:2;pointer-events:none}
+.r-pin{position:absolute;pointer-events:none;touch-action:none}
+.r-pin img{display:block;width:100%;height:auto;border-radius:6px;box-shadow:0 2px 10px rgba(20,30,60,.22);user-select:none;-webkit-user-drag:none}
+.pin-ed .r-pin{pointer-events:auto;cursor:move}
+.r-pin.sel img{outline:2px solid var(--blue)}
+.rp-x{position:absolute;right:-10px;top:-10px;width:26px;height:26px;border-radius:50%;border:0;background:#D5402F;color:#fff;font-size:17px;line-height:1;cursor:pointer}
+.rp-rs{position:absolute;right:-8px;bottom:-8px;width:18px;height:18px;border-radius:50%;background:var(--blue);border:2px solid #fff;cursor:nwse-resize}
+.rm-up{position:fixed;left:16px;bottom:16px;z-index:60;background:#1F2C55;color:#fff;border-radius:999px;padding:8px 16px;font-size:13px;box-shadow:0 4px 14px rgba(20,30,60,.3)}
 .rimg img{display:block;width:100%;height:auto}
 .rbd{aspect-ratio:210/297}
 .bg-grid{background-image:linear-gradient(#c9dcf0 1px,transparent 1px),linear-gradient(90deg,#c9dcf0 1px,transparent 1px);background-size:3.4cqw 3.4cqw}
@@ -6385,7 +6396,7 @@ async function openRoomCab(id){
 function roomStart(pb,role,rec,info){
   roomStop();
   Object.assign(R,{on:true,pb,role,rec,info,mats:rec.mats||[],st:rec.st||{},ans:rec.ans||{},ink:[],other:null,otherAt:0,
-    seenS:false,topK:'',tool:'hand',stageKey:'',items:null,sel:null,keys:false,unsub:[],timers:[],obs:[],myPulse:null,pgNow:0,away:false,myCur:null,live:null,icache:{},side:false});
+    seenS:false,topK:'',local:{},upQ:null,upHi:0,pinSel:null,drawQ:null,tool:'hand',stageKey:'',items:null,sel:null,keys:false,unsub:[],timers:[],obs:[],myPulse:null,pgNow:0,away:false,myCur:null,live:null,icache:{},side:false});
   if(role==='t'&&!R.st.cur&&R.mats.length)R.st.cur=R.mats[R.mats.length-1].id;
   roomRemember(role,rec,info);roomConnect(rec.id);
 }
@@ -6545,7 +6556,7 @@ function roomSide(){
   const days=Object.keys(byDay).sort().reverse();
   el.innerHTML=`<div class="rm-sh">${t?'Сегодня':'Тетрадь'}</div>
     ${today.length?today.map(row).join(''):`<p class="empty">${t?'На сегодня материалов нет.':'Сегодня пока ничего.'}</p>`}
-    ${t?'<button class="btn wide" id="rmAdd">+ Материал</button><p class="hint rm-paste">Скриншот или фото учебника можно вставить прямо сюда: Ctrl+V</p>':''}
+    ${t?'<button class="btn wide" id="rmAdd">+ Материал</button><p class="hint rm-paste">Скриншот или фото можно вставить прямо сюда: Ctrl+V. Если лист открыт, картинка ляжет на него.</p>':''}
     ${days.length?`<details class="rm-past"${R.pastOpen?' open':''}><summary>Прошлые уроки · ${days.length}</summary>${days.map(k=>`<div class="rm-day">${dayTxt(atOf(k))}</div>${byDay[k].map(row).join('')}`).join('')}</details>`:''}`;
   el.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>roomOpenMat(b.dataset.m));
   el.querySelectorAll('[data-eye]').forEach(b=>b.onclick=()=>{const m=R.mats.find(x=>x.id===b.dataset.eye);m.vis=!m.vis;roomSaveMats();roomSide()});
@@ -6561,7 +6572,7 @@ function roomOpenMat(id){
   R.myCur=id;R.away=roomFollow()&&id!==R.st.cur;R.side=false;roomUpdate();window.scrollTo({top:0});
 }
 function roomTools(){
-  const el=document.getElementById('rmTools');if(!el||!R.on)return;const m=roomMat();
+  const el=document.getElementById('rmTools');if(!el||!R.on)return;const m=roomMat();roomPinMode();
   const tb=(k,n)=>`<button class="rt${R.tool===k?' on':''}" data-tool="${k}">${n}</button>`;
   if(R.role==='t'){
     el.innerHTML=`<div class="seg rm-seg"><button class="${R.st.lead!==false?'on':''}" id="rmLead" title="Ученик видит то же, что вы: тот же материал и страницу">Веду я</button><button class="${R.st.lead===false?'on':''}" id="rmFree" title="Ученик листает сам, вы видите, где он">Свободно</button></div>
@@ -6569,12 +6580,14 @@ function roomTools(){
       <div class="rt-g"><button class="rt${R.st.pen?' on':''}" id="rmPen">${R.st.pen?'Ручка у ученика':'Дать ручку'}</button>
         ${m&&m.k==='sheet'&&m.tid&&TOPICS[m.tid]?'<button class="rt" id="rmTune">Настроить лист</button>':''}
         ${m&&m.k==='sheet'?`<button class="rt${R.keys?' on':''}" id="rmKeys">Ответы</button>${m.tid&&TOPICS[m.tid]?'<button class="rt" id="rmHw">В домашку</button>':''}`:''}
-        ${m&&m.k==='board'?'<button class="rt" id="rmPg">+ Страница</button>':''}</div>${inkSwatches()}${rxBar()}`;
+        ${m&&m.k==='board'?'<button class="rt" id="rmPg">+ Страница</button>':''}
+        ${m&&['sheet','pdf','img','board','note'].includes(m.k)?'<button class="rt" id="rmImg" title="Положить фото или скриншот на страницу. Работает и Ctrl+V">+ Картинка</button>':''}</div>${inkSwatches()}${rxBar()}`;
     const $=id=>document.getElementById(id);
     $('rmLead').onclick=()=>{const c=R.mats.find(x=>x.id===R.st.cur);if(c&&!c.vis&&roomLive(R.st)){c.vis=true;roomSaveMats()}roomSet({lead:true,pg:R.pgNow});roomUpdate()};
     $('rmFree').onclick=()=>{roomSet({lead:false});roomUpdate()};
     $('rmPen').onclick=()=>{roomSet({pen:!R.st.pen});roomTools()};
     $('rmUndo').onclick=roomUndo;$('rmClr').onclick=roomClear;
+    if($('rmImg'))$('rmImg').onclick=roomPinPick;
     if($('rmKeys'))$('rmKeys').onclick=()=>{R.keys=!R.keys;roomTools();roomAnsPaint()};
     if($('rmHw'))$('rmHw').onclick=()=>roomHomework(m);
     if($('rmTune'))$('rmTune').onclick=()=>roomTune(m.tid,m);
@@ -6596,8 +6609,12 @@ function roomTopic(m){const tp=m.tp||{};const L=[];for(let i=0;i<=(m.lv||0);i++)
   return{t:tp.t||m.t,grade:tp.grade||1,subject:tp.subject||'math',rule:tp.rule||null,sheet:!!tp.sheet,section:tp.sec||SUBJ[tp.subject]||'',L}}
 function roomStage(){
   const host=document.getElementById('rmStage');if(!host||!R.on)return;const m=roomMat();
-  const key=m?(m.k==='deck'?m.id+'|deck|'+BD.frames(m.items||[]).map(f=>f.id+':'+f.w+'x'+f.h+(f.src||'')+(f.fill||'')).join(','):m.id+'|'+JSON.stringify(m)):'none';
-  if(key===R.stageKey){roomAnsPaint();return}
+  /* картинки на листе, готовые страницы PDF и признак отправки в ключ не входят: они обновляются на месте, без перерисовки листа */
+  const key=m?(m.k==='deck'?m.id+'|deck|'+BD.frames(m.items||[]).map(f=>f.id+':'+f.w+'x'+f.h+(f.src||'')+(f.fill||'')).join(','):
+    m.k==='pdf'&&m.n?m.id+'|pdfp|'+m.n+'|'+(R.local[m.id]&&R.local[m.id].doc?'L':'S'):
+    m.k==='img'?m.id+'|img|'+(R.local[m.id]?'L':m.f||'')+(m.err?'E':''):
+    m.id+'|'+JSON.stringify({...m,pins:0})):'none';
+  if(key===R.stageKey){roomAnsPaint();roomPdfSync(m);roomPinsPaint();return}
   R.stageKey=key;R.items=null;roomAnsClose();(R.pgObs&&R.pgObs.disconnect());
   if(R.role==='s')roomPulse({m:m?m.id:null,pg:0});
   if(!m){host.innerHTML=R.role==='t'?`<div class="rm-empty"><h2>Тетрадь · ${esc(R.info.first||'')}</h2><p>Добавьте материал к уроку: лист по текущей теме, файл, фото учебника или чистую доску. Ученик увидит его, только когда вы покажете.</p>
@@ -6606,7 +6623,8 @@ function roomStage(){
     host.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>roomQuick(b.dataset.q));return}
   host.innerHTML=`<div class="rm-pages" id="rmPages"></div>`;
   const pages=document.getElementById('rmPages');
-  const done=()=>{if(R.stageKey!==key)return;[...pages.children].forEach((pg,k)=>roomSetupPage(pg,k));roomInkAll();roomAnsPaint();roomTrackPages(pages);
+  roomPinMode(pages);
+  const done=()=>{if(R.stageKey!==key)return;[...pages.children].forEach((pg,k)=>roomSetupPage(pg,k));roomInkAll();roomAnsPaint();roomPinsPaint();roomTrackPages(pages);
     if(roomFollow()&&!R.away)roomScrollPg(R.st.pg||0,true)};
   if(m.k==='sheet'){
     const items=roomItems(m);R.items=items;
@@ -6614,9 +6632,14 @@ function roomStage(){
     const lay=()=>{if(R.stageKey!==key)return;paginate(pages,items,o);const els=[...pages.querySelectorAll('.sh-items .it:not(.stab)')];
       if(els.length===items.length){els.forEach((e,i)=>{e.dataset.ri=i;if(rAnswerable(items[i]))e.classList.add('r-it')});roomCarry(pages,items)}done()};
     lay();if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{if(R.stageKey===key)lay()});
-  }else if(m.k==='pdf'){pages.innerHTML='<p class="hint">Открываю PDF…</p>';roomPdf(pages,m,key).then(()=>{if(R.stageKey===key)done()}).catch(()=>{if(R.stageKey===key)pages.innerHTML='<p class="empty">PDF не открылся. Проверьте интернет.</p>'})}
-  else if(m.k==='img'){roomFileURL(m.f).then(u=>{if(R.stageKey!==key)return;pages.innerHTML=`<div class="rpg rimg"><img src="${esc(u)}" alt="${esc(m.t)}"></div>`;
-    const im=pages.querySelector('img');im.onload=done;im.onerror=()=>{pages.innerHTML='<p class="empty">Картинка не загрузилась.</p>'}}).catch(()=>{pages.innerHTML='<p class="empty">Нет связи.</p>'})}
+  }else if(m.k==='pdf'&&m.n){if(R.local[m.id]&&R.local[m.id].doc)roomPdfLocal(pages,m,key);else roomPdfPages(pages,m);done();roomPdfSync(m)}
+  else if(m.k==='pdf'){pages.innerHTML='<p class="hint">Открываю PDF…</p>';roomPdf(pages,m,key).then(()=>{if(R.stageKey===key)done()}).catch(()=>{if(R.stageKey===key)pages.innerHTML='<p class="empty">PDF не открылся. Проверьте интернет.</p>'})}
+  else if(m.k==='img'){
+    const show=u=>{if(R.stageKey!==key)return;pages.innerHTML=`<div class="rpg rimg"><img src="${esc(u)}" alt="${esc(m.t)}"></div>`;
+      const im=pages.querySelector('img');im.onload=done;im.onerror=()=>{pages.innerHTML='<p class="empty">Картинка не загрузилась.</p>'}};
+    if(R.local[m.id])show(R.local[m.id]);
+    else if(!m.f){pages.innerHTML=`<div class="rpg rimg rwait"><p>${m.err?'Картинка не отправилась':'Картинка загружается…'}</p></div>`;done()}
+    else roomFileURL(m.f).then(show).catch(()=>{pages.innerHTML='<p class="empty">Нет связи.</p>'})}
   else if(m.k==='deck'){roomFileURL('x').then(()=>{if(R.stageKey!==key)return;const url=s=>s&&s.startsWith('d:')?R.pb.files.getURL(R.rec,s.slice(2),{token:FTOK.t}):s;
     pages.innerHTML=BD.frames(m.items||[]).map(f=>`<div class="rpg rdeck" data-f="${f.id}" style="aspect-ratio:${f.w}/${f.h}"><div class="bd-st" data-w="${f.w}" style="width:${f.w}px;height:${f.h}px">${deckInner(m,f)}</div></div>`).join('')||'<p class="empty">В разработке нет фреймов.</p>';
     roomDeckScale();done()}).catch(()=>{pages.innerHTML='<p class="empty">Нет связи.</p>'})}
@@ -6650,6 +6673,7 @@ async function roomPdf(host,m,key){
 function roomSetupPage(pg,k){
   pg.classList.add('rpg');pg.dataset.pg=k;
   if(pg.querySelector('.r-ink'))return;
+  if(!pg.querySelector('.r-pins')){const L=document.createElement('div');L.className='r-pins';pg.appendChild(L)}
   const cv=document.createElement('canvas');cv.className='r-ink';pg.appendChild(cv);
   const lz=document.createElement('i');lz.className='r-laser';pg.appendChild(lz);
   let cur=null;
@@ -6875,7 +6899,7 @@ document.addEventListener('pointerdown',e=>{const p=document.querySelector('.r-p
 document.addEventListener('keydown',e=>{const bar=document.getElementById('rmAnsBar');if(!bar||!bar.numKey||document.activeElement&&document.activeElement.id==='raTx')return;
   if(/^[0-9]$/.test(e.key))bar.numKey(e.key);else if(e.key==='Backspace')bar.numKey('⌫');else if(e.key==='Enter')bar.numKey('OK');else if(e.key==='Escape')roomAnsClose()});
 document.addEventListener('paste',e=>{if(V.screen!=='room'||!R.on||R.role!=='t'||mroot.innerHTML)return;
-  const f=[...(e.clipboardData&&e.clipboardData.files||[])].find(x=>/^image\//.test(x.type));if(!f)return;e.preventDefault();roomUpload(f,'Скриншот '+hm(Date.now()))});
+  const f=[...(e.clipboardData&&e.clipboardData.files||[])].find(x=>/^image\//.test(x.type));if(!f)return;e.preventDefault();roomDropImage(f,'Скриншот '+hm(Date.now()))});
 
 /* ---------- добавление материалов ---------- */
 function roomStudent(){return student(R.info.sid)}
@@ -6988,24 +7012,142 @@ async function roomSavedPick(){
     document.querySelectorAll('[data-sv]').forEach(b=>b.onclick=()=>{const m=S.saved.find(x=>x.id===b.dataset.sv);close();
       if(m.sheet){const t=m.sheet;roomAdd({...roomSheetFrom({...t,id:null,sheet:true},0,null,m.seed),t:m.name})}
       else{const t=TOPICS[m.topicId];if(!t){toast('Тема этого листа удалена');return}roomAdd({...roomSheetFrom(t,Math.min(m.level||0,t.L.length-1),m.over,m.seed),t:m.name})}});
-    document.querySelectorAll('[data-f]').forEach(b=>b.onclick=async()=>{const f=FILES.find(x=>x.id===b.dataset.f);close();toast('Копирую файл в комнату…');
-      try{const tok=await pbT.files.getToken();const bl=await (await fetch(pbT.files.getURL(f,f.file,{token:tok}))).blob();
-        roomUpload(new File([bl],f.name||f.file,{type:bl.type}),(f.name||f.file).replace(/\.[^.]+$/,''))}catch(e){toast('Файл не скопировался')}});
+    document.querySelectorAll('[data-f]').forEach(b=>b.onclick=async()=>{const f=FILES.find(x=>x.id===b.dataset.f);close();const nm=f.name||f.file,ttl=nm.replace(/\.[^.]+$/,'');
+      try{const tok=await pbT.files.getToken(),url=pbT.files.getURL(f,f.file,{token:tok});
+        if(/\.pdf$/i.test(nm))roomAddPdf(url,ttl,nm);
+        else{const bl=await (await fetch(url)).blob();roomAddImage(new File([bl],nm,{type:bl.type}),ttl)}}catch(e){toast('Файл не открылся')}});
   });
 }
 function roomFilePick(){
   close();const inp=document.createElement('input');inp.type='file';inp.accept='.pdf,image/*';inp.multiple=true;
   inp.onchange=async()=>{for(const f of inp.files)await roomUpload(f)};inp.click();
 }
+/* Файл показывается сразу, а ученику уходит в фоне. PDF разбирается на страницы: каждая страница сжимается
+   и отправляется отдельно, ученик видит страницы по мере готовности, а размер файла не ограничен. */
+const isPdf=f=>/pdf/i.test(f.type)||/\.pdf$/i.test(f.name||'');
 async function roomUpload(file,title){
-  if(file.size>25e6){toast('Файл больше 25 МБ');return}
-  toast('Загружаю '+(file.name||'файл')+'…');
-  const before=new Set(R.rec.docs||[]);const fd=new FormData();fd.append('docs+',file);
-  try{const r=await R.pb.collection('rooms').update(R.rec.id,fd);R.rec=r;const fn=(r.docs||[]).find(x=>!before.has(x));if(!fn)throw 0;
-    const pdf=/pdf/i.test(file.type)||/\.pdf$/i.test(file.name||'');
-    roomAdd({k:pdf?'pdf':'img',f:fn,t:rTitle(title||file.name)})}
-  catch(e){toast('Файл не загрузился. Проверьте интернет')}
+  if(file.size>300e6){toast('Файл больше 300 МБ');return}
+  if(isPdf(file))return roomAddPdf(file,title,file.name);
+  if(/^image\//.test(file.type))return roomAddImage(file,title);
+  toast('Этот тип файла не открывается в комнате. Подойдут PDF и картинки')
 }
+function roomUpBar(txt){let b=document.getElementById('rmUp');
+  if(!txt){if(b)b.remove();return}
+  if(!b){b=document.createElement('div');b.id='rmUp';b.className='rm-up';document.body.appendChild(b)}b.textContent=txt}
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+/* в комнату файлы кладём по одному, иначе новый файл не отличить от прежних; срочные (картинки) идут вперёд страниц PDF */
+function roomPutDoc(file,hi){
+  const run=async()=>{for(let i=0;i<3;i++){
+    try{const before=new Set(R.rec.docs||[]);const fd=new FormData();fd.append('docs+',file);
+      const r=await R.pb.collection('rooms').update(R.rec.id,fd);R.rec=r;const fn=(r.docs||[]).find(x=>!before.has(x));if(fn)return fn}
+    catch(e){await sleep(700*(i+1))}}return null};
+  const go=async()=>{if(hi)R.upHi++;else while(R.upHi>0)await sleep(150);
+    try{return await (R.upQ=(R.upQ||Promise.resolve()).then(run,run))}finally{if(hi)R.upHi--}};
+  return go()}
+/* фото с телефона на 4 МБ превращается в картинку на 200–400 КБ */
+async function roomPrepImage(file,max=2000){
+  if(/gif|svg/i.test(file.type))return file;
+  try{const bm=await createImageBitmap(file);const k=Math.min(1,max/Math.max(bm.width,bm.height)),w=Math.round(bm.width*k),h=Math.round(bm.height*k);
+    const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(bm,0,0,w,h);if(bm.close)bm.close();
+    const b=await new Promise(r=>c.toBlob(r,'image/webp',.86));
+    if(b&&b.size<file.size)return new File([b],(file.name||'картинка').replace(/\.[^.]+$/,'')+'.webp',{type:'image/webp'})}catch(e){}
+  return file}
+async function roomAddImage(file,title){
+  const f=await roomPrepImage(file);const m={id:RID(10),k:'img',f:null,up:1,t:rTitle(title||file.name||'Картинка')};
+  R.local[m.id]=URL.createObjectURL(f);roomAdd(m);
+  const fn=await roomPutDoc(f,true);
+  if(!fn){m.err=1;roomSaveMats();toast('Картинка не отправилась ученику. Проверьте интернет');return}
+  m.f=fn;delete m.up;roomSaveMats()}
+async function roomAddPdf(src,title,name){
+  toast('Открываю '+(name||'PDF')+'…');let doc;
+  try{const lib=await loadPdfJs();doc=await lib.getDocument(typeof src==='string'?{url:src}:{data:await src.arrayBuffer()}).promise}
+  catch(e){toast('PDF не открылся');return}
+  const n=Math.min(doc.numPages,300);let ar=1.41;
+  try{const v=(await doc.getPage(1)).getViewport({scale:1});ar=+(v.height/v.width).toFixed(4)}catch(e){}
+  const m={id:RID(10),k:'pdf',t:rTitle(title||name||'PDF'),n,ar,pg:[],up:1};
+  R.local[m.id]={doc};roomAdd(m);
+  if(doc.numPages>n)toast('Взяты первые '+n+' страниц из '+doc.numPages);
+  roomPdfUpload(m,doc,n)}
+async function roomPdfUpload(m,doc,n){
+  let ok=true;
+  for(let i=1;i<=n;i++){
+    if(!R.on||!R.mats.includes(m)){ok=false;break}
+    roomUpBar('Отправка ученику: страница '+i+' из '+n);
+    try{const pg=await doc.getPage(i),v0=pg.getViewport({scale:1}),v=pg.getViewport({scale:1600/v0.width});
+      const c=document.createElement('canvas');c.width=Math.round(v.width);c.height=Math.round(v.height);
+      await pg.render({canvasContext:c.getContext('2d'),viewport:v}).promise;
+      const b=await new Promise(r=>c.toBlob(r,'image/webp',.8));
+      const fn=await roomPutDoc(new File([b],'p'+i+'.webp',{type:'image/webp'}),false);
+      if(!fn)throw 0;m.pg[i-1]=fn}
+    catch(e){ok=false;m.err=1;toast('Отправка PDF прервалась на странице '+i+'. Ученик видит уже отправленные страницы');break}
+    if(i%3===0||i===n)roomSaveMats()}
+  if(R.on&&R.mats.includes(m)){if(ok)delete m.up;roomSaveMats()}
+  roomUpBar('')}
+/* ученик и репетитор после перезагрузки видят страницы PDF как обычные картинки; у того, кто загружал, страницы рисуются из самого файла */
+function roomPdfPages(host,m){host.innerHTML='';
+  for(let i=0;i<m.n;i++){const pg=document.createElement('div');pg.className='rpg rpdf rwait';pg.style.aspectRatio='1 / '+m.ar;host.appendChild(pg)}}
+function roomPdfLocal(host,m,key){const doc=R.local[m.id].doc;host.innerHTML='';
+  const W=Math.min(1700,Math.round((host.clientWidth||800)*Math.min(2,devicePixelRatio||1)));
+  const io=new IntersectionObserver(es=>es.forEach(e=>{if(!e.isIntersecting)return;io.unobserve(e.target);roomPdfDraw(e.target,doc,W,key)}),{rootMargin:'1500px 0px'});
+  R.obs.push(io);
+  for(let i=0;i<m.n;i++){const pg=document.createElement('div');pg.className='rpg rpdf';pg._i=i;pg.style.aspectRatio='1 / '+m.ar;host.appendChild(pg);io.observe(pg)}}
+function roomPdfDraw(pg,doc,W,key){
+  R.drawQ=(R.drawQ||Promise.resolve()).then(async()=>{if(R.stageKey!==key||!pg.isConnected)return;
+    try{const page=await doc.getPage(pg._i+1),vp=page.getViewport({scale:1}),v2=page.getViewport({scale:W/vp.width});
+      const c=document.createElement('canvas');c.className='r-bg';c.width=Math.round(v2.width);c.height=Math.round(v2.height);
+      await page.render({canvasContext:c.getContext('2d'),viewport:v2}).promise;
+      if(R.stageKey===key&&pg.isConnected)pg.insertBefore(c,pg.firstChild)}catch(e){}})}
+async function roomPdfSync(m){
+  if(!m||m.k!=='pdf'||!m.n||(R.local[m.id]&&R.local[m.id].doc))return;
+  const host=document.getElementById('rmPages');if(!host)return;
+  const miss=[...host.children].map((pg,i)=>[pg,i]).filter(([pg,i])=>m.pg&&m.pg[i]&&!pg.querySelector('img.r-bg'));
+  if(!miss.length)return;
+  try{await roomFileURL('x')}catch(e){return}
+  miss.forEach(([pg,i])=>{if(pg.querySelector('img.r-bg'))return;const im=new Image();im.className='r-bg';im.decoding='async';im.alt='';im.src=R.pb.files.getURL(R.rec,m.pg[i],{token:FTOK.t});
+    im.onload=()=>pg.classList.remove('rwait');pg.insertBefore(im,pg.firstChild)})}
+/* ---------- картинки поверх листа ----------
+   Фото или скриншот кладётся на текущую страницу листа, доски или PDF. Его можно двигать и менять размер, а писать поверх и рядом.
+   Хранится в самом материале (m.pins), положение в долях ширины страницы. Двигает только репетитор, ученик видит. */
+async function roomAddPin(file){
+  const m=roomMat();if(!m)return;const f=await roomPrepImage(file,1600);
+  let ratio=.75;try{const bm=await createImageBitmap(f);ratio=bm.height/bm.width;if(bm.close)bm.close()}catch(e){}
+  const k=R.pgNow||0,w=ratio>1.3?.3:.42,el=document.querySelector(`#rmPages > .rpg[data-pg="${k}"]`);let y=.1;
+  if(el){const r=el.getBoundingClientRect();y=Math.max(.02,Math.min((innerHeight*.3-r.top)/r.width,r.height/r.width-w*ratio-.02))}
+  const pin={id:RID(6),f:null,pg:k,x:+((1-w)/2).toFixed(4),y:+y.toFixed(4),w,r:+ratio.toFixed(3)};
+  (m.pins=m.pins||[]).push(pin);R.local['p'+pin.id]=URL.createObjectURL(f);R.pinSel=pin.id;roomPinsPaint();
+  const fn=await roomPutDoc(f,true);
+  if(!fn){m.pins=m.pins.filter(x=>x!==pin);roomPinsPaint();toast('Картинка не отправилась. Проверьте интернет');return}
+  pin.f=fn;roomSaveMats();roomPinsPaint()}
+async function roomPinsPaint(){
+  const host=document.getElementById('rmPages');if(!host||!R.on)return;const m=roomMat();const pins=(m&&m.pins)||[];
+  if(pins.some(p=>p.f&&!R.local['p'+p.id])){try{await roomFileURL('x')}catch(e){}}
+  [...host.children].forEach((pg,k)=>{const L=pg.querySelector('.r-pins');if(!L)return;
+    const mine=pins.filter(p=>(p.pg||0)===k&&(p.f||R.local['p'+p.id]));const sig=JSON.stringify(mine)+(R.role==='t'?R.pinSel:'');
+    if(L._sig===sig)return;L._sig=sig;
+    L.innerHTML=mine.map(p=>{const src=R.local['p'+p.id]||R.pb.files.getURL(R.rec,p.f,{token:FTOK.t}),sel=R.role==='t'&&R.pinSel===p.id;
+      return `<div class="r-pin${sel?' sel':''}" data-pin="${p.id}" style="left:${p.x*100}cqw;top:${p.y*100}cqw;width:${p.w*100}cqw"><img src="${esc(src)}" alt="" draggable="false">${sel?'<button class="rp-x" data-pdel aria-label="Убрать картинку">×</button><i class="rp-rs"></i>':''}</div>`}).join('')})}
+function roomPinMode(pages){const p=pages||document.getElementById('rmPages');if(!p)return;p.classList.toggle('pin-ed',R.role==='t'&&R.tool==='hand');
+  if(R.role==='t'&&!p._pin){p._pin=1;p.addEventListener('pointerdown',roomPinDown)}}
+function roomPinDown(e){
+  if(R.role!=='t'||R.tool!=='hand')return;const m=roomMat();if(!m)return;
+  const el=e.target.closest('.r-pin');
+  if(!el){if(R.pinSel){R.pinSel=null;roomPinsPaint()}return}
+  const p=(m.pins||[]).find(x=>x.id===el.dataset.pin);if(!p)return;e.preventDefault();e.stopPropagation();
+  if(e.target.closest('[data-pdel]')){m.pins=m.pins.filter(x=>x!==p);R.pinSel=null;roomSaveMats();roomPinsPaint();return}
+  if(R.pinSel!==p.id){R.pinSel=p.id;document.querySelectorAll('#rmPages .r-pin.sel').forEach(x=>x.classList.remove('sel'));el.classList.add('sel');
+    if(!el.querySelector('.rp-rs'))el.insertAdjacentHTML('beforeend','<button class="rp-x" data-pdel aria-label="Убрать картинку">×</button><i class="rp-rs"></i>');
+    const L=el.parentNode;if(L)L._sig=null}
+  const W=el.closest('.rpg').clientWidth,sx=e.clientX,sy=e.clientY,ox=p.x,oy=p.y,ow=p.w,rs=!!e.target.closest('.rp-rs');let moved=false;
+  const mv=ev=>{const dx=(ev.clientX-sx)/W,dy=(ev.clientY-sy)/W;if(!moved&&Math.hypot(ev.clientX-sx,ev.clientY-sy)<3)return;moved=true;
+    if(rs){p.w=+Math.max(.08,Math.min(1,ow+dx)).toFixed(4);el.style.width=p.w*100+'cqw'}
+    else{p.x=+Math.max(-.05,Math.min(.95,ox+dx)).toFixed(4);p.y=+Math.max(0,oy+dy).toFixed(4);el.style.left=p.x*100+'cqw';el.style.top=p.y*100+'cqw'}};
+  const up=()=>{removeEventListener('pointermove',mv);removeEventListener('pointerup',up);removeEventListener('pointercancel',up);if(moved){if(p.f)roomSaveMats();const L=el.parentNode;if(L)L._sig=null}};
+  addEventListener('pointermove',mv);addEventListener('pointerup',up);addEventListener('pointercancel',up)}
+/* картинку из буфера или из файла кладём на лист, если он открыт, иначе открываем как отдельный материал */
+function roomDropImage(file,title){const m=roomMat();
+  if(m&&['sheet','pdf','img','board','note'].includes(m.k))roomAddPin(file);else roomAddImage(file,title)}
+function roomPinPick(){const inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.multiple=true;
+  inp.onchange=async()=>{for(const f of inp.files)await roomAddPin(f)};inp.click()}
 function roomBoardPick(){
   modal(`<h2>Чистая доска</h2><div class="rm-pick bd">
     <button class="rq" data-bg="grid"><span class="bdp bg-grid"></span><b>В клетку</b></button>
