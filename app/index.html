@@ -5,6 +5,7 @@
 <title>Кабинет репетитора</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1F2C55">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://153-76-170-187.sslip.io http://127.0.0.1:8090; media-src 'self' blob: https://153-76-170-187.sslip.io http://127.0.0.1:8090; connect-src 'self' https://153-76-170-187.sslip.io http://127.0.0.1:8090 blob: data:; worker-src 'self' blob:; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'">
 <link rel="apple-touch-icon" id="ati" href="../icons/app-180.png">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -6479,7 +6480,8 @@ function roomStart(pb,role,rec,info){
   roomRemember(role,rec,info);roomConnect(rec.id);
 }
 function roomStop(){
-  if(!R.on)return;roomForget();{const d=document.getElementById('rxDock');if(d)d.remove()}if(C.st!=='idle'||C.offer)callEnd(true,null,'left');R.on=false;
+  if(!R.on)return;roomForget();
+  Object.values(R.local||{}).forEach(v=>{if(typeof v==='string'&&v.startsWith('blob:'))try{URL.revokeObjectURL(v)}catch(e){}else if(v&&v.doc)try{v.doc.destroy()}catch(e){}});{const d=document.getElementById('rxDock');if(d)d.remove()}if(C.st!=='idle'||C.offer)callEnd(true,null,'left');R.on=false;
   (R.unsub||[]).forEach(u=>{try{u()}catch(e){}});(R.timers||[]).forEach(clearInterval);(R.obs||[]).forEach(o=>o.disconnect());
   clearTimeout(R.stT);clearTimeout(R.ansT);
   if(R.myPulse)R.pb.collection('pulse').update(R.myPulse.id,{d:{at:Date.now(),gone:true}}).catch(()=>{});
@@ -6612,6 +6614,10 @@ function roomToggleOpen(id){
   else{if(o.length>=3){toast('Рядом можно открыть до трёх материалов. Закройте одно окно крестиком');return}o.push(id)}
   if(roomLive(R.st)&&!m.vis){m.vis=true;roomSaveMats()}
   roomSet({open:o,cur:o.includes(R.st.cur)?R.st.cur:o[o.length-1],foc:null});roomUpdate()}
+/* файлы удалённого материала: страницы PDF, картинка, картинки на листе */
+function roomDropFiles(m){
+  const fs=[m.f,...(m.pg||[]),...(m.pins||[]).map(p=>p.f)].filter(f=>typeof f==='string'&&f&&(R.rec.docs||[]).includes(f));
+  if(!fs.length)return;R.pb.collection('rooms').update(R.rec.id,{'docs-':fs}).then(r=>{R.rec=r}).catch(()=>{})}
 function roomPaneClose(id){const o=(R.st.open||[]).filter(x=>x!==id);roomSet({open:o,cur:o.includes(R.st.cur)?R.st.cur:o[0]||R.st.cur,foc:null});roomUpdate()}
 function roomMat1(){
   if(R.role==='t')return R.mats.find(m=>m.id===R.st.cur)||null;
@@ -6681,7 +6687,7 @@ function roomSide(){
   el.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>roomOpenMat(b.dataset.m));
   el.querySelectorAll('[data-pn]').forEach(b=>b.onclick=()=>roomToggleOpen(b.dataset.pn));
   el.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{const id=b.dataset.del;if(R.delM!==id){R.delM=id;roomSide();return}
-    R.delM=null;R.mats=R.mats.filter(m=>m.id!==id);if(R.st.cur===id)roomSet({cur:R.mats.length?R.mats[R.mats.length-1].id:null,pg:0});roomSaveMats();roomUpdate()});
+    R.delM=null;{const dm=R.mats.find(m=>m.id===id);if(dm)roomDropFiles(dm)}R.mats=R.mats.filter(m=>m.id!==id);if(R.st.cur===id)roomSet({cur:R.mats.length?R.mats[R.mats.length-1].id:null,pg:0});roomSaveMats();roomUpdate()});
   const pd=el.querySelector('.rm-past');if(pd)pd.ontoggle=()=>{R.pastOpen=pd.open};
   const add=document.getElementById('rmAdd');if(add)add.onclick=roomPicker;
   const see=document.getElementById('rmSee');if(see)see.onclick=()=>{roomSet({hide:!R.st.hide});roomUpdate()};
@@ -6754,7 +6760,7 @@ function roomStage(){
   const m=roomMat();
   /* картинки на листе, готовые страницы PDF и признак отправки в ключ не входят: они обновляются на месте, без перерисовки листа */
   const key=(m?(m.k==='deck'?m.id+'|deck|'+BD.frames(m.items||[]).map(f=>f.id+':'+f.w+'x'+f.h+(f.src||'')+(f.fill||'')).join(','):
-    m.k==='pdf'&&m.n?m.id+'|pdfp|'+m.n+'|'+(R.local[m.id]&&R.local[m.id].doc?'L':'S'):
+    m.k==='pdf'&&m.n?m.id+'|pdfp|'+roomN(m)+'|'+(R.local[m.id]&&R.local[m.id].doc?'L':'S'):
     m.k==='img'?m.id+'|img|'+(R.local[m.id]?'L':m.f||'')+(m.err?'E':''):
     m.id+'|'+JSON.stringify({...m,pins:0})):'none');
   if(key===R.stageKey){roomAnsPaint();roomPdfSync(m);roomPinsPaint();return}
@@ -6767,7 +6773,9 @@ function roomStage(){
   host.innerHTML=`<div class="rm-pages" id="rmPages"></div>`;
   roomFill(document.getElementById('rmPages'),m,key,true);
 }
-function roomPaneKey(m){if(m.ph)m={...m,ph:0};return m.k==='pdf'&&m.n?m.id+'|pdfp|'+m.n+'|'+(R.local[m.id]&&R.local[m.id].doc?'L':'S'):m.k==='img'?m.id+'|img|'+(R.local[m.id]?'L':m.f||'')+(m.err?'E':''):m.id+'|'+JSON.stringify({...m,pins:0})}
+const roomN=m=>Math.min(500,Math.max(0,Math.floor(+m.n)||0));
+const roomAr=m=>Math.min(5,Math.max(.2,+m.ar||1.41));
+function roomPaneKey(m){if(m.ph)m={...m,ph:0};return m.k==='pdf'&&m.n?m.id+'|pdfp|'+roomN(m)+'|'+(R.local[m.id]&&R.local[m.id].doc?'L':'S'):m.k==='img'?m.id+'|img|'+(R.local[m.id]?'L':m.f||'')+(m.err?'E':''):m.id+'|'+JSON.stringify({...m,pins:0})}
 function roomStageMulti(host,ids){
   const ms=ids.map(id=>R.mats.find(x=>x.id===id));
   const key='multi|'+ms.map(roomPaneKey).join('||');
@@ -6784,7 +6792,7 @@ function roomStageMulti(host,ids){
 }
 /* высота окон: репетитор тянет нижний край, высота хранится в долях экрана и у ученика такая же */
 function roomPaneSize(){document.querySelectorAll('#rmStage .rm-pane').forEach(p=>{const m=R.mats.find(x=>x.id===p.dataset.mat),pg=p.querySelector('.rm-pages');if(!pg||!m)return;
-  if(m.ph){pg.style.height=m.ph*100+'vh';pg.style.maxHeight='none'}else{pg.style.height='';pg.style.maxHeight=''}})}
+  const ph=Math.min(1,Math.max(.1,Number(m.ph)||0));if(Number(m.ph)){pg.style.height=ph*100+'vh';pg.style.maxHeight='none'}else{pg.style.height='';pg.style.maxHeight=''}})}
 function roomPaneResize(e){
   if(R.role!=='t')return;const pane=e.target.closest('.rm-pane'),m=R.mats.find(x=>x.id===pane.dataset.mat),pg=pane.querySelector('.rm-pages');if(!m||!pg)return;e.preventDefault();
   const sy=e.clientY,h0=pg.getBoundingClientRect().height;let moved=false;
@@ -6835,7 +6843,7 @@ function roomFill(pages,m,key,act){
   else if(m.k==='deck'){roomFileURL('x').then(()=>{if(R.stageKey!==key)return;const url=s=>s&&s.startsWith('d:')?R.pb.files.getURL(R.rec,s.slice(2),{token:FTOK.t}):s;
     pages.innerHTML=BD.frames(m.items||[]).map(f=>`<div class="rpg rdeck" data-f="${f.id}" style="aspect-ratio:${f.w}/${f.h}"><div class="bd-st" data-w="${f.w}" style="width:${f.w}px;height:${f.h}px">${deckInner(m,f)}</div></div>`).join('')||'<p class="empty">В разработке нет фреймов.</p>';
     roomDeckScale();done()}).catch(()=>{pages.innerHTML='<p class="empty">Нет связи.</p>'})}
-  else if(m.k==='board'){pages.innerHTML=Array.from({length:m.n||1},()=>`<div class="rpg rbd bg-${m.bg||'grid'}"></div>`).join('');done()}
+  else if(m.k==='board'){pages.innerHTML=Array.from({length:m.n||1},()=>`<div class="rpg rbd bg-${['grid','lines','white'].includes(m.bg)?m.bg:'grid'}"></div>`).join('');done()}
   else if(m.k==='note'){pages.innerHTML=`<div class="rpg rnote"><div class="rn-in"><span class="rn-k">Объяснение</span><h3>${esc(m.t)}</h3>${(m.txt||'').split(/\n+/).map(x=>`<p>${esc(x)}</p>`).join('')}${m.ex?`<p class="rn-ex">${esc(m.ex)}</p>`:''}</div></div>`;done()}
   else if(m.k==='link'){let host2='';try{host2=new URL(m.url).hostname}catch(e){}
     pages.innerHTML=`<div class="rpg rlink"><div class="rn-in"><span class="rn-k">Ссылка</span><h3>${esc(m.t)}</h3><a class="btn primary" href="${esc(m.url)}" target="_blank" rel="noopener">Открыть</a><p class="hint">${esc(host2)}</p></div></div>`;done()}
@@ -6926,7 +6934,7 @@ function roomTrackPages(pages){
     pages._pg=best;const pm=pages.dataset.paneMat;if(pm&&pm!==(roomMat()||{}).id)return;
     if(best!==R.pgNow){R.pgNow=best;if(R.role==='t'&&R.st.lead!==false){clearTimeout(R.pgT);R.pgT=setTimeout(()=>roomSet({pg:R.pgNow}),400)}
       if(R.role==='s')roomPulse({pg:best})}},{threshold:[0,.25,.5,.75,1]});
-  [...pages.children].forEach(pg=>pg.classList.contains('rpg')&&io.observe(pg));R.pgObs=io;(R.pgObsAll=R.pgObsAll||[]).push(io);R.obs.push(io);
+  [...pages.children].forEach(pg=>pg.classList.contains('rpg')&&io.observe(pg));R.pgObs=io;(R.pgObsAll=R.pgObsAll||[]).push(io);
 }
 function roomScrollPg(k,instant){const pg=document.querySelector(`#rmPages > .rpg[data-pg="${k}"]`);if(!pg)return;
   if(k===0&&!instant&&!pg.closest('.rm-pane')){window.scrollTo({top:0,behavior:'smooth'});return}pg.scrollIntoView({behavior:instant?'auto':'smooth',block:'start'})}
@@ -7279,6 +7287,8 @@ async function roomAddPdf(src,title,name){
   try{const lib=await loadPdfJs();doc=await lib.getDocument(typeof src==='string'?{url:src}:{data:await src.arrayBuffer()}).promise}
   catch(e){toast('PDF не открылся');return}
   const n=Math.min(doc.numPages,300);let ar=1.41;
+  /* в комнате не больше 999 файлов: заранее говорим, если страницы не поместятся */
+  if((R.rec.docs||[]).length+n>990){toast('В комнате слишком много файлов. Уберите старые материалы крестиком в списке и добавьте PDF снова');return}
   try{const v=(await doc.getPage(1)).getViewport({scale:1});ar=+(v.height/v.width).toFixed(4)}catch(e){}
   const m={id:RID(10),k:'pdf',t:rTitle(title||name||'PDF'),n,ar,pg:[],up:1};
   R.local[m.id]={doc};roomAdd(m);
@@ -7301,12 +7311,12 @@ async function roomPdfUpload(m,doc,n){
   roomUpBar('')}
 /* ученик и репетитор после перезагрузки видят страницы PDF как обычные картинки; у того, кто загружал, страницы рисуются из самого файла */
 function roomPdfPages(host,m){host.innerHTML='';
-  for(let i=0;i<m.n;i++){const pg=document.createElement('div');pg.className='rpg rpdf rwait';pg.style.aspectRatio='1 / '+m.ar;host.appendChild(pg)}}
+  for(let i=0;i<roomN(m);i++){const pg=document.createElement('div');pg.className='rpg rpdf rwait';pg.style.aspectRatio='1 / '+roomAr(m);host.appendChild(pg)}}
 function roomPdfLocal(host,m,key){const doc=R.local[m.id].doc;host.innerHTML='';
   const W=Math.min(1700,Math.round((host.clientWidth||800)*Math.min(2,devicePixelRatio||1)));
   const io=new IntersectionObserver(es=>es.forEach(e=>{if(!e.isIntersecting)return;io.unobserve(e.target);roomPdfDraw(e.target,doc,W,key)}),{rootMargin:'1500px 0px'});
-  R.obs.push(io);
-  for(let i=0;i<m.n;i++){const pg=document.createElement('div');pg.className='rpg rpdf';pg._i=i;pg.style.aspectRatio='1 / '+m.ar;host.appendChild(pg);io.observe(pg)}}
+  (R.pgObsAll=R.pgObsAll||[]).push(io);
+  for(let i=0;i<roomN(m);i++){const pg=document.createElement('div');pg.className='rpg rpdf';pg._i=i;pg.style.aspectRatio='1 / '+roomAr(m);host.appendChild(pg);io.observe(pg)}}
 function roomPdfDraw(pg,doc,W,key){
   R.drawQ=(R.drawQ||Promise.resolve()).then(async()=>{if(R.stageKey!==key||!pg.isConnected)return;
     try{const page=await doc.getPage(pg._i+1),vp=page.getViewport({scale:1}),v2=page.getViewport({scale:W/vp.width});
@@ -7343,7 +7353,7 @@ async function roomPinsPaint(){
     const mine=pins.filter(p=>(p.pg||0)===k&&(p.f||R.local['p'+p.id]));const sig=JSON.stringify(mine)+(R.role==='t'?R.pinSel:'');
     if(L._sig===sig)return;L._sig=sig;
     L.innerHTML=mine.map(p=>{const src=R.local['p'+p.id]||R.pb.files.getURL(R.rec,p.f,{token:FTOK.t}),sel=R.role==='t'&&R.pinSel===p.id;
-      return `<div class="r-pin${sel?' sel':''}" data-pin="${p.id}" style="left:${p.x*100}cqw;top:${p.y*100}cqw;width:${p.w*100}cqw"><img src="${esc(src)}" alt="" draggable="false">${sel?'<button class="rp-x" data-pdel aria-label="Убрать картинку">×</button><i class="rp-rs"></i>':''}</div>`}).join('')})})}
+      return `<div class="r-pin${sel?' sel':''}" data-pin="${esc(p.id)}" style="left:${(+p.x||0)*100}cqw;top:${(+p.y||0)*100}cqw;width:${Math.min(1,Math.max(.05,+p.w||.4))*100}cqw"><img src="${esc(src)}" alt="" draggable="false">${sel?'<button class="rp-x" data-pdel aria-label="Убрать картинку">×</button><i class="rp-rs"></i>':''}</div>`}).join('')})})}
 function roomPinMode(pages){const p=pages||document.getElementById('rmPages');if(!p)return;p.classList.toggle('pin-ed',R.role==='t'&&R.tool==='hand');
   if(R.role==='t'&&!p._pin){p._pin=1;p.addEventListener('pointerdown',roomPinDown)}}
 function roomPinDown(e){
@@ -8489,7 +8499,7 @@ function rxDock(){let d=document.getElementById('rxDock');const on=R.on&&(R.role
   if(d)return;d=document.createElement('div');d.id='rxDock';d.className='rx-dock';
   d.innerHTML=RX.map(e=>`<button class="rx-b" data-rx="${e}" aria-label="Реакция" title="Отправить реакцию">${RX_ART[e]}</button>`).join('');document.body.appendChild(d);rxBind(d)}
 function rxBind(el){el.querySelectorAll('[data-rx]').forEach(b=>b.onclick=()=>{const e=b.dataset.rx;rxShow(e,true);roomPulse({rx:{e,i:RID(5)}},true)})}
-function rxShow(e,mine){const art=RX_ART[e];for(let k=0;k<5;k++){const s=document.createElement('span');s.className='rx-fly';
+function rxShow(e,mine){if(!RX.includes(e))return;const art=RX_ART[e];for(let k=0;k<5;k++){const s=document.createElement('span');s.className='rx-fly';
   if(art){s.innerHTML=art;const z=34+Math.random()*26;s.style.width=s.style.height=z+'px'}else{s.textContent=e;s.style.fontSize=28+Math.random()*22+'px'}
   s.style.left=(mine?3:10)+Math.random()*10+'%';s.style.animationDelay=k*90+'ms';document.body.appendChild(s);setTimeout(()=>s.remove(),2400)}}
 
