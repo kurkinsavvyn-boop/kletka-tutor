@@ -1178,6 +1178,11 @@ button.mchip:hover{background:rgba(255,255,255,.24)}
 .r-pin.sel img{outline:2px solid var(--blue)}
 .rp-x{position:absolute;right:-10px;top:-10px;width:26px;height:26px;border-radius:50%;border:0;background:#D5402F;color:#fff;font-size:17px;line-height:1;cursor:pointer}
 .rp-rs{position:absolute;right:-8px;bottom:-8px;width:18px;height:18px;border-radius:50%;background:var(--blue);border:2px solid #fff;cursor:nwse-resize}
+.rm-scr{position:fixed;inset:0;z-index:40;background:#0B1020;display:flex;flex-direction:column}
+.rm-scr .rs-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 16px;color:#fff;font-size:14px}
+.rm-scr video{flex:1;min-height:0;width:100%;object-fit:contain;background:#000}
+.rm-scr-show{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:39}
+.rm-share{position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:70;display:flex;align-items:center;gap:12px;background:#3E9A5F;color:#fff;border-radius:999px;padding:6px 8px 6px 16px;font-size:14px;box-shadow:0 4px 14px rgba(20,30,60,.3)}
 .rm-up{position:fixed;left:16px;bottom:16px;z-index:60;background:#1F2C55;color:#fff;border-radius:999px;padding:8px 16px;font-size:13px;box-shadow:0 4px 14px rgba(20,30,60,.3)}
 .rimg img{display:block;width:100%;height:auto}
 .rbd{aspect-ratio:210/297}
@@ -1240,6 +1245,7 @@ button.mchip:hover{background:rgba(255,255,255,.24)}
 .cr-act{display:flex;gap:8px}
 .cr-warn{flex-basis:100%;margin:0;font-size:14px;color:var(--bad)}
 body.inroom .wrap{max-width:1360px}
+body.inroom{background-image:none;background-color:#fff}
 @media (max-width:900px){
   .rm-body{grid-template-columns:minmax(0,1fr)}
   .r-t .rm-side{position:static;flex-direction:row;overflow-x:auto;max-height:none;gap:6px;padding-bottom:4px}
@@ -1296,7 +1302,7 @@ body.inroom .wrap{max-width:1360px}
 .vc-q.good::before{background:#5CC98C}.vc-q.mid::before{background:#E8B04A}.vc-q.bad::before{background:#FF7863}
 .vc-b{width:42px;height:42px;border-radius:50%;border:0;background:rgba(255,255,255,.14);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s}
 .vc-b svg{width:22px;height:22px}
-.vc-b:hover{background:rgba(255,255,255,.22)}.vc-b.off{background:#fff;color:#141A28}
+.vc-b:hover{background:rgba(255,255,255,.22)}.vc-b.on{background:#3E9A5F}.vc-b.on:hover{background:#34834F}.vc-b.off{background:#fff;color:#141A28}
 .vc-b.end{background:#D5402F}.vc-b.end:hover{background:#B83526}
 .vc-lv{display:grid;grid-template-columns:auto 1fr auto 1fr;gap:4px 6px;align-items:center;padding:6px 10px 0;font-size:11px;color:#9AA5BF}
 .vc-lv span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:80px}
@@ -7265,8 +7271,14 @@ async function callPc(){
     else p.encodings[0].maxBitrate=48000;
     p.encodings[0].priority=snd.track.kind==='audio'?'high':'medium';p.encodings[0].networkPriority=p.encodings[0].priority;
     snd.setParameters(p).catch(()=>{})});
-  pc.ontrack=e=>{C.rem=e.streams[0]||C.rem||new MediaStream();if(!e.streams[0])C.rem.addTrack(e.track);callVideos()};
+  /* первый поток — камера и голос собеседника, любой следующий — его экран */
+  C.pcSeen=new Set();C.scr=null;C.scrId=null;
+  pc.ontrack=e=>{const st=e.streams[0];
+    if(st&&(st.id===C.scrId||(C.pcSeen.size>=1&&!C.pcSeen.has(st.id)))){C.scrId=st.id;C.scr=st;callScreenUI();return}
+    if(st)C.pcSeen.add(st.id);
+    C.rem=st||C.rem||new MediaStream();if(!st)C.rem.addTrack(e.track);callVideos()};
   pc.onconnectionstatechange=()=>callNet();pc.oniceconnectionstatechange=()=>callNet();
+  if(C.scrStream)callScreenAttach(pc);
   return pc;
 }
 /* полное описание связи сразу со всеми адресами: одно сообщение туда и одно обратно */
@@ -7344,13 +7356,13 @@ async function callOnSig(d){
   let mine='';try{mine=sessionStorage.getItem(CALL_KEY)||''}catch(e){}
   /* страницу обновили посреди звонка: репетитор звонит заново сам, ученик просит перезвонить */
   if(R.role==='t'&&C.st==='idle'&&d&&d.call&&mine===d.call&&!C.declined&&roomLive(R.st)){C.n=d.call;callStart(true);return}
-  if(R.role==='s')callWatch();
+  if(R.role==='s'){callWatch();if(!(d&&d.scr)&&C.scr){C.scr=null;C.scrHide=false}callScreenUI()}
   /* ученик просит позвонить: страницу обновили или связь не вернулась сама */
   if(R.role==='t'&&d&&d.join&&d.jt!==C.lastJoin&&roomLive(R.st)&&!C.declined){C.lastJoin=d.jt;if(C.st==='idle')callWatch();else callOffer(false);return}
   if(d&&!!d.ao!==!!C.themAo){C.themAo=!!d.ao;callUI()}
   const s=d&&d.sig;if(!s||!s.n)return;const key=s.i||s.n+':'+s.t+':'+(s.r||0);if(key===C.seen)return;C.seen=key;
   if(s.t==='bye'){if(R.role==='t'&&C.n===s.n&&!s.left)C.declined=true;if(R.role==='s')C.noJoin=true;if(C.n===s.n){callEnd(false,R.role==='t'?'Ученик завершил звонок':'Репетитор завершил звонок')}if(C.offer&&C.offer.n===s.n){C.offer=null;callUI()}return}
-  if(R.role==='t'){if(s.t==='answer'&&C.pc&&s.n===C.n&&(!s.oi||s.oi===C.oid)&&C.pc.signalingState==='have-local-offer'){try{await C.pc.setRemoteDescription({type:'answer',sdp:s.sdp});C.st='connecting';callUI()}catch(e){}}return}
+  if(R.role==='t'){if(s.t==='answer'&&C.pc&&s.n===C.n&&(!s.oi||s.oi===C.oid)&&C.pc.signalingState==='have-local-offer'){try{await C.pc.setRemoteDescription({type:'answer',sdp:s.sdp});if(C.st!=='live'&&C.st!=='reconnecting'){C.st='connecting';callUI()}}catch(e){}}return}
   if(s.t!=='offer')return;C.offer=s;C.noJoin=false;C.joinN=0;
   if(C.st!=='idle'){try{await callAnswer(s)}catch(e){}return}
   if(mine===s.n)return callAccept(true);
@@ -7383,16 +7395,57 @@ function callAdapt(){C.bad=C.q==='bad'?(C.bad||0)+1:0;C.good=C.q==='good'?(C.goo
   const snd=C.pc&&C.pc.getSenders().find(x=>x.track&&x.track.kind==='video');if(!snd)return;
   const set=(br,sc)=>{const p=snd.getParameters();if(!p.encodings||!p.encodings[0])return;p.encodings[0].maxBitrate=br;p.encodings[0].scaleResolutionDownBy=sc;snd.setParameters(p).catch(()=>{})};
   if(C.bad>=2&&!C.lite){C.lite=true;set(150000,2)}else if(C.good>=10&&C.lite){C.lite=false;set(450000,1)}}
+/* ---------- показ экрана ----------
+   Репетитор нажимает «Показать экран», браузер сам спрашивает, что показать (вкладку, окно или весь экран), и без этого выбора
+   ничего не уходит. Картинка идёт ученику по тому же звонку. Ученик только смотрит, управлять экраном репетитора браузер не позволяет. */
+async function callRenego(n=0){
+  const pc=C.pc;if(!pc||C.st==='idle')return;
+  if(pc.signalingState!=='stable'){if(n<20)setTimeout(()=>callRenego(n+1),400);return}
+  const off=await pc.createOffer();await pc.setLocalDescription(off);await callGather(pc);
+  if(C.st==='idle')return;C.r++;C.oid=callSend({n:C.n,t:'offer',r:C.r,fresh:false,sdp:pc.localDescription.sdp})}
+function callScreenAttach(pc){const s=C.scrStream;pc=pc||C.pc;if(!pc||!s)return;
+  C.scrSenders=s.getTracks().map(t=>pc.addTrack(t,s));
+  C.scrSenders.forEach(snd=>{if(!snd.track||snd.track.kind!=='video')return;const p=snd.getParameters();p.encodings=p.encodings&&p.encodings.length?p.encodings:[{}];
+    p.encodings[0].maxBitrate=1800000;p.encodings[0].maxFramerate=15;p.degradationPreference='maintain-resolution';snd.setParameters(p).catch(()=>{})})}
+async function callScreenToggle(){
+  if(C.scrStream)return callScreenStop();
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getDisplayMedia){toast('Этот браузер не умеет показывать экран. Откройте Клетку в Chrome, Яндекс Браузере, Edge или Safari на компьютере');return}
+  if(C.st!=='live'){toast('Показать экран можно, когда ученик в звонке');return}
+  let s;try{s=await navigator.mediaDevices.getDisplayMedia({video:{frameRate:{ideal:15,max:30}},audio:true})}
+  catch(e){if(e&&e.name!=='NotAllowedError')toast('Экран не удалось включить');return}
+  if(C.st==='idle'){s.getTracks().forEach(t=>t.stop());return}
+  C.scrStream=s;s.getVideoTracks().forEach(t=>{try{t.contentHint='detail'}catch(_){}t.onended=callScreenStop});
+  callScreenAttach();roomPulse({scr:{sid:s.id}},true);callRenego();callUI();callScreenUI()}
+function callScreenStop(){const s=C.scrStream;if(!s)return;C.scrStream=null;s.getTracks().forEach(t=>{t.onended=null;t.stop()});
+  if(C.pc&&C.scrSenders)C.scrSenders.forEach(snd=>{try{C.pc.removeTrack(snd)}catch(e){}});C.scrSenders=null;
+  roomPulse({scr:null},true);callRenego();callUI();callScreenUI()}
+/* у репетитора: плашка «идёт показ»; у ученика: экран репетитора на всё окно, с кнопкой «К тетради» */
+function callScreenUI(){
+  const me=R.on&&R.role==='t'&&C.scrStream;let b=document.getElementById('rmShare');
+  if(!me){if(b)b.remove()}else if(!b){b=document.createElement('div');b.id='rmShare';b.className='rm-share';b.innerHTML='<span>Идёт показ экрана</span><button class="btn small" id="rmShareStop">Остановить</button>';document.body.appendChild(b);document.getElementById('rmShareStop').onclick=callScreenStop}
+  let el=document.getElementById('rmScr'),pill=document.getElementById('rmScrShow');
+  const on=R.on&&R.role==='s'&&C.scr&&R.other&&R.other.scr;
+  if(!on){if(el)el.remove();if(pill)pill.remove();return}
+  if(C.scrHide){if(el)el.remove();if(!pill){pill=document.createElement('button');pill.id='rmScrShow';pill.className='btn primary rm-scr-show';pill.textContent='Показать экран репетитора';document.body.appendChild(pill);pill.onclick=()=>{C.scrHide=false;callScreenUI()}}return}
+  if(pill)pill.remove();
+  if(!el){el=document.createElement('div');el.id='rmScr';el.className='rm-scr';
+    el.innerHTML=`<div class="rs-bar"><b>${esc((R.info&&R.info.tutor)||'Репетитор')} показывает экран</b><button class="btn small" id="rsHide">К тетради</button></div><video id="rsV" autoplay playsinline></video>`;
+    document.body.appendChild(el);document.getElementById('rsHide').onclick=()=>{C.scrHide=true;callScreenUI()}}
+  const v=document.getElementById('rsV');if(v&&v.srcObject!==C.scr){v.srcObject=C.scr;v.play().catch(()=>{v.muted=true;v.play().catch(()=>{})})}}
 /* ---------- завершение ---------- */
 /* left — просто вышел из комнаты: вернётся, звонок поднимется сам; иначе положил трубку */
 function callEnd(send,why,left){
   if(send&&C.n)callSend({n:C.n,t:'bye',left:left==='left'});
+  /* показ экрана снимаем, только когда репетитор сам закончил звонок; если ученик перезагрузил страницу, показ продолжится после его возвращения */
+  if(C.scrStream&&send){C.scrStream.getTracks().forEach(t=>{t.onended=null;t.stop()});C.scrStream=null;C.scrSenders=null;if(R.on)roomPulse({scr:null},true)}
+  C.scrSenders=null;
+  C.scr=null;C.scrId=null;C.scrHide=false;
   clearTimeout(C.restT);clearTimeout(C.sjT);C.sjT=null;clearInterval(C.statsT);C.restT=null;
   if(C.pc){try{C.pc.close()}catch(e){}}C.pc=null;C.pcN=null;
   if(C.loc)C.loc.getTracks().forEach(t=>t.stop());C.loc=null;C.rem=null;C.st='idle';C.offer=null;C.q='';
   try{sessionStorage.removeItem(CALL_KEY)}catch(e){}
   if(R.on)roomPulse({sig:send?{n:C.n,t:'bye',left:left==='left',i:RID(6)}:null,call:null},true);
-  if(C.aonly)roomPulse({ao:false},true);C.n=null;C.needTap=false;C.lite=false;C.aonly=false;C.themAo=false;const au=document.getElementById('vcA');if(au){au.srcObject=null;au.remove()}callBanner();callUI();if(why)toast(why);
+  if(C.aonly)roomPulse({ao:false},true);C.n=null;C.needTap=false;C.lite=false;C.aonly=false;C.themAo=false;const au=document.getElementById('vcA');if(au){au.srcObject=null;au.remove()}callBanner();callUI();callScreenUI();if(why)toast(why);
 }
 function callMic(){C.mic=!C.mic;if(C.loc)C.loc.getAudioTracks().forEach(t=>t.enabled=C.mic);callUI()}
 function callCam(){C.cam=!C.cam;if(C.loc)C.loc.getVideoTracks().forEach(t=>t.enabled=C.cam);callUI()}
@@ -7453,6 +7506,7 @@ const VC_SL='<path d="M4 4l16 16" stroke="currentColor" stroke-width="2.4" strok
 const VC_ICO={
   mic:on=>`<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="2.5" width="6" height="12" rx="3" fill="currentColor"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3.2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>${on?'':VC_SL}</svg>`,
   cam:on=>`<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="6" width="13" height="12" rx="3" fill="currentColor"/><path d="M17 10.6l4.5-3v8.8l-4.5-3z" fill="currentColor"/>${on?'':VC_SL}</svg>`,
+  scr:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="4" width="19" height="12.5" rx="2.2" fill="currentColor"/><path d="M8 20h8M12 16.5V20" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>',
   end:'<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08c-.18-.17-.29-.42-.29-.7 0-.28.11-.53.29-.71C3.34 8.78 7.46 7 12 7s8.66 1.78 11.71 4.67c.18.18.29.43.29.71 0 .28-.11.53-.29.71l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.11-.7-.28-.79-.73-1.68-1.36-2.66-1.85-.33-.16-.56-.51-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z"/></svg>'};
 function callUI(){
   let el=document.getElementById('vc');
@@ -7472,10 +7526,11 @@ function callUI(){
   document.getElementById('vcBar').innerHTML=`<span class="vc-q" id="vcQ"></span>
       <button class="vc-b${C.mic?'':' off'}" id="vcMic" aria-label="${C.mic?'Выключить микрофон':'Включить микрофон'}" title="${C.mic?'Выключить микрофон':'Включить микрофон'}">${VC_ICO.mic(C.mic)}</button>
       <button class="vc-b${C.cam?'':' off'}" id="vcCam" aria-label="${C.cam?'Выключить камеру':'Включить камеру'}" title="${C.cam?'Выключить камеру':'Включить камеру'}">${VC_ICO.cam(C.cam)}</button>
+      ${R.role==='t'&&C.st==='live'?`<button class="vc-b${C.scrStream?' on':''}" id="vcScr" aria-label="${C.scrStream?'Остановить показ экрана':'Показать экран'}" title="${C.scrStream?'Остановить показ экрана':'Показать экран'}">${VC_ICO.scr}</button>`:''}
       ${R.role==='t'?`<button class="vc-b end" id="vcEnd" aria-label="Завершить звонок" title="Завершить звонок">${VC_ICO.end}</button>`:''}`;
   document.getElementById('vcMsg').innerHTML=C.msg?`<div class="vc-msg">${esc(C.msg)}</div>`:'';
   const $=id=>document.getElementById(id);
-  $('vcMic').onclick=callMic;$('vcCam').onclick=callCam;if($('vcEnd'))$('vcEnd').onclick=()=>{C.declined=true;callEnd(true)};
+  $('vcMic').onclick=callMic;$('vcCam').onclick=callCam;if($('vcScr'))$('vcScr').onclick=callScreenToggle;if($('vcEnd'))$('vcEnd').onclick=()=>{C.declined=true;callEnd(true)};
   callVideos();callQ();callBanner();roomTop();
 }
 /* ---------- Разбор урока ----------
