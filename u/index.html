@@ -1152,8 +1152,15 @@ button.mchip:hover{background:rgba(255,255,255,.24)}
 .rm-day{font-size:12px;color:var(--ink-3);margin:8px 0 4px}
 .rm-past .rm-mat{margin-bottom:6px}
 .rm-main{min-width:0;display:flex;flex-direction:column;gap:10px}
-.rm-tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center;position:sticky;top:64px;z-index:4;background:var(--paper);padding:6px 0}
+.rm-tools{display:flex;gap:10px 12px;flex-wrap:wrap;align-items:flex-end;position:sticky;top:64px;z-index:4;background:var(--paper);padding:6px 0}
 .rm-tools:empty{display:none}
+.rt-sec{display:flex;flex-direction:column;gap:3px;min-width:0}
+.rt-cap{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);padding-left:6px;line-height:1}
+.rt-lbl{font-size:12.5px;color:var(--ink-2);align-self:center;padding:0 2px 0 8px;cursor:help}
+.rt-sg{display:inline-flex;gap:2px;align-self:center}
+.rt-sg button{border:0;background:none;padding:5px 9px;border-radius:7px;font:inherit;font-size:13px;cursor:pointer;color:var(--ink)}
+.rt-sg button.on{background:var(--blue);color:#fff}
+.rm-more{display:flex;flex-direction:column;gap:8px;margin-top:6px}
 .rt-g{display:flex;gap:4px;flex-wrap:wrap;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:3px}
 .rt{border:0;background:none;padding:6px 10px;border-radius:7px;font:inherit;font-size:13px;color:var(--ink);cursor:pointer;min-height:34px}
 .rt:hover{background:var(--ink-soft)}
@@ -6643,30 +6650,38 @@ function roomTools(){
   const el=document.getElementById('rmTools');if(!el||!R.on)return;const m=roomMat();roomPinMode();
   const tb=(k,n)=>`<button class="rt${R.tool===k?' on':''}" data-tool="${k}">${n}</button>`;
   if(R.role==='t'){
-    el.innerHTML=`<div class="seg rm-seg"><button class="${R.st.lead!==false?'on':''}" id="rmLead" title="Ученик видит то же, что вы: тот же материал и страницу">Веду я</button><button class="${R.st.lead===false?'on':''}" id="rmFree" title="Ученик листает сам, вы видите, где он">Свободно</button></div>
-      <div class="rt-g">${tb('hand','Указка')}${tb('pen','Маркер')}${tb('hl','Выделитель')}${tb('er','Ластик')}<button class="rt" id="rmUndo" aria-label="Отменить свою линию" title="Отменить последнюю линию">↶</button><button class="rt" id="rmClr" title="Стереть все пометки этой страницы">Очистить</button></div>
-      <div class="rt-g"><button class="rt${R.st.pen?' on':''}" id="rmPen">${R.st.pen?'Ручка у ученика':'Дать ручку'}</button>
-        ${m&&m.k==='sheet'&&m.tid&&TOPICS[m.tid]?'<button class="rt" id="rmTune">Настроить лист</button>':''}
-        ${m&&m.k==='sheet'?`<button class="rt${R.keys?' on':''}" id="rmKeys">Ответы</button>${m.tid&&TOPICS[m.tid]?'<button class="rt" id="rmHw">В домашку</button>':''}`:''}
-        ${m&&m.k==='board'?'<button class="rt" id="rmPg">+ Страница</button>':''}
-        ${m&&['sheet','pdf','img','board','note'].includes(m.k)?'<button class="rt" id="rmImg" title="Положить фото или скриншот на страницу. Работает и Ctrl+V">+ Картинка</button>':''}</div>${inkSwatches()}${rxBar()}`;
+    const mine=!!m&&['sheet','pdf','img','board','note'].includes(m.k);
+    const chkOn=R.st.chk!==false;
+    el.innerHTML=`<div class="rt-sec"><span class="rt-cap">Показ</span><div class="seg rm-seg"><button class="${R.st.lead!==false?'on':''}" id="rmLead" title="Ученик видит то же, что вы: тот же материал и страницу">Веду я</button><button class="${R.st.lead===false?'on':''}" id="rmFree" title="Ученик листает сам, вы видите, где он">Свободно</button></div></div>
+      <div class="rt-sec"><span class="rt-cap">Рисование</span><div class="rt-g">${tb('hand','Указка')}${tb('pen','Маркер')}${tb('hl','Выделитель')}${tb('er','Ластик')}<button class="rt" id="rmUndo" aria-label="Отменить свою линию" title="Отменить последнюю линию">↶</button><button class="rt" id="rmClr" title="Стереть все пометки этой страницы">Очистить</button></div></div>
+      ${inkSwatches()?`<div class="rt-sec"><span class="rt-cap">Цвет</span>${inkSwatches()}</div>`:''}
+      <div class="rt-sec"><span class="rt-cap">Ученик</span><div class="rt-g"><button class="rt${R.st.pen?' on':''}" id="rmPen" title="Разрешить ученику рисовать маркером. Пока выключено, он только отвечает в окошках">${R.st.pen?'Ручка у ученика: есть':'Ручка у ученика: нет'}</button>
+        <span class="rt-lbl" title="Показывать ли ученику сразу, верно он ответил или нет. «Скрывать» подходит для проверочной: ответ встаёт в лист без отметки, а вы видите всё">Отметки ✓ ✗</span><span class="seg rt-sg"><button class="${chkOn?'on':''}" id="rmChk1" title="Ученик сразу видит, верно ли ответил">Видит</button><button class="${chkOn?'':'on'}" id="rmChk0" title="Ученик отметок не видит, только вы">Скрыты</button></span></div></div>
+      ${mine?`<div class="rt-sec"><span class="rt-cap">Материал</span><div class="rt-g">
+        ${m.k==='sheet'?`<button class="rt${R.keys?' on':''}" id="rmKeys" title="Показать правильные ответы только вам, ученик их не видит">Ключ ответов</button>`:''}
+        ${m.k==='sheet'&&m.tid&&TOPICS[m.tid]?'<button class="rt" id="rmTune" title="Сменить уровень, число заданий, вариант">Настроить лист</button><button class="rt" id="rmHw" title="Выдать такой же лист как домашку">В домашку</button>':''}
+        ${m.k==='board'?'<button class="rt" id="rmPg" title="Добавить ещё одну страницу к доске">+ Страница</button>':''}
+        <button class="rt" id="rmImg" title="Положить фото или скриншот на страницу. Работает и Ctrl+V">+ Картинка</button></div></div>`:''}
+      <div class="rt-sec"><span class="rt-cap">Масштаб</span><div class="rt-g rt-z"><button class="rt" id="rmZm" aria-label="Уменьшить" title="Уменьшить">−</button><button class="rt" id="rmZr" title="Вернуть по ширине">${Math.round((R.zoom||1)*100)}%</button><button class="rt" id="rmZp" aria-label="Увеличить" title="Увеличить">+</button></div></div>
+      <div class="rt-sec"><span class="rt-cap">Реакции</span>${rxBar()}</div>`;
     const $=id=>document.getElementById(id);
     $('rmLead').onclick=()=>{const c=R.mats.find(x=>x.id===R.st.cur);if(c&&!c.vis&&roomLive(R.st)){c.vis=true;roomSaveMats()}roomSet({lead:true,pg:R.pgNow});roomUpdate()};
     $('rmFree').onclick=()=>{roomSet({lead:false});roomUpdate()};
     $('rmPen').onclick=()=>{roomSet({pen:!R.st.pen});roomTools()};
     $('rmUndo').onclick=roomUndo;$('rmClr').onclick=roomClear;
     if($('rmImg'))$('rmImg').onclick=roomPinPick;
+    [1,0].forEach(v=>{if($('rmChk'+v))$('rmChk'+v).onclick=()=>{roomSet({chk:v===1});roomTools();roomAnsPaint()}});
     if($('rmKeys'))$('rmKeys').onclick=()=>{R.keys=!R.keys;roomTools();roomAnsPaint()};
     if($('rmHw'))$('rmHw').onclick=()=>roomHomework(m);
     if($('rmTune'))$('rmTune').onclick=()=>roomTune(m.tid,m);
     if($('rmPg'))$('rmPg').onclick=()=>{m.n=(m.n||1)+1;roomSaveMats();R.stageKey='';roomStage();setTimeout(()=>roomScrollPg(m.n-1),60)};
   }else{
     const pen=!!R.st.pen&&roomLive(R.st);if(!pen&&R.tool!=='hand')R.tool='hand';
-    el.innerHTML=(pen?`<div class="rt-g">${tb('hand','Листать')}${tb('pen','Маркер')}${tb('hl','Выделитель')}${tb('er','Ластик')}<button class="rt" id="rmUndo">↶</button></div>${inkSwatches()}<span class="rt-note">Ручку дал репетитор</span>`
-      :(m&&m.k==='sheet'&&roomItems(m).some(rAnswerable)?'<span class="rt-note">Нажми на окошко и впиши ответ</span>':m&&m.k==='deck'?'<span class="rt-note">Двигай карточки, пиши в стикеры и поля</span>':''))+(roomLive(R.st)?rxBar():'');
+    el.innerHTML=(pen?`<div class="rt-sec"><span class="rt-cap">Рисование</span><div class="rt-g">${tb('hand','Листать')}${tb('pen','Маркер')}${tb('hl','Выделитель')}${tb('er','Ластик')}<button class="rt" id="rmUndo">↶</button></div></div>${inkSwatches()?`<div class="rt-sec"><span class="rt-cap">Цвет</span>${inkSwatches()}</div>`:''}`
+      :(m&&m.k==='sheet'&&roomItems(m).some(rAnswerable)?'<span class="rt-note">Нажми на окошко и впиши ответ</span>':m&&m.k==='deck'?'<span class="rt-note">Двигай карточки, пиши в стикеры и поля</span>':''))+(roomLive(R.st)?`<div class="rt-sec"><span class="rt-cap">Реакции</span>${rxBar()}</div>`:'');
     const u=document.getElementById('rmUndo');if(u)u.onclick=roomUndo;
   }
-  const z=R.zoom||1;el.insertAdjacentHTML('beforeend',`<div class="rt-g rt-z"><button class="rt" id="rmZm" aria-label="Уменьшить" title="Уменьшить">−</button><button class="rt" id="rmZr" title="Вернуть по ширине">${Math.round(z*100)}%</button><button class="rt" id="rmZp" aria-label="Увеличить" title="Увеличить">+</button></div>`);
+  const z=R.zoom||1;if(R.role!=='t')el.insertAdjacentHTML('beforeend',`<div class="rt-sec"><span class="rt-cap">Масштаб</span><div class="rt-g rt-z"><button class="rt" id="rmZm" aria-label="Уменьшить" title="Уменьшить">−</button><button class="rt" id="rmZr" title="Вернуть по ширине">${Math.round(z*100)}%</button><button class="rt" id="rmZp" aria-label="Увеличить" title="Увеличить">+</button></div></div>`);
   const ZS=[.5,.67,.8,1,1.25,1.5,2],zset=v=>{R.zoom=v;R.stageKey='';roomStage();roomTools()};
   document.getElementById('rmZm').onclick=()=>zset([...ZS].reverse().find(v=>v<(R.zoom||1)-.01)||ZS[0]);
   document.getElementById('rmZp').onclick=()=>zset(ZS.find(v=>v>(R.zoom||1)+.01)||ZS[ZS.length-1]);
@@ -7298,11 +7313,14 @@ function roomCallModal(){
 }
 function roomSettings(){
   modal(`<h2>Комната ${esc(R.info.first||'')}</h2>
-    <div class="field"><span class="label">Ученик видит, верно ли ответил</span><div class="seg" id="rsChk"><button data-v="1" class="${R.st.chk!==false?'on':''}">Сразу</button><button data-v="0" class="${R.st.chk===false?'on':''}">Нет, только я</button></div></div>
-    <p class="hint" style="margin:0">«Нет, только я» подходит для проверочной: ответ встаёт в лист, но без отметки.</p>
-    <div class="modal-actions"><button class="btn quiet" id="rsCall">Запасная ссылка на звонок</button><button class="btn primary" id="cl">Готово</button></div>`,()=>{
+    <p style="margin:0">Всё, что нужно во время урока, лежит на панели над материалом: показ, рисование, ручка и отметки ✓ ✗ ученику, масштаб.</p>
+    <div class="rm-more">
+      <button class="btn wide" id="rsHelp">Как работает комната</button>
+      <button class="btn wide quiet" id="rsCall">Запасная ссылка на звонок</button>
+    </div>
+    <div class="modal-actions"><button class="btn primary" id="cl">Готово</button></div>`,()=>{
     document.getElementById('cl').onclick=close;document.getElementById('rsCall').onclick=roomCallModal;
-    document.querySelectorAll('#rsChk button').forEach(b=>b.onclick=()=>{roomSet({chk:b.dataset.v==='1'});document.querySelectorAll('#rsChk button').forEach(x=>x.classList.toggle('on',x===b))})});
+    document.getElementById('rsHelp').onclick=()=>{close();roomHelp('t')}});
 }
 
 /* ---------- начало и конец урока ---------- */
@@ -8387,8 +8405,12 @@ function roomHelp(role){
     ['Свободно','Ученик листает сам, например на самостоятельной работе. Вы видите сверху, на каком материале и странице он сейчас.'],
     ['Указка','Ваш курсор виден ученику красной точкой. Удобно показывать «вот здесь». Нажатие на задание подсвечивает его у ученика.'],
     ['Маркер, выделитель, ластик','Рисуют поверх листа. Цвет выбирается рядом. Ластик стирает одну линию, «Очистить» — все пометки страницы.'],
-    ['Дать ручку','Разрешает ученику рисовать. Пока не дали, ученик только отвечает в окошках.'],
-    ['Ответы ученика','Ученик пишет прямо в окошках листа. У вас ответ появляется сразу: верно — зелёным, ошибка — красным. «Ответы» показывают ключ только вам.']];
+    ['Ручка у ученика','Разрешает ученику рисовать маркером. Пока выключено, ученик только отвечает в окошках.'],
+    ['Отметки ✓ ✗','Ученик пишет прямо в окошках листа, у вас ответ появляется сразу: верно зелёным, ошибка красным. «Видит» показывает ученику такую же отметку, «Скрыты» оставляет её только вам (удобно для проверочной).'],
+    ['Ключ ответов','Показывает правильные ответы только вам. Ученик их не видит.'],
+    ['Несколько материалов','Кнопка с двумя рамками у материала в списке открывает его рядом с другими, до трёх окон. Окно, в которое вы нажали, становится главным: в нём рисуете и по нему идёт «Веду я». Крестик в заголовке окна закрывает его.'],
+    ['Картинка на листе','«+ Картинка» или Ctrl+V кладёт фото или скриншот на текущую страницу. Её можно двигать, менять размер угловой точкой и убирать крестиком, а писать поверх.'],
+    ['Показ экрана','Кнопка с монитором в окне звонка. Браузер спросит, что показать: лучше выбрать вкладку. Ученик видит ваш экран, но управлять им не может.']];
   const S2=[['Урок','Когда репетитор начинает урок, нажми «Войти». Разреши камеру и микрофон — так вы будете видеть и слышать друг друга.'],
     ['Ответы','Нажми на окошко в задании и впиши ответ. В столбик цифры пишутся с конца, как в тетради.'],
     ['Рисовать','Когда репетитор даст ручку, появится «Маркер». Им можно обводить и писать.'],
