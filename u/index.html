@@ -1125,6 +1125,7 @@ button.mchip:hover{background:rgba(255,255,255,.24)}
 .rm-who b{font-size:17px;line-height:1.2}
 .rm-pres{font-size:13px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 .rm-pres.on{color:var(--ok)}
+.rm-pres.out{color:#fff;background:#D5402F;padding:3px 11px;border-radius:999px;font-weight:600;overflow:visible}
 .rm-pres.on::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ok);margin-right:6px;vertical-align:1px}
 .rm-act{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end;margin-left:auto}
 .rm-start{background:var(--pen);border-color:var(--pen);color:#fff}
@@ -1282,7 +1283,8 @@ body.inroom .wrap{max-width:1360px}
 .vc-q{flex:1;font-size:12px;color:#9AA5BF;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .vc-q::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;background:#66718D;vertical-align:0}
 .vc-q.good::before{background:#5CC98C}.vc-q.mid::before{background:#E8B04A}.vc-q.bad::before{background:#FF7863}
-.vc-b{width:38px;height:38px;border-radius:50%;border:0;background:rgba(255,255,255,.12);color:#fff;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.vc-b{width:42px;height:42px;border-radius:50%;border:0;background:rgba(255,255,255,.14);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s}
+.vc-b svg{width:22px;height:22px}
 .vc-b:hover{background:rgba(255,255,255,.22)}.vc-b.off{background:#fff;color:#141A28}
 .vc-b.end{background:#D5402F}.vc-b.end:hover{background:#B83526}
 .vc-lv{display:grid;grid-template-columns:auto 1fr auto 1fr;gap:4px 6px;align-items:center;padding:6px 10px 0;font-size:11px;color:#9AA5BF}
@@ -1297,7 +1299,7 @@ body.inroom .wrap{max-width:1360px}
 .vc-yes{background:#2C8A57!important;border-color:#2C8A57!important;color:#fff!important}
 .vc-no{background:transparent!important;color:#fff!important;border-color:rgba(255,255,255,.4)!important}
 .vc:not(.on) .vc-v{aspect-ratio:16/9}
-@media (max-width:700px){.vc-bar{padding:6px;gap:4px}.vc-b{width:32px;height:32px;font-size:14px}.vc-q{font-size:0}.vc-q::before{margin:0}}
+@media (max-width:700px){.vc-bar{padding:6px;gap:4px}.vc-b{width:36px;height:36px}.vc-b svg{width:19px;height:19px}.vc-q{font-size:0}.vc-q::before{margin:0}}
 /* разбор урока и итоги в карточке ученика */
 .rp-nums{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px}
 .rp-n{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;display:flex;flex-direction:column}
@@ -1441,6 +1443,7 @@ body.bd-open{overflow:hidden}
 .rdeck .r-lnk{position:absolute;right:-14px;top:-14px;width:36px;height:36px;border-radius:50%;background:#2D57C8;color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;pointer-events:auto;z-index:3}
 .rx-g .rt{font-size:18px;padding:4px 6px;min-height:32px}
 .ink-sw{align-items:center;padding:5px 6px}
+.rt-g.ink-sw{display:grid;grid-template-columns:repeat(5,22px);gap:5px 6px}
 .isw{width:22px;height:22px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px var(--line);cursor:pointer;padding:0}
 .isw.on{box-shadow:0 0 0 2px var(--blue)}
 .drawing.er .rpg .r-ink{cursor:cell}
@@ -6346,6 +6349,11 @@ const R={on:false};
 const RID=n=>{const a='abcdefghijklmnopqrstuvwxyz0123456789';let s='';for(let i=0;i<(n||15);i++)s+=a[Math.floor(Math.random()*36)];return s};
 const INK_COL={t:'#D5402F',s:'#2D57C8'};
 const R_LIVE_MAX=3*3600e3;
+/* в какой комнате сейчас человек: после перезагрузки страницы возвращаем его туда, и звонок поднимается сам */
+const ROOM_KEY='kletka-room';
+function roomRemember(role,rec,info){try{localStorage.setItem(ROOM_KEY,JSON.stringify({role,id:rec.id,sid:(info&&info.sid)||null,t:Date.now()}))}catch(e){}}
+function roomForget(){try{localStorage.removeItem(ROOM_KEY)}catch(e){}}
+function roomSaved(role){try{const d=JSON.parse(localStorage.getItem(ROOM_KEY));return d&&d.role===role&&Date.now()-d.t<R_LIVE_MAX?d:null}catch(e){return null}}
 const roomLive=st=>!!(st&&st.live&&Date.now()-(st.liveAt||0)<R_LIVE_MAX);
 const rTitle=t=>String(t||'').replace(/\.(pdf|png|jpe?g|webp|gif|heic)$/i,'').replace(/[_]+/g,' ').replace(/\s+/g,' ').trim()||'Файл';
 const R_KIND={deck:'Разработка',sheet:'Лист',pdf:'PDF',img:'Картинка',board:'Доска',note:'Объяснение',link:'Ссылка'};
@@ -6377,12 +6385,12 @@ async function openRoomCab(id){
 function roomStart(pb,role,rec,info){
   roomStop();
   Object.assign(R,{on:true,pb,role,rec,info,mats:rec.mats||[],st:rec.st||{},ans:rec.ans||{},ink:[],other:null,otherAt:0,
-    tool:'hand',stageKey:'',items:null,sel:null,keys:false,unsub:[],timers:[],obs:[],myPulse:null,pgNow:0,away:false,myCur:null,live:null,icache:{},side:false});
+    seenS:false,topK:'',tool:'hand',stageKey:'',items:null,sel:null,keys:false,unsub:[],timers:[],obs:[],myPulse:null,pgNow:0,away:false,myCur:null,live:null,icache:{},side:false});
   if(role==='t'&&!R.st.cur&&R.mats.length)R.st.cur=R.mats[R.mats.length-1].id;
-  roomConnect(rec.id);
+  roomRemember(role,rec,info);roomConnect(rec.id);
 }
 function roomStop(){
-  if(!R.on)return;if(C.st!=='idle'||C.offer)callEnd(true,null,'left');R.on=false;
+  if(!R.on)return;roomForget();if(C.st!=='idle'||C.offer)callEnd(true,null,'left');R.on=false;
   (R.unsub||[]).forEach(u=>{try{u()}catch(e){}});(R.timers||[]).forEach(clearInterval);(R.obs||[]).forEach(o=>o.disconnect());
   clearTimeout(R.stT);clearTimeout(R.ansT);
   if(R.myPulse)R.pb.collection('pulse').update(R.myPulse.id,{d:{at:Date.now(),gone:true}}).catch(()=>{});
@@ -6401,8 +6409,11 @@ async function roomConnect(id){
   await sub('rooms',id,e=>roomOnRec(e.record));
   await sub('ink','*',roomOnInk,{filter:f});
   await sub('pulse','*',roomOnPulse,{filter:f});
-  R.timers.push(setInterval(()=>{if(!R.on)return;roomPulse({},true);
+  R.timers.push(setInterval(()=>{if(!R.on)return;roomPulse({},true);roomRemember(R.role,R.rec,R.info);
     if(R.role==='t'&&R.st.live&&Date.now()-(R.st.liveAt||0)>10*60e3)roomSet({liveAt:Date.now()});roomTop()},15000));
+  /* пока урок идёт, звонок держится сам: каждые 3 секунды смотрим, нет ли обрыва, и обновляем отметку «ученик в комнате» */
+  R.timers.push(setInterval(()=>{if(!R.on)return;callWatch();
+    const k=R.role+roomHere()+roomLive(R.st);if(k!==R.topK){R.topK=k;roomTop()}},3000));
   /* после обрыва связи забираем свежую комнату целиком */
   const back=async()=>{if(!alive())return;try{const r=await pb.collection('rooms').getOne(id);roomOnRec(r);const ink=await pb.collection('ink').getFullList({filter:f,sort:'created'});R.ink=ink;roomInkAll()}catch(e){}};
   addEventListener('online',back);R.unsub.push(()=>removeEventListener('online',back));
@@ -6431,7 +6442,7 @@ function roomOnInk(e){
 function roomOnPulse(e){
   if(!R.on||!e.record||e.record.who===R.role)return;
   const wasHere=roomHere();R.other=e.record.d||{};R.otherAt=R.other.gone?0:Date.now();
-  if(R.role==='t'&&!wasHere&&roomHere()&&roomLive(R.st)&&C.st==='idle'&&!C.declined)setTimeout(()=>{if(R.on&&C.st==='idle'&&roomLive(R.st))callStart()},600);
+  if(!wasHere&&roomHere())setTimeout(callWatch,600);
   if(R.other.gone&&(C.st!=='idle'||C.offer))callEnd(false,R.role==='t'?'Ученик вышел из комнаты':'Репетитор вышел из комнаты');else callOnSig(R.other);
   if(R.role==='s')roomLaser(R.other);
   deckRemoteDrag(R.other.dg);
@@ -6483,13 +6494,19 @@ function roomTop(){
   if(R.role==='t'){
     const om=R.mats.find(m=>m.id===o.m);
     const where=roomHere()?(o.typ?'печатает ответ…':om?'смотрит «'+rTitle(om.t)+'»'+(o.pg?', стр. '+(o.pg+1):''):'в комнате'):'';
+    if(roomHere())R.seenS=true;
+    const out=live&&!roomHere()&&R.seenS;
     el.innerHTML=`<button class="btn quiet small" id="rmBack">← Выйти</button>
-      <div class="rm-who"><b>${esc(R.info.name)}</b><span class="rm-pres${roomHere()?' on':''}">${roomHere()?esc(where):'не в комнате'}</span></div>
+      <div class="rm-who"><b>${esc(R.info.name)}</b><span class="rm-pres${roomHere()?' on':out?' out':''}">${roomHere()?esc(where):out?'Ученик вышел из комнаты':live?'Ученик ещё не пришёл':'не в комнате'}</span></div>
       <div class="rm-act">${live&&C.st==='idle'?'<button class="btn small" id="rmVideo">Позвонить снова</button>':''}${R.st.call?'<button class="btn small quiet" id="rmCall">Ссылка</button>':''}
         <button class="ibtn" id="rmHelpBtn" aria-label="Как работает комната" title="Как работает комната">?</button><button class="ibtn" id="rmSet" aria-label="Настройки комнаты">⋯</button>
         ${live?'<button class="btn small rm-start" id="rmEnd">Завершить урок</button>':'<button class="btn small rm-start" id="rmLive">Начать урок</button>'}</div>`;
     const $=id=>document.getElementById(id);
-    $('rmBack').onclick=()=>go({screen:'student'});
+    $('rmBack').onclick=()=>{
+      if(!roomLive(R.st)){go({screen:'student'});return}
+      modal(`<h2>Выйти из урока?</h2><p style="margin:0">Урок останется идти, но звонок прервётся и ${esc(R.info.first||'ученик')} увидит, что вас нет в комнате. Чтобы закончить урок, нажмите «Завершить урок».</p>
+        <div class="modal-actions"><button class="btn quiet" id="lvNo">Остаться</button><button class="btn primary" id="lvYes">Выйти</button></div>`,()=>{
+        document.getElementById('lvNo').onclick=close;document.getElementById('lvYes').onclick=()=>{close();go({screen:'student'})}})};
     if($('rmVideo'))$('rmVideo').onclick=()=>{C.declined=false;callStart()};
     if($('rmCall'))$('rmCall').onclick=()=>window.open(R.st.call,'_blank','noopener');
     $('rmSet').onclick=roomSettings;$('rmHelpBtn').onclick=()=>roomHelp('t');
@@ -6497,12 +6514,12 @@ function roomTop(){
     if($('rmEnd'))$('rmEnd').onclick=roomFinish;
   }else{
     const away=roomFollow()&&R.away;
-    el.innerHTML=`<button class="btn quiet small" id="rmBack">← Мои задания</button>
+    el.innerHTML=`${live?'':'<button class="btn quiet small" id="rmBack">← Мои задания</button>'}
       <div class="rm-who"><b>${live?'Урок идёт':'Моя тетрадь'}</b><span class="rm-pres${live?' on':''}">${esc(R.info.tutor||'Репетитор')}${live&&R.st.lead!==false&&!away?' показывает':''}</span></div>
       <div class="rm-act">${away?'<button class="btn primary small" id="rmFollow">К репетитору</button>':''}
         <button class="ibtn" id="rmHelpBtn" aria-label="Как работает урок">?</button><button class="btn small" id="rmNote">Тетрадь</button>${R.st.call&&live?'<button class="btn primary small" id="rmCall">Звонок</button>':''}</div>`;
     const $=id=>document.getElementById(id);
-    $('rmBack').onclick=()=>{roomStop();V={screen:'cab'};CAB.items=null;render();loadCab()};
+    if($('rmBack'))$('rmBack').onclick=()=>{roomStop();V={screen:'cab'};CAB.items=null;render();loadCab()};
     $('rmNote').onclick=()=>{R.side=!R.side;roomSide()};$('rmHelpBtn').onclick=()=>roomHelp('s');
     if($('rmCall'))$('rmCall').onclick=()=>window.open(R.st.call,'_blank','noopener');
     if($('rmFollow'))$('rmFollow').onclick=()=>{R.away=false;R.myCur=null;roomUpdate();roomScrollPg(R.st.pg||0)};
@@ -6650,7 +6667,9 @@ function roomSetupPage(pg,k){
 }
 const roomCanDraw=()=>R.tool!=='hand'&&(R.role==='t'||(R.st.pen&&roomLive(R.st)));
 /* цвета ручки и выделителя; по умолчанию у репетитора красная ручка, у ученика синяя */
-const INK_PEN=['#D5402F','#2D57C8','#2C8A57','#1F2C55','#E8A317','#7E57C2'],INK_HL=['#F2C94C','#7FD3A0','#F6A6C1','#8EC5FF'];
+/* новые цвета только в конце списков: номера цветов в уже нарисованных линиях не меняются */
+const INK_PEN=['#D5402F','#2D57C8','#2C8A57','#1F2C55','#E8A317','#7E57C2','#E0559B','#20AFB8','#7A4B2A','#1B1B1F'],
+  INK_HL=['#F2C94C','#7FD3A0','#F6A6C1','#8EC5FF','#FFB45E','#C8A8F2','#7FE0E8','#D4EB6A','#FF8A80','#C9CED6'];
 const inkPen=()=>R.penC??(R.role==='t'?0:1),inkHl=()=>R.hlC??0;
 /* ластик стирает только ту линию, которой коснулся (ученик — только свои) */
 function roomErase(pg,k,p){const m=roomMat();if(!m)return;const W=pg.clientWidth,r=12/W;
@@ -7074,6 +7093,8 @@ function roomHomework(m){
    Связь моргнула или страницу обновили — репетитор сам переподключает звонок. */
 const C={st:'idle',n:null,pc:null,loc:null,rem:null,mic:true,cam:true,big:false,seen:'',r:0,restT:null,statsT:null,q:'',msg:'',ice:null,iceAt:0,lastOk:0};
 const CALL_KEY='kletka-call';
+addEventListener('pagehide',e=>{if(!R.on||!R.myPulse||e.persisted)return;
+  try{fetch(API+'/api/collections/pulse/records/'+R.myPulse.id,{method:'PATCH',keepalive:true,headers:{'Content-Type':'application/json',Authorization:R.pb.authStore.token},body:JSON.stringify({d:{at:Date.now(),gone:true}})}).catch(()=>{})}catch(_){}});
 async function callIce(){
   if(C.ice&&Date.now()-C.iceAt<3*3600e3)return C.ice;
   const list=[{urls:['stun:stun.l.google.com:19302','stun:stun.cloudflare.com:3478']}];
@@ -7108,7 +7129,10 @@ async function callPc(){
 }
 /* полное описание связи сразу со всеми адресами: одно сообщение туда и одно обратно */
 function callGather(pc){return new Promise(res=>{if(pc.iceGatheringState==='complete')return res();
-  const t=setTimeout(res,2500);pc.addEventListener('icegatheringstatechange',()=>{if(pc.iceGatheringState==='complete'){clearTimeout(t);res()}})})}
+  let t2=null;const done=()=>{clearTimeout(t);clearTimeout(t2);res()},t=setTimeout(done,1500);
+  /* не ждём все адреса: хватает внешнего адреса или адреса ретранслятора, ещё 250 мс про запас */
+  pc.addEventListener('icecandidate',e=>{if(e.candidate&&/ typ (srflx|relay)/.test(e.candidate.candidate)&&!t2)t2=setTimeout(done,250)});
+  pc.addEventListener('icegatheringstatechange',()=>{if(pc.iceGatheringState==='complete')done()})})}
 /* у каждого сообщения свой номер: после перезагрузки страницы старые и новые не путаются */
 function callSend(sig){if(sig)sig.i=RID(6);roomPulse({sig,call:C.st==='idle'?null:C.n},true);return sig&&sig.i}
 
@@ -7139,11 +7163,18 @@ function mediaHelp(){if(document.getElementById('mediaHelp'))return;
         if(!R.on)return;if(R.role==='t'&&C.st==='idle'&&roomLive(R.st)){C.declined=false;callStart()}else if(R.role==='s'&&C.offer&&C.st==='idle')callAccept(true);else if(R.role==='s'&&C.st==='idle'){C.joinSent=false;callOnSig(R.other)}}
       catch(e){st.textContent='Доступа всё ещё нет. Проверьте шаги выше и обновите страницу.'}}});
 }
+/* звонок привязан к уроку, а не к странице. Пока урок идёт и оба в комнате: репетитор сам звонит, ученик сам просит позвонить.
+   Обновили страницу, закрыли и открыли вкладку, пропал интернет — связь поднимется без кнопок. Не звонит сам только после «положить трубку». */
+function callWatch(){
+  if(!R.on||!roomLive(R.st)||C.st!=='idle'||C.offer||C.starting||Date.now()<(C.noMediaUntil||0))return;
+  if(R.role==='t'){if(!C.declined&&roomHere()){C.starting=true;callStart().finally(()=>{C.starting=false})}}
+  else if(roomHere()&&!C.noJoin&&Date.now()-(C.joinAt||0)>((C.joinN||0)>=3?30000:4000)){C.joinAt=Date.now();C.joinN=(C.joinN||0)+1;roomPulse({join:1,jt:Date.now()},true)}
+}
 async function callStart(again){
   if(C.st!=='idle'&&!again)return;
   if(!navigator.mediaDevices||!window.RTCPeerConnection){toast('Этот браузер не умеет видеозвонки. Откройте Клетку в Chrome, Яндекс Браузере, Safari или Firefox');return}
   C.n=again&&C.n||RID(8);C.st='calling';C.msg='';C.r=0;C.aonly=false;roomPulse({ao:false});callUI();
-  try{if(!C.loc)C.loc=await (MEDIA_P||callMedia())}catch(e){C.st='idle';callUI();return}
+  try{if(!C.loc)C.loc=await (MEDIA_P||callMedia())}catch(e){C.st='idle';C.noMediaUntil=Date.now()+30000;callUI();return}
   try{sessionStorage.setItem(CALL_KEY,C.n)}catch(e){}
   await callOffer(false);
 }
@@ -7157,7 +7188,7 @@ async function callOffer(restart){
 async function callAccept(auto){
   const o=C.offer;if(!o)return;C.st='connecting';C.n=o.n;C.msg='';C.aonly=false;roomPulse({ao:false});callUI();
   /* без доступа к камере звонок не обрываем: репетитор ждёт, пока ученик разрешит */
-  try{if(!C.loc)C.loc=await (MEDIA_P||callMedia())}catch(e){C.st='idle';callUI();return}
+  try{if(!C.loc)C.loc=await (MEDIA_P||callMedia())}catch(e){C.st='idle';C.noMediaUntil=Date.now()+30000;callUI();return}
   try{sessionStorage.setItem(CALL_KEY,C.n)}catch(e){}
   await callAnswer(o);
 }
@@ -7170,14 +7201,15 @@ async function callAnswer(o){
 async function callOnSig(d){
   let mine='';try{mine=sessionStorage.getItem(CALL_KEY)||''}catch(e){}
   /* страницу обновили посреди звонка: репетитор звонит заново сам, ученик просит перезвонить */
-  if(R.role==='t'&&C.st==='idle'&&d&&d.call&&mine===d.call){C.n=d.call;callStart(true);return}
-  if(R.role==='s'&&C.st==='idle'&&d&&d.call&&mine===d.call&&!C.joinSent){C.joinSent=true;roomPulse({join:mine,jt:Date.now()},true)}
-  if(R.role==='t'&&d&&d.join&&d.join===C.n&&d.jt!==C.lastJoin&&C.st!=='idle'){C.lastJoin=d.jt;callOffer(false);return}
+  if(R.role==='t'&&C.st==='idle'&&d&&d.call&&mine===d.call&&!C.declined&&roomLive(R.st)){C.n=d.call;callStart(true);return}
+  if(R.role==='s')callWatch();
+  /* ученик просит позвонить: страницу обновили или связь не вернулась сама */
+  if(R.role==='t'&&d&&d.join&&d.jt!==C.lastJoin&&roomLive(R.st)&&!C.declined){C.lastJoin=d.jt;if(C.st==='idle')callWatch();else callOffer(false);return}
   if(d&&!!d.ao!==!!C.themAo){C.themAo=!!d.ao;callUI()}
   const s=d&&d.sig;if(!s||!s.n)return;const key=s.i||s.n+':'+s.t+':'+(s.r||0);if(key===C.seen)return;C.seen=key;
-  if(s.t==='bye'){if(R.role==='t'&&C.n===s.n&&!s.left)C.declined=true;if(C.n===s.n){callEnd(false,R.role==='t'?'Ученик завершил звонок':'Репетитор завершил звонок')}if(C.offer&&C.offer.n===s.n){C.offer=null;callUI()}return}
+  if(s.t==='bye'){if(R.role==='t'&&C.n===s.n&&!s.left)C.declined=true;if(R.role==='s')C.noJoin=true;if(C.n===s.n){callEnd(false,R.role==='t'?'Ученик завершил звонок':'Репетитор завершил звонок')}if(C.offer&&C.offer.n===s.n){C.offer=null;callUI()}return}
   if(R.role==='t'){if(s.t==='answer'&&C.pc&&s.n===C.n&&(!s.oi||s.oi===C.oid)&&C.pc.signalingState==='have-local-offer'){try{await C.pc.setRemoteDescription({type:'answer',sdp:s.sdp});C.st='connecting';callUI()}catch(e){}}return}
-  if(s.t!=='offer')return;C.offer=s;
+  if(s.t!=='offer')return;C.offer=s;C.noJoin=false;C.joinN=0;
   if(C.st!=='idle'){try{await callAnswer(s)}catch(e){}return}
   if(mine===s.n)return callAccept(true);
   if(roomLive(R.st))return callAccept(true);
@@ -7188,11 +7220,13 @@ function callDecline(){C.declined=true;const o=C.offer;C.offer=null;C.st='idle';
 function callNet(){
   const pc=C.pc;if(!pc||C.st==='idle')return;const s=pc.connectionState||pc.iceConnectionState;
   if(s==='connected'||pc.iceConnectionState==='connected'||pc.iceConnectionState==='completed'){
-    if(C.st!=='live'){C.st='live';C.msg='';C.lastOk=Date.now();roomPulse({sig:null,call:C.n},true);callStats()}
-    clearTimeout(C.restT);C.restT=null;callUI();return}
+    if(C.st!=='live'){C.st='live';C.msg='';C.lastOk=Date.now();roomPulse({sig:null,call:C.n,join:null},true);callStats()}
+    clearTimeout(C.restT);C.restT=null;clearTimeout(C.sjT);C.sjT=null;callUI();return}
   if(['disconnected','failed'].includes(s)&&C.st==='live'){C.st='reconnecting';callUI()}
   if(R.role==='t'&&['disconnected','failed'].includes(s)&&!C.restT){
-    C.restT=setTimeout(()=>{C.restT=null;const st=C.pc&&(C.pc.connectionState||C.pc.iceConnectionState);if(C.st!=='idle'&&st!=='connected')callOffer(st!=='failed'||C.r<3)},s==='failed'?500:6000)}
+    C.restT=setTimeout(()=>{C.restT=null;const st=C.pc&&(C.pc.connectionState||C.pc.iceConnectionState);if(C.st!=='idle'&&st!=='connected')callOffer(st!=='failed'||C.r<3)},s==='failed'?300:2500)}
+  if(R.role==='s'&&['disconnected','failed'].includes(s)&&!C.sjT){
+    C.sjT=setTimeout(()=>{C.sjT=null;const pc=C.pc;if(C.st!=='idle'&&pc&&!['connected','completed'].includes(pc.iceConnectionState)){C.joinAt=Date.now();roomPulse({join:1,jt:Date.now()},true)}},s==='failed'?500:3500)}
 }
 /* качество связи раз в 2 секунды: задержка и потери */
 function callStats(){clearInterval(C.statsT);let prevLost=0,prevRecv=0;
@@ -7211,7 +7245,7 @@ function callAdapt(){C.bad=C.q==='bad'?(C.bad||0)+1:0;C.good=C.q==='good'?(C.goo
 /* left — просто вышел из комнаты: вернётся, звонок поднимется сам; иначе положил трубку */
 function callEnd(send,why,left){
   if(send&&C.n)callSend({n:C.n,t:'bye',left:left==='left'});
-  clearTimeout(C.restT);clearInterval(C.statsT);C.restT=null;
+  clearTimeout(C.restT);clearTimeout(C.sjT);C.sjT=null;clearInterval(C.statsT);C.restT=null;
   if(C.pc){try{C.pc.close()}catch(e){}}C.pc=null;C.pcN=null;
   if(C.loc)C.loc.getTracks().forEach(t=>t.stop());C.loc=null;C.rem=null;C.st='idle';C.offer=null;C.q='';
   try{sessionStorage.removeItem(CALL_KEY)}catch(e){}
@@ -7272,6 +7306,12 @@ function callDrag(el){
     el.addEventListener('pointermove',mv);el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up)});
 }
 addEventListener('resize',()=>{const el=document.getElementById('vc');if(el)callPlace(el)});
+/* значки как в мессенджерах: круглые кнопки, у выключенных микрофона и камеры перечёркнутый значок */
+const VC_SL='<path d="M4 4l16 16" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" fill="none"/>';
+const VC_ICO={
+  mic:on=>`<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="2.5" width="6" height="12" rx="3" fill="currentColor"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3.2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>${on?'':VC_SL}</svg>`,
+  cam:on=>`<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="6" width="13" height="12" rx="3" fill="currentColor"/><path d="M17 10.6l4.5-3v8.8l-4.5-3z" fill="currentColor"/>${on?'':VC_SL}</svg>`,
+  end:'<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08c-.18-.17-.29-.42-.29-.7 0-.28.11-.53.29-.71C3.34 8.78 7.46 7 12 7s8.66 1.78 11.71 4.67c.18.18.29.43.29.71 0 .28-.11.53-.29.71l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.11-.7-.28-.79-.73-1.68-1.36-2.66-1.85-.33-.16-.56-.51-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z"/></svg>'};
 function callUI(){
   let el=document.getElementById('vc');
   if(!R.on||(C.st==='idle'&&!C.offer)){if(el)el.remove();if(R.on)roomTop();return}
@@ -7288,13 +7328,12 @@ function callUI(){
   const wait=C.st==='calling'?`Звоним: ${esc(other)}…${roomHere()?'':' Ученик пока не в комнате, звонок дождётся его.'}`:C.st==='connecting'?'Соединяем…':C.st==='reconnecting'?'Связь прервалась, восстанавливаем…':'';
   document.getElementById('vcOv').innerHTML=wait?`<div class="vc-wait">${wait}</div>`:C.themAo&&C.st==='live'?`<div class="vc-wait">🔈 ${esc(other)}: только звук</div>`:'';
   document.getElementById('vcBar').innerHTML=`<span class="vc-q" id="vcQ"></span>
-      <button class="vc-b${C.mic?'':' off'}" id="vcMic" aria-label="${C.mic?'Выключить микрофон':'Включить микрофон'}" title="Микрофон">${C.mic?'🎙':'🔇'}</button>
-      <button class="vc-b${C.cam?'':' off'}" id="vcCam" aria-label="${C.cam?'Выключить камеру':'Включить камеру'}" title="Камера">${C.cam?'📷':'🚫'}</button>
-      <button class="vc-b${C.aonly?' off':''}" id="vcAo" title="${C.aonly?'Включить видео':'Только звук: при плохой связи'}" aria-label="Только звук">${C.aonly?'🎞':'🔈'}</button>
-      <button class="vc-b end" id="vcEnd" aria-label="Завершить звонок" title="Завершить">✕</button>`;
+      <button class="vc-b${C.mic?'':' off'}" id="vcMic" aria-label="${C.mic?'Выключить микрофон':'Включить микрофон'}" title="${C.mic?'Выключить микрофон':'Включить микрофон'}">${VC_ICO.mic(C.mic)}</button>
+      <button class="vc-b${C.cam?'':' off'}" id="vcCam" aria-label="${C.cam?'Выключить камеру':'Включить камеру'}" title="${C.cam?'Выключить камеру':'Включить камеру'}">${VC_ICO.cam(C.cam)}</button>
+      ${R.role==='t'?`<button class="vc-b end" id="vcEnd" aria-label="Завершить звонок" title="Завершить звонок">${VC_ICO.end}</button>`:''}`;
   document.getElementById('vcMsg').innerHTML=C.msg?`<div class="vc-msg">${esc(C.msg)}</div>`:'';
   const $=id=>document.getElementById(id);
-  $('vcMic').onclick=callMic;$('vcCam').onclick=callCam;$('vcAo').onclick=callAudioOnly;$('vcEnd').onclick=()=>callEnd(true);
+  $('vcMic').onclick=callMic;$('vcCam').onclick=callCam;if($('vcEnd'))$('vcEnd').onclick=()=>{C.declined=true;callEnd(true)};
   callVideos();callQ();callBanner();roomTop();
 }
 /* ---------- Разбор урока ----------
@@ -8090,13 +8129,14 @@ document.getElementById('home').onclick=()=>{if(!STUDENT_MODE&&(ACC.user||ACC.de
 if(CABINET){
   STUDENT_MODE=true;document.body.classList.add('cabinet');document.title='Кабинет ученика';document.getElementById('ati').href='../icons/u-180.png';
   addEventListener('focus',()=>{if(V.screen==='cab'&&pbS.authStore.isValid)loadCab()});
-  if(pbS&&pbS.authStore.isValid&&pbS.authStore.record&&pbS.authStore.record.collectionName==='students'){V={screen:'cab'};render();loadCab()}
+  if(pbS&&pbS.authStore.isValid&&pbS.authStore.record&&pbS.authStore.record.collectionName==='students'){V={screen:'cab'};render();loadCab();const sv=roomSaved('s');if(sv)openRoomCab(sv.id)}
   else{V={screen:'cablogin'};render()}
 }else if(!STUDENT_MODE){
   const hash=location.hash;
   if(hash==='#student')location.replace('../u/');
   if(pbT&&pbT.authStore.isValid&&pbT.authStore.record&&pbT.authStore.record.collectionName==='users'){
-    startTutor();pbT.collection('users').authRefresh().then(()=>{ACC.user=pbT.authStore.record;crumbs()}).catch(e=>{if(e&&e.status===401)logout()});
+    startTutor();{const sv=roomSaved('t');if(sv&&sv.sid)setTimeout(()=>{if(!R.on&&student(sv.sid))openRoom(sv.sid)},0)}
+    pbT.collection('users').authRefresh().then(()=>{ACC.user=pbT.authStore.record;crumbs()}).catch(e=>{if(e&&e.status===401)logout()});
   }else if(sessionStorage.getItem('kletka-demo')&&hash!=='#signup'&&hash!=='#login')startDemo();
   else{V={screen:'auth',authMode:hash==='#signup'?'signup':'login'};render()}
   try{history.replaceState({V:JSON.parse(JSON.stringify(V))},'')}catch(e){}
