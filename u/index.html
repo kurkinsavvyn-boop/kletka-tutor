@@ -1256,6 +1256,14 @@ button.mchip:hover{background:rgba(255,255,255,.24)}
 .rm-scr.ctl video{cursor:crosshair;outline:3px solid #3E9A5F;outline-offset:-3px}
 .rm-share.ctl{background:#D5402F}
 .rm-share{position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:70;display:flex;align-items:center;gap:12px;background:#3E9A5F;color:#fff;border-radius:999px;padding:6px 8px 6px 16px;font-size:14px;box-shadow:0 4px 14px rgba(20,30,60,.3)}
+.fview{position:fixed;inset:0;z-index:50;background:var(--paper);display:flex;flex-direction:column}
+.fv-bar{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--line);background:var(--card)}
+.fv-bar b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fv-body{flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;align-items:center;gap:14px}
+.fv-pg{width:min(100%,1000px);background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.2);flex:none}
+.fv-pg canvas{display:block;width:100%;height:auto}
+.fv-body>img{max-width:100%;height:auto;box-shadow:0 1px 4px rgba(0,0,0,.2);background:#fff}
+body.fv-on{overflow:hidden}
 .rm-up{position:fixed;left:50%;transform:translateX(-50%);bottom:16px;z-index:60;background:#1F2C55;color:#fff;border-radius:999px;padding:8px 16px;font-size:13px;box-shadow:0 4px 14px rgba(20,30,60,.3)}
 .rimg img{display:block;width:100%;height:auto}
 .rbd{aspect-ratio:210/297}
@@ -6005,9 +6013,34 @@ async function uploadFiles(list){
     const fd=new FormData();fd.append('owner',ACC.user.id);fd.append('file',f);fd.append('name',f.name.slice(0,200));fd.append('folder',V.mfolder&&V.mfolder!=='*'?V.mfolder:'');
     try{const r=await pbT.collection('files').create(fd);FILES=[r,...(FILES||[])]}catch(e){toast('Не загрузился: '+f.name)}}
   render()}
-async function openFile(r){const w=window.open('about:blank','_blank');
-  try{const token=await pbT.files.getToken();const url=pbT.files.getURL(r,r.file,{token});if(w)w.location.href=url;else location.href=url}
-  catch(e){if(w)w.close();toast('Не удалось открыть файл')}}
+/* файл из «Моих материалов» открывается в этом же окне: PDF и картинки прямо в программе, остальное скачивается */
+async function openFile(r){
+  const nm=r.name||r.file,kind=fileKind(nm);let url;
+  try{const token=await pbT.files.getToken();url=pbT.files.getURL(r,r.file,{token})}catch(e){toast('Не удалось открыть файл');return}
+  if(kind!=='PDF'&&kind!=='IMG'){const a=document.createElement('a');a.href=url;a.target='_blank';a.rel='noopener';document.body.appendChild(a);a.click();a.remove();toast('Этот тип файла не показывается в программе. Он скачивается');return}
+  fileViewOpen(nm,kind,url)}
+let FV=null;
+function fileViewClose(){if(!FV)return;document.removeEventListener('keydown',FV.key);try{FV.io&&FV.io.disconnect();FV.doc&&FV.doc.destroy()}catch(e){}
+  const el=document.getElementById('fileView');if(el)el.remove();document.body.classList.remove('fv-on');FV=null}
+async function fileViewOpen(nm,kind,url){
+  fileViewClose();const el=document.createElement('div');el.id='fileView';el.className='fview';
+  el.innerHTML=`<div class="fv-bar"><button class="btn small" id="fvBack">← Назад к материалам</button><b>${esc(rTitle(nm))}</b><a class="btn small quiet" href="${esc(url)}" target="_blank" rel="noopener">Скачать</a></div><div class="fv-body" id="fvBody"><p class="hint">Открываю…</p></div>`;
+  document.body.appendChild(el);document.body.classList.add('fv-on');
+  const key=e=>{if(e.key==='Escape')fileViewClose()};document.addEventListener('keydown',key);FV={key};
+  document.getElementById('fvBack').onclick=fileViewClose;
+  const body=document.getElementById('fvBody');
+  if(kind==='IMG'){body.innerHTML=`<img src="${esc(url)}" alt="${esc(nm)}">`;const im=body.querySelector('img');im.onerror=()=>{body.innerHTML='<p class="empty">Картинка не открылась.</p>'};return}
+  try{
+    const lib=await loadPdfJs();const doc=await lib.getDocument({url}).promise;if(!FV||FV.key!==key)return doc.destroy();FV.doc=doc;
+    const p1=await doc.getPage(1),v1=p1.getViewport({scale:1}),ar=v1.height/v1.width;body.innerHTML='';
+    const W=Math.min(1700,Math.round(Math.min(body.clientWidth-32,1000)*Math.min(2,devicePixelRatio||1)));
+    FV.io=new IntersectionObserver(es=>es.forEach(e=>{if(!e.isIntersecting)return;FV.io.unobserve(e.target);const pg=e.target;
+      (FV.q=(FV.q||Promise.resolve()).then(async()=>{if(!FV||!pg.isConnected)return;
+        const page=await doc.getPage(pg._i+1),vp=page.getViewport({scale:1}),v2=page.getViewport({scale:W/vp.width});
+        const c=document.createElement('canvas');c.width=Math.round(v2.width);c.height=Math.round(v2.height);
+        await page.render({canvasContext:c.getContext('2d'),viewport:v2}).promise;if(pg.isConnected){pg.textContent='';pg.appendChild(c)}}).catch(()=>{}))}),{root:body,rootMargin:'1500px 0px'});
+    for(let i=0;i<Math.min(doc.numPages,500);i++){const pg=document.createElement('div');pg.className='fv-pg';pg._i=i;pg.style.aspectRatio='1 / '+ar;body.appendChild(pg);FV.io.observe(pg)}
+  }catch(e){body.innerHTML='<p class="empty">PDF не открылся. Проверьте интернет.</p>'}}
 const fileKind=n=>{const x=(n.split('.').pop()||'').toLowerCase();return /^(png|jpe?g|webp|gif|heic)$/.test(x)?'IMG':x==='pdf'?'PDF':/^(docx?|odt|rtf)$/.test(x)?'DOC':/^(pptx?|key)$/.test(x)?'PPT':/^(xlsx?|csv)$/.test(x)?'XLS':'FILE'};
 const fsize=b=>b>1e6?(b/1e6).toFixed(1).replace('.',',')+' МБ':Math.max(1,Math.round(b/1e3))+' КБ';
 function folders(){return [...new Set([...S.saved.map(m=>m.folder),...(FILES||[]).map(f=>f.folder)].filter(f=>f&&f!=='__board'))].sort((a,b)=>a.localeCompare(b,'ru'))}
