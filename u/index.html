@@ -1182,13 +1182,19 @@ button.mchip:hover{background:rgba(255,255,255,.24)}
 .rm-stage{min-width:0}
 .rm-pages{display:flex;flex-direction:column;gap:18px;max-width:880px;margin:0 auto;container-type:inline-size}
 .rm-stage{overflow-x:auto}
-.rm-panes{display:grid;gap:14px;align-items:start}
-.rm-panes.pn2{grid-template-columns:repeat(2,minmax(0,1fr))}
-.rm-panes.pn3{grid-template-columns:repeat(3,minmax(0,1fr))}
-.rm-panes.pn3.pnt{grid-template-columns:repeat(2,minmax(0,1fr))}
-.rm-panes.pn3.pnt .rm-pane:first-child{grid-column:1/-1}
-.rm-panes.pn3.pnt .rm-pane:first-child .rm-pages{max-height:32vh}
-@media (max-width:900px){.rm-panes.pn2,.rm-panes.pn3,.rm-panes.pn3.pnt{grid-template-columns:minmax(0,1fr)}}
+.rm-panes{display:flex;flex-direction:column;gap:14px}
+.rm-prow{display:flex;align-items:flex-start}
+.rm-prow>.rm-pane,.rm-prow>.rm-pcol{flex:1 1 0;min-width:0}
+.rm-pcol{display:flex;flex-direction:column;gap:14px}
+.rm-pane .rnote,.rm-pane .rlink{min-height:0}
+.rm-split{flex:none;width:14px;align-self:stretch;cursor:col-resize;position:relative;touch-action:none}
+.rm-split::after{content:"";position:absolute;left:5px;top:0;bottom:0;width:4px;border-radius:2px;background:var(--line);transition:background .12s}
+.rm-split:hover::after{background:var(--blue)}
+.rm-gap{flex:none;width:14px}
+.rm-note .rm-pages{max-height:36vh}
+@media (max-width:900px){.rm-prow{flex-direction:column;gap:14px}.rm-prow>.rm-pane,.rm-prow>.rm-pcol{flex:none!important;width:100%}.rm-split,.rm-gap{display:none}}
+.rm-pane .rp-w{position:absolute;top:10px;right:44px;z-index:7;border:0;border-radius:14px;padding:5px 10px;background:rgba(21,24,31,.78);color:#fff;font:inherit;font-size:12px;cursor:pointer}
+.rm-pane .rp-w:hover{background:#15181F}
 .rm-pane{position:relative;min-width:0}
 .rm-pane .rp-c{position:absolute;top:8px;right:8px;z-index:7;width:28px;height:28px;border-radius:50%;border:0;background:#D5402F;color:#fff;font-size:15px;line-height:1;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.25)}
 .rm-pane .rp-c:hover{background:#B83526}
@@ -1245,6 +1251,10 @@ button.mchip:hover{background:rgba(255,255,255,.24)}
 .rm-scr .rs-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 16px;color:#fff;font-size:14px}
 .rm-scr video{flex:1;min-height:0;width:100%;object-fit:contain;background:#000}
 .rm-scr-show{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:39}
+.rs-ctl{display:none;color:#8FE3A7;font-size:13px;margin:0 12px}
+.rm-scr.ctl .rs-ctl{display:inline}
+.rm-scr.ctl video{cursor:crosshair;outline:3px solid #3E9A5F;outline-offset:-3px}
+.rm-share.ctl{background:#D5402F}
 .rm-share{position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:70;display:flex;align-items:center;gap:12px;background:#3E9A5F;color:#fff;border-radius:999px;padding:6px 8px 6px 16px;font-size:14px;box-shadow:0 4px 14px rgba(20,30,60,.3)}
 .rm-up{position:fixed;left:50%;transform:translateX(-50%);bottom:16px;z-index:60;background:#1F2C55;color:#fff;border-radius:999px;padding:8px 16px;font-size:13px;box-shadow:0 4px 14px rgba(20,30,60,.3)}
 .rimg img{display:block;width:100%;height:auto}
@@ -6637,7 +6647,7 @@ function roomTop(){
       <div class="rm-who"><b>${esc(R.info.name)}</b><span class="rm-pres${roomHere()?' on':out?' out':''}">${roomHere()?esc(where):out?'Ученик вышел из комнаты':live?'Ученик ещё не пришёл':'не в комнате'}</span></div>
       <div class="rm-act">${live&&C.st==='idle'?'<button class="btn small" id="rmVideo">Позвонить снова</button>':''}${R.st.call?'<button class="btn small quiet" id="rmCall">Ссылка</button>':''}
         <button class="ibtn" id="rmHelpBtn" aria-label="Как работает комната" title="Как работает комната">?</button><button class="ibtn" id="rmSet" aria-label="Настройки комнаты">⋯</button>
-        ${live?`<button class="btn small${C.scrStream?' primary':''}" id="rmScrBtn" title="${C.scrStream?'Остановить показ экрана ученику':'Показать ученику свой экран, вкладку или окно: например, сайт с игрой. Ученик только смотрит'}">${C.scrStream?'Остановить показ':'Показать экран'}</button><button class="btn small rm-start" id="rmEnd">Завершить урок</button>`:'<button class="btn small rm-start" id="rmLive">Начать урок</button>'}</div>`;
+        ${live?`<button class="btn small${C.scrStream?' primary':''}" id="rmScrBtn" title="${C.scrStream?'Остановить показ экрана ученику':'Показать ученику свой экран, вкладку или окно: например, сайт с игрой. Ученик только смотрит'}">${C.scrStream?'Остановить показ':'Показать экран'}</button>${C.scrStream?`<button class="btn small${C.ctl?' primary':''}" id="rmCtlBtn" title="${C.ctl?'Ученик сейчас управляет вашим экраном. Нажмите, чтобы забрать управление (то же делает Ctrl или Cmd + Shift + Esc)':DESK()?'Разрешить ученику нажимать и печатать на вашем экране':'Нужна программа «Клетка» для компьютера'}">${C.ctl?'Забрать управление':'Разрешить управление'}</button>`:''}<button class="btn small rm-start" id="rmEnd">Завершить урок</button>`:'<button class="btn small rm-start" id="rmLive">Начать урок</button>'}</div>`;
     const $=id=>document.getElementById(id);
     $('rmBack').onclick=()=>{
       if(!roomLive(R.st)){go({screen:'student'});return}
@@ -6650,6 +6660,7 @@ function roomTop(){
     if($('rmLive'))$('rmLive').onclick=roomBegin;
     if($('rmEnd'))$('rmEnd').onclick=roomFinish;
     if($('rmScrBtn'))$('rmScrBtn').onclick=callScreenToggle;
+    if($('rmCtlBtn'))$('rmCtlBtn').onclick=callCtlToggle;
   }else{
     const away=roomFollow()&&R.away;
     el.innerHTML=`${live?'':'<button class="btn quiet small" id="rmBack">← Мои задания</button>'}
@@ -6780,18 +6791,32 @@ const roomAr=m=>Math.min(5,Math.max(.2,+m.ar||1.41));
 function roomPaneKey(m){if(m.ph)m={...m,ph:0};return m.k==='pdf'&&m.n?m.id+'|pdfp|'+roomN(m)+'|'+(R.local[m.id]&&R.local[m.id].doc?'L':'S'):m.k==='img'?m.id+'|img|'+(R.local[m.id]?'L':m.f||'')+(m.err?'E':''):m.id+'|'+JSON.stringify({...m,pins:0})}
 function roomStageMulti(host,ids){
   const ms=ids.map(id=>R.mats.find(x=>x.id===id));
-  const key='multi|'+ms.map(roomPaneKey).join('||');
-  if(key===R.stageKey){roomAnsPaint();ms.forEach(roomPdfSync);roomPinsPaint();roomPaneMark();roomPaneSize();return}
+  const key='multi|'+ms.map(roomPaneKey).join('||')+'|nf'+(R.st.nf===false?0:1);
+  if(key===R.stageKey){roomAnsPaint();ms.forEach(roomPdfSync);roomPinsPaint();roomPaneMark();roomPaneSize();roomPaneCols();return}
   R.stageKey=key;R.items=null;roomAnsClose();(R.pgObsAll||[]).forEach(o=>o.disconnect());R.pgObsAll=[];
   if(R.role==='s')roomPulse({m:(roomMat()||{}).id||null,pg:0});
   const note=ms.length===3?ms.find(x=>x.k==='note'):null,order=note?[note,...ms.filter(x=>x!==note)]:ms;
-  host.innerHTML=`<div class="rm-panes pn${ms.length}${note?' pnt':''}">${order.map(m=>`<div class="rm-pane" data-mat="${m.id}" title="${esc(rTitle(m.t))}">${R.role==='t'?`<button class="rp-c" data-pc="${m.id}" aria-label="Закрыть это окно" title="Закрыть это окно">✕</button>`:''}<div class="rm-pages"></div>${R.role==='t'?`<i class="rp-rz" data-rz="${m.id}" title="Потяните вниз или вверх, чтобы изменить высоту окна"></i>`:''}</div>`).join('')}</div>`;
+  /* ряды окон: два или три в ряд; если среди трёх есть объяснение, оно либо на всю ширину сверху, либо на половину слева */
+  const rows=note?(R.st.nf===false?[[[note,order[2]],[order[1]]]]:[[note],[order[1],order[2]]]):[order];
+  const paneHTML=m=>`<div class="rm-pane${m===note?' rm-note':''}" data-mat="${m.id}" title="${esc(rTitle(m.t))}">${R.role==='t'?`${m===note?`<button class="rp-w" data-pw title="${R.st.nf===false?'Растянуть объяснение на всю ширину':'Сделать объяснение вполовину ширины'}">${R.st.nf===false?'На всю ширину':'На половину'}</button>`:''}<button class="rp-c" data-pc="${m.id}" aria-label="Закрыть это окно" title="Закрыть это окно">✕</button>`:''}<div class="rm-pages"></div>${R.role==='t'?`<i class="rp-rz" data-rz="${m.id}" title="Потяните вниз или вверх, чтобы изменить высоту окна"></i>`:''}</div>`;
+  host.innerHTML=`<div class="rm-panes">${rows.map((row,ri)=>`<div class="rm-prow" data-row="${ri}">${row.map((m,ci)=>(ci&&R.role==='t'?`<i class="rm-split" data-ri="${ri}" data-ci="${ci-1}" title="Потяните влево или вправо, чтобы изменить ширину окон"></i>`:ci?'<i class="rm-gap"></i>':'')+(Array.isArray(m)?`<div class="rm-pcol">${m.map(paneHTML).join('')}</div>`:paneHTML(m))).join('')}</div>`).join('')}</div>`;
+  host.querySelectorAll('.rm-split').forEach(h=>h.addEventListener('pointerdown',roomSplitDown));
+  host.querySelectorAll('[data-pw]').forEach(b=>b.onclick=ev=>{ev.stopPropagation();roomSet({nf:R.st.nf===false,rw:null});roomUpdate()});
   host.querySelectorAll('.rp-c').forEach(b=>b.onclick=ev=>{ev.stopPropagation();roomPaneClose(b.dataset.pc)});
   host.querySelectorAll('.rp-rz').forEach(h=>h.addEventListener('pointerdown',roomPaneResize));
   const act=roomMat();
   order.forEach(m=>{const pages=host.querySelector(`.rm-pane[data-mat="${m.id}"] .rm-pages`);pages.dataset.paneMat=m.id;roomFill(pages,m,key,!!act&&act.id===m.id)});
-  roomPaneMark();roomPaneSize();
+  roomPaneMark();roomPaneSize();roomPaneCols();
 }
+/* ширина окон в ряду: репетитор двигает разделитель между соседними окнами, доли хранятся в st.rw и у ученика такие же */
+function roomRowFr(ri,n){const rw=(R.st.rw||[])[ri];if(Array.isArray(rw)&&rw.length===n&&rw.every(x=>Number(x)>0)){const t=rw.reduce((a,b)=>a+Number(b),0);return rw.map(x=>Number(x)/t)}return Array(n).fill(1/n)}
+function roomPaneCols(){document.querySelectorAll('#rmStage .rm-prow').forEach(r=>{const ps=[...r.querySelectorAll(':scope > .rm-pane, :scope > .rm-pcol')],fr=roomRowFr(+r.dataset.row,ps.length);ps.forEach((p,i)=>p.style.flex=fr[i]+' 1 0')})}
+function roomSplitDown(e){
+  if(R.role!=='t')return;const row=e.target.closest('.rm-prow'),ri=+row.dataset.row,ci=+e.target.dataset.ci,ps=[...row.querySelectorAll(':scope > .rm-pane, :scope > .rm-pcol')];if(!ps[ci+1])return;e.preventDefault();
+  const fr=roomRowFr(ri,ps.length),sx=e.clientX,room=row.getBoundingClientRect().width-row.querySelectorAll(':scope > .rm-split,:scope > .rm-gap').length*14;let moved=false;
+  const mv=ev=>{moved=true;const d=(ev.clientX-sx)/Math.max(200,room),a=Math.min(fr[ci]+fr[ci+1]-.15,Math.max(.15,fr[ci]+d)),b=fr[ci]+fr[ci+1]-a;ps[ci].style.flex=a+' 1 0';ps[ci+1].style.flex=b+' 1 0';row._fr=fr.map((v,i)=>i===ci?a:i===ci+1?b:v)};
+  const up=()=>{removeEventListener('pointermove',mv);removeEventListener('pointerup',up);removeEventListener('pointercancel',up);if(moved&&row._fr){const rw=(R.st.rw||[]).slice();rw[ri]=row._fr.map(v=>+v.toFixed(4));roomSet({rw});roomInkAll()}};
+  addEventListener('pointermove',mv);addEventListener('pointerup',up);addEventListener('pointercancel',up)}
 /* высота окон: репетитор тянет нижний край, высота хранится в долях экрана и у ученика такая же */
 function roomPaneSize(){document.querySelectorAll('#rmStage .rm-pane').forEach(p=>{const m=R.mats.find(x=>x.id===p.dataset.mat),pg=p.querySelector('.rm-pages');if(!pg||!m)return;
   const ph=Math.min(1,Math.max(.1,Number(m.ph)||0));if(Number(m.ph)){pg.style.height=ph*100+'vh';pg.style.maxHeight='none'}else{pg.style.height='';pg.style.maxHeight=''}})}
@@ -7426,6 +7451,7 @@ function roomSettings(){
     <p style="margin:0">Всё, что нужно во время урока, лежит на панели над материалом: показ, рисование, ручка и отметки ✓ ✗ ученику, масштаб.</p>
     <div class="rm-more">
       <button class="btn wide" id="rsHelp">Как работает комната</button>
+      <a class="btn wide quiet" href="../download/" target="_blank" rel="noopener" style="text-align:center">Скачать программу для компьютера</a>
       <button class="btn wide quiet" id="rsCall">Запасная ссылка на звонок</button>
     </div>
     <div class="modal-actions"><button class="btn primary" id="cl">Готово</button></div>`,()=>{
@@ -7506,6 +7532,9 @@ async function callPc(){
     C.rem=st||C.rem||new MediaStream();if(!st)C.rem.addTrack(e.track);callVideos()};
   pc.onconnectionstatechange=()=>callNet();pc.oniceconnectionstatechange=()=>callNet();
   if(C.scrStream)callScreenAttach(pc);
+  /* канал «ctl»: по нему ученик шлёт репетитору движения мыши, клики и клавиши, когда репетитор разрешил управление */
+  if(R.role==='t'){const dc=pc.createDataChannel('ctl',{ordered:true});callDc(dc)}
+  else pc.ondatachannel=e=>callDc(e.channel);
   return pc;
 }
 /* полное описание связи сразу со всеми адресами: одно сообщение туда и одно обратно */
@@ -7622,6 +7651,40 @@ function callAdapt(){C.bad=C.q==='bad'?(C.bad||0)+1:0;C.good=C.q==='good'?(C.goo
   const snd=C.pc&&C.pc.getSenders().find(x=>x.track&&x.track.kind==='video');if(!snd)return;
   const set=(br,sc)=>{const p=snd.getParameters();if(!p.encodings||!p.encodings[0])return;p.encodings[0].maxBitrate=br;p.encodings[0].scaleResolutionDownBy=sc;snd.setParameters(p).catch(()=>{})};
   if(C.bad>=2&&!C.lite){C.lite=true;set(150000,2)}else if(C.good>=10&&C.lite){C.lite=false;set(450000,1)}}
+/* ---------- управление экраном ----------
+   Работает, только если репетитор открыл Клетку в программе для компьютера (она умеет двигать мышь) и нажал «Разрешить управление».
+   Ученик видит экран репетитора и нажимает прямо на видео, программа повторяет нажатия на компьютере репетитора. */
+const DESK=()=>window.kletkaDesktop&&window.kletkaDesktop.isDesktop?window.kletkaDesktop:null;
+function callDc(dc){C.dc=dc;dc.onmessage=e=>{
+  if(R.role!=='t'||!C.ctl||!DESK()||typeof e.data!=='string'||e.data.length>300)return;
+  try{DESK().controlEvent(JSON.parse(e.data))}catch(_){}}}
+function callCtlInfo(){modal(`<h2>Управление экраном</h2>
+  <p style="margin:0">Чтобы ученик мог нажимать на вашем экране, нужна программа «Клетка» для компьютера. Браузер такое делать не позволяет.</p>
+  <p class="hint" style="margin:0">Скачайте программу, откройте в ней Клетку, начните урок и нажмите «Показать экран». Тогда рядом появится кнопка «Разрешить управление».</p>
+  <div class="modal-actions"><button class="btn quiet" id="cl">Закрыть</button><a class="btn primary" href="../download/" target="_blank" rel="noopener">Скачать программу</a></div>`,()=>{document.getElementById('cl').onclick=close})}
+async function callCtlToggle(){
+  if(C.ctl){callCtlStop(true);return}
+  const d=DESK();if(!d){callCtlInfo();return}
+  if(!C.scrStream){toast('Сначала нажмите «Показать экран» и выберите экран');return}
+  let r;try{r=await d.controlStart()}catch(e){r={ok:false,why:'error'}}
+  if(!r||!r.ok){
+    const why=r&&r.why;
+    toast(why==='accessibility'?'Разрешите программе «Клетка» управлять компьютером: Системные настройки, Конфиденциальность и безопасность, Универсальный доступ. Потом нажмите ещё раз':why==='no-screen'?'Сначала нажмите «Показать экран» и выберите экран':'В этой версии программы управление недоступно');return}
+  C.ctl=true;roomPulse({ctl:1},true);callUI();callScreenUI()}
+function callCtlStop(tell){if(!C.ctl)return;C.ctl=false;const d=DESK();if(d&&tell)d.controlStop();if(R.on)roomPulse({ctl:0},true);callUI();callScreenUI()}
+if(DESK())DESK().onControlStopped(()=>{C.ctl=false;if(R.on)roomPulse({ctl:0},true);toast('Управление выключено');if(R.on){callUI();callScreenUI()}});
+/* у ученика: нажатия на видео уходят репетитору, координаты в долях картинки */
+function callCtlBind(v){if(v._ctl)return;v._ctl=1;v.tabIndex=0;let last={x:.5,y:.5},lm=0;
+  const send=o=>{if(C.dc&&C.dc.readyState==='open'&&R.other&&R.other.ctl)try{C.dc.send(JSON.stringify(o))}catch(_){}};
+  const pos=e=>{const r=v.getBoundingClientRect(),vw=v.videoWidth,vh=v.videoHeight;if(!vw||!vh)return null;
+    const k=Math.min(r.width/vw,r.height/vh),w=vw*k,h=vh*k,x=(e.clientX-(r.left+(r.width-w)/2))/w,y=(e.clientY-(r.top+(r.height-h)/2))/h;
+    return x<0||x>1||y<0||y>1?null:{x:+x.toFixed(4),y:+y.toFixed(4)}};
+  v.addEventListener('pointermove',e=>{const p=pos(e);if(!p||Date.now()-lm<33)return;lm=Date.now();last=p;send({t:'m',...p})});
+  v.addEventListener('pointerdown',e=>{const p=pos(e);if(!p||!(R.other&&R.other.ctl))return;e.preventDefault();v.focus();try{v.setPointerCapture(e.pointerId)}catch(_){}last=p;send({t:'d',b:e.button,...p})});
+  v.addEventListener('pointerup',e=>{const p=pos(e)||last;send({t:'u',b:e.button,...p})});
+  v.addEventListener('wheel',e=>{if(!(R.other&&R.other.ctl))return;const p=pos(e);if(!p)return;e.preventDefault();send({t:'w',dy:Math.sign(e.deltaY)*Math.min(5,Math.ceil(Math.abs(e.deltaY)/40)),...p})},{passive:false});
+  v.addEventListener('keydown',e=>{if(!(R.other&&R.other.ctl)||e.metaKey||e.ctrlKey||e.altKey)return;e.preventDefault();send({t:'k',k:e.key})});
+  v.addEventListener('contextmenu',e=>e.preventDefault())}
 /* ---------- показ экрана ----------
    Репетитор нажимает «Показать экран», браузер сам спрашивает, что показать (вкладку, окно или весь экран), и без этого выбора
    ничего не уходит. Картинка идёт ученику по тому же звонку. Ученик только смотрит, управлять экраном репетитора браузер не позволяет. */
@@ -7643,27 +7706,30 @@ async function callScreenToggle(){
   if(C.st==='idle'){s.getTracks().forEach(t=>t.stop());return}
   C.scrStream=s;s.getVideoTracks().forEach(t=>{try{t.contentHint='detail'}catch(_){}t.onended=callScreenStop});
   callScreenAttach();roomPulse({scr:{sid:s.id}},true);callRenego();callUI();callScreenUI()}
-function callScreenStop(){const s=C.scrStream;if(!s)return;C.scrStream=null;s.getTracks().forEach(t=>{t.onended=null;t.stop()});
+function callScreenStop(){const s=C.scrStream;if(!s)return;callCtlStop(true);C.scrStream=null;s.getTracks().forEach(t=>{t.onended=null;t.stop()});
   if(C.pc&&C.scrSenders)C.scrSenders.forEach(snd=>{try{C.pc.removeTrack(snd)}catch(e){}});C.scrSenders=null;
   roomPulse({scr:null},true);callRenego();callUI();callScreenUI()}
 /* у репетитора: плашка «идёт показ»; у ученика: экран репетитора на всё окно, с кнопкой «К тетради» */
 function callScreenUI(){
   const me=R.on&&R.role==='t'&&C.scrStream;let b=document.getElementById('rmShare');
-  if(!me){if(b)b.remove()}else if(!b){b=document.createElement('div');b.id='rmShare';b.className='rm-share';b.innerHTML='<span>Идёт показ экрана</span><button class="btn small" id="rmShareStop">Остановить</button>';document.body.appendChild(b);document.getElementById('rmShareStop').onclick=callScreenStop}
+  if(!me){if(b)b.remove()}else if(!b){b=document.createElement('div');b.id='rmShare';b.className='rm-share';b.innerHTML='<span id="rmShareTx">Идёт показ экрана</span><button class="btn small" id="rmShareCtl" style="display:none">Забрать управление</button><button class="btn small" id="rmShareStop">Остановить</button>';document.body.appendChild(b);document.getElementById('rmShareStop').onclick=callScreenStop;document.getElementById('rmShareCtl').onclick=()=>callCtlStop(true)}
+  if(b){b.classList.toggle('ctl',!!C.ctl);document.getElementById('rmShareTx').textContent=C.ctl?'Ученик управляет вашим экраном':'Идёт показ экрана';document.getElementById('rmShareCtl').style.display=C.ctl?'':'none'}
   let el=document.getElementById('rmScr'),pill=document.getElementById('rmScrShow');
   const on=R.on&&R.role==='s'&&C.scr&&R.other&&R.other.scr;
   if(!on){if(el)el.remove();if(pill)pill.remove();return}
   if(C.scrHide){if(el)el.remove();if(!pill){pill=document.createElement('button');pill.id='rmScrShow';pill.className='btn primary rm-scr-show';pill.textContent='Показать экран репетитора';document.body.appendChild(pill);pill.onclick=()=>{C.scrHide=false;callScreenUI()}}return}
   if(pill)pill.remove();
   if(!el){el=document.createElement('div');el.id='rmScr';el.className='rm-scr';
-    el.innerHTML=`<div class="rs-bar"><b>${esc((R.info&&R.info.tutor)||'Репетитор')} показывает экран</b><button class="btn small" id="rsHide">К тетради</button></div><video id="rsV" autoplay playsinline></video>`;
+    el.innerHTML=`<div class="rs-bar"><b>${esc((R.info&&R.info.tutor)||'Репетитор')} показывает экран</b><span class="rs-ctl" id="rsCtl">Управление включено: нажимайте на экран</span><button class="btn small" id="rsHide">К тетради</button></div><video id="rsV" autoplay playsinline></video>`;
     document.body.appendChild(el);document.getElementById('rsHide').onclick=()=>{C.scrHide=true;callScreenUI()}}
+  { const cv=document.getElementById('rsV');if(cv){callCtlBind(cv);const on=!!(R.other&&R.other.ctl);el.classList.toggle('ctl',on)}}
   const v=document.getElementById('rsV');if(v&&v.srcObject!==C.scr){v.srcObject=C.scr;v.play().catch(()=>{v.muted=true;v.play().catch(()=>{})})}}
 /* ---------- завершение ---------- */
 /* left — просто вышел из комнаты: вернётся, звонок поднимется сам; иначе положил трубку */
 function callEnd(send,why,left){
   if(send&&C.n)callSend({n:C.n,t:'bye',left:left==='left'});
   /* показ экрана снимаем, только когда репетитор сам закончил звонок; если ученик перезагрузил страницу, показ продолжится после его возвращения */
+  if(C.ctl&&send)callCtlStop(true);
   if(C.scrStream&&send){C.scrStream.getTracks().forEach(t=>{t.onended=null;t.stop()});C.scrStream=null;C.scrSenders=null;if(R.on)roomPulse({scr:null},true)}
   C.scrSenders=null;
   C.scr=null;C.scrId=null;C.scrHide=false;
