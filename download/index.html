@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Клетка для компьютера</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=Pangolin&display=swap">
+<style>
+:root{--ink:#1F2C55;--ink2:#56627d;--bg:#f4f6fa;--card:#fff;--line:#d6dbe5;--blue:#2D57C8}
+@media (prefers-color-scheme:dark){:root{--ink:#E8ECF7;--ink2:#9AA6BF;--bg:#11151F;--card:#171D2A;--line:#283247;--blue:#7AA2FF}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Golos Text',system-ui,sans-serif;line-height:1.55}
+.w{max-width:760px;margin:0 auto;padding:32px 16px 64px}
+h1{font-family:Pangolin,cursive;font-weight:400;font-size:clamp(30px,6vw,42px);margin:0 0 8px}
+h2{font-size:20px;margin:36px 0 8px}
+p,li{font-size:16px}
+.lead{font-size:18px;color:var(--ink2);margin:0 0 24px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin:12px 0}
+.btns{display:flex;gap:12px;flex-wrap:wrap}
+.btn{display:inline-block;background:var(--blue);color:#fff;text-decoration:none;border-radius:12px;padding:14px 20px;font-weight:600}
+.btn small{display:block;font-weight:400;opacity:.85}
+.btn.alt{background:transparent;color:var(--blue);border:2px solid var(--blue)}
+ol{padding-left:22px}li{margin:6px 0}
+.note{color:var(--ink2);font-size:14px}
+code{background:rgba(120,130,160,.18);border-radius:6px;padding:1px 6px}
+</style></head><body><div class="w">
+<h1>Клетка для компьютера</h1>
+<p class="lead">Та же Клетка, только как программа. С ней ученик может нажимать и печатать на вашем экране, когда вы это разрешите. Пока программа только для Mac.</p>
+
+<h2>Скачать</h2>
+<div class="btns">
+<a class="btn" href="https://github.com/kurkinsavvyn-boop/kletka-tutor/releases/download/desktop-v0.1.0/Kletka-0.1.0-mac-arm64.dmg">Скачать для Mac<small>с чипом Apple: M1, M2, M3, M4</small></a>
+<a class="btn alt" href="https://github.com/kurkinsavvyn-boop/kletka-tutor/releases/download/desktop-v0.1.0/Kletka-0.1.0-mac-x64.dmg">Скачать для Mac<small>с процессором Intel</small></a>
+</div>
+<p class="note">Не знаете, какой у вас? Яблоко в левом верхнем углу → «Об этом Mac». Если написано «Чип Apple», берите первую кнопку, если «Процессор Intel», вторую.</p>
+
+<h2>Установка</h2>
+<ol>
+<li>Откройте скачанный файл <code>Kletka-….dmg</code> и перетащите «Клетку» в папку «Программы».</li>
+<li><b>Первый запуск.</b> Программа не куплена у Apple за подпись, поэтому Mac спросит осторожно. Откройте «Программы», нажмите на «Клетку» правой кнопкой (или с зажатым Control) → «Открыть» → ещё раз «Открыть».</li>
+<li>Если окно не открылось: «Системные настройки» → «Конфиденциальность и безопасность», внизу нажмите «Всё равно открыть» рядом с «Клеткой».</li>
+<li>Войдите в свой кабинет репетитора, как обычно. Всё остальное работает как на сайте.</li>
+</ol>
+
+<h2>Разрешения для Mac</h2>
+<div class="card">
+<p><b>Камера и микрофон.</b> Для звонка. Mac спросит при первом звонке, нажмите «Разрешить».</p>
+<p><b>Запись экрана.</b> Нужна, чтобы показывать экран ученику. «Системные настройки» → «Конфиденциальность и безопасность» → «Запись экрана и системного звука» → включите «Клетка». После этого закройте и откройте программу заново.</p>
+<p><b>Универсальный доступ.</b> Нужен, чтобы ученик мог нажимать на вашем экране. Mac предложит сам, когда вы нажмёте «Разрешить управление». Включите «Клетка» в списке и нажмите кнопку ещё раз.</p>
+</div>
+
+<h2>Как дать ученику управлять экраном</h2>
+<ol>
+<li>Начните урок и дождитесь, пока ученик войдёт и соединится звонок.</li>
+<li>Нажмите «Показать экран» и выберите экран. Откройте на нём игру на весь экран.</li>
+<li>Нажмите «Разрешить управление». Ученик увидит зелёную рамку и сможет нажимать, прокручивать и печатать.</li>
+<li><b>Забрать управление:</b> кнопка «Забрать управление» вверху или клавиши <code>⌘ Shift Esc</code>. Они работают всегда, даже если окно Клетки не на первом плане.</li>
+</ol>
+<p class="note">Ученик управляет только пока вы разрешили и пока идёт показ экрана. Сочетания клавиш системы (⌘, Control, Option) ему недоступны. Лучше не открывать на показанном экране почту и банк.</p>
+</div></body></html>
