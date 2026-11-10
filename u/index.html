@@ -1366,7 +1366,8 @@ body.inroom .rm-tools,body.inroom .rm-top{background:var(--card)}
 .vc-q.good::before{background:#5CC98C}.vc-q.mid::before{background:#E8B04A}.vc-q.bad::before{background:#FF7863}
 .vc-b{width:42px;height:42px;border-radius:50%;border:0;background:rgba(255,255,255,.14);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s}
 .vc-b svg{width:22px;height:22px}
-.vc-b:hover{background:rgba(255,255,255,.22)}.vc-b.on{background:#3E9A5F}.vc-b.on:hover{background:#34834F}.vc-b.off{background:#fff;color:#141A28}
+.vc-b:hover{background:rgba(255,255,255,.22)}.vc-b.dim{opacity:.45}
+.vc-b.on{background:#3E9A5F}.vc-b.on:hover{background:#34834F}.vc-b.off{background:#fff;color:#141A28}
 .vc-b.end{background:#D5402F}.vc-b.end:hover{background:#B83526}
 .vc-lv{display:grid;grid-template-columns:auto 1fr auto 1fr;gap:4px 6px;align-items:center;padding:6px 10px 0;font-size:11px;color:#9AA5BF}
 .vc-lv span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:80px}
@@ -6636,7 +6637,7 @@ function roomTop(){
       <div class="rm-who"><b>${esc(R.info.name)}</b><span class="rm-pres${roomHere()?' on':out?' out':''}">${roomHere()?esc(where):out?'Ученик вышел из комнаты':live?'Ученик ещё не пришёл':'не в комнате'}</span></div>
       <div class="rm-act">${live&&C.st==='idle'?'<button class="btn small" id="rmVideo">Позвонить снова</button>':''}${R.st.call?'<button class="btn small quiet" id="rmCall">Ссылка</button>':''}
         <button class="ibtn" id="rmHelpBtn" aria-label="Как работает комната" title="Как работает комната">?</button><button class="ibtn" id="rmSet" aria-label="Настройки комнаты">⋯</button>
-        ${live?`<button class="btn small rm-start" id="rmEnd">Завершить урок</button>`:'<button class="btn small rm-start" id="rmLive">Начать урок</button>'}</div>`;
+        ${live?`<button class="btn small${C.scrStream?' primary':''}" id="rmScrBtn" title="${C.scrStream?'Остановить показ экрана ученику':'Показать ученику свой экран, вкладку или окно: например, сайт с игрой. Ученик только смотрит'}">${C.scrStream?'Остановить показ':'Показать экран'}</button><button class="btn small rm-start" id="rmEnd">Завершить урок</button>`:'<button class="btn small rm-start" id="rmLive">Начать урок</button>'}</div>`;
     const $=id=>document.getElementById(id);
     $('rmBack').onclick=()=>{
       if(!roomLive(R.st)){go({screen:'student'});return}
@@ -6648,6 +6649,7 @@ function roomTop(){
     $('rmSet').onclick=roomSettings;$('rmHelpBtn').onclick=()=>roomHelp('t');
     if($('rmLive'))$('rmLive').onclick=roomBegin;
     if($('rmEnd'))$('rmEnd').onclick=roomFinish;
+    if($('rmScrBtn'))$('rmScrBtn').onclick=callScreenToggle;
   }else{
     const away=roomFollow()&&R.away;
     el.innerHTML=`${live?'':'<button class="btn quiet small" id="rmBack">← Мои задания</button>'}
@@ -7635,7 +7637,7 @@ function callScreenAttach(pc){const s=C.scrStream;pc=pc||C.pc;if(!pc||!s)return;
 async function callScreenToggle(){
   if(C.scrStream)return callScreenStop();
   if(!navigator.mediaDevices||!navigator.mediaDevices.getDisplayMedia){toast('Этот браузер не умеет показывать экран. Откройте Клетку в Chrome, Яндекс Браузере, Edge или Safari на компьютере');return}
-  if(C.st!=='live'){toast('Показать экран можно, когда ученик в звонке');return}
+  if(C.st!=='live'){toast('Ученик ещё не в звонке. Показать экран можно, когда он войдёт и связь соединится');return}
   let s;try{s=await navigator.mediaDevices.getDisplayMedia({video:{frameRate:{ideal:15,max:30}},audio:true})}
   catch(e){if(e&&e.name!=='NotAllowedError')toast('Экран не удалось включить');return}
   if(C.st==='idle'){s.getTracks().forEach(t=>t.stop());return}
@@ -7751,7 +7753,7 @@ function callUI(){
   document.getElementById('vcBar').innerHTML=`<span class="vc-q" id="vcQ"></span>
       <button class="vc-b${C.mic?'':' off'}" id="vcMic" aria-label="${C.mic?'Выключить микрофон':'Включить микрофон'}" title="${C.mic?'Выключить микрофон':'Включить микрофон'}">${VC_ICO.mic(C.mic)}</button>
       <button class="vc-b${C.cam?'':' off'}" id="vcCam" aria-label="${C.cam?'Выключить камеру':'Включить камеру'}" title="${C.cam?'Выключить камеру':'Включить камеру'}">${VC_ICO.cam(C.cam)}</button>
-      ${R.role==='t'&&C.st==='live'?`<button class="vc-b${C.scrStream?' on':''}" id="vcScr" aria-label="${C.scrStream?'Остановить показ экрана':'Показать экран'}" title="${C.scrStream?'Остановить показ экрана':'Показать экран'}">${VC_ICO.scr}</button>`:''}
+      ${R.role==='t'&&C.st!=='idle'?`<button class="vc-b${C.scrStream?' on':''}${C.st==='live'?'':' dim'}" id="vcScr" aria-label="${C.scrStream?'Остановить показ экрана':'Показать экран'}" title="${C.scrStream?'Остановить показ экрана':'Показать экран'}">${VC_ICO.scr}</button>`:''}
       ${R.role==='t'?`<button class="vc-b end" id="vcEnd" aria-label="Завершить звонок" title="Завершить звонок">${VC_ICO.end}</button>`:''}`;
   document.getElementById('vcMsg').innerHTML=C.msg?`<div class="vc-msg">${esc(C.msg)}</div>`:'';
   const $=id=>document.getElementById(id);
