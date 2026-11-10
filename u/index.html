@@ -1213,6 +1213,7 @@ button.mchip:hover{background:rgba(255,255,255,.24)}
 .rm-pages.dk{max-width:none;width:100%!important;display:block}
 .rdk{position:relative;overflow:hidden;background:var(--line);border-radius:10px;touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab;min-height:420px}
 .rdk.pan{cursor:grabbing}
+.rdk.lock{cursor:default}.rdk.lock .rdk-bar,.rdk.lock .rdk-menu,.rdk.lock .r-lnk{display:none}
 .rdk-w{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform}
 .rdk .rpg.rdf{position:absolute;border-radius:0;box-shadow:0 1px 4px rgba(20,30,60,.2)}
 .rdf-ph{position:absolute;inset:0;background-size:cover;background-position:center;background-repeat:no-repeat}
@@ -6613,6 +6614,7 @@ function roomOnRec(r){
   roomUpdate();
   if(!R.away&&roomFollow()&&(was.pg!==R.st.pg||was.cur!==R.st.cur))roomScrollPg(R.st.pg||0);
   if(R.st.foc&&JSON.stringify(R.st.foc)!==JSON.stringify(was.foc))roomFocus(R.st.foc);
+  if(deckView()&&deckLocked()){roomDeckPaint();deckApplyCam(deckCamOf())}
 }
 function roomOnInk(e){
   if(!R.on)return;const r=e.record;
@@ -6628,7 +6630,7 @@ function roomOnPulse(e){
   if(R.other.gone&&(C.st!=='idle'||C.offer))callEnd(false,R.role==='t'?'Ученик вышел из комнаты':'Репетитор вышел из комнаты');else callOnSig(R.other);
   if(R.role==='s')roomLaser(R.other);
   deckRemoteDrag(R.other.dg);
-  if(R.role==='s'&&R.other.cam&&roomFollow()&&!R.away)deckApplyCam(deckCamOf());
+  if(R.other.cam&&deckLocked())deckApplyCam(deckCamOf());
   if(R.other.rx&&R.other.rx.i!==R.rxSeen){R.rxSeen=R.other.rx.i;rxShow(R.other.rx.e,false)}
   clearTimeout(R.topT);R.topT=setTimeout(roomTop,120);
 }
@@ -6814,7 +6816,7 @@ function roomTools(){
       ${m&&m.k==='deck'?'':`<div class="rt-sec"><span class="rt-cap">${roomMulti()?'Масштаб окна':'Масштаб'}</span><div class="rt-g rt-z"><button class="rt" id="rmZm" aria-label="Уменьшить" title="Уменьшить">−</button><button class="rt" id="rmZr" title="Вернуть по ширине">${Math.round(roomZoomCur()*100)}%</button><button class="rt" id="rmZp" aria-label="Увеличить" title="Увеличить">+</button></div></div>`}
 `;
     const $=id=>document.getElementById(id);
-    $('rmLead').onclick=()=>{const c=R.mats.find(x=>x.id===R.st.cur);if(c&&!c.vis&&roomLive(R.st)){c.vis=true;roomSaveMats()}roomSet({lead:true,pg:R.pgNow});roomUpdate()};
+    $('rmLead').onclick=()=>{const c=R.mats.find(x=>x.id===R.st.cur);if(c&&!c.vis&&roomLive(R.st)){c.vis=true;roomSaveMats()}roomSet({lead:true,pg:R.pgNow});roomUpdate();deckSendCam()};
     $('rmFree').onclick=()=>{roomSet({lead:false});roomUpdate()};
     $('rmPen').onclick=()=>{roomSet({pen:!R.st.pen});roomTools()};
     $('rmUndo').onclick=roomUndo;$('rmClr').onclick=roomClear;
@@ -7039,7 +7041,7 @@ function roomTrackPages(pages){
       if(R.role==='s')roomPulse({pg:best})}},{threshold:[0,.25,.5,.75,1]});
   [...pages.children].forEach(pg=>pg.classList.contains('rpg')&&io.observe(pg));R.pgObs=io;(R.pgObsAll=R.pgObsAll||[]).push(io);
 }
-function roomScrollPg(k,instant){if(deckView()){if(R.role==='s'&&roomFollow()&&!R.away)deckApplyCam(deckCamOf());return}const pg=document.querySelector(`#rmPages > .rpg[data-pg="${k}"]`);if(!pg)return;
+function roomScrollPg(k,instant){if(deckView()){if(deckLocked())deckApplyCam(deckCamOf());return}const pg=document.querySelector(`#rmPages > .rpg[data-pg="${k}"]`);if(!pg)return;
   if(k===0&&!instant&&!pg.closest('.rm-pane')){window.scrollTo({top:0,behavior:'smooth'});return}pg.scrollIntoView({behavior:instant?'auto':'smooth',block:'start'})}
 function roomLaser(d){
   document.querySelectorAll('.r-laser.on').forEach(l=>l.classList.remove('on'));
@@ -8652,7 +8654,7 @@ function deckInner(m,f,all){const items=all||deckEff(m),show=R.role==='t'||R.st.
     if(!it.lock)cls+=' r-dr';if(hid)cls+=' r-ghost';const c=deckCheck(it,items);if(c&&show)cls+=c==='ok'?' r-good':' r-badd';
     h+=`<div class="${cls}" data-id="${it.id}" style="${l.style}">${l.html}${it.link?`<span class="r-lnk" data-link="${it.link}" title="Перейти">↗</span>`:''}${R.role==='t'&&it.hide?`<button class="r-rev" data-rev="${it.id}">${hid?'Показать':'Спрятать'}</button>`:''}${c&&show?`<i class="r-mark">${c==='ok'?'✓':'✗'}</i>`:''}</div>`}
   return h}
-function roomDeckPaint(){const m=roomMat();if(!m||m.k!=='deck')return;const vp=deckView();if(!vp||!DK.cur)return;
+function roomDeckPaint(){const m=roomMat();if(!m||m.k!=='deck')return;const vp=deckView();if(!vp||!DK.cur)return;vp.classList.toggle('lock',deckLocked());
   const v=DK.cur,W=vp.clientWidth,H=vp.clientHeight,M=400,items=deckEff(m);
   vp.querySelectorAll('.rdf').forEach(pg=>{if(R.deckBusy&&pg.contains(R.deckBusy))return;const f=(m.items||[]).find(x=>x.id===pg.dataset.f);const st=pg.querySelector('.bd-st');if(!f||!st)return;
     const sx=f.x*v.s+v.x,sy=f.y*v.s+v.y,sw=f.w*v.s,sh=f.h*v.s,inView=sx<W+M&&sy<H+M&&sx+sw>-M&&sy+sh>-M,big=sw>=150;
@@ -8667,7 +8669,7 @@ function deckSave(m,it,patch){const now=Date.now();
 /* перетаскивание: второй участник видит движение через pulse, сохраняем при отпускании */
 function deckBind(stage){
   stage.addEventListener('pointerdown',e=>{if(R.tool!=='hand')return;
-    const lk=e.target.closest('.r-lnk');if(lk&&deckView()){e.preventDefault();e.stopPropagation();if(R.role==='s'&&roomFollow()&&!R.away){R.away=true;roomTop()}deckGo(lk.dataset.link);return}
+    const lk=e.target.closest('.r-lnk');if(lk&&deckView()){e.preventDefault();e.stopPropagation();if(!deckLocked())deckGo(lk.dataset.link);return}
     if(lk){e.preventDefault();e.stopPropagation();const m=roomMat();const i=BD.frames(m.items||[]).findIndex(f=>f.id===lk.dataset.link);if(i>=0){if(R.role==='s')R.away=true;roomScrollPg(i)}return}
     const rv=e.target.closest('.r-rev');if(rv&&R.role==='t'){e.preventDefault();const m=roomMat(),o=m.items.find(x=>x.id===rv.dataset.rev);o.shown=!o.shown;roomSaveMats();roomDeckPaint();return}
     const el=e.target.closest('.rdeck .r-dr');if(!el||el.querySelector('[contenteditable="true"]'))return;const m=roomMat();if(!m||m.k!=='deck')return;
@@ -8706,7 +8708,7 @@ function deckCanvas(pages,m){
   pages.innerHTML=`<div class="rdk" id="rdk"><div class="rdk-w">${fr.map((f,k)=>`<div class="rpg rdeck rdf" data-f="${esc(f.id)}" data-pg="${k}" style="left:${+f.x||0}px;top:${+f.y||0}px;width:${+f.w||1}px;height:${+f.h||1}px"><div class="bd-st" style="width:${+f.w||1}px;height:${+f.h||1}px"></div></div>`).join('')}</div>
     <div class="rdk-bar"><button data-dz="-" title="Отдалить" aria-label="Отдалить">−</button><span id="rdkZ">100%</span><button data-dz="+" title="Приблизить" aria-label="Приблизить">+</button><button data-dz="all" title="Показать весь холст">Весь холст</button><button data-dz="fr" title="Найти фрейм и перейти к нему">Фреймы ▾</button></div></div>`;
   deckSize();deckBindView();
-  const c=R.role==='s'&&roomFollow()&&!R.away?deckCamOf():null,saved=DK.v[m.id];
+  const c=deckLocked()?deckCamOf():null,saved=DK.v[m.id];
   if(c)deckApplyCam(c);else if(saved)deckSet(saved.x,saved.y,saved.s,R.role==='s');else deckFit([fr.find(f=>f.id===m.f0)||fr[0]])}
 function deckSize(){const vp=deckView();if(!vp)return;const top=vp.getBoundingClientRect().top+scrollY;vp.style.height=Math.max(420,innerHeight-top-14)+'px'}
 function deckSet(x,y,s,quiet){const vp=deckView(),m=roomMat();if(!vp||!m)return;s=Math.max(.02,Math.min(4,s));if(!Number.isFinite(x+y+s))return;
@@ -8729,18 +8731,20 @@ function deckSendCam(){if(R.role!=='t'||R.st.lead===false)return;const vp=deckVi
 function deckCamOf(){const m=roomMat();if(!m)return null;const o=R.other&&R.other.cam;if(o&&o.m===m.id)return o;const c=R.st.cam;return c&&c.m===m.id?c:null}
 function deckApplyCam(c){const vp=deckView();if(!vp||!c)return;const n=v=>Number.isFinite(+v)?+v:0,W=vp.clientWidth,H=vp.clientHeight,ww=Math.max(50,n(c.ww)),wh=Math.max(50,n(c.wh));
   const s=Math.min(W/ww,H/wh);deckSet(W/2-n(c.cx)*s,H/2-n(c.cy)*s,s,true)}
+/* в «Веду я» ученик холст не двигает и не приближает: видит то, что показывает репетитор, и двигает только карточки на экране */
+const deckLocked=()=>R.role==='s'&&roomFollow();
 function deckBindView(){const vp=deckView();
-  const mine=()=>{if(R.role==='s'&&roomFollow()&&!R.away){R.away=true;roomTop()}};
+  const mine=()=>{};
   const zoomAt=(px,py,s)=>{const v=DK.cur;s=Math.max(.02,Math.min(4,s));deckSet(px-(px-v.x)*s/v.s,py-(py-v.y)*s/v.s,s)};
-  vp.addEventListener('wheel',e=>{e.preventDefault();e.stopPropagation();const v=DK.cur;if(!v)return;mine();
+  vp.addEventListener('wheel',e=>{e.preventDefault();e.stopPropagation();const v=DK.cur;if(!v||deckLocked())return;mine();
     if(e.ctrlKey||e.metaKey){const r=vp.getBoundingClientRect();zoomAt(e.clientX-r.left,e.clientY-r.top,v.s*Math.exp(-Math.max(-30,Math.min(30,e.deltaMode===1?e.deltaY*8:e.deltaY))*.01))}
     else{const f=e.deltaMode===1?30:1;deckSet(v.x-e.deltaX*f,v.y-e.deltaY*f,v.s)}},{passive:false});
   let gs=1;vp.addEventListener('gesturestart',e=>{e.preventDefault();e.stopPropagation();gs=1});
-  vp.addEventListener('gesturechange',e=>{e.preventDefault();e.stopPropagation();const v=DK.cur,r=vp.getBoundingClientRect();mine();zoomAt(e.clientX-r.left,e.clientY-r.top,v.s*e.scale/gs);gs=e.scale});
+  vp.addEventListener('gesturechange',e=>{e.preventDefault();e.stopPropagation();if(deckLocked())return;const v=DK.cur,r=vp.getBoundingClientRect();mine();zoomAt(e.clientX-r.left,e.clientY-r.top,v.s*e.scale/gs);gs=e.scale});
   ['touchstart','touchmove'].forEach(t=>vp.addEventListener(t,e=>e.stopPropagation(),{passive:true}));
   const P=new Map();let moved=false;
   vp.addEventListener('pointerdown',e=>{if(e.button>0)return;if(e.target.closest('.r-dr,.r-lnk,.r-rev,.rdk-bar,.rdk-menu,[contenteditable="true"]'))return;
-    if(e.target.classList.contains('r-ink')&&roomCanDraw())return;const mn=vp.querySelector('.rdk-menu');if(mn)mn.remove();
+    if(e.target.classList.contains('r-ink')&&roomCanDraw())return;if(deckLocked())return;const mn=vp.querySelector('.rdk-menu');if(mn)mn.remove();
     P.set(e.pointerId,{x:e.clientX,y:e.clientY});if(P.size===1)moved=false;try{vp.setPointerCapture(e.pointerId)}catch(_){}});
   vp.addEventListener('pointermove',e=>{const p=P.get(e.pointerId);if(!p||!DK.cur)return;const v=DK.cur;
     if(P.size===1){const dx=e.clientX-p.x,dy=e.clientY-p.y;if(!moved){if(Math.hypot(dx,dy)<3)return;moved=true;mine();vp.classList.add('pan')}
@@ -8759,7 +8763,7 @@ function deckFrameMenu(){const vp=deckView();let mn=vp.querySelector('.rdk-menu'
   vp.appendChild(mn);const inp=mn.querySelector('input');inp.focus();
   inp.oninput=()=>{const q=inp.value.trim().toLowerCase();mn.querySelectorAll('[data-go]').forEach(b=>b.hidden=!!q&&!b.textContent.toLowerCase().includes(q))};
   inp.onkeydown=e=>{e.stopPropagation();if(e.key==='Escape')mn.remove();if(e.key==='Enter'){const b=[...mn.querySelectorAll('[data-go]')].find(x=>!x.hidden);if(b)b.click()}};
-  mn.onclick=e=>{const b=e.target.closest('[data-go]');if(!b)return;mn.remove();if(R.role==='s'&&roomFollow()&&!R.away){R.away=true;roomTop()}deckGo(b.dataset.go)};
+  mn.onclick=e=>{const b=e.target.closest('[data-go]');if(!b)return;mn.remove();if(!deckLocked())deckGo(b.dataset.go)};
   mn.addEventListener('wheel',e=>e.stopPropagation(),{passive:true})}
 /* перенос картинок в комнату: только то, что открыли на экране, по 4 сразу */
 function deckNeed(m,f,items){if(DK.full)return;
@@ -8846,7 +8850,7 @@ function roomHelp(role){
    ['Разработка из «Моих материалов»',[
      ['',`<span class="hk-cv"><i></i><i class="on"></i><i></i><i></i></span>`,'Открывается весь холст, как в «Разработках»: фреймы на своих местах. Сначала на экране тот фрейм, который вы выбрали.'],
      ['',ch('Фреймы ▾','out'),'Найти фрейм по названию и перейти к нему. «Весь холст» показывает доску целиком.'],
-     ['',ch('✋ тянуть','soft'),'Двигать холст: потяните за пустое место или двумя пальцами по тачпаду. Приблизить: щипок или Ctrl и колесо.']]],
+     ['',ch('✋ тянуть','soft'),'Двигать холст: потяните за пустое место или двумя пальцами по тачпаду. Приблизить: щипок или Ctrl и колесо. В «Веду я» ученик сам по холсту не ходит: видит только то, что показываете вы, и двигает карточки на экране.']]],
    ['Экран и программа',[
      ['',ch('Показать экран','out'),'Показать ученику ваш экран, вкладку или окно, например сайт с игрой. Работает, когда урок начат и ученик в звонке.'],
      ['',ch('Разрешить управление','out'),'Ученик сможет нажимать и печатать на вашем экране. Нужна программа «Клетка» для Mac: кнопка «⋯» вверху → «Скачать программу». Забрать управление: Cmd + Shift + Esc.'],
@@ -8857,7 +8861,7 @@ function roomHelp(role){
     ['Задания',[
      ['',`<span class="hk-box">7</span>`,'Нажми на окошко в задании и впиши ответ. В столбик цифры пишутся с конца, как в тетради.'],
      ['',ch('Маркер'),'Появится, когда репетитор даст ручку. Им можно обводить и писать.'],
-     ['',ch('✋ тянуть','soft'),'На большом холсте: тяни за пустое место, чтобы двигать. Щипок двумя пальцами приближает.']]],
+     ['',ch('✋ тянуть','soft'),'На большом холсте карточки на экране можно двигать. Сам холст двигает репетитор, а когда он включит «Свободно» — и ты.']]],
     ['После урока',[
      ['',ch('Тетрадь','out'),'Все материалы с уроков. Их можно открыть и потом.']]]];
   const L=role==='s'?S2:T;
