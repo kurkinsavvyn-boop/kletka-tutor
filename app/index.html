@@ -6076,7 +6076,7 @@ async function uploadFiles(list){
     if(f.size>100*1048576){toast('Больше 100 МБ: '+f.name);continue}
     if(box)box.textContent='Загружаю '+f.name+'…';
     const fd=new FormData();fd.append('owner',ACC.user.id);fd.append('file',f);fd.append('name',f.name.slice(0,200));fd.append('folder',V.mfolder&&V.mfolder!=='*'?V.mfolder:'');
-    try{const r=await pbT.collection('files').create(fd);FILES=[r,...(FILES||[])]}catch(e){toast(e&&e.status===400&&f.size>25*1048576?'Сервер пока принимает файлы до 25 МБ: '+f.name:'Не загрузился: '+f.name)}}
+    try{const r=await pbT.collection('files').create(fd);FILES=[r,...(FILES||[])]}catch(e){toast('Не загрузился: '+f.name)}}
   render()}
 /* файл из «Моих материалов» открывается в этом же окне: PDF и картинки прямо в программе, остальное скачивается */
 async function openFile(r){
@@ -7505,9 +7505,9 @@ async function roomAddPdf(src,title,name){
   try{const lib=await loadPdfJs();doc=await lib.getDocument(typeof src==='string'?{url:src}:{data:await src.arrayBuffer()}).promise}
   catch(e){toast('PDF не открылся');return}
   const n=Math.min(doc.numPages,300);let ar=1.41;
-  /* в комнате не больше 999 файлов: заранее говорим, если страницы не поместятся */
-  if((R.rec.docs||[]).length+n>990){const used=new Set(R.mats.flatMap(roomDocsOf));await roomDocsDel((R.rec.docs||[]).filter(f=>!used.has(f)))}
-  if((R.rec.docs||[]).length+n>990){toast('В комнате слишком много файлов. Уберите старые материалы крестиком в списке и добавьте PDF снова');return}
+  /* в комнате не больше 3000 файлов: заранее говорим, если страницы не поместятся */
+  if((R.rec.docs||[]).length+n>2990){const used=new Set(R.mats.flatMap(roomDocsOf));await roomDocsDel((R.rec.docs||[]).filter(f=>!used.has(f)))}
+  if((R.rec.docs||[]).length+n>2990){toast('В комнате слишком много файлов. Уберите старые материалы крестиком в списке и добавьте PDF снова');return}
   try{const v=(await doc.getPage(1)).getViewport({scale:1});ar=+(v.height/v.width).toFixed(4)}catch(e){}
   const m={id:RID(10),k:'pdf',t:rTitle(title||name||'PDF'),n,ar,pg:[],up:1};
   R.local[m.id]={doc};roomAdd(m);
@@ -8878,7 +8878,7 @@ function deckNeed(m,f,items){if(DK.full)return;
   deckPump()}
 function deckPump(){while(DK.busy<4&&DK.q.length){const j=DK.q.shift();DK.busy++;deckCopy(j).finally(()=>{DK.busy--;deckPump()})}}
 async function deckCopy({m:mid,s}){
-  if((R.rec.docs||[]).length>=990){if(!DK.full){DK.full=true;toast('В комнате кончилось место для картинок. Уберите старые материалы крестиком')}return}
+  if((R.rec.docs||[]).length>=2990){if(!DK.full){DK.full=true;toast('В комнате кончилось место для картинок. Уберите старые материалы крестиком')}return}
   try{const u=s.startsWith('f:')?await BD.cachedURL(s):s;if(!u||u.startsWith('f:'))throw 0;const bl=await (await fetch(u)).blob();
     const file=await roomPrepImage(new File([bl],'board.'+((bl.type.split('/')[1]||'png').replace('jpeg','jpg')),{type:bl.type}),1800);
     const fn=await roomPutDoc(file,false);if(!fn)throw 0;
