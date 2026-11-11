@@ -1193,11 +1193,19 @@ button.mchip:hover{background:rgba(255,255,255,.24)}
 .rm-gap{flex:none;width:14px}
 .rm-note .rm-pages{max-height:36vh}
 @media (max-width:900px){.rm-prow{flex-direction:column;gap:14px}.rm-prow>.rm-pane,.rm-prow>.rm-pcol{flex:none!important;width:100%}.rm-split,.rm-gap{display:none}}
-.rm-pane .rp-w{position:absolute;top:10px;right:44px;z-index:7;border:0;border-radius:14px;padding:5px 10px;background:rgba(21,24,31,.78);color:#fff;font:inherit;font-size:12px;cursor:pointer}
+.rm-pane .rp-w{position:absolute;top:10px;right:80px;z-index:7;border:0;border-radius:14px;padding:5px 10px;background:rgba(21,24,31,.78);color:#fff;font:inherit;font-size:12px;cursor:pointer}
 .rm-pane .rp-w:hover{background:#15181F}
 .rm-pane{position:relative;min-width:0}
 .rm-pane .rp-c{position:absolute;top:8px;right:8px;z-index:7;width:28px;height:28px;border-radius:50%;border:0;background:#D5402F;color:#fff;font-size:15px;line-height:1;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.25)}
 .rm-pane .rp-c:hover{background:#B83526}
+.hk-eye{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:#D5402F;color:#fff}
+.rp-e,.rm-eye{display:inline-grid;place-items:center;border:0;cursor:pointer;color:#fff;background:rgba(21,24,31,.62)}
+.rm-pane .rp-e{position:absolute;top:8px;right:42px;z-index:7;width:28px;height:28px;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,.25)}
+.rp-e:hover,.rm-eye:hover{background:rgba(21,24,31,.85)}
+.rp-e.on,.rm-eye.on{background:#D5402F}
+.rm-eye{width:28px;height:28px;border-radius:50%;flex-shrink:0;background:var(--line);color:var(--ink2,#4e5870)}
+.rm-eye.on{color:#fff}
+.rm-pane .rp-hid{position:absolute;top:10px;left:10px;z-index:7;background:#D5402F;color:#fff;font-size:12px;font-weight:600;border-radius:12px;padding:4px 10px;pointer-events:none}
 .rm-pane .rm-pages{max-width:none;margin:0;gap:14px;padding:0;max-height:calc(100vh - 230px);overflow:auto;box-shadow:inset 0 3px 0 transparent}
 .rm-pane.on .rm-pages{box-shadow:inset 0 3px 0 var(--blue)}
 .rp-rz{display:block;height:14px;cursor:ns-resize;position:relative;touch-action:none}
@@ -4509,7 +4517,7 @@ function richItemHTML(it,i,showAns){
     return `<div class="it rich">${badgeH(i)}<div class="rb">${it.svg||''}<span class="crow cwrap">${tokRow(q,it,showAns)}</span></div></div>`}
   return `<div class="it rich">${badgeH(i)}<div class="rb"><span class="crow cwrap">${tokRow(plainQ(it),it,showAns)}</span></div></div>`}
 /* высоты всех частей листа кратны клетке: тогда цифры каждого задания попадают в клетки */
-function snapCells(root){(root||document).querySelectorAll('.sheet').forEach(sh=>{const c=sh.clientWidth*cellOf(sh)/100;if(!c)return;
+function snapCells(root){(root||document).querySelectorAll('.sheet').forEach(sh=>{if(sh.closest('.rm-pages:not([data-lay])'))return;const c=sh.clientWidth*cellOf(sh)/100;if(!c)return;
   sh.querySelectorAll('.tw').forEach(el=>{el.style.width='';el.style.width=(Math.ceil(el.scrollWidth/c-0.02)*c)+'px'});
   /* задание с рисунком шире своей колонки занимает столько колонок, сколько нужно */
   /* задания с текстом: ширина по содержимому, в одной части — одинаковая, чтобы шли ровными колонками */
@@ -4674,6 +4682,16 @@ function sheetHTML(items,o){
     <div class="sh-foot"><span>${s.footL}</span><span>${s.footR}</span></div></div></div>`;
 }
 /* раскладка по страницам A4: задания добавляются по одному, пока страница не переполнится */
+/* лист в комнате как PDF: раскладываем один раз на ширине 820 px, а все размеры в пикселях переводим в доли ширины листа.
+   Тогда при любом масштабе и экране у репетитора и ученика задания стоят в тех же местах и пометки не съезжают */
+const SHEET_W=820,PXP=['width','height','top','left','right','bottom','marginTop','marginRight','marginBottom','marginLeft','minHeight','maxHeight'];
+function pxFreeze(root){const one=el=>{const sh=el.closest('.sheet');if(!sh||!el.style)return;const W=sh.clientWidth;if(!W)return;
+    PXP.forEach(k=>{const v=el.style[k];if(v&&/^-?[\d.]+px$/.test(v))el.style[k]=(parseFloat(v)/W*100).toFixed(4)+'cqw'})};
+  if(root.matches&&root.matches('[style]'))one(root);root.querySelectorAll('.sheet [style]').forEach(one)}
+const roomMats0=()=>{const ids=roomMulti();return ids?ids.map(id=>R.mats.find(m=>m.id===id)).filter(Boolean):[roomMat()].filter(Boolean)};
+function roomPaginate(pages,items,o){const tmp=document.createElement('div');tmp.className=pages.className;tmp.dataset.lay='1';
+  tmp.style.cssText=`position:absolute;left:-99999px;top:0;width:${SHEET_W}px;max-width:none;visibility:hidden;pointer-events:none`;document.body.appendChild(tmp);
+  try{paginate(tmp,items,o);pxFreeze(tmp);pages.replaceChildren(...tmp.children)}finally{tmp.remove()}}
 function paginate(host,items,o){
   const s=sheetParts(items,o);host.innerHTML='';
   let pn=0;
@@ -4751,7 +4769,7 @@ function fitFree(root){(root||document).querySelectorAll('.sheet.lv5 .pfill img.
   const sh=img.closest('.sheet'),cell=sh.clientWidth*cellOf(sh)/100,box=img.parentNode,H=box.clientHeight/Math.max(.3,1-f.t-f.b),W=H*f.ar;
   Object.assign(img.style,{height:H+'px',width:W+'px',maxWidth:'none',marginRight:(-f.r*W)+'px',marginBottom:(-f.b*H)+'px'});
   let c=box.querySelector('.wq-cut');if(!c){c=document.createElement('div');c.className='wq-cut';box.insertBefore(c,img)}
-  Object.assign(c.style,{width:Math.max(0,W*(1-f.l-f.r)-1.5*cell)+'px',height:Math.max(0,box.clientHeight-1.5*cell)+'px'})});
+  Object.assign(c.style,{width:Math.max(0,W*(1-f.l-f.r)-1.5*cell)+'px',height:Math.max(0,box.clientHeight-1.5*cell)+'px'});if(box.closest('.rm-pages'))pxFreeze(box)});
   img.complete&&img.naturalWidth?go():img.addEventListener('load',go,{once:true})})}
 function fitPics(root){fitFree(root);(root||document).querySelectorAll('.wq-row .wq-pic').forEach(img=>{const go=()=>picPad(img.src).then(f=>{
   const sh=img.closest('.sheet'),cell=sh?sh.clientWidth*cellOf(sh)/100:16,row=img.closest('.wq-row'),rw=row.clientWidth,rh=row.clientHeight,fv=Math.max(.2,1-f.l-f.r),fh=Math.max(.2,1-f.t-f.b);
@@ -4759,7 +4777,7 @@ function fitPics(root){fitFree(root);(root||document).querySelectorAll('.wq-row 
   let H=Math.max(7*cell,Math.min(.36*rw/(fv*f.ar),room/fh*.95,13*cell/fh));const W=H*f.ar,vis=W*fv,visH=H*fh,cut=Math.max(0,vis-1.5*cell);
   Object.assign(img.style,{height:H+'px',width:W+'px',right:(-f.r*W)+'px',bottom:(-f.b*H)+'px'});
   let c=row.querySelector('.wq-cut');if(!c){c=document.createElement('div');c.className='wq-cut';row.insertBefore(c,img)}
-  Object.assign(c.style,{width:cut+'px',height:Math.min(rh,Math.max(cell,visH-1.5*cell))+'px'});
+  Object.assign(c.style,{width:cut+'px',height:Math.min(rh,Math.max(cell,visH-1.5*cell))+'px'});if(row.closest('.rm-pages'))pxFreeze(row);
   const al=row.querySelector('.aline');if(al)al.style.marginRight=cut+'px'});
   img.complete&&img.naturalWidth?go():img.addEventListener('load',go,{once:true})})}
 const pagesWord=n=>`${n} ${plural(n,['страница','страницы','страниц'])}`;
@@ -6055,10 +6073,10 @@ async function loadFiles(){if(!ACC.user)return;
 async function uploadFiles(list){
   const box=document.getElementById('upSt');
   for(const f of list){
-    if(f.size>25e6){toast('Больше 25 МБ: '+f.name);continue}
+    if(f.size>100*1048576){toast('Больше 100 МБ: '+f.name);continue}
     if(box)box.textContent='Загружаю '+f.name+'…';
     const fd=new FormData();fd.append('owner',ACC.user.id);fd.append('file',f);fd.append('name',f.name.slice(0,200));fd.append('folder',V.mfolder&&V.mfolder!=='*'?V.mfolder:'');
-    try{const r=await pbT.collection('files').create(fd);FILES=[r,...(FILES||[])]}catch(e){toast('Не загрузился: '+f.name)}}
+    try{const r=await pbT.collection('files').create(fd);FILES=[r,...(FILES||[])]}catch(e){toast(e&&e.status===400&&f.size>25*1048576?'Сервер пока принимает файлы до 25 МБ: '+f.name:'Не загрузился: '+f.name)}}
   render()}
 /* файл из «Моих материалов» открывается в этом же окне: PDF и картинки прямо в программе, остальное скачивается */
 async function openFile(r){
@@ -6569,6 +6587,10 @@ function roomStart(pb,role,rec,info){
     seenS:false,topK:'',local:{},upQ:null,upHi:0,pinSel:null,drawQ:null,tool:'hand',stageKey:'',items:null,sel:null,keys:false,unsub:[],timers:[],obs:[],myPulse:null,pgNow:0,away:false,myCur:null,live:null,icache:{},side:false});
   if(role==='t'&&!R.st.cur&&R.mats.length)R.st.cur=R.mats[R.mats.length-1].id;
   roomRemember(role,rec,info);roomConnect(rec.id);
+  if(role==='t')R.timers.push(setTimeout(roomDocsGc,4000));
+  if(role==='s')roomLockBind();
+  else{const sc=e=>{const t=e.target;if(t===document||t&&t.classList&&(t.classList.contains('rm-pages')||t.id==='rmStage'||t.classList.contains('rm-pane')))roomVwSend()};
+    document.addEventListener('scroll',sc,true);R.unsub.push(()=>document.removeEventListener('scroll',sc,true))}
 }
 function roomStop(){
   if(!R.on)return;roomForget();
@@ -6615,6 +6637,7 @@ function roomOnRec(r){
   if(!R.away&&roomFollow()&&(was.pg!==R.st.pg||was.cur!==R.st.cur))roomScrollPg(R.st.pg||0);
   if(R.st.foc&&JSON.stringify(R.st.foc)!==JSON.stringify(was.foc))roomFocus(R.st.foc);
   if(deckView()&&deckLocked()){roomDeckPaint();deckApplyCam(deckCamOf())}
+  roomVwFollow();
 }
 function roomOnInk(e){
   if(!R.on)return;const r=e.record;
@@ -6625,17 +6648,52 @@ function roomOnInk(e){
 }
 function roomOnPulse(e){
   if(!R.on||!e.record||e.record.who===R.role)return;
-  const wasHere=roomHere();R.other=e.record.d||{};R.otherAt=R.other.gone?0:Date.now();
+  const wasHere=roomHere(),nd={...(e.record.d||{})};
+  /* сервер принёс состояние старше того, что уже пришло быстрым каналом: движения берём быстрые */
+  if(R.other&&(+nd.at||0)<(R.fastAt||0))FASTK.forEach(k=>{if(k in R.other)nd[k]=R.other[k];else delete nd[k]});
+  R.other=nd;R.otherAt=R.other.gone?0:Date.now();
   if(!wasHere&&roomHere())setTimeout(callWatch,600);
   if(R.other.gone&&(C.st!=='idle'||C.offer))callEnd(false,R.role==='t'?'Ученик вышел из комнаты':'Репетитор вышел из комнаты');else callOnSig(R.other);
   if(R.role==='s')roomLaser(R.other);
   deckRemoteDrag(R.other.dg);
   if(R.other.cam&&deckLocked())deckApplyCam(deckCamOf());
+  if(R.other.vw)roomVwFollow();
   if(R.other.rx&&R.other.rx.i!==R.rxSeen){R.rxSeen=R.other.rx.i;rxShow(R.other.rx.e,false)}
   clearTimeout(R.topT);R.topT=setTimeout(roomTop,120);
 }
 const roomHere=()=>R.otherAt&&Date.now()-R.otherAt<40000;
-const roomFollow=()=>R.role==='s'&&roomLive(R.st)&&R.st.lead!==false;
+/* на уроке ученик всегда видит то же, что репетитор: сам не листает и не приближает.
+   «Отвечает» (st.act не false): вписывает ответы и двигает карточки. «Смотрит»: только смотрит. Ручка выдаётся отдельно */
+const roomFollow=()=>R.role==='s'&&roomLive(R.st);
+const roomCanAct=()=>R.role!=='s'||!roomLive(R.st)||R.st.act!==false;
+function roomNoAct(){if(Date.now()-(R.naT||0)>2500){R.naT=Date.now();toast('Сейчас можно только смотреть. Репетитор скажет, когда отвечать')}}
+/* что видно: номер страницы и доля её высоты у верхнего края, масштаб и сдвиг вбок. Так у ученика тот же кусок листа при любом экране */
+const roomPgs=p=>[...p.children].filter(x=>x.classList.contains('rpg'));
+function roomHxOf(p){for(const el of [p,p.parentElement,p.closest('.rm-pane'),document.getElementById('rmStage')])if(el&&el.scrollWidth>el.clientWidth+1)return el;return null}
+function roomVwOf(p){const pane=!!p.dataset.paneMat,pr=p.getBoundingClientRect(),line=pane?pr.top:Math.max(0,pr.top);let k=0,f=0;
+  const pgs=roomPgs(p);for(let i=0;i<pgs.length;i++){const r=pgs[i].getBoundingClientRect();if(r.bottom>line+1){k=i;f=Math.max(0,Math.min(1,(line-r.top)/(r.height||1)));break}}
+  const hx=roomHxOf(p);return{k,f:+f.toFixed(4),z:roomZoomOf(p),x:hx?+(hx.scrollLeft/(hx.scrollWidth-hx.clientWidth)).toFixed(4):0}}
+function roomVwApply(p,v){if(!v||!p)return;const id=p.dataset.paneMat,z=Math.max(.4,Math.min(3,+v.z||1));
+  if(z!==roomZoomOf(p)){if(id)(R.pz=R.pz||{})[id]=z;else R.zoom=z;roomZoomApply(p);clearTimeout(R.zT);R.zT=setTimeout(roomInkAll,60)}
+  const pg=roomPgs(p)[v.k|0];if(!pg)return;const r=pg.getBoundingClientRect(),y=r.top+(+v.f||0)*r.height;
+  if(id)p.scrollTop+=y-p.getBoundingClientRect().top;
+  else if(!(v.k|0)&&!(v.f>0))window.scrollTo(0,0);else window.scrollTo(0,scrollY+y);
+  const hx=roomHxOf(p);if(hx)hx.scrollLeft=(+v.x||0)*(hx.scrollWidth-hx.clientWidth)}
+const roomVwPages=()=>[...document.querySelectorAll('#rmStage .rm-pages')].filter(p=>!p.querySelector('#rdk'));
+const roomVwId=p=>p.dataset.paneMat||(roomMat()||{}).id;
+function roomVwSend(){if(R.role!=='t'||!R.on||!roomLive(R.st))return;if(R.vwT)return;
+  R.vwT=setTimeout(()=>{R.vwT=0;const vw={at:Date.now()};roomVwPages().forEach(p=>{const id=roomVwId(p);if(id)vw[id]=roomVwOf(p)});
+    roomPulse({vw});clearTimeout(R.vwS);R.vwS=setTimeout(()=>roomSet({vw}),1200)},50)}
+function roomVwFollow(){if(!roomFollow())return;const a=R.other&&R.other.vw,b=R.st.vw,vw=a&&(!b||(a.at||0)>=(b.at||0))?a:b;if(!vw)return;
+  R.vwIn=1;roomVwPages().forEach(p=>{const v=vw[roomVwId(p)];if(v)roomVwApply(p,v)});setTimeout(()=>{R.vwIn=0},80)}
+/* ученик в уроке не листает сам: колесо, пальцы и клавиши прокрутки не работают, кроме списка материалов и окон */
+function roomLockBind(){
+  const free=t=>t&&t.closest&&t.closest('.modal,.rm-side,.r-in,.r-pop,#rmAnsBar,input,textarea,[contenteditable="true"]');
+  const on=()=>R.on&&roomFollow();
+  const wh=e=>{if(on()&&!free(e.target))e.preventDefault()};
+  const kd=e=>{if(on()&&!free(e.target)&&[' ','PageDown','PageUp','ArrowDown','ArrowUp','Home','End'].includes(e.key))e.preventDefault()};
+  addEventListener('wheel',wh,{passive:false});addEventListener('touchmove',wh,{passive:false});addEventListener('keydown',kd);
+  R.unsub.push(()=>{removeEventListener('wheel',wh);removeEventListener('touchmove',wh);removeEventListener('keydown',kd)})}
 
 /* ---------- запись ---------- */
 function roomSet(patch){
@@ -6645,7 +6703,23 @@ function roomSet(patch){
 function roomSaveMats(){R.pb.collection('rooms').update(R.rec.id,{mats:R.mats}).catch(()=>toast('Нет связи с сервером'))}
 function roomSaveAns(){clearTimeout(R.ansT);R.ansT=setTimeout(()=>R.pb.collection('rooms').update(R.rec.id,{ans:R.ans}).catch(()=>{}),250)}
 let pulseLast=0,pulseT=null;
+/* быстрый канал: во время звонка движения (перетаскивание, указка, камера холста, прокрутка) идут напрямую между компьютерами,
+   минуя сервер, — почти без задержки. Без звонка всё идёт через сервер, как раньше */
+const FASTK=['x','y','m','pg','dg','cam','vw','typ','rx'];
+function roomFast(d){const c=C.fdc;if(!c||c.readyState!=='open'||c.bufferedAmount>65536)return false;
+  try{c.send(JSON.stringify({...d,at:Date.now()}));return true}catch(e){return false}}
+function callFastDc(dc){C.fdc=dc;dc.onmessage=e=>{if(typeof e.data!=='string'||e.data.length>20000)return;let d;try{d=JSON.parse(e.data)}catch(_){return}
+  if(d&&typeof d==='object')roomOnFast(d)}}
+function roomOnFast(d){if(!R.on)return;const o={};FASTK.forEach(k=>{if(k in d)o[k]=d[k]});R.fastAt=Math.max(R.fastAt||0,+d.at||0);
+  R.other={...(R.other||{}),...o};R.otherAt=Date.now();
+  if(R.role==='s'&&'x' in o)roomLaser(R.other);
+  if('dg' in o)deckRemoteDrag(o.dg);
+  if(o.cam&&deckLocked())deckApplyCam(deckCamOf());
+  if(o.vw)roomVwFollow();
+  if(o.rx&&o.rx.i!==R.rxSeen){R.rxSeen=o.rx.i;rxShow(o.rx.e,false)}
+  clearTimeout(R.topT);R.topT=setTimeout(roomTop,120)}
 function roomPulse(d,now){
+  if(!d.sig&&!('call' in d)&&!('join' in d))roomFast(d);
   if(!R.myPulse)return;R.myD={...(R.myD||{}),...d,at:Date.now()};
   const send=()=>{pulseLast=Date.now();R.pb.collection('pulse').update(R.myPulse.id,{d:R.myD}).catch(()=>{})};
   clearTimeout(pulseT);if(now||Date.now()-pulseLast>90)send();else pulseT=setTimeout(send,90);
@@ -6667,7 +6741,7 @@ function viewRoom(){
   stage.addEventListener('pointermove',e=>{if(R.role!=='t'||R.tool!=='hand'||e.pointerType==='touch')return;const pg=e.target.closest('.rpg');if(!pg)return;
     const r=pg.getBoundingClientRect();roomPulse({m:(roomMatOfPg(pg)||{id:R.st.cur}).id,pg:+pg.dataset.pg,x:+((e.clientX-r.left)/r.width).toFixed(4),y:+((e.clientY-r.top)/r.width).toFixed(4)})});
   stage.addEventListener('pointerleave',()=>{if(R.role==='t')roomPulse({x:null})});
-  let lastW=stage.clientWidth;const ro=new ResizeObserver(()=>{const w=stage.clientWidth;if(Math.abs(w-lastW)>30){lastW=w;R.stageKey='';roomStage()}else{roomDeckScale();roomInkAll()}});
+  let lastW=stage.clientWidth;const ro=new ResizeObserver(()=>{const w=stage.clientWidth;if(Math.abs(w-lastW)>30&&roomMats0().some(m=>m.k==='note'||m.k==='link')){lastW=w;R.stageKey='';roomStage()}else{roomDeckScale();roomInkAll();roomAnsPaint()}});
   ro.observe(stage);R.obs.push(ro);
 }
 function roomUpdate(){if(!R.on||!document.getElementById('rmTop'))return;roomTop();roomSide();roomTools();roomStage()}
@@ -6675,10 +6749,15 @@ function roomUpdate(){if(!R.on||!document.getElementById('rmTop'))return;roomTop
    Репетитор открывает до трёх материалов (st.open). Раскладка выбирается сама: два рядом, три в ряд, а если среди трёх есть объяснение, оно ложится сверху.
    У каждого окна своя прокрутка. «Активное» окно то, в которое последним нажали: именно оно получает ручку, ответы и страницу «Веду я». */
 const R_NOPANE=['deck','link'];
+/* глаз: скрыть один материал от ученика, у репетитора он остаётся на экране */
+const EYE_OFF='<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.6 5.1A10.6 10.6 0 0 1 12 5c6 0 9.5 7 9.5 7a17 17 0 0 1-2.6 3.5M6.6 6.6C3.9 8.4 2.5 12 2.5 12S6 19 12 19a9.6 9.6 0 0 0 5.4-1.6"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/><path d="M3 3l18 18"/></svg>';
+function roomHideToggle(id){const m=R.mats.find(x=>x.id===id);if(!m)return;m.hid=!m.hid;roomSaveMats();roomUpdate();
+  toast(m.hid?'«'+rTitle(m.t)+'» скрыт от ученика. У вас он остаётся':'«'+rTitle(m.t)+'» снова видно ученику')}
+const eyeBtn=(m,cls)=>`<button class="${cls}${m.hid?' on':''}" data-eye="${m.id}" aria-pressed="${m.hid?'true':'false'}" aria-label="${m.hid?'Показать ученику':'Скрыть от ученика'}" title="${m.hid?'Ученик этого не видит. Нажмите, чтобы показать':'Скрыть от ученика (у вас останется)'}">${EYE_OFF}</button>`;
 function roomMulti(){const o=R.st.open;if(!o||o.length<2)return null;
   if(R.role==='s'&&R.st.hide&&roomLive(R.st))return null;
   if(R.role==='s'&&(!roomFollow()||R.away))return null;
-  const ids=o.filter(id=>{const m=R.mats.find(x=>x.id===id);return m&&(R.role==='t'||m.vis)&&!R_NOPANE.includes(m.k)});
+  const ids=o.filter(id=>{const m=R.mats.find(x=>x.id===id);return m&&(R.role==='t'||m.vis&&!m.hid)&&!R_NOPANE.includes(m.k)});
   return ids.length>1?ids:null}
 function roomMat(){
   if(R.forceMat){const f=R.mats.find(x=>x.id===R.forceMat);if(f)return f}
@@ -6708,14 +6787,26 @@ function roomToggleOpen(id){
   if(roomLive(R.st)&&!m.vis){m.vis=true;roomSaveMats()}
   roomSet({open:o,cur:o.includes(R.st.cur)?R.st.cur:o[o.length-1],foc:null});roomUpdate()}
 /* файлы удалённого материала: страницы PDF, картинка, картинки на листе */
+function roomDocsOf(m){const d=x=>typeof x==='string'&&x.startsWith('d:')?x.slice(2):null;
+  return [m.f,...(m.pg||[]),...(m.pins||[]).map(p=>p.f),...(m.items||[]).flatMap(x=>[d(x.src),d(x.th)])].filter(f=>typeof f==='string'&&f)}
 function roomDropFiles(m){
-  const fs=[m.f,...(m.pg||[]),...(m.pins||[]).map(p=>p.f)].filter(f=>typeof f==='string'&&f&&(R.rec.docs||[]).includes(f));
-  if(!fs.length)return;R.pb.collection('rooms').update(R.rec.id,{'docs-':fs}).then(r=>{R.rec=r}).catch(()=>{})}
+  const keep=new Set(R.mats.filter(x=>x!==m).flatMap(roomDocsOf));
+  const fs=roomDocsOf(m).filter(f=>!keep.has(f)&&(R.rec.docs||[]).includes(f));
+  if(!fs.length)return;roomDocsDel(fs)}
+function roomDocsDel(fs){let p=Promise.resolve();
+  for(let i=0;i<fs.length;i+=100){const part=fs.slice(i,i+100);p=p.then(()=>R.pb.collection('rooms').update(R.rec.id,{'docs-':part}).then(r=>{R.rec=r}))}
+  return p.catch(()=>{})}
+/* файлы, на которые не ссылается ни один материал (остались от старых удалений), убираем, когда комнату открывает репетитор */
+function roomDocsGc(){
+  if(!R.on||R.role!=='t'||R.upHi>0||R.mats.some(m=>m.up)||DK.busy||DK.q.length||DK.pend)return;
+  const used=new Set(R.mats.flatMap(roomDocsOf)),fs=(R.rec.docs||[]).filter(f=>!used.has(f));
+  if(fs.length)roomDocsDel(fs).then(()=>{DK.full=false})}
 function roomPaneClose(id){const o=(R.st.open||[]).filter(x=>x!==id);roomSet({open:o,cur:o.includes(R.st.cur)?R.st.cur:o[0]||R.st.cur,foc:null});roomUpdate()}
 function roomMat1(){
   if(R.role==='t')return R.mats.find(m=>m.id===R.st.cur)||null;
   if(R.st.hide&&roomLive(R.st))return null;
-  const vis=R.mats.filter(m=>m.vis);const id=roomFollow()&&!R.away?R.st.cur:(R.myCur||R.st.cur);
+  const vis=R.mats.filter(m=>m.vis&&!m.hid);const id=roomFollow()&&!R.away?R.st.cur:(R.myCur||R.st.cur);
+  if(roomFollow()){const c=R.mats.find(m=>m.id===id);if(c&&c.hid)return (R.st.open||[]).map(i=>vis.find(m=>m.id===i)).find(Boolean)||null}
   return vis.find(m=>m.id===id)||vis[vis.length-1]||null;
 }
 function roomTop(){
@@ -6744,7 +6835,7 @@ function roomTop(){
   }else{
     const away=roomFollow()&&R.away;
     el.innerHTML=`${live?'':'<button class="btn quiet small" id="rmBack">← Мои задания</button>'}
-      <div class="rm-who"><b>${live?'Урок идёт':'Моя тетрадь'}</b><span class="rm-pres${live?' on':''}">${esc(R.info.tutor||'Репетитор')}${live&&R.st.lead!==false&&!away?' показывает':''}</span></div>
+      <div class="rm-who"><b>${live?'Урок идёт':'Моя тетрадь'}</b><span class="rm-pres${live?' on':''}">${esc(R.info.tutor||'Репетитор')}${live?(R.st.act===false?' показывает · смотри':' показывает'):''}</span></div>
       <div class="rm-act">${away?'<button class="btn primary small" id="rmFollow">К репетитору</button>':''}
         <button class="ibtn" id="rmHelpBtn" aria-label="Как работает урок">?</button><button class="btn small" id="rmNote">Тетрадь</button>${R.st.call&&live?'<button class="btn primary small" id="rmCall">Звонок</button>':''}</div>`;
     const $=id=>document.getElementById(id);
@@ -6766,11 +6857,11 @@ function roomSide(){
   const el=document.getElementById('rmSide');if(!el||!R.on)return;
   const t=R.role==='t',cur=roomMat();
   if(!t){el.classList.toggle('open',!!R.side);if(!R.side){el.innerHTML='';return}}
-  const list=t?R.mats:R.mats.filter(m=>m.vis);
+  const list=t?R.mats:R.mats.filter(m=>m.vis&&!m.hid);
   const d0=dayStart(Date.now());const today=list.filter(m=>(m.at||0)>=d0),past=list.filter(m=>(m.at||0)<d0);
   const open=R.st.open||[],multi=open.length>1;
   const row=m=>`<div class="rm-mat${cur&&cur.id===m.id?' on':''}"><button class="rm-mb" data-m="${m.id}"><span class="rmk">${R_KIND[m.k]||''}</span><b>${esc(rTitle(m.t))}</b>${m.k==='sheet'?`<small>${roomProg(m)}</small>`:''}</button>
-    ${t?`${!R_NOPANE.includes(m.k)?`<button class="rm-pn${multi&&open.includes(m.id)?' on':''}" data-pn="${m.id}" title="${multi&&open.includes(m.id)?'Убрать из окон рядом':'Открыть рядом с тем, что уже на экране'}">${multi&&open.includes(m.id)?'✓ рядом':'+ рядом'}</button>`:''}<button class="rm-del${R.delM===m.id?' on':''}" data-del="${m.id}" aria-label="Убрать" title="Убрать материал из комнаты">${R.delM===m.id?'Убрать?':'✕'}</button>`:''}</div>`;
+    ${t?`${!R_NOPANE.includes(m.k)?`<button class="rm-pn${multi&&open.includes(m.id)?' on':''}" data-pn="${m.id}" title="${multi&&open.includes(m.id)?'Убрать из окон рядом':'Открыть рядом с тем, что уже на экране'}">${multi&&open.includes(m.id)?'✓ рядом':'+ рядом'}</button>`:''}${eyeBtn(m,'rm-eye')}<button class="rm-del${R.delM===m.id?' on':''}" data-del="${m.id}" aria-label="Убрать" title="Убрать материал из комнаты">${R.delM===m.id?'Убрать?':'✕'}</button>`:''}</div>`;
   const byDay={};past.forEach(m=>{const k=dkey(m.at||0);(byDay[k]=byDay[k]||[]).push(m)});
   const days=Object.keys(byDay).sort().reverse();
   el.innerHTML=`${t?`<button class="rm-strip${R.st.hide?' off':''}" id="rmSee" title="${R.st.hide?'Ученик сейчас ничего не видит. Нажмите, чтобы показать ему материалы':'Скрыть от ученика все материалы, пока вы не нажмёте ещё раз'}"><i class="rm-dot"></i><span>${R.st.hide?'Материалы скрыты':'Скрыть материалы'}</span></button>`:'<div class="rm-sh">Тетрадь</div>'}
@@ -6779,6 +6870,7 @@ function roomSide(){
     ${days.length?`<details class="rm-past"${R.pastOpen?' open':''}><summary>Прошлые уроки · ${days.length}</summary>${days.map(k=>`<div class="rm-day">${dayTxt(atOf(k))}</div>${byDay[k].map(row).join('')}`).join('')}</details>`:''}`;
   el.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>roomOpenMat(b.dataset.m));
   el.querySelectorAll('[data-pn]').forEach(b=>b.onclick=()=>roomToggleOpen(b.dataset.pn));
+  el.querySelectorAll('.rm-eye').forEach(b=>b.onclick=ev=>{ev.stopPropagation();roomHideToggle(b.dataset.eye)});
   el.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{const id=b.dataset.del;if(R.delM!==id){R.delM=id;roomSide();return}
     R.delM=null;{const dm=R.mats.find(m=>m.id===id);if(dm)roomDropFiles(dm)}R.mats=R.mats.filter(m=>m.id!==id);if(R.st.cur===id)roomSet({cur:R.mats.length?R.mats[R.mats.length-1].id:null,pg:0});roomSaveMats();roomUpdate()});
   const pd=el.querySelector('.rm-past');if(pd)pd.ontoggle=()=>{R.pastOpen=pd.open};
@@ -6794,6 +6886,7 @@ function roomOpenMat(id){
       else{const o=R.st.open.slice(),i=o.indexOf(R.st.cur);o[i>=0?i:0]=id;roomSet({open:o,cur:id,pg:0,foc:null});roomUpdate()}
       return}
     roomSet({cur:id,pg:0,foc:null,open:[id]});R.pgNow=0;roomUpdate();window.scrollTo({top:0});return}
+  if(roomFollow()&&id!==R.st.cur){toast('Во время урока материалы открывает репетитор');R.side=false;roomSide();return}
   const mids=roomMulti();if(mids&&mids.includes(id)){roomActivate(id);R.side=false;roomSide();return}
   R.myCur=id;R.away=roomFollow()&&id!==R.st.cur;R.side=false;roomUpdate();window.scrollTo({top:0});
 }
@@ -6803,7 +6896,7 @@ function roomTools(){
   if(R.role==='t'){
     const mine=!!m&&['sheet','pdf','img','board','note'].includes(m.k);
     const chkOn=R.st.chk!==false;
-    el.innerHTML=`<div class="rt-sec"><span class="rt-cap">Показ</span><div class="seg rm-seg"><button class="${R.st.lead!==false?'on':''}" id="rmLead" title="Ученик видит то же, что вы: тот же материал и страницу">Веду я</button><button class="${R.st.lead===false?'on':''}" id="rmFree" title="Ученик листает сам, вы видите, где он">Свободно</button></div></div>
+    el.innerHTML=`<div class="rt-sec"><span class="rt-cap">Ученик видит ваш экран и</span><div class="seg rm-seg"><button class="${R.st.act===false?'on':''}" id="rmAct0" title="Ученик только смотрит: ничего не нажимает, не вписывает и не двигает">Смотрит</button><button class="${R.st.act!==false?'on':''}" id="rmAct1" title="Ученик вписывает ответы и двигает карточки. Листаете и приближаете только вы">Отвечает</button></div></div>
       <div class="rt-sec"><span class="rt-cap">Рисование</span><div class="rt-g">${tb('hand','Указка')}${tb('pen','Маркер')}${tb('hl','Выделитель')}${tb('er','Ластик')}<button class="rt" id="rmUndo" aria-label="Отменить свою линию" title="Отменить последнюю линию">↶</button><button class="rt" id="rmClr" title="Стереть все пометки этой страницы">Очистить</button></div></div>
       ${inkSwatches()?`<div class="rt-sec"><span class="rt-cap">Цвет</span>${inkSwatches()}</div>`:''}
       <div class="rt-sec"><span class="rt-cap">Ученик</span><div class="rt-g"><button class="rt${R.st.pen?' on':''}" id="rmPen" title="${R.st.pen?'Ручка у ученика есть. Нажмите, чтобы забрать':'Разрешить ученику рисовать маркером. Пока не дали, он только отвечает в окошках'}">${R.st.pen?'✓ ':''}Дать ручку ученику</button>
@@ -6816,8 +6909,8 @@ function roomTools(){
       ${m&&m.k==='deck'?'':`<div class="rt-sec"><span class="rt-cap">${roomMulti()?'Масштаб окна':'Масштаб'}</span><div class="rt-g rt-z"><button class="rt" id="rmZm" aria-label="Уменьшить" title="Уменьшить">−</button><button class="rt" id="rmZr" title="Вернуть по ширине">${Math.round(roomZoomCur()*100)}%</button><button class="rt" id="rmZp" aria-label="Увеличить" title="Увеличить">+</button></div></div>`}
 `;
     const $=id=>document.getElementById(id);
-    $('rmLead').onclick=()=>{const c=R.mats.find(x=>x.id===R.st.cur);if(c&&!c.vis&&roomLive(R.st)){c.vis=true;roomSaveMats()}roomSet({lead:true,pg:R.pgNow});roomUpdate();deckSendCam()};
-    $('rmFree').onclick=()=>{roomSet({lead:false});roomUpdate()};
+    $('rmAct0').onclick=()=>{roomSet({act:false,lead:true});roomTools()};
+    $('rmAct1').onclick=()=>{roomSet({act:true,lead:true});roomTools()};
     $('rmPen').onclick=()=>{roomSet({pen:!R.st.pen});roomTools()};
     $('rmUndo').onclick=roomUndo;$('rmClr').onclick=roomClear;
     if($('rmImg'))$('rmImg').onclick=roomPinPick;
@@ -6878,11 +6971,12 @@ function roomStageMulti(host,ids){
   const note=ms.length===3?ms.find(x=>x.k==='note'):null,order=note?[note,...ms.filter(x=>x!==note)]:ms;
   /* ряды окон: два или три в ряд; если среди трёх есть объяснение, оно либо на всю ширину сверху, либо на половину слева */
   const rows=note?(R.st.nf===false?[[[note,order[2]],[order[1]]]]:[[note],[order[1],order[2]]]):[order];
-  const paneHTML=m=>`<div class="rm-pane${m===note?' rm-note':''}" data-mat="${m.id}" title="${esc(rTitle(m.t))}">${R.role==='t'?`${m===note?`<button class="rp-w" data-pw title="${R.st.nf===false?'Растянуть объяснение на всю ширину':'Сделать объяснение вполовину ширины'}">${R.st.nf===false?'На всю ширину':'На половину'}</button>`:''}<button class="rp-c" data-pc="${m.id}" aria-label="Закрыть это окно" title="Закрыть это окно">✕</button>`:''}<div class="rm-pages"></div>${R.role==='t'?`<i class="rp-rz" data-rz="${m.id}" title="Потяните вниз или вверх, чтобы изменить высоту окна"></i>`:''}</div>`;
+  const paneHTML=m=>`<div class="rm-pane${m===note?' rm-note':''}" data-mat="${m.id}" title="${esc(rTitle(m.t))}">${R.role==='t'?`${m===note?`<button class="rp-w" data-pw title="${R.st.nf===false?'Растянуть объяснение на всю ширину':'Сделать объяснение вполовину ширины'}">${R.st.nf===false?'На всю ширину':'На половину'}</button>`:''}${eyeBtn(m,'rp-e')}<button class="rp-c" data-pc="${m.id}" aria-label="Закрыть это окно" title="Закрыть это окно">✕</button>${m.hid?'<span class="rp-hid">Ученик не видит</span>':''}`:''}<div class="rm-pages"></div>${R.role==='t'?`<i class="rp-rz" data-rz="${m.id}" title="Потяните вниз или вверх, чтобы изменить высоту окна"></i>`:''}</div>`;
   host.innerHTML=`<div class="rm-panes">${rows.map((row,ri)=>`<div class="rm-prow" data-row="${ri}">${row.map((m,ci)=>(ci&&R.role==='t'?`<i class="rm-split" data-ri="${ri}" data-ci="${ci-1}" title="Потяните влево или вправо, чтобы изменить ширину окон"></i>`:ci?'<i class="rm-gap"></i>':'')+(Array.isArray(m)?`<div class="rm-pcol">${m.map(paneHTML).join('')}</div>`:paneHTML(m))).join('')}</div>`).join('')}</div>`;
   host.querySelectorAll('.rm-split').forEach(h=>h.addEventListener('pointerdown',roomSplitDown));
   host.querySelectorAll('[data-pw]').forEach(b=>b.onclick=ev=>{ev.stopPropagation();roomSet({nf:R.st.nf===false,rw:null});roomUpdate()});
   host.querySelectorAll('.rp-c').forEach(b=>b.onclick=ev=>{ev.stopPropagation();roomPaneClose(b.dataset.pc)});
+  host.querySelectorAll('.rp-e').forEach(b=>b.onclick=ev=>{ev.stopPropagation();roomHideToggle(b.dataset.eye)});
   host.querySelectorAll('.rp-rz').forEach(h=>h.addEventListener('pointerdown',roomPaneResize));
   const act=roomMat();
   order.forEach(m=>{const pages=host.querySelector(`.rm-pane[data-mat="${m.id}"] .rm-pages`);pages.dataset.paneMat=m.id;roomFill(pages,m,key,!!act&&act.id===m.id)});
@@ -6916,15 +7010,15 @@ const roomZoomCur=()=>{const p=roomZoomTarget();return p?roomZoomOf(p):(R.zoom||
 /* кнопки меняют масштаб главного окна, щипок и Ctrl+колесо то окно, над которым курсор */
 function roomZoomSet(z,pages){pages=pages||roomZoomTarget();if(!pages)return;z=Math.max(.4,Math.min(3,+z.toFixed(3)));if(z===roomZoomOf(pages))return;
   if(pages.dataset.paneMat)(R.pz=R.pz||{})[pages.dataset.paneMat]=z;else R.zoom=z;
-  roomZoomApply(pages);clearTimeout(R.zT);R.zT=setTimeout(()=>{roomInkAll();const l=document.getElementById('rmZr');if(l)l.textContent=Math.round(roomZoomCur()*100)+'%'},60)}
+  roomZoomApply(pages);roomVwSend();clearTimeout(R.zT);R.zT=setTimeout(()=>{roomInkAll();const l=document.getElementById('rmZr');if(l)l.textContent=Math.round(roomZoomCur()*100)+'%'},60)}
 function roomZoomBind(stage){
   const under=e=>(e.target.closest&&e.target.closest('.rm-pages'))||roomZoomTarget();
-  stage.addEventListener('wheel',e=>{if(!(e.ctrlKey||e.metaKey))return;e.preventDefault();const pg=under(e);if(!pg)return;
+  stage.addEventListener('wheel',e=>{if(!(e.ctrlKey||e.metaKey))return;e.preventDefault();if(roomFollow())return;const pg=under(e);if(!pg)return;
     roomZoomSet(roomZoomOf(pg)*Math.exp(-Math.max(-15,Math.min(15,e.deltaMode===1?e.deltaY*8:e.deltaY))*.01),pg)},{passive:false});
   stage.addEventListener('gesturestart',e=>{e.preventDefault();R.gs=1});
-  stage.addEventListener('gesturechange',e=>{e.preventDefault();const pg=under(e);if(pg)roomZoomSet(roomZoomOf(pg)*e.scale/(R.gs||1),pg);R.gs=e.scale});
+  stage.addEventListener('gesturechange',e=>{e.preventDefault();if(roomFollow())return;const pg=under(e);if(pg)roomZoomSet(roomZoomOf(pg)*e.scale/(R.gs||1),pg);R.gs=e.scale});
   let d0=0,z0=1,tp=null;const dist=t=>Math.hypot(t[0].clientX-t[1].clientX,t[0].clientY-t[1].clientY);
-  stage.addEventListener('touchstart',e=>{if(e.touches.length===2){tp=under(e);if(tp){d0=dist(e.touches);z0=roomZoomOf(tp)}}},{passive:true});
+  stage.addEventListener('touchstart',e=>{if(e.touches.length===2&&!roomFollow()){tp=under(e);if(tp){d0=dist(e.touches);z0=roomZoomOf(tp)}}},{passive:true});
   stage.addEventListener('touchmove',e=>{if(e.touches.length===2&&d0&&tp){e.preventDefault();roomZoomSet(z0*dist(e.touches)/d0,tp)}},{passive:false});
   stage.addEventListener('touchend',()=>{d0=0},{passive:true})}
 /* содержимое одного материала: страницы листа, PDF, картинка, доска, объяснение */
@@ -6932,11 +7026,11 @@ function roomFill(pages,m,key,act){
   roomPinMode(pages);
   roomZoomApply(pages);
   const done=()=>{if(R.stageKey!==key)return;[...pages.children].forEach((pg,k)=>roomSetupPage(pg,k));roomInkAll();roomAnsPaint();roomPinsPaint();roomTrackPages(pages);
-    if(act&&roomFollow()&&!R.away)roomScrollPg(R.st.pg||0,true)};
+    if(roomFollow()){const vw=(R.other&&R.other.vw)||R.st.vw;if(vw&&vw[m.id])roomVwFollow();else if(act)roomScrollPg(R.st.pg||0,true)}else if(R.role==='t')roomVwSend()};
   if(m.k==='sheet'){
     const items=roomItems(m);pages._items=items;if(act)R.items=items;
     const o={topic:roomTopic(m),level:m.lv||0,seed:m.s,studentName:R.role==='t'?R.info.name:R.info.name,design:m.dz?resolveDesign({design:m.dz},m.s):null};
-    const lay=()=>{if(R.stageKey!==key)return;paginate(pages,items,o);const els=[...pages.querySelectorAll('.sh-items .it:not(.stab)')];
+    const lay=()=>{if(R.stageKey!==key)return;roomPaginate(pages,items,o);const els=[...pages.querySelectorAll('.sh-items .it:not(.stab)')];
       if(els.length===items.length){els.forEach((e,i)=>{e.dataset.ri=i;if(rAnswerable(items[i]))e.classList.add('r-it')});roomCarry(pages,items)}done()};
     lay();if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{if(R.stageKey===key)lay()});
   }else if(m.k==='pdf'&&m.n){if(R.local[m.id]&&R.local[m.id].doc)roomPdfLocal(pages,m,key);else roomPdfPages(pages,m);done();roomPdfSync(m)}
@@ -7037,7 +7131,7 @@ function roomTrackPages(pages){
   const vis=new Map();const io=new IntersectionObserver(es=>{es.forEach(e=>vis.set(+e.target.dataset.pg,e.intersectionRatio));
     let best=0,bv=-1;vis.forEach((v,k)=>{if(v>bv){bv=v;best=k}});
     pages._pg=best;const pm=pages.dataset.paneMat;if(pm&&pm!==(roomMat()||{}).id)return;
-    if(best!==R.pgNow){R.pgNow=best;if(R.role==='t'&&R.st.lead!==false){clearTimeout(R.pgT);R.pgT=setTimeout(()=>roomSet({pg:R.pgNow}),400)}
+    if(best!==R.pgNow){R.pgNow=best;if(R.role==='t'){clearTimeout(R.pgT);R.pgT=setTimeout(()=>roomSet({pg:R.pgNow}),400)}
       if(R.role==='s')roomPulse({pg:best})}},{threshold:[0,.25,.5,.75,1]});
   [...pages.children].forEach(pg=>pg.classList.contains('rpg')&&io.observe(pg));R.pgObs=io;(R.pgObsAll=R.pgObsAll||[]).push(io);
 }
@@ -7054,7 +7148,7 @@ function roomLaser(d){
 }
 function roomFocus(f){const m=roomMat();if(!f||!m||f.m!==m.id||Date.now()-(f.at||0)>15000)return;
   const el=document.querySelector(`#rmPages [data-ri="${f.i}"]`);if(!el)return;
-  if(R.role==='s'&&!R.away)el.scrollIntoView({behavior:'smooth',block:'center'});
+  if(R.role==='s'&&!roomFollow())el.scrollIntoView({behavior:'smooth',block:'center'});
   el.classList.remove('r-foc');void el.offsetWidth;el.classList.add('r-foc');setTimeout(()=>el.classList.remove('r-foc'),3200)}
 
 /* ---------- ответы ученика прямо в листе ---------- */
@@ -7138,7 +7232,7 @@ function roomStageClick(e){
   const cc=e.target.closest('.r-cc');if(cc&&R.role==='s'){e.stopPropagation();roomCarryOpen(cc);return}
   const el=e.target.closest('[data-ri]');if(!el)return;const m=roomMat();if(!m||!R.items)return;const i=+el.dataset.ri;
   if(R.role==='t'){roomSet({foc:{m:m.id,i,at:Date.now()}});roomFocus(R.st.foc);return}
-  const it=R.items[i];if(!rAnswerable(it))return;
+  const it=R.items[i];if(!rAnswerable(it))return;if(!roomCanAct()){roomNoAct();return}
   if(it.type==='ch'){const o=e.target.closest('.ob');if(o){roomAnswer(i,o.textContent,true);return}}
   roomAnsOpen(i);
 }
@@ -7257,7 +7351,7 @@ function roomFromTopic(st,t,tpl,blocks){
   if(old){const used=R.ink.some(x=>x.mat===old.id)||Object.keys(R.ans[old.id]||{}).length;
     m.id=RID(10);m.at=old.at;m.vis=old.vis;
     if(used)R.mats.splice(R.mats.indexOf(old)+1,0,m);else R.mats[R.mats.indexOf(old)]=m;
-    if(R.st.lead!==false&&roomLive(R.st))m.vis=true;roomSet({cur:m.id,pg:0,foc:null});R.pgNow=0;roomSaveMats();
+    if(roomLive(R.st))m.vis=true;roomSet({cur:m.id,pg:0,foc:null});R.pgNow=0;roomSaveMats();
     if(used)toast('Старый лист с пометками остался в ленте');
   }else roomAdd(m);
   go({screen:'room'});
@@ -7384,6 +7478,14 @@ function roomPutDoc(file,hi){
   const go=async()=>{if(hi)R.upHi++;else while(R.upHi>0)await sleep(150);
     try{return await (R.upQ=(R.upQ||Promise.resolve()).then(run,run))}finally{if(hi)R.upHi--}};
   return go()}
+/* несколько файлов одним запросом: сервер добавляет их в конец списка в том же порядке */
+function roomPutDocs(files){
+  const run=async()=>{for(let i=0;i<3;i++){
+    try{const before=new Set(R.rec.docs||[]);const fd=new FormData();files.forEach(f=>fd.append('docs+',f));
+      const r=await R.pb.collection('rooms').update(R.rec.id,fd);R.rec=r;const fns=(r.docs||[]).filter(x=>!before.has(x));if(fns.length===files.length)return fns}
+    catch(e){await sleep(700*(i+1))}}return null};
+  const go=async()=>{while(R.upHi>0)await sleep(150);return await (R.upQ=(R.upQ||Promise.resolve()).then(run,run))};
+  return go()}
 /* фото с телефона на 4 МБ превращается в картинку на 200–400 КБ */
 async function roomPrepImage(file,max=2000){
   if(/gif|svg/i.test(file.type))return file;
@@ -7404,6 +7506,7 @@ async function roomAddPdf(src,title,name){
   catch(e){toast('PDF не открылся');return}
   const n=Math.min(doc.numPages,300);let ar=1.41;
   /* в комнате не больше 999 файлов: заранее говорим, если страницы не поместятся */
+  if((R.rec.docs||[]).length+n>990){const used=new Set(R.mats.flatMap(roomDocsOf));await roomDocsDel((R.rec.docs||[]).filter(f=>!used.has(f)))}
   if((R.rec.docs||[]).length+n>990){toast('В комнате слишком много файлов. Уберите старые материалы крестиком в списке и добавьте PDF снова');return}
   try{const v=(await doc.getPage(1)).getViewport({scale:1});ar=+(v.height/v.width).toFixed(4)}catch(e){}
   const m={id:RID(10),k:'pdf',t:rTitle(title||name||'PDF'),n,ar,pg:[],up:1};
@@ -7411,18 +7514,22 @@ async function roomAddPdf(src,title,name){
   if(doc.numPages>n)toast('Взяты первые '+n+' страниц из '+doc.numPages);
   roomPdfUpload(m,doc,n)}
 async function roomPdfUpload(m,doc,n){
-  let ok=true;
-  for(let i=1;i<=n;i++){
+  /* страницы рисуем заранее, пока предыдущие уходят на сервер; начинаем с той, что сейчас на экране */
+  const cur=R.st.cur===m.id?Math.min(n-1,R.pgNow||0):0,order=[...Array(n).keys()].sort((a,b)=>(a<cur)-(b<cur)||a-b);
+  const draw=async i=>{const pg=await doc.getPage(i+1),v0=pg.getViewport({scale:1}),v=pg.getViewport({scale:1600/v0.width});
+    const c=document.createElement('canvas');c.width=Math.round(v.width);c.height=Math.round(v.height);
+    await pg.render({canvasContext:c.getContext('2d'),viewport:v}).promise;
+    const b=await new Promise(r=>c.toBlob(r,'image/webp',.8));c.width=c.height=0;return new File([b],'p'+(i+1)+'.webp',{type:'image/webp'})};
+  const B=3,parts=[];for(let k=0;k<order.length;k+=B)parts.push(order.slice(k,k+B));
+  const prep=idx=>Promise.all(idx.map(draw));
+  let ok=true,sent=0,nx=parts.length?prep(parts[0]):null;
+  for(let k=0;k<parts.length;k++){
     if(!R.on||!R.mats.includes(m)){ok=false;break}
-    roomUpBar('Отправка ученику: страница '+i+' из '+n);
-    try{const pg=await doc.getPage(i),v0=pg.getViewport({scale:1}),v=pg.getViewport({scale:1600/v0.width});
-      const c=document.createElement('canvas');c.width=Math.round(v.width);c.height=Math.round(v.height);
-      await pg.render({canvasContext:c.getContext('2d'),viewport:v}).promise;
-      const b=await new Promise(r=>c.toBlob(r,'image/webp',.8));
-      const fn=await roomPutDoc(new File([b],'p'+i+'.webp',{type:'image/webp'}),false);
-      if(!fn)throw 0;m.pg[i-1]=fn}
-    catch(e){ok=false;m.err=1;toast('Отправка PDF прервалась на странице '+i+'. Ученик видит уже отправленные страницы');break}
-    if(i%3===0||i===n)roomSaveMats()}
+    roomUpBar('Отправка ученику: '+sent+' из '+n+' страниц');
+    try{const files=await nx;nx=k+1<parts.length?prep(parts[k+1]):null;if(nx)nx.catch(()=>{});
+      const fns=await roomPutDocs(files);if(!fns)throw 0;
+      parts[k].forEach((i,j)=>{m.pg[i]=fns[j]});sent+=files.length;roomSaveMats()}
+    catch(e){ok=false;m.err=1;toast('Отправка PDF прервалась. Ученик видит уже отправленные страницы');break}}
   if(R.on&&R.mats.includes(m)){if(ok)delete m.up;roomSaveMats()}
   roomUpBar('')}
 /* ученик и репетитор после перезагрузки видят страницы PDF как обычные картинки; у того, кто загружал, страницы рисуются из самого файла */
@@ -7551,7 +7658,7 @@ function roomSettings(){
 /* ---------- начало и конец урока ---------- */
 function roomBegin(){
   const d0=dayStart(Date.now());const c=R.mats.find(m=>m.id===R.st.cur);
-  if(c&&R.st.lead!==false){c.vis=true;roomSaveMats()}
+  if(c){c.vis=true;roomSaveMats()}
   roomSet({live:true,liveAt:Date.now(),liveAt0:Date.now(),lead:R.st.lead!==false});roomUpdate();
   toast(`${R.info.first||'Ученик'} увидит в кабинете «Урок идёт · Войти», звонок подключится сам`);
   C.declined=false;callStart();
@@ -7622,8 +7729,8 @@ async function callPc(){
   pc.onconnectionstatechange=()=>callNet();pc.oniceconnectionstatechange=()=>callNet();
   if(C.scrStream)callScreenAttach(pc);
   /* канал «ctl»: по нему ученик шлёт репетитору движения мыши, клики и клавиши, когда репетитор разрешил управление */
-  if(R.role==='t'){const dc=pc.createDataChannel('ctl',{ordered:true});callDc(dc)}
-  else pc.ondatachannel=e=>callDc(e.channel);
+  if(R.role==='t'){callDc(pc.createDataChannel('ctl',{ordered:true}));callFastDc(pc.createDataChannel('fast',{ordered:false,maxRetransmits:0}))}
+  else pc.ondatachannel=e=>e.channel.label==='fast'?callFastDc(e.channel):callDc(e.channel);
   return pc;
 }
 /* полное описание связи сразу со всеми адресами: одно сообщение туда и одно обратно */
@@ -8670,9 +8777,9 @@ function deckSave(m,it,patch){const now=Date.now();
 function deckBind(stage){
   stage.addEventListener('pointerdown',e=>{if(R.tool!=='hand')return;
     const lk=e.target.closest('.r-lnk');if(lk&&deckView()){e.preventDefault();e.stopPropagation();if(!deckLocked())deckGo(lk.dataset.link);return}
-    if(lk){e.preventDefault();e.stopPropagation();const m=roomMat();const i=BD.frames(m.items||[]).findIndex(f=>f.id===lk.dataset.link);if(i>=0){if(R.role==='s')R.away=true;roomScrollPg(i)}return}
+    if(lk){e.preventDefault();e.stopPropagation();const m=roomMat();const i=BD.frames(m.items||[]).findIndex(f=>f.id===lk.dataset.link);if(i>=0&&!roomFollow())roomScrollPg(i);return}
     const rv=e.target.closest('.r-rev');if(rv&&R.role==='t'){e.preventDefault();const m=roomMat(),o=m.items.find(x=>x.id===rv.dataset.rev);o.shown=!o.shown;roomSaveMats();roomDeckPaint();return}
-    const el=e.target.closest('.rdeck .r-dr');if(!el||el.querySelector('[contenteditable="true"]'))return;const m=roomMat();if(!m||m.k!=='deck')return;
+    const el=e.target.closest('.rdeck .r-dr');if(!el||el.querySelector('[contenteditable="true"]'))return;const m=roomMat();if(!m||m.k!=='deck')return;if(!roomCanAct()){roomNoAct();return}
     const pg=el.closest('.rdeck'),f=m.items.find(x=>x.id===pg.dataset.f),it=deckEff(m).find(x=>x.id===el.dataset.id);if(!f||!it)return;
     e.preventDefault();try{el.setPointerCapture(e.pointerId)}catch(_){}const k=pg.getBoundingClientRect().width/f.w,sx=e.clientX,sy=e.clientY;let moved=false;R.deckBusy=el;el.classList.add('r-drag');
     const nb=[{x:0,y:0,w:f.w,h:f.h},...deckEff(m).filter(x=>x.id!==it.id&&deckIn(x,f)&&x.t!=='pen'&&x.t!=='line'&&!(x.hide&&!x.shown&&R.role==='s')).map(x=>({x:x.x-f.x,y:x.y-f.y,w:x.w,h:x.h}))],host=pg.querySelector('.bd-st');
@@ -8683,7 +8790,7 @@ function deckBind(stage){
       if(host)snapDraw(host,null);if(moved){const[dx,dy]=snapD(ev,(ev.clientX-sx)/k,(ev.clientY-sy)/k);if(host)snapDraw(host,null);deckSave(m,it,{x:it.x+dx,y:it.y+dy})}
       else if(it.t==='answer'&&R.role==='s')deckEdit(el,it,m)};
     el.addEventListener('pointermove',mv);el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up)});
-  stage.addEventListener('dblclick',e=>{const el=e.target.closest('.rdeck .r-dr');if(!el)return;const m=roomMat();if(!m||m.k!=='deck')return;const it=deckEff(m).find(x=>x.id===el.dataset.id);
+  stage.addEventListener('dblclick',e=>{const el=e.target.closest('.rdeck .r-dr');if(!el||!roomCanAct())return;const m=roomMat();if(!m||m.k!=='deck')return;const it=deckEff(m).find(x=>x.id===el.dataset.id);
     if(it&&['text','sticky','shape'].includes(it.t)||(it&&it.t==='answer'&&R.role==='s'))deckEdit(el,it,m)});
 }
 /* писать прямо на доске: стикер, текст, фигура, поле ответа */
@@ -8725,7 +8832,7 @@ function deckGo(id){const m=roomMat();const f=m&&(m.items||[]).find(x=>x.id===id
 function deckPgNow(){const vp=deckView(),m=roomMat();if(!vp||!DK.cur||!m)return;const v=DK.cur,cx=(vp.clientWidth/2-v.x)/v.s,cy=(vp.clientHeight/2-v.y)/v.s;
   let best=0,bd=Infinity;BD.frames(m.items||[]).forEach((f,i)=>{const dx=Math.max(f.x-cx,0,cx-f.x-f.w),dy=Math.max(f.y-cy,0,cy-f.y-f.h),d=dx*dx+dy*dy;if(d<bd){bd=d;best=i}});R.pgNow=best}
 /* «Веду я»: репетитор шлёт середину экрана и сколько холста видно, ученик подстраивает под свой экран */
-function deckSendCam(){if(R.role!=='t'||R.st.lead===false)return;const vp=deckView(),m=roomMat();if(!vp||!m||!DK.cur)return;const{x,y,s}=DK.cur,W=vp.clientWidth,H=vp.clientHeight;
+function deckSendCam(){if(R.role!=='t')return;const vp=deckView(),m=roomMat();if(!vp||!m||!DK.cur)return;const{x,y,s}=DK.cur,W=vp.clientWidth,H=vp.clientHeight;
   const cam={m:m.id,cx:Math.round((W/2-x)/s),cy:Math.round((H/2-y)/s),ww:Math.round(W/s),wh:Math.round(H/s)};
   roomPulse({cam});clearTimeout(DK.camT);DK.camT=setTimeout(()=>roomSet({cam}),900)}
 function deckCamOf(){const m=roomMat();if(!m)return null;const o=R.other&&R.other.cam;if(o&&o.m===m.id)return o;const c=R.st.cam;return c&&c.m===m.id?c:null}
@@ -8778,7 +8885,7 @@ async function deckCopy({m:mid,s}){
     const m=R.mats.find(x=>x.id===mid);if(!m)return;const d='d:'+fn;
     DK.urls.set(d,DK.urls.get(s)&&typeof DK.urls.get(s)==='string'?DK.urls.get(s):u);
     (m.items||[]).forEach(x=>{if(x.src===s)x.src=d;if(x.th===s)delete x.th});
-    clearTimeout(DK.saveT);DK.saveT=setTimeout(roomSaveMats,800)}
+    clearTimeout(DK.saveT);DK.pend=1;DK.saveT=setTimeout(()=>{DK.pend=0;roomSaveMats()},800)}
   catch(e){DK.qd.delete(s);DK.fail[s]=(DK.fail[s]||0)+1}}
 /* итог по разработкам для разбора урока */
 function deckReport(m){const items=deckEff(m);let n=0,k=0;const mm=[];
@@ -8830,12 +8937,12 @@ function roomHelp(role){
    ['Как провести урок',[
      ['1',ch('+ Материал','out'),'Добавьте, что будете делать: лист по теме, PDF, фото учебника, чистую доску или разработку. Ученик пока ничего не видит.'],
      ['2',ch('Начать урок','red'),'У ученика в кабинете загорается «Урок идёт». Он входит, и сразу начинается видеозвонок.'],
-     ['3',ch('Веду я','dark'),'Ученик видит то же, что вы. Листаете, приближаете, открываете другой материал — у него так же.'],
+     ['3',ch('Отвечает','dark'),'Ученик всегда видит то же, что вы: листаете, приближаете, открываете другой материал — у него так же. Сам он не листает.'],
      ['4',ch('Завершить урок','red'),'Звонок закончится, откроется разбор урока: что усвоено, где были ошибки.']]],
    ['Что видит ученик',[
      ['',ch('● Скрыть материалы','green'),'Пока зелёная, ученик видит материал. Нажмите — станет красной, и ученик не увидит ничего, пока вы готовите следующее. Нажмите ещё раз, и всё вернётся.'],
-     ['',seg('Веду я','Свободно',0),'«Веду я»: ученик идёт за вами. «Свободно»: листает сам, например на самостоятельной. Сверху видно, что он сейчас смотрит.'],
-     ['',ch('К репетитору','dark'),'Если ученик сам отошёл в сторону, у него появляется эта кнопка. Нажал — и снова видит то же, что вы.'],
+     ['',seg('Смотрит','Отвечает',1),'«Смотрит»: ученик только смотрит, ничего не нажимает. «Отвечает»: вписывает ответы и двигает карточки. Листаете и приближаете всегда только вы.'],
+     ['',`<span class="hk-eye">${EYE_OFF}</span>`,'Глаз у материала в списке и в углу окна: скрыть только этот материал от ученика. У вас он остаётся. Нажмите ещё раз, чтобы показать.'],
      ['',seg('Видит','Скрыты',0),'Ответы ученика: «Видит» — он сам видит ✓ и ✗. «Скрыты» — отметки видите только вы (удобно для проверочной).'],
      ['',ch('Ключ ответов','out'),'Правильные ответы на листе. Видите только вы.']]],
    ['Рисовать и показывать',[
@@ -8850,18 +8957,18 @@ function roomHelp(role){
    ['Разработка из «Моих материалов»',[
      ['',`<span class="hk-cv"><i></i><i class="on"></i><i></i><i></i></span>`,'Открывается весь холст, как в «Разработках»: фреймы на своих местах. Сначала на экране тот фрейм, который вы выбрали.'],
      ['',ch('Фреймы ▾','out'),'Найти фрейм по названию и перейти к нему. «Весь холст» показывает доску целиком.'],
-     ['',ch('✋ тянуть','soft'),'Двигать холст: потяните за пустое место или двумя пальцами по тачпаду. Приблизить: щипок или Ctrl и колесо. В «Веду я» ученик сам по холсту не ходит: видит только то, что показываете вы, и двигает карточки на экране.']]],
+     ['',ch('✋ тянуть','soft'),'Двигать холст: потяните за пустое место или двумя пальцами по тачпаду. Приблизить: щипок или Ctrl и колесо. Ученик сам по холсту не ходит: видит только то, что показываете вы, и двигает карточки на экране.']]],
    ['Экран и программа',[
      ['',ch('Показать экран','out'),'Показать ученику ваш экран, вкладку или окно, например сайт с игрой. Работает, когда урок начат и ученик в звонке.'],
      ['',ch('Разрешить управление','out'),'Ученик сможет нажимать и печатать на вашем экране. Нужна программа «Клетка» для Mac: кнопка «⋯» вверху → «Скачать программу». Забрать управление: Cmd + Shift + Esc.'],
      ['',ch('⋯','sq'),'Вверху рядом с вашим именем: эта помощь, программа для компьютера и запасная ссылка на звонок.']]]];
   const S2=[['Урок',[
      ['',ch('Войти','dark'),'Когда репетитор начнёт урок, в кабинете появится «Урок идёт». Нажми «Войти» и разреши камеру и микрофон.'],
-     ['',ch('К репетитору','dark'),'Если ты отошёл в сторону, эта кнопка вернёт тебя туда, куда смотрит репетитор.']]],
+]],
     ['Задания',[
      ['',`<span class="hk-box">7</span>`,'Нажми на окошко в задании и впиши ответ. В столбик цифры пишутся с конца, как в тетради.'],
      ['',ch('Маркер'),'Появится, когда репетитор даст ручку. Им можно обводить и писать.'],
-     ['',ch('✋ тянуть','soft'),'На большом холсте карточки на экране можно двигать. Сам холст двигает репетитор, а когда он включит «Свободно» — и ты.']]],
+     ['',ch('✋ тянуть','soft'),'На большом холсте карточки на экране можно двигать, когда репетитор разрешит отвечать. Холст двигает репетитор.']]],
     ['После урока',[
      ['',ch('Тетрадь','out'),'Все материалы с уроков. Их можно открыть и потом.']]]];
   const L=role==='s'?S2:T;
@@ -8877,7 +8984,7 @@ async function loadCabRoom(){
   if(CAB.room&&!CAB.roomSub){CAB.roomSub=true;try{await pbS.collection('rooms').subscribe(CAB.room.id,e=>{CAB.room=e.record;if(V.screen==='cab')render()},{fields:'id,st,mats'})}catch(e){CAB.roomSub=false}}
   if(V.screen==='cab')render();
 }
-function cabRoomHTML(){const r=CAB.room;if(!r)return'';const st=r.st||{},live=roomLive(st),n=(r.mats||[]).filter(m=>m.vis).length;
+function cabRoomHTML(){const r=CAB.room;if(!r)return'';const st=r.st||{},live=roomLive(st),n=(r.mats||[]).filter(m=>m.vis&&!m.hid).length;
   if(live)return `<div class="cab-room live"><div><b>Урок идёт</b><span>Репетитор ждёт тебя в комнате</span></div><div class="cr-act">${st.call?'<button class="btn" id="crCall">Звонок</button>':''}<button class="btn primary" id="crGo">Войти</button></div>
     <p class="cr-warn" id="crWarn" hidden>Камера или микрофон заблокированы в браузере. <button class="btn link">Как включить</button></p></div>`;
   return n?`<div class="cab-room"><div><b>Моя тетрадь</b><span>Материалы с уроков: ${n}</span></div><div class="cr-act"><button class="btn" id="crGo">Открыть</button></div></div>`:'';
