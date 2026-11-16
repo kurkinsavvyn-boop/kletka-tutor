@@ -1283,13 +1283,62 @@ button.mchip:hover{background:rgba(255,255,255,.24)}
 .rp-rs{position:absolute;right:-8px;bottom:-8px;width:18px;height:18px;border-radius:50%;background:var(--blue);border:2px solid #fff;cursor:nwse-resize}
 .rm-scr{position:fixed;inset:0;z-index:40;background:#0B1020;display:flex;flex-direction:column}
 .rm-scr .rs-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 16px;color:#fff;font-size:14px}
-.rm-scr video{flex:1;min-height:0;width:100%;object-fit:contain;background:#000}
+.rm-scr .rs-w{flex:1;min-height:0;position:relative}
+.rm-scr video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000}
+.rm-scr canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.rs-p{display:none;background:#F2B53A;color:#1E2230;border-radius:999px;padding:3px 10px;font-size:13px;font-weight:600}
+.rm-scr.paused .rs-p{display:inline}
 .rm-scr-show{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:39}
+.rm-scr-a{background:#1E2230;color:#fff;border-radius:999px;padding:10px 18px;font-size:14px;box-shadow:0 4px 14px rgba(20,30,60,.3)}
+.rm-scr-a audio{display:none}
 .rs-ctl{display:none;color:#8FE3A7;font-size:13px;margin:0 12px}
 .rm-scr.ctl .rs-ctl{display:inline}
 .rm-scr.ctl video{cursor:crosshair;outline:3px solid #3E9A5F;outline-offset:-3px}
-.rm-share.ctl{background:#D5402F}
-.rm-share{position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:70;display:flex;align-items:center;gap:12px;background:#3E9A5F;color:#fff;border-radius:999px;padding:6px 8px 6px 16px;font-size:14px;box-shadow:0 4px 14px rgba(20,30,60,.3)}
+.rm-share-top{position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:70;border-radius:14px;box-shadow:0 6px 20px rgba(20,30,60,.35);max-width:calc(100vw - 20px);overflow-x:auto}
+.rm-share{display:flex;align-items:center;gap:4px;background:#1E2230;color:#fff;padding:6px 8px}
+.rm-share button{border:0;background:transparent;color:#fff;font:inherit;font-size:13px;padding:7px 10px;border-radius:8px;cursor:pointer;white-space:nowrap}
+.rm-share button:hover{background:rgba(255,255,255,.12)}
+.rm-share button.on{background:#3E9A5F}
+.rm-share .shb-stop{background:#D5402F}
+.rm-share .shb-c{width:22px;height:22px;padding:0;border-radius:50%;border:2px solid transparent}
+.rm-share .shb-c.on{border-color:#fff}
+.shb-dot{width:8px;height:8px;border-radius:50%;background:#3E9A5F;margin:0 4px 0 6px;flex-shrink:0}
+.shb-t{color:#BFE6CB;padding-right:6px;white-space:nowrap}
+.modal:has(.shp){width:min(780px,100%);padding:0;gap:0}
+.shp{display:flex;flex-direction:column;min-height:0}
+.shp-h{padding:20px 22px 0;border-bottom:1px solid var(--line)}
+.shp-tabs{display:flex;gap:4px;margin-top:12px}
+.shp-tabs button{border:0;background:none;font:inherit;font-size:15px;padding:10px 14px;border-bottom:3px solid transparent;cursor:pointer;color:var(--ink2,#555)}
+.shp-tabs button.on{border-bottom-color:var(--blue);color:var(--ink,#111);font-weight:600}
+.shp-b{padding:18px 22px;overflow:auto;max-height:min(56vh,520px);min-height:200px}
+.shp-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}
+.shp-t{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;border:2px solid var(--line);background:var(--card);border-radius:12px;padding:14px 10px;font:inherit;cursor:pointer;color:inherit;min-width:0}
+.shp-t:hover{border-color:#9DB4F5}
+.shp-t.on{border-color:var(--blue);background:rgba(47,107,255,.07)}
+.shp-t.dis{opacity:.45}
+.shp-t b{font-size:14px;font-weight:600;display:flex;gap:6px;align-items:center;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.shp-t small{font-size:12px;color:var(--ink2,#666);line-height:1.3}
+.shp-i{color:var(--blue);height:40px;display:flex;align-items:center}
+.shp-k{font-size:26px}
+.shp-pv{padding:8px}
+.shp-th{width:100%;aspect-ratio:16/10;background:#EEF1F7;border-radius:8px;overflow:hidden;display:flex;align-items:center;justify-content:center;color:#8893AA}
+.shp-th img{width:100%;height:100%;object-fit:contain}
+.shp-ic{width:16px;height:16px;flex:none}
+.shp-n{margin-top:14px}
+.shp-f{display:flex;align-items:center;gap:16px;padding:14px 22px;border-top:1px solid var(--line);flex-wrap:wrap}
+.shp-f label{display:flex;gap:6px;align-items:center;font-size:14px;cursor:pointer}
+.shp-f .sp{flex:1}
+.sh-ann{position:fixed;inset:0;z-index:65;background:#0B1020;display:flex;flex-direction:column}
+.sh-ann-h{display:flex;align-items:center;gap:12px;padding:8px 12px;color:#fff;font-size:14px}
+.sh-ann-h .sp{flex:1}
+.sh-ann-h .rm-share{border-radius:12px;min-width:0;overflow-x:auto}
+.sh-ann-h b{white-space:nowrap}
+body:has(#shAnn) .rm-share-top{display:none}
+@media (max-width:1100px){.sh-ann-h b{display:none}}
+.sh-ann-w{flex:1;min-height:0;position:relative}
+.sh-ann-w video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+.sh-ann-w canvas{position:absolute;inset:0;width:100%;height:100%;cursor:crosshair;touch-action:none}
+@media (max-width:600px){.shp-g{grid-template-columns:1fr 1fr}.shp-tabs button{padding:10px 8px;font-size:14px}}
 .fview{position:fixed;inset:0;z-index:50;background:var(--paper);display:flex;flex-direction:column}
 .fv-bar{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--line);background:var(--card)}
 .fv-bar b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -7893,34 +7942,196 @@ function callScreenAttach(pc){const s=C.scrStream;pc=pc||C.pc;if(!pc||!s)return;
   C.scrSenders=s.getTracks().map(t=>pc.addTrack(t,s));
   C.scrSenders.forEach(snd=>{if(!snd.track||snd.track.kind!=='video')return;const p=snd.getParameters();p.encodings=p.encodings&&p.encodings.length?p.encodings:[{}];
     p.encodings[0].maxBitrate=1800000;p.encodings[0].maxFramerate=15;p.degradationPreference='maintain-resolution';snd.setParameters(p).catch(()=>{})})}
+/* ---------- показ экрана как в Zoom ----------
+   «Показать экран» открывает окно выбора: «Экраны и окна», «Материалы», «Ещё» (часть экрана, только звук).
+   В программе для компьютера окно выбора показывает все экраны и окна с картинками, как в Zoom.
+   В браузере картинок окон сайту не видно: выбираем вид (весь экран, окно, вкладка), а браузер спрашивает, что именно.
+   Во время показа — панель: пауза, сменить, рисовать, управление, остановить. */
+const SH={tab:'scr',sel:null,audio:true,video:false,raw:null,crop:null,reg:{x:.2,y:.15,w:.6,h:.6},paused:false,ann:false,col:'#E5397A',strokes:[],kind:null,snd:false,pip:null,swap:false};
+const SH_SVG={
+  monitor:'<svg viewBox="0 0 48 36" width="48" height="36" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="42" height="24" rx="3"/><path d="M17 33h14M24 27v6"/></svg>',
+  window:'<svg viewBox="0 0 48 36" width="48" height="36" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="5" y="4" width="38" height="28" rx="3"/><path d="M5 11h38"/><circle cx="10" cy="7.5" r="1" fill="currentColor"/><circle cx="14" cy="7.5" r="1" fill="currentColor"/></svg>',
+  browser:'<svg viewBox="0 0 48 36" width="48" height="36" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="4" y="6" width="40" height="26" rx="3"/><path d="M4 13h40M4 6l6-3h10l3 3"/></svg>',
+  part:'<svg viewBox="0 0 48 36" width="48" height="36" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="42" height="30" rx="3" stroke-opacity=".35"/><rect x="12" y="9" width="24" height="16" stroke="#3E9A5F" stroke-dasharray="4 3"/></svg>',
+  sound:'<svg viewBox="0 0 48 36" width="48" height="36" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10 14h7l9-7v22l-9-7h-7z"/><path d="M31 12a8 8 0 0 1 0 12M35 8a14 14 0 0 1 0 20"/></svg>',
+  plus:'<svg viewBox="0 0 48 36" width="48" height="36" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M24 8v20M14 18h20"/></svg>'};
+const shCanCrop=()=>!!DESK();
 async function callScreenToggle(){
   if(C.scrStream)return callScreenStop();
   if(!navigator.mediaDevices||!navigator.mediaDevices.getDisplayMedia){toast('Этот браузер не умеет показывать экран. Откройте Клетку в Chrome, Яндекс Браузере, Edge или Safari на компьютере');return}
   if(!roomLive(R.st)){toast('Сначала нажмите «Начать урок»: экран показывается ученику через звонок');return}
   if(C.st!=='live'){toast('Ученик ещё не в звонке. Показать экран можно, когда он войдёт и связь соединится');return}
-  let s;try{s=await navigator.mediaDevices.getDisplayMedia({video:{frameRate:{ideal:15,max:30}},audio:true})}
+  shPick(false)}
+function shPick(change){
+  SH.sel=null;SH.swap=change;
+  const tabs=[['scr','Экраны и окна'],['mat','Материалы'],['more','Ещё']];
+  modal(`<div class="shp"><div class="shp-h"><h2>${change?'Что показать вместо этого':'Что показать ученику'}</h2>
+    <div class="shp-tabs" role="tablist">${tabs.map(([k,n])=>`<button role="tab" data-st="${k}" aria-selected="${SH.tab===k}" class="${SH.tab===k?'on':''}">${n}</button>`).join('')}</div></div>
+    <div class="shp-b" id="shpB"></div>
+    <div class="shp-f"><label><input type="checkbox" id="shpA"${SH.audio?' checked':''}> Передавать звук</label><label title="Плавнее для видео и игр, но буквы чуть менее чёткие"><input type="checkbox" id="shpV"${SH.video?' checked':''}> Для видео</label>
+      <span class="sp"></span><button class="btn quiet" id="shpX">Отмена</button><button class="btn primary" id="shpGo">Показать</button></div></div>`,()=>{
+    document.querySelectorAll('[data-st]').forEach(b=>b.onclick=()=>{SH.tab=b.dataset.st;SH.sel=null;document.querySelectorAll('[data-st]').forEach(x=>{x.classList.toggle('on',x===b);x.setAttribute('aria-selected',x===b)});shPickBody()});
+    document.getElementById('shpA').onchange=e=>{SH.audio=e.target.checked};document.getElementById('shpV').onchange=e=>{SH.video=e.target.checked};
+    document.getElementById('shpX').onclick=close;document.getElementById('shpGo').onclick=shGo;shPickBody()})}
+function shTile(sel,ico,name,sub,dis){return `<button class="shp-t${dis?' dis':''}" data-sel='${esc(JSON.stringify(sel))}'${dis?' aria-disabled="true"':''}><span class="shp-i">${ico}</span><b>${esc(name)}</b>${sub?`<small>${esc(sub)}</small>`:''}</button>`}
+async function shPickBody(){
+  const b=document.getElementById('shpB');if(!b)return;const tab=SH.tab;
+  if(tab==='scr'){
+    if(DESK()){b.innerHTML='<p class="hint">Ищу экраны и окна…</p>';let list=[];try{list=await DESK().shareSources()}catch(e){}
+      if(SH.tab!==tab||!document.getElementById('shpB'))return;
+      if(!list.length){b.innerHTML='<p class="hint">Не вижу экранов. Разрешите программе «Клетка» запись экрана: Системные настройки → Конфиденциальность и безопасность → Запись экрана. Потом перезапустите программу.</p>';return}
+      b.innerHTML=`<div class="shp-g">${list.map(s=>`<button class="shp-t shp-pv" data-sel='${esc(JSON.stringify({id:s.id,kind:s.kind}))}'><span class="shp-th">${s.thumb?`<img src="${s.thumb}" alt="">`:SH_SVG[s.kind==='screen'?'monitor':'window']}</span><b>${s.icon?`<img class="shp-ic" src="${s.icon}" alt="">`:''}${esc(s.name)}</b></button>`).join('')}</div>`}
+    else b.innerHTML=`<div class="shp-g">${shTile({surface:'monitor',kind:'screen'},SH_SVG.monitor,'Весь экран','Всё, что на экране')}${shTile({surface:'window',kind:'window'},SH_SVG.window,'Окно программы','Одна программа: игра, Word, Paint')}${shTile({surface:'browser',kind:'tab'},SH_SVG.browser,'Вкладка браузера','Сайт с игрой или видео')}</div>
+      <p class="hint shp-n">Дальше браузер покажет свои окна: выберите там нужное и нажмите «Поделиться». Миниатюры всех окон, как в Zoom, есть в программе «Клетка» для компьютера.</p>`}
+  else if(tab==='mat'){
+    const ms=R.mats.filter(m=>m.k!=='link').slice(-12).reverse();
+    b.innerHTML=`<div class="shp-g">${ms.map(m=>shTile({mat:m.id},`<span class="shp-k">${R_KIND[m.k]||''}</span>`,rTitle(m.t),m.hid?'скрыт от ученика':'')).join('')}${shTile({add:1},SH_SVG.plus,'Новый материал','Лист, доска, PDF, фото')}</div>
+      <p class="hint shp-n">Материал открывается прямо в комнате: ученик видит его чётко, отвечает в окошках и рисует ручкой. Так лучше, чем показ экрана.</p>`}
+  else{b.innerHTML=`<div class="shp-g">${shTile({kind:'screen',region:1},SH_SVG.part,'Часть экрана','Зелёная рамка: ученик видит только то, что внутри',!shCanCrop())}${shTile({snd:1,kind:'screen',surface:'monitor'},SH_SVG.sound,'Только звук','Музыка или видео без картинки')}</div>
+      ${shCanCrop()?'':'<p class="hint shp-n">«Часть экрана» работает в программе «Клетка» для компьютера: кнопка «⋯» вверху → «Скачать программу».</p>'}`}
+  b.querySelectorAll('[data-sel]').forEach(t=>{t.onclick=()=>{if(t.classList.contains('dis')){toast('Это есть в программе «Клетка» для компьютера');return}
+    SH.sel=JSON.parse(t.dataset.sel);b.querySelectorAll('[data-sel]').forEach(x=>x.classList.toggle('on',x===t))};t.ondblclick=()=>{if(!t.classList.contains('dis')){SH.sel=JSON.parse(t.dataset.sel);shGo()}}})}
+async function shGo(){
+  const o=SH.sel;if(!o){toast('Выберите, что показать');return}
+  if(o.add){close();roomPicker();return}
+  if(o.mat){close();if(C.scrStream)callScreenStop();roomOpenMat(o.mat);const m=R.mats.find(x=>x.id===o.mat);if(m&&m.hid){m.hid=false;roomSaveMats();roomUpdate()}toast('Ученик видит «'+rTitle(m?m.t:'')+'»');return}
+  close();await shStart({...o,audio:SH.audio||!!o.snd,video:SH.video})}
+/* выбор в окне Клетки → запрос показа; в программе источник уже выбран, браузер покажет свой список */
+async function shStart(o){
+  if(C.st!=='live'){toast('Ученик вышел из звонка. Показ не начат');return}
+  let id=o.id;
+  if(DESK()&&!id&&(o.region||o.snd)){try{const l=await DESK().shareSources();const s=l.find(x=>x.kind==='screen');id=s&&s.id}catch(e){}}
+  if(DESK()&&id)try{await DESK().shareChoose({id,audio:!!o.audio,region:!!o.region})}catch(e){}
+  const v={frameRate:{ideal:o.video?30:15,max:30}};if(!DESK()&&o.surface)v.displaySurface=o.surface;
+  const opt={video:v,audio:o.audio?(DESK()?true:{suppressLocalAudioPlayback:false}):false,selfBrowserSurface:'exclude',surfaceSwitching:'include',systemAudio:'include',monitorTypeSurfaces:'include'};
+  let raw;try{raw=await navigator.mediaDevices.getDisplayMedia(opt)}
   catch(e){if(e&&e.name!=='NotAllowedError')toast('Экран не удалось включить');return}
-  if(C.st==='idle'){s.getTracks().forEach(t=>t.stop());return}
-  C.scrStream=s;s.getVideoTracks().forEach(t=>{try{t.contentHint='detail'}catch(_){}t.onended=callScreenStop});
-  callScreenAttach();roomPulse({scr:{sid:s.id}},true);callRenego();callUI();callScreenUI()}
-function callScreenStop(){const s=C.scrStream;if(!s)return;callCtlStop(true);C.scrStream=null;s.getTracks().forEach(t=>{t.onended=null;t.stop()});
+  if(C.st==='idle'){raw.getTracks().forEach(t=>t.stop());return}
+  const au=raw.getAudioTracks();let vt=raw.getVideoTracks()[0]||null;
+  if(o.snd){if(!au.length){raw.getTracks().forEach(t=>t.stop());toast(DESK()?'Звук компьютера не передаётся на этой версии macOS':'Звук не выбран: в окне браузера включите «Поделиться звуком» и выберите вкладку');return}
+    raw.getVideoTracks().forEach(t=>t.stop());vt=null}
+  if(o.audio&&!o.snd&&!au.length&&!DESK())toast('Звук не передаётся: его можно передать только со вкладки браузера (галочка «Поделиться звуком»)');
+  let crop=null;if(vt&&o.region){crop=shCrop(raw,o.video);vt=crop.track}
+  if(vt){try{vt.contentHint=o.video?'motion':'detail'}catch(_){}}
+  const tracks=[...(vt?[vt]:[]),...au];
+  const rv=raw.getVideoTracks()[0];if(rv)rv.onended=()=>{if(SH.raw===raw)callScreenStop()};if(!rv&&au[0])au[0].onended=()=>{if(SH.raw===raw)callScreenStop()};
+  const old=SH.raw,oldCrop=SH.crop;SH.raw=raw;SH.crop=crop;SH.snd=!!o.snd;SH.kind=o.region?'region':o.kind||'screen';const hadAnn=SH.strokes.length;SH.paused=false;SH.strokes=[];if(hadAnn)roomPulse({ann:null},true);
+  if(C.scrStream&&C.pc&&C.scrSenders)await shSwap(tracks);
+  else{C.scrStream=new MediaStream(tracks);callScreenAttach();callRenego()}
+  if(old)old.getTracks().forEach(t=>{t.onended=null;t.stop()});if(oldCrop)oldCrop.stop();
+  shSendState();callUI();callScreenUI();
+  if(DESK()){try{const r=await DESK().shareStarted(shState());if(r&&r.kind)SH.kind=o.region?'region':r.kind}catch(e){}shSendState()}
+  toast(SH.snd?'Ученик слышит звук вашего компьютера':'Ученик видит '+(SH.kind==='region'?'часть экрана в зелёной рамке':SH.kind==='window'?'окно':SH.kind==='tab'?'вкладку':'ваш экран'))}
+/* смена источника без остановки: дорожки подменяются на лету, ученику ничего нажимать не нужно */
+async function shSwap(tracks){
+  const pc=C.pc,s=C.scrStream,senders=C.scrSenders||[];let reneg=false;
+  for(const kind of ['video','audio']){
+    const nt=tracks.find(t=>t.kind===kind)||null,snd=senders.find(x=>x._k===kind||(x.track&&x.track.kind===kind));
+    s.getTracks().filter(t=>t.kind===kind).forEach(t=>{s.removeTrack(t);if(!tracks.includes(t))t.stop()});
+    if(nt)s.addTrack(nt);
+    if(snd){await snd.replaceTrack(nt).catch(()=>{});snd._k=kind}
+    else if(nt){const ns=pc.addTrack(nt,s);ns._k=kind;senders.push(ns);reneg=true}}
+  C.scrSenders=senders;if(reneg)callRenego()}
+/* «Часть экрана»: берём весь экран и вырезаем рамку, которую репетитор двигает поверх экрана */
+function shCrop(raw,smooth){
+  const v=document.createElement('video');v.muted=true;v.playsInline=true;v.srcObject=raw;v.play().catch(()=>{});
+  const c=document.createElement('canvas'),x=c.getContext('2d');c.width=1280;c.height=720;let live=true;
+  const draw=()=>{if(!live)return;const W=v.videoWidth,H=v.videoHeight;if(W&&H){const r=SH.reg,sw=Math.max(16,r.w*W),sh=Math.max(16,r.h*H);
+      const k=Math.min(1,1920/sw),cw=Math.round(sw*k),ch=Math.round(sh*k);if(c.width!==cw||c.height!==ch){c.width=cw;c.height=ch}
+      x.drawImage(v,r.x*W,r.y*H,sw,sh,0,0,cw,ch)}
+    if(v.requestVideoFrameCallback)v.requestVideoFrameCallback(draw);else setTimeout(draw,1000/(smooth?30:15))};
+  if(v.requestVideoFrameCallback)v.requestVideoFrameCallback(draw);else draw();
+  const track=c.captureStream(smooth?30:15).getVideoTracks()[0];
+  return{track,stop:()=>{live=false;track.stop();v.srcObject=null}}}
+if(DESK()&&DESK().onShareRegion)DESK().onShareRegion(b=>{if(b&&[b.x,b.y,b.w,b.h].every(Number.isFinite))SH.reg=b});
+if(DESK()&&DESK().onShareAct)DESK().onShareAct(a=>shAct(a));
+function callScreenStop(){const s=C.scrStream;if(!s)return;callCtlStop(true);C.scrStream=null;
+  s.getTracks().forEach(t=>{t.onended=null;t.stop()});if(SH.raw)SH.raw.getTracks().forEach(t=>{t.onended=null;t.stop()});if(SH.crop)SH.crop.stop();
+  SH.raw=null;SH.crop=null;SH.paused=false;SH.ann=false;SH.strokes=[];shAnnClose();
   if(C.pc&&C.scrSenders)C.scrSenders.forEach(snd=>{try{C.pc.removeTrack(snd)}catch(e){}});C.scrSenders=null;
-  roomPulse({scr:null},true);callRenego();callUI();callScreenUI()}
-/* у репетитора: плашка «идёт показ»; у ученика: экран репетитора на всё окно, с кнопкой «К тетради» */
+  if(DESK())try{DESK().shareStopped()}catch(e){}
+  if(SH.pip){try{SH.pip.close()}catch(e){}SH.pip=null}
+  roomPulse({scr:null,ann:null},true);callRenego();callUI();callScreenUI()}
+const shState=()=>({paused:SH.paused,ann:SH.ann,ctl:!!C.ctl,audioOnly:SH.snd,kind:SH.kind});
+function shSendState(){if(!C.scrStream)return;roomPulse({scr:{sid:C.scrStream.id,p:SH.paused?1:0,snd:SH.snd?1:0}},true);
+  if(DESK())try{DESK().shareState(shState())}catch(e){}shBarPaint()}
+function shPause(){if(!C.scrStream)return;SH.paused=!SH.paused;
+  /* без дорожки ученик видит последний кадр, а не чёрный экран */
+  const vt=C.scrStream.getVideoTracks()[0],snd=(C.scrSenders||[]).find(x=>x._k==='video'||(x.track&&x.track.kind==='video'));
+  if(snd&&vt){snd._k='video';snd.replaceTrack(SH.paused?null:vt).catch(()=>{})}shSendState();toast(SH.paused?'Показ на паузе: ученик видит последний кадр':'Показ продолжается')}
+/* действия с панели: в окне Клетки, в окне поверх всех окон (браузер) или в панели программы */
+function shAct(a){if(!C.scrStream&&a!=='app')return;
+  if(a==='pause')shPause();else if(a==='swap'){if(DESK())try{window.focus()}catch(e){}shPick(true)}
+  else if(a==='ann')shAnnToggle();else if(a==='clr')shAnnClear();else if(a.startsWith('color:')){SH.col=a.slice(6);if(DESK()&&shAnnNative())DESK().shareAnn(true,SH.col);shAnnPaint()}
+  else if(a==='ctl'){if(C.ctl)callCtlStop(true);else callCtlToggle()}else if(a==='stop')callScreenStop();else if(a==='pip')shPip()}
+const SH_COLS=['#E5397A','#2F6BFF','#2C8A57'];
+function shBarHTML(){const st=shState();
+  return `<span class="shb-dot"></span><span class="shb-t">${st.paused?'Показ на паузе':C.ctl?'Ученик управляет':st.audioOnly?'Ученик слышит звук':'Ученик видит экран'}</span>
+  ${st.audioOnly?'':`<button data-a="pause" class="${st.paused?'on':''}">${st.paused?'Продолжить':'Пауза'}</button>`}<button data-a="swap">Сменить</button>
+  ${st.audioOnly?'':`<button data-a="ann" class="${st.ann?'on':''}">${st.ann?'Готово':'Рисовать'}</button>`}
+  ${st.ann?`${SH_COLS.map(c=>`<button class="shb-c${SH.col===c?' on':''}" data-a="color:${c}" style="background:${c}" aria-label="Цвет"></button>`).join('')}<button data-a="clr">Стереть</button>`:''}
+  ${st.audioOnly?'':`<button data-a="ctl" class="${C.ctl?'on':''}">${C.ctl?'Забрать управление':'Управление'}</button>`}
+  ${!DESK()&&'documentPictureInPicture' in window&&!SH.pip?'<button data-a="pip" title="Панель останется поверх других окон, даже когда вы в игре или другой программе">Поверх окон</button>':''}
+  <button data-a="stop" class="shb-stop">Остановить</button>`}
+function shBarBind(root){root.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>shAct(b.dataset.a))}
+function shBarPaint(){const b=document.getElementById('rmShare');if(b){b.innerHTML=shBarHTML();shBarBind(b);b.classList.toggle('ctl',!!C.ctl)}
+  if(SH.pip&&SH.pip.document){const r=SH.pip.document.getElementById('shb');if(r){r.innerHTML=shBarHTML();shBarBind(r)}}}
+/* в браузере панель можно вынести в маленькое окно поверх всех программ (Chrome, Edge, Яндекс) */
+async function shPip(){if(!('documentPictureInPicture' in window)||SH.pip)return;
+  try{const w=await documentPictureInPicture.requestWindow({width:620,height:60});SH.pip=w;
+    const st=w.document.createElement('style');st.textContent=SH_BAR_CSS+'body{margin:0;background:#1E2230;font:14px system-ui,sans-serif}#shb{position:static;transform:none;border-radius:0;box-shadow:none;height:60px}';w.document.head.appendChild(st);
+    w.document.body.innerHTML='<div id="shb" class="rm-share"></div>';w.addEventListener('pagehide',()=>{SH.pip=null;shBarPaint()});shBarPaint()}
+  catch(e){toast('Окно поверх не открылось')}}
+const SH_BAR_CSS=`.rm-share{display:flex;align-items:center;gap:4px;background:#1E2230;color:#fff;padding:6px 8px}.rm-share button{border:0;background:transparent;color:#fff;font:inherit;font-size:13px;padding:7px 10px;border-radius:8px;cursor:pointer;white-space:nowrap}.rm-share button:hover{background:rgba(255,255,255,.12)}.rm-share button.on{background:#3E9A5F}.rm-share .shb-stop{background:#D5402F}.rm-share .shb-c{width:22px;height:22px;padding:0;border-radius:50%;border:2px solid transparent}.rm-share .shb-c.on{border-color:#fff}.shb-dot{width:8px;height:8px;border-radius:50%;background:#3E9A5F;margin:0 4px 0 6px;flex-shrink:0}.shb-t{color:#BFE6CB;padding-right:6px;white-space:nowrap}`;
+/* рисовать поверх показа. В программе — прямо на экране (линии попадают в показ сами).
+   В браузере и для окна — на большом просмотре своего показа, ученик видит линии поверх видео */
+const shAnnNative=()=>!!DESK()&&(SH.kind==='screen'||SH.kind==='region');
+async function shAnnToggle(){SH.ann=!SH.ann;
+  if(shAnnNative()){try{await DESK().shareAnn(SH.ann,SH.col)}catch(e){}}
+  else if(SH.ann)shAnnOpen();else shAnnClose();
+  shSendState()}
+function shAnnClear(){if(shAnnNative()){try{DESK().shareAnnClear()}catch(e){}}SH.strokes=[];shAnnSend();shAnnPaint()}
+function shAnnSend(){let s=SH.strokes;while(s.length&&JSON.stringify(s).length>15000)s=s.slice(1);SH.strokes=s;roomPulse({ann:{i:RID(5),s}},true)}
+function shAnnOpen(){let el=document.getElementById('shAnn');if(el)return;
+  el=document.createElement('div');el.id='shAnn';el.className='sh-ann';
+  el.innerHTML=`<div class="sh-ann-h"><b>Рисуйте поверх показа — ученик видит линии</b><span class="sp"></span><div class="rm-share" id="shAnnBar"></div></div><div class="sh-ann-w"><video id="shAnnV" muted autoplay playsinline></video><canvas id="shAnnC"></canvas></div>`;
+  document.body.appendChild(el);const v=document.getElementById('shAnnV');v.srcObject=C.scrStream;v.play().catch(()=>{});
+  const cv=document.getElementById('shAnnC');let cur=null;
+  const pt=e=>{const r=shFit(v),x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;return[+x.toFixed(4),+y.toFixed(4)]};
+  cv.onpointerdown=e=>{cv.setPointerCapture(e.pointerId);cur={c:SH.col,p:[...pt(e)]};SH.strokes.push(cur);shAnnPaint()};
+  cv.onpointermove=e=>{if(!cur)return;if(cur.p.length<400)cur.p.push(...pt(e));shAnnPaint();clearTimeout(SH.annT);SH.annT=setTimeout(shAnnSend,120)};
+  cv.onpointerup=()=>{cur=null;shAnnSend()};
+  v.onloadedmetadata=shAnnPaint;addEventListener('resize',shAnnPaint);shAnnPaint();shBarPaint()}
+function shAnnClose(){const el=document.getElementById('shAnn');if(el)el.remove()}
+/* где на экране само видео внутри элемента (по краям могут быть чёрные поля) */
+function shFit(v){const r=v.getBoundingClientRect(),W=v.videoWidth||16,H=v.videoHeight||9,k=Math.min(r.width/W,r.height/H),w=W*k,h=H*k;return{left:r.left+(r.width-w)/2,top:r.top+(r.height-h)/2,width:w,height:h}}
+function shStrokes(cv,v,list){const r=shFit(v),cr=cv.getBoundingClientRect(),d=devicePixelRatio||1;cv.width=cr.width*d;cv.height=cr.height*d;const x=cv.getContext('2d');x.scale(d,d);
+  const ox=r.left-cr.left,oy=r.top-cr.top;x.lineWidth=Math.max(2,r.width/300);x.lineCap='round';x.lineJoin='round';
+  (list||[]).forEach(s=>{if(!s||!Array.isArray(s.p)||s.p.length<2)return;x.strokeStyle=/^#[0-9a-f]{6}$/i.test(s.c)?s.c:'#E5397A';x.beginPath();
+    for(let i=0;i<s.p.length;i+=2){const px=ox+s.p[i]*r.width,py=oy+s.p[i+1]*r.height;i?x.lineTo(px,py):x.moveTo(px,py)}if(s.p.length===2)x.lineTo(ox+s.p[0]*r.width+.1,oy+s.p[1]*r.height);x.stroke()})}
+function shAnnPaint(){const cv=document.getElementById('shAnnC'),v=document.getElementById('shAnnV');if(cv&&v)shStrokes(cv,v,SH.strokes);
+  const b=document.getElementById('shAnnBar');if(b){b.innerHTML=shBarHTML();shBarBind(b)}}
+/* у репетитора — панель показа; у ученика — экран репетитора на всё окно (пауза, линии поверх, только звук) */
 function callScreenUI(){
   const me=R.on&&R.role==='t'&&C.scrStream;let b=document.getElementById('rmShare');
-  if(!me){if(b)b.remove()}else if(!b){b=document.createElement('div');b.id='rmShare';b.className='rm-share';b.innerHTML='<span id="rmShareTx">Идёт показ экрана</span><button class="btn small" id="rmShareCtl" style="display:none">Забрать управление</button><button class="btn small" id="rmShareStop">Остановить</button>';document.body.appendChild(b);document.getElementById('rmShareStop').onclick=callScreenStop;document.getElementById('rmShareCtl').onclick=()=>callCtlStop(true)}
-  if(b){b.classList.toggle('ctl',!!C.ctl);document.getElementById('rmShareTx').textContent=C.ctl?'Ученик управляет вашим экраном':'Идёт показ экрана';document.getElementById('rmShareCtl').style.display=C.ctl?'':'none'}
-  let el=document.getElementById('rmScr'),pill=document.getElementById('rmScrShow');
-  const on=R.on&&R.role==='s'&&C.scr&&R.other&&R.other.scr;
-  if(!on){if(el)el.remove();if(pill)pill.remove();return}
+  if(!me){if(b)b.remove()}else if(!b){b=document.createElement('div');b.id='rmShare';b.className='rm-share rm-share-top';document.body.appendChild(b);shBarPaint()}else shBarPaint();
+  let el=document.getElementById('rmScr'),pill=document.getElementById('rmScrShow'),au=document.getElementById('rmScrA');
+  const sc=R.other&&R.other.scr,on=R.on&&R.role==='s'&&C.scr&&sc;
+  if(!on){if(el)el.remove();if(pill)pill.remove();if(au)au.remove();return}
+  /* только звук: картинки нет, играет звук */
+  if(sc.snd||!C.scr.getVideoTracks().length){if(el)el.remove();if(!au){au=document.createElement('div');au.id='rmScrA';au.className='rm-scr-show rm-scr-a';au.innerHTML='<span>🔊 Звук с компьютера репетитора</span><audio autoplay></audio>';document.body.appendChild(au)}
+    const a=au.querySelector('audio');if(a.srcObject!==C.scr){a.srcObject=C.scr;a.play().catch(()=>{})}return}
+  if(au)au.remove();
   if(C.scrHide){if(el)el.remove();if(!pill){pill=document.createElement('button');pill.id='rmScrShow';pill.className='btn primary rm-scr-show';pill.textContent='Показать экран репетитора';document.body.appendChild(pill);pill.onclick=()=>{C.scrHide=false;callScreenUI()}}return}
   if(pill)pill.remove();
   if(!el){el=document.createElement('div');el.id='rmScr';el.className='rm-scr';
-    el.innerHTML=`<div class="rs-bar"><b>${esc((R.info&&R.info.tutor)||'Репетитор')} показывает экран</b><span class="rs-ctl" id="rsCtl">Управление включено: нажимайте на экран</span><button class="btn small" id="rsHide">К тетради</button></div><video id="rsV" autoplay playsinline></video>`;
-    document.body.appendChild(el);document.getElementById('rsHide').onclick=()=>{C.scrHide=true;callScreenUI()}}
+    el.innerHTML=`<div class="rs-bar"><b>${esc((R.info&&R.info.tutor)||'Репетитор')} показывает экран</b><span class="rs-ctl" id="rsCtl">Управление включено: нажимайте на экран</span><span class="rs-p" id="rsP">Пауза</span><button class="btn small" id="rsHide">К тетради</button></div><div class="rs-w"><video id="rsV" autoplay playsinline></video><canvas id="rsC"></canvas></div>`;
+    document.body.appendChild(el);document.getElementById('rsHide').onclick=()=>{C.scrHide=true;callScreenUI()};
+    addEventListener('resize',()=>{R.annSeen=null;callScreenUI()})}
   { const cv=document.getElementById('rsV');if(cv){callCtlBind(cv);const on=!!(R.other&&R.other.ctl);el.classList.toggle('ctl',on)}}
-  const v=document.getElementById('rsV');if(v&&v.srcObject!==C.scr){v.srcObject=C.scr;v.play().catch(()=>{v.muted=true;v.play().catch(()=>{})})}}
+  const v=document.getElementById('rsV');if(v&&v.srcObject!==C.scr){v.srcObject=C.scr;v.onloadedmetadata=()=>{R.annSeen=null;callScreenUI()};v.play().catch(()=>{v.muted=true;v.play().catch(()=>{})})}
+  el.classList.toggle('paused',!!sc.p);if(v){if(sc.p&&!v.paused)v.pause();else if(!sc.p&&v.paused)v.play().catch(()=>{})}
+  const an=R.other.ann,ai=an&&an.i||'';if(R.annSeen!==ai+'|'+(v&&v.videoWidth)){R.annSeen=ai+'|'+(v&&v.videoWidth);const c=document.getElementById('rsC');if(c&&v)shStrokes(c,v,an&&an.s)}}
 /* ---------- завершение ---------- */
 /* left — просто вышел из комнаты: вернётся, звонок поднимется сам; иначе положил трубку */
 function callEnd(send,why,left){
