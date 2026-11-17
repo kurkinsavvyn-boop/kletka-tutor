@@ -8017,12 +8017,12 @@ async function shPickBody(){
   const b=document.getElementById('shpB');if(!b)return;const tab=SH.tab;
   if(tab==='scr'){
     if(DESK()){b.innerHTML='<p class="hint">Ищу экраны и окна…</p>';
-      let ps=null;if(DESK().permState)try{ps=await DESK().permState()}catch(e){}
-      if(ps&&(ps.screen==='denied'||ps.screen==='restricted')){b.innerHTML=permBody('screen');permBind(b,'screen');return}
       let list=[];try{list=await DESK().shareSources()}catch(e){}
+      let ps=null;if(DESK().permState)try{ps=await DESK().permState()}catch(e){}
       if(SH.tab!==tab||!document.getElementById('shpB'))return;
-      if(!list.length){if(DESK().permFix){b.innerHTML=permBody('screen');permBind(b,'screen')}else b.innerHTML='<p class="hint">Не вижу экранов. Разрешите программе «Клетка» запись экрана: Системные настройки → Конфиденциальность и безопасность → Запись экрана. Потом перезапустите программу.</p>';return}
-      b.innerHTML=`<div class="shp-g">${list.map(s=>`<button class="shp-t shp-pv" data-sel='${esc(JSON.stringify({id:s.id,kind:s.kind}))}'><span class="shp-th">${s.thumb?`<img src="${s.thumb}" alt="">`:SH_SVG[s.kind==='screen'?'monitor':'window']}</span><b>${s.icon?`<img class="shp-ic" src="${s.icon}" alt="">`:''}${esc(s.name)}</b></button>`).join('')}</div>`}
+      const noPerm=ps&&ps.screen!=='granted';
+      if(!list.length||noPerm&&!list.some(s=>s.kind==='window')){if(DESK().permFix){b.innerHTML=permBody('screen');permBind(b,'screen')}else b.innerHTML='<p class="hint">Не вижу экранов. Разрешите программе «Клетка» запись экрана: Системные настройки → Конфиденциальность и безопасность → Запись экрана. Потом перезапустите программу.</p>';return}
+      b.innerHTML=(noPerm?permBody('screen'):'')+`<div class="shp-g">${list.map(s=>`<button class="shp-t shp-pv" data-sel='${esc(JSON.stringify({id:s.id,kind:s.kind}))}'><span class="shp-th">${s.thumb?`<img src="${s.thumb}" alt="">`:SH_SVG[s.kind==='screen'?'monitor':'window']}</span><b>${s.icon?`<img class="shp-ic" src="${s.icon}" alt="">`:''}${esc(s.name)}</b></button>`).join('')}</div>`;if(noPerm)permBind(b,'screen')}
     else b.innerHTML=`<div class="shp-g">${shTile({surface:'monitor',kind:'screen'},SH_SVG.monitor,'Весь экран','Всё, что на экране')}${shTile({surface:'window',kind:'window'},SH_SVG.window,'Окно программы','Одна программа: игра, Word, Paint')}${shTile({surface:'browser',kind:'tab'},SH_SVG.browser,'Вкладка браузера','Сайт с игрой или видео')}</div>
       <p class="hint shp-n">Дальше браузер покажет свои окна: выберите там нужное и нажмите «Поделиться». Миниатюры всех окон, как в Zoom, есть в программе «Клетка» для компьютера.</p>`}
   else if(tab==='mat'){
@@ -8033,16 +8033,25 @@ async function shPickBody(){
       ${shCanCrop()?'':'<p class="hint shp-n">«Часть экрана» работает в программе «Клетка» для компьютера: кнопка «⋯» вверху → «Скачать программу».</p>'}`}
   b.querySelectorAll('[data-sel]').forEach(t=>{t.onclick=()=>{if(t.classList.contains('dis')){toast('Это есть в программе «Клетка» для компьютера');return}
     SH.sel=JSON.parse(t.dataset.sel);b.querySelectorAll('[data-sel]').forEach(x=>x.classList.toggle('on',x===t))};t.ondblclick=()=>{if(!t.classList.contains('dis')){SH.sel=JSON.parse(t.dataset.sel);shGo()}}})}
-/* разрешения macOS: галочка может стоять, но относиться к старой версии программы. Тогда помогает только «починить»:
-   программа стирает старую запись, перезапускается, и macOS спрашивает заново */
-const PERM_T={screen:['Запись экрана','показывать экран'],access:['Универсальный доступ','давать ученику управление']};
-function permBody(k){const [pane,what]=PERM_T[k];return `<div class="perm-box"><b>macOS не даёт программе ${what}</b>
-  <p>Даже если в настройках «${pane}» у «Клетки» уже стоит галочка, она могла остаться от старой версии программы. Нажмите «Починить»: ${k==='screen'?'программа перезапустится, ':''}macOS спросит разрешение заново. Нажмите «Открыть Системные настройки» и включите «Клетку»${k==='screen'?', затем «Выйти и открыть снова»':''}.</p>
+/* разрешения macOS. Запись экрана: macOS сама спрашивает, когда программа впервые ищет экраны, а включает разрешение
+   только после перезапуска. Поэтому сначала ищем экраны (это вызывает вопрос macOS), а не проверяем заранее:
+   проверка до поиска говорила «нет» и при первом разе, и кнопка «Починить» сбрасывала разрешение по кругу.
+   Сброс — только запасной путь, когда галочка стоит от старой версии программы */
+const PERM_T={screen:['Запись экрана и системного звука','показывать экран'],access:['Универсальный доступ','давать ученику управление']};
+function permBody(k){const [pane,what]=PERM_T[k],d=DESK()||{};
+  if(k==='screen')return `<div class="perm-box"><b>macOS пока не даёт программе ${what}</b>
+  <p>1. Нажмите «Открыть настройки» и включите «Клетку» в разделе «${pane}».<br>
+  2. ${d.permRelaunch?'Нажмите «Перезапустить программу»':'Закройте программу (Cmd+Q) и откройте снова'}: без перезапуска macOS разрешение не включает.</p>
+  <div class="row"><button class="btn primary" data-pf="open">Открыть настройки</button>${d.permRelaunch?'<button class="btn" data-pf="re">Перезапустить программу</button>':''}</div>
+  <p class="hint" style="margin:10px 0 0">Галочка уже стоит, перезапуск был, а экран всё равно не показывается? <button class="btn quiet" data-pf="fix">Сбросить разрешение</button><br>Программа сотрёт старую запись и перезапустится. Потом включите галочку заново и ещё раз перезапустите.</p></div>`;
+  return `<div class="perm-box"><b>macOS не даёт программе ${what}</b>
+  <p>Даже если в настройках «${pane}» у «Клетки» уже стоит галочка, она могла остаться от старой версии программы. Нажмите «Починить», затем «Открыть настройки» и включите «Клетку».</p>
   <div class="row"><button class="btn primary" data-pf="fix">Починить</button><button class="btn" data-pf="open">Открыть настройки</button></div></div>`}
-function permBind(box,k){box.querySelectorAll('[data-pf]').forEach(b=>b.onclick=async()=>{const d=DESK();if(!d)return;
-  if(b.dataset.pf==='open'){d.permOpen(k);return}
-  if(k==='screen'&&C.st==='live'&&!confirm('Программа перезапустится, звонок прервётся. Ученик останется в комнате, звонок можно будет начать снова. Починить сейчас?'))return;
-  b.disabled=true;await d.permFix(k);if(k==='access'){d.permOpen(k);toast('Включите «Клетку» в «Универсальном доступе» и снова нажмите «Дать управление»')}})}
+function permBind(box,k){box.querySelectorAll('[data-pf]').forEach(b=>b.onclick=async()=>{const d=DESK();if(!d)return;const f=b.dataset.pf;
+  if(f==='open'){d.permOpen(k);return}
+  if(k==='screen'&&C.st==='live'&&!confirm('Программа перезапустится, звонок прервётся. Ученик останется в комнате, звонок можно будет начать снова. Перезапустить сейчас?'))return;
+  b.disabled=true;if(f==='re'){await d.permRelaunch();return}
+  await d.permFix(k);if(k==='access'){d.permOpen(k);toast('Включите «Клетку» в «Универсальном доступе» и снова нажмите «Дать управление»')}})}
 function permHelp(k){modal(`<h2>Нужно разрешение</h2>${permBody(k)}<div class="row" style="margin-top:12px"><button class="btn" id="permX">Закрыть</button></div>`,()=>{permBind(mroot,k);document.getElementById('permX').onclick=close})}
 async function shGo(){
   const o=SH.sel;if(!o){toast('Выберите, что показать');return}
