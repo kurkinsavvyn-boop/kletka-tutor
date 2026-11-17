@@ -7920,7 +7920,8 @@ function callStats(){clearInterval(C.statsT);let prevLost=0,prevRecv=0;
       C.q=rtt==null?'':rtt<0.25&&loss<0.03?'good':rtt<0.5&&loss<0.08?'mid':'bad';C.rtt=rtt;C.relay=relay;callQ();callAdapt()}catch(e){}},2000)}
 /* плохая связь 4 секунды — видео легче (меньше и реже), голос не трогаем; хорошая 20 секунд — обратно */
 function callAdapt(){C.bad=C.q==='bad'?(C.bad||0)+1:0;C.good=C.q==='good'?(C.good||0)+1:0;
-  const snd=C.pc&&C.pc.getSenders().find(x=>x.track&&x.track.kind==='video');if(!snd)return;
+  /* только камера: показ экрана сюда не попадает, иначе при выключенной камере экран зажимался до 450 кбит/с и шёл рывками */
+  const snd=C.pc&&C.pc.getSenders().find(x=>x.track&&x.track.kind==='video'&&!(C.scrSenders||[]).includes(x));if(!snd)return;
   const set=(br,sc)=>{const p=snd.getParameters();if(!p.encodings||!p.encodings[0])return;p.encodings[0].maxBitrate=br;p.encodings[0].scaleResolutionDownBy=sc;snd.setParameters(p).catch(()=>{})};
   if(C.bad>=2&&!C.lite){C.lite=true;set(150000,2)}else if(C.good>=10&&C.lite){C.lite=false;set(450000,1)}}
 /* ---------- управление экраном ----------
@@ -7979,8 +7980,10 @@ async function callRenego(n=0){
   if(C.st==='idle')return;C.r++;C.oid=callSend({n:C.n,t:'offer',r:C.r,fresh:false,sdp:pc.localDescription.sdp})}
 function callScreenAttach(pc){const s=C.scrStream;pc=pc||C.pc;if(!pc||!s)return;
   C.scrSenders=s.getTracks().map(t=>pc.addTrack(t,s));
-  C.scrSenders.forEach(snd=>{if(!snd.track||snd.track.kind!=='video')return;const p=snd.getParameters();p.encodings=p.encodings&&p.encodings.length?p.encodings:[{}];
-    p.encodings[0].maxBitrate=1800000;p.encodings[0].maxFramerate=15;p.degradationPreference='maintain-resolution';snd.setParameters(p).catch(()=>{})})}
+  C.scrSenders.forEach(shEnc)}
+/* текст на экране должен оставаться чётким, видео — плавным */
+function shEnc(snd){if(!snd||!snd.track||snd.track.kind!=='video')return;const p=snd.getParameters();p.encodings=p.encodings&&p.encodings.length?p.encodings:[{}];
+  p.encodings[0].maxBitrate=SH.vid?3000000:2000000;p.encodings[0].maxFramerate=SH.vid?30:15;p.degradationPreference=SH.vid?'balanced':'maintain-resolution';snd.setParameters(p).catch(()=>{})}
 /* ---------- показ экрана как в Zoom ----------
    «Показать экран» открывает окно выбора: «Экраны и окна», «Материалы», «Ещё» (часть экрана, только звук).
    В программе для компьютера окно выбора показывает все экраны и окна с картинками, как в Zoom.
@@ -8064,7 +8067,9 @@ async function shStart(o){
   let id=o.id;
   if(DESK()&&!id&&(o.region||o.snd)){try{const l=await DESK().shareSources();const s=l.find(x=>x.kind==='screen');id=s&&s.id}catch(e){}}
   if(DESK()&&id)try{await DESK().shareChoose({id,audio:!!o.audio,region:!!o.region})}catch(e){}
-  const v={frameRate:{ideal:o.video?30:15,max:30}};if(!DESK()&&o.surface)v.displaySurface=o.surface;
+  /* экран Mac — это 3–6 миллионов точек: кодировать столько 15–30 раз в секунду тяжело и Маку, и сети, отсюда лаги.
+     Ученику хватает 1920×1080: текст читается, а работы в разы меньше */
+  const v={frameRate:{ideal:o.video?30:15,max:o.video?30:15},width:{max:1920},height:{max:1080}};if(!DESK()&&o.surface)v.displaySurface=o.surface;
   const opt={video:v,audio:o.audio?(DESK()?true:{suppressLocalAudioPlayback:false}):false,selfBrowserSurface:'exclude',surfaceSwitching:'include',systemAudio:'include',monitorTypeSurfaces:'include'};
   let raw;try{raw=await navigator.mediaDevices.getDisplayMedia(opt)}
   catch(e){if(e&&e.name!=='NotAllowedError')toast('Экран не удалось включить');return}
@@ -8075,7 +8080,8 @@ async function shStart(o){
   if(o.audio&&!o.snd&&!au.length&&!DESK())toast('Звук не передаётся: его можно передать только со вкладки браузера (галочка «Поделиться звуком»)');
   if(o.snd&&C.ctl)callCtlStop(true);
   let crop=null;if(vt&&o.region){crop=shCrop(raw,o.video);vt=crop.track}
-  if(vt){try{vt.contentHint=o.video?'motion':'detail'}catch(_){}}
+  if(vt){try{vt.contentHint=o.video?'motion':'detail'}catch(_){}if(!crop)vt.applyConstraints({width:{max:1920},height:{max:1080},frameRate:{max:o.video?30:15}}).catch(()=>{})}
+  SH.vid=!!o.video;
   const tracks=[...(vt?[vt]:[]),...au];
   const rv=raw.getVideoTracks()[0];if(rv)rv.onended=()=>{if(SH.raw===raw)callScreenStop()};if(!rv&&au[0])au[0].onended=()=>{if(SH.raw===raw)callScreenStop()};
   const old=SH.raw,oldCrop=SH.crop;SH.raw=raw;SH.crop=crop;SH.snd=!!o.snd;SH.kind=o.region?'region':o.kind||'screen';const hadAnn=SH.strokes.length;SH.paused=false;SH.strokes=[];if(hadAnn)roomPulse({ann:null},true);
@@ -8092,7 +8098,7 @@ async function shSwap(tracks){
     const nt=tracks.find(t=>t.kind===kind)||null,snd=senders.find(x=>x._k===kind||(x.track&&x.track.kind===kind));
     s.getTracks().filter(t=>t.kind===kind).forEach(t=>{s.removeTrack(t);if(!tracks.includes(t))t.stop()});
     if(nt)s.addTrack(nt);
-    if(snd){await snd.replaceTrack(nt).catch(()=>{});snd._k=kind}
+    if(snd){await snd.replaceTrack(nt).catch(()=>{});snd._k=kind;if(kind==='video')shEnc(snd)}
     else if(nt){const ns=pc.addTrack(nt,s);ns._k=kind;senders.push(ns);reneg=true}}
   C.scrSenders=senders;if(reneg)callRenego()}
 /* «Часть экрана»: берём весь экран и вырезаем рамку, которую репетитор двигает поверх экрана */
