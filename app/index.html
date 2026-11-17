@@ -152,6 +152,9 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .stp-i{display:flex;flex-direction:column;gap:6px;padding:6px;border:1.5px solid var(--line);border-radius:12px;background:var(--paper);cursor:pointer;text-align:left;font:inherit;color:inherit}
 .stp-i:hover{border-color:var(--blue)}.stp-i b{font-size:14px;line-height:1.25;padding:0 4px 4px}
 .stp-th{display:block;aspect-ratio:4/3;border-radius:8px;background:var(--ink-soft) center/contain no-repeat}
+.pw-step{border:1.5px solid var(--line,#ddd);border-radius:12px;padding:12px 14px;margin:0 0 10px}.pw-step p{margin:4px 0 10px;font-size:14px;line-height:1.45}
+.pw-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line,#eee)}.pw-row:first-of-type{border-top:0}.pw-row .pw-t{flex:1;min-width:0}.pw-row .pw-t b{display:block}.pw-row .pw-t small{color:var(--mut,#667);font-size:13px}
+.pw-ok{color:#2E7D4F;font-weight:700;white-space:nowrap}.pw-hint{font-size:13px;color:var(--mut,#667);margin-top:4px}
 .perm-box{border:1.5px solid var(--line,#ddd);border-radius:12px;padding:14px 16px;background:var(--paper,#fff)}.perm-box p{margin:6px 0 12px;font-size:14px;line-height:1.45}.perm-box .row{display:flex;gap:8px;flex-wrap:wrap}
 .tune{border-top:1px solid var(--line);padding-top:12px;margin-top:4px}
 .tune summary{cursor:pointer;font-weight:600;color:var(--ink-2);font-size:14px}
@@ -7717,11 +7720,11 @@ function roomSettings(){
     <p style="margin:0">Всё, что нужно во время урока, лежит на панели над материалом: показ, рисование, ручка и отметки ✓ ✗ ученику, масштаб.</p>
     <div class="rm-more">
       <button class="btn wide" id="rsHelp">Как работает комната</button>
-      <a class="btn wide quiet" href="../download/" target="_blank" rel="noopener" style="text-align:center">Скачать программу для компьютера</a>
+      ${DESK()&&DESK().permAsk?'<button class="btn wide quiet" id="rsPerm">Разрешения программы</button>':'<a class="btn wide quiet" href="../download/" target="_blank" rel="noopener" style="text-align:center">Скачать программу для компьютера</a>'}
       <button class="btn wide quiet" id="rsCall">Запасная ссылка на звонок</button>
     </div>
     <div class="modal-actions"><button class="btn primary" id="cl">Готово</button></div>`,()=>{
-    document.getElementById('cl').onclick=close;document.getElementById('rsCall').onclick=roomCallModal;
+    document.getElementById('cl').onclick=close;document.getElementById('rsCall').onclick=roomCallModal;const rp=document.getElementById('rsPerm');if(rp)rp.onclick=()=>{close();permWin()};
     document.getElementById('rsHelp').onclick=()=>{close();roomHelp('t')}});
 }
 
@@ -8042,6 +8045,7 @@ async function shPickBody(){
    Сброс — только запасной путь, когда галочка стоит от старой версии программы */
 const PERM_T={screen:['Запись экрана и системного звука','показывать экран'],access:['Универсальный доступ','давать ученику управление']};
 function permBody(k){const [pane,what]=PERM_T[k],d=DESK()||{};
+  if(d.permAsk)return `<div class="perm-box"><b>macOS пока не даёт программе ${what}</b><p>Откройте «Разрешения программы»: там всё по шагам, с кнопками.</p><div class="row"><button class="btn primary" data-pf="win">Разрешения программы</button></div></div>`;
   if(k==='screen')return `<div class="perm-box"><b>macOS пока не даёт программе ${what}</b>
   <p>1. Нажмите «Открыть настройки» и включите «Клетку» в разделе «${pane}».<br>
   2. ${d.permRelaunch?'Нажмите «Перезапустить программу»':'Закройте программу (Cmd+Q) и откройте снова'}: без перезапуска macOS разрешение не включает.</p>
@@ -8051,10 +8055,44 @@ function permBody(k){const [pane,what]=PERM_T[k],d=DESK()||{};
   <p>Даже если в настройках «${pane}» у «Клетки» уже стоит галочка, она могла остаться от старой версии программы. Нажмите «Починить», затем «Открыть настройки» и включите «Клетку».</p>
   <div class="row"><button class="btn primary" data-pf="fix">Починить</button><button class="btn" data-pf="open">Открыть настройки</button></div></div>`}
 function permBind(box,k){box.querySelectorAll('[data-pf]').forEach(b=>b.onclick=async()=>{const d=DESK();if(!d)return;const f=b.dataset.pf;
+  if(f==='win'){close();permWin();return}
   if(f==='open'){d.permOpen(k);return}
   if(k==='screen'&&C.st==='live'&&!confirm('Программа перезапустится, звонок прервётся. Ученик останется в комнате, звонок можно будет начать снова. Перезапустить сейчас?'))return;
   b.disabled=true;if(f==='re'){await d.permRelaunch();return}
   await d.permFix(k);if(k==='access'){d.permOpen(k);toast('Включите «Клетку» в «Универсальном доступе» и снова нажмите «Дать управление»')}})}
+/* «Разрешения программы»: один экран для всех доступов macOS.
+   Шаг 1 — один раз стереть старые разрешения (от прошлых версий, подписанных иначе), программа перезапускается.
+   Шаг 2 — список: «Разрешить» спрашивает macOS и сразу открывает нужный раздел настроек; галочки обновляются сами */
+const PW=[['camera','Камера','Чтобы ученик видел вас',1],['mic','Микрофон','Чтобы ученик вас слышал',1],
+  ['screen','Запись экрана и системного звука','Показывать ученику экран',1],['access','Универсальный доступ','Ученик может нажимать на вашем экране (если нужно)',0]];
+const pwOk=(k,ps)=>k==='access'?!!ps.access:ps[k]==='granted';
+function permWin(){const d=DESK();if(!d||!d.permAsk)return;let t=null;const asked={};
+  const fresh=(()=>{try{return localStorage.getItem('kl_perm_v4')!=='1'}catch(e){return false}})();
+  modal(`<h2>Разрешения для «Клетки»</h2>
+    <div class="pw-step" id="pwS1"${fresh?'':' hidden'}><b>Шаг 1. Сбросить старые разрешения</b><p>Старые версии программы оставили в macOS свои разрешения, и из-за них галочки стоят, а не работают. Нажмите один раз: программа сотрёт их и перезапустится.</p>
+      <div class="row" style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn primary" id="pwReset">Сбросить всё</button><button class="btn quiet" id="pwSkip">Уже сбрасывали</button></div></div>
+    <div class="pw-step" id="pwS2"${fresh?' hidden':''}><b>${fresh?'Шаг 2. ':''}Разрешите программе</b><p>Нажмите «Разрешить»: откроются нужные настройки. Включите там «Клетку».</p><div id="pwL"></div></div>
+    <p class="hint" id="pwV" style="margin:6px 0 0"></p>
+    <div class="modal-actions"><button class="btn quiet" id="pwAll" title="Если галочки стоят, а не работает">Сбросить всё и начать заново</button><button class="btn primary" id="pwX">Готово</button></div>`,()=>{
+    const stop=()=>{clearInterval(t);t=null};
+    document.getElementById('pwX').onclick=()=>{stop();close()};
+    const reset=async()=>{if(C.st!=='idle'&&!confirm('Идёт звонок. Программа перезапустится, звонок прервётся. Продолжить?'))return;try{localStorage.setItem('kl_perm_v4','1')}catch(e){}stop();await d.permReset()};
+    document.getElementById('pwReset').onclick=reset;document.getElementById('pwAll').onclick=reset;
+    document.getElementById('pwSkip').onclick=()=>{try{localStorage.setItem('kl_perm_v4','1')}catch(e){}document.getElementById('pwS1').hidden=true;document.getElementById('pwS2').hidden=false};
+    try{d.info().then(i=>{const e=document.getElementById('pwV');if(e&&i)e.textContent='Программа «Клетка» '+i.version})}catch(e){}
+    const draw=async()=>{const L=document.getElementById('pwL');if(!L){stop();return}let ps;try{ps=await d.permState()}catch(e){return}
+      L.innerHTML=PW.map(([k,n,w])=>{const ok=pwOk(k,ps);
+        return `<div class="pw-row"><div class="pw-t"><b>${n}</b><small>${w}</small>${!ok&&k==='screen'&&asked.screen?'<div class="pw-hint">Включили «Клетку» в настройках? Теперь перезапустите программу: без этого macOS разрешение не включает.</div>':''}</div>
+          ${ok?'<span class="pw-ok">✓ Разрешено</span>':k==='screen'&&asked.screen?'<button class="btn small primary" data-re>Перезапустить</button>':`<button class="btn small${PW.find(x=>x[0]===k)[3]?' primary':''}" data-k="${k}">Разрешить</button>`}</div>`}).join('');
+      L.querySelectorAll('[data-k]').forEach(b=>b.onclick=async()=>{asked[b.dataset.k]=1;b.disabled=true;await d.permAsk(b.dataset.k);draw()});
+      L.querySelectorAll('[data-re]').forEach(b=>b.onclick=()=>{if(C.st!=='idle'&&!confirm('Идёт звонок. Перезапустить программу?'))return;stop();d.permRelaunch()})};
+    draw();t=setInterval(draw,1500)})}
+/* при запуске программы: если чего-то важного не хватает (или ещё не сбрасывали старое) — показываем окно один раз */
+async function permAuto(){const d=DESK();if(!d||!d.permAsk)return;try{if(sessionStorage.getItem('kl_pw'))return;sessionStorage.setItem('kl_pw','1')}catch(e){}
+  let need=false;try{need=localStorage.getItem('kl_perm_v4')!=='1'}catch(e){}
+  if(!need)try{const ps=await d.permState();need=PW.some(([k,,,req])=>req&&!pwOk(k,ps))}catch(e){}
+  if(need)setTimeout(()=>{if(!document.querySelector('.modal-back, .modal'))permWin()},1200)}
+if(DESK())permAuto();
 function shNoPerm(){modal(`<h2>Ученик видит только окно Клетки</h2><p style="margin:0 0 10px">macOS не разрешила программе запись экрана. Пока разрешения нет, macOS вместо вашего экрана показывает ученику только окно Клетки и обои.</p>${permBody('screen')}<p class="hint" id="permV" style="margin:8px 0 0"></p><div class="row" style="margin-top:12px"><button class="btn" id="permX">Закрыть</button></div>`,()=>{permBind(mroot,'screen');document.getElementById('permX').onclick=close;
   try{DESK().info().then(i=>{const e=document.getElementById('permV');if(e&&i)e.textContent='Программа «Клетка» '+i.version})}catch(e){}})}
 function permHelp(k){modal(`<h2>Нужно разрешение</h2>${permBody(k)}<div class="row" style="margin-top:12px"><button class="btn" id="permX">Закрыть</button></div>`,()=>{permBind(mroot,k);document.getElementById('permX').onclick=close})}
