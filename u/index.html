@@ -8467,10 +8467,11 @@ function studentSummary(st,subj){
   const ord=new Map(items.map((x,i)=>[x.id,i]));out.sort((a,b)=>ord.get(a.id)-ord.get(b.id));
   return JSON.parse(JSON.stringify(out))}
 /* обложка: самая большая картинка фрейма (у фреймов из Miro своей картинки нет — были одноцветные квадраты) */
-function frameCover(items,f){let best=null,bg=null;const A=f.w*f.h;
-  /* фон (картинка во весь фрейм или его часть) обложкой не берём: ищем самую крупную картинку меньше четверти фрейма — обычно это герой */
-  for(const it of items){if(it.t!=='image')continue;const cx=it.x+it.w/2,cy=it.y+(it.h||it.w)/2;if(!(cx>=f.x&&cx<=f.x+f.w&&cy>=f.y&&cy<=f.y+f.h))continue;const a=it.w*(it.h||it.w);
-    if(a<A*.25){if(!best||a>best.w*(best.h||best.w))best=it}else if(!bg||a>bg.w*(bg.h||bg.w))bg=it}
+function frameCover(items,f){const F=items.filter(x=>x.t==='frame');let best=null,bg=null;
+  /* фон (картинка почти во весь фрейм или вложенный фрейм) обложкой не берём: самая крупная из остальных — обычно герой */
+  for(const it of items){if(it.t!=='image')continue;const h=it.h||it.w,cx=it.x+it.w/2,cy=it.y+h/2;if(!(cx>=f.x&&cx<=f.x+f.w&&cy>=f.y&&cy<=f.y+f.h))continue;const a=it.w*h;
+    const isBg=F.some(g=>cx>=g.x&&cx<=g.x+g.w&&cy>=g.y&&cy<=g.y+g.h&&a>=g.w*g.h*.45);
+    if(!isBg){if(!best||a>best.w*(best.h||best.w))best=it}else if(!bg||a>bg.w*(bg.h||bg.w))bg=it}
   best=best||bg;return best?(best.th||best.src||''):''}
 function storyCover(items){const f=items.find(x=>x.t==='frame');return f?(f.th||f.src||frameCover(items,f)):''}
 /* сделать холсты сюжетов из большой доски: plan = [{name, frames:[id фреймов]}]. Повторный запуск не плодит копии */
