@@ -1304,6 +1304,8 @@ button.mchip:hover{background:rgba(255,255,255,.24)}
 .rm-share .shb-c.on{border-color:#fff}
 .shb-dot{width:8px;height:8px;border-radius:50%;background:#3E9A5F;margin:0 4px 0 6px;flex-shrink:0}
 .shb-t{color:#BFE6CB;padding-right:6px;white-space:nowrap}
+.upd-bar{position:fixed;left:16px;bottom:16px;z-index:84;display:flex;align-items:center;gap:10px;max-width:calc(100vw - 32px);background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:10px 10px 10px 14px;font-size:14px;box-shadow:0 8px 24px rgba(20,30,60,.18)}
+.upd-x{border:0;background:none;font-size:20px;line-height:1;cursor:pointer;color:inherit;padding:2px 6px}
 .modal:has(.shp){width:min(780px,100%);padding:0;gap:0}
 .shp{display:flex;flex-direction:column;min-height:0}
 .shp-h{padding:20px 22px 0;border-bottom:1px solid var(--line)}
@@ -8061,6 +8063,13 @@ function shCrop(raw,smooth){
   if(v.requestVideoFrameCallback)v.requestVideoFrameCallback(draw);else draw();
   const track=c.captureStream(smooth?30:15).getVideoTracks()[0];
   return{track,stop:()=>{live=false;track.stop();v.srcObject=null}}}
+/* программа для компьютера обновляется сама: скачала новую версию — она включится, когда репетитор закроет программу */
+function updBar(v){let b=document.getElementById('updBar');if(b)b.remove();b=document.createElement('div');b.id='updBar';b.className='upd-bar';
+  b.innerHTML=`<span>Новая версия программы ${esc(v)} скачана. Включится, когда закроете Клетку.</span><button class="btn small primary" id="updGo">Перезапустить сейчас</button><button class="upd-x" id="updX" aria-label="Скрыть">×</button>`;
+  document.body.appendChild(b);document.getElementById('updX').onclick=()=>b.remove();
+  document.getElementById('updGo').onclick=()=>{if(C.st!=='idle'&&!confirm('Идёт звонок с учеником. Перезапуск прервёт его примерно на полминуты. Перезапустить?'))return;DESK().updateRestart()}}
+if(DESK()&&DESK().onUpdateReady){DESK().onUpdateReady(o=>{if(o&&o.version)updBar(String(o.version).slice(0,20))});
+  DESK().onUpdateDone(o=>{if(o&&o.version)setTimeout(()=>toast('Программа обновлена до '+String(o.version).slice(0,20)+'. Если показ экрана или управление не работают, включите их заново: Системные настройки → Конфиденциальность и безопасность'),1500)})}
 if(DESK()&&DESK().onShareRegion)DESK().onShareRegion(b=>{if(b&&[b.x,b.y,b.w,b.h].every(Number.isFinite))SH.reg=b});
 if(DESK()&&DESK().onShareAct)DESK().onShareAct(a=>shAct(a));
 function callScreenStop(){const s=C.scrStream;if(!s)return;callCtlStop(true);C.scrStream=null;
