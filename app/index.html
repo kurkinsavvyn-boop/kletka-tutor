@@ -8055,6 +8055,8 @@ function permBind(box,k){box.querySelectorAll('[data-pf]').forEach(b=>b.onclick=
   if(k==='screen'&&C.st==='live'&&!confirm('Программа перезапустится, звонок прервётся. Ученик останется в комнате, звонок можно будет начать снова. Перезапустить сейчас?'))return;
   b.disabled=true;if(f==='re'){await d.permRelaunch();return}
   await d.permFix(k);if(k==='access'){d.permOpen(k);toast('Включите «Клетку» в «Универсальном доступе» и снова нажмите «Дать управление»')}})}
+function shNoPerm(){modal(`<h2>Ученик видит только окно Клетки</h2><p style="margin:0 0 10px">macOS не разрешила программе запись экрана. Пока разрешения нет, macOS вместо вашего экрана показывает ученику только окно Клетки и обои.</p>${permBody('screen')}<p class="hint" id="permV" style="margin:8px 0 0"></p><div class="row" style="margin-top:12px"><button class="btn" id="permX">Закрыть</button></div>`,()=>{permBind(mroot,'screen');document.getElementById('permX').onclick=close;
+  try{DESK().info().then(i=>{const e=document.getElementById('permV');if(e&&i)e.textContent='Программа «Клетка» '+i.version})}catch(e){}})}
 function permHelp(k){modal(`<h2>Нужно разрешение</h2>${permBody(k)}<div class="row" style="margin-top:12px"><button class="btn" id="permX">Закрыть</button></div>`,()=>{permBind(mroot,k);document.getElementById('permX').onclick=close})}
 async function shGo(){
   const o=SH.sel;if(!o){toast('Выберите, что показать');return}
@@ -8090,6 +8092,9 @@ async function shStart(o){
   if(old)old.getTracks().forEach(t=>{t.onended=null;t.stop()});if(oldCrop)oldCrop.stop();
   shSendState();callUI();callScreenUI();
   if(DESK()){try{const r=await DESK().shareStarted(shState());if(r&&r.kind)SH.kind=o.region?'region':r.kind}catch(e){}shSendState()}
+  /* без разрешения «Запись экрана» macOS отдаёт вместо экрана только обои и окна самой Клетки: ученик видит одно приложение.
+     Сразу говорим репетитору, что делать, а не оставляем гадать */
+  if(DESK()&&DESK().permState&&!SH.snd)try{const ps=await DESK().permState();if(ps&&ps.screen!=='granted')shNoPerm()}catch(e){}
   toast(SH.snd?'Ученик слышит звук вашего компьютера':'Ученик видит '+(SH.kind==='region'?'часть экрана в зелёной рамке':SH.kind==='window'?'окно':SH.kind==='tab'?'вкладку':'ваш экран'))}
 /* смена источника без остановки: дорожки подменяются на лету, ученику ничего нажимать не нужно */
 async function shSwap(tracks){
