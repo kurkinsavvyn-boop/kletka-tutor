@@ -9054,10 +9054,22 @@ function deckEff(m){const a=R.ans[m.id]||{},P=a.p||{},X=a.x||{},Vv=a.v||{};
 const deckIn=(x,f)=>x.t!=='frame'&&x.x+x.w/2>=f.x&&x.x+x.w/2<=f.x+f.w&&x.y+x.h/2>=f.y&&x.y+x.h/2<=f.y+f.h;
 const zoneAt=(it,zs)=>zs.find(z=>it.x+it.w/2>=z.x&&it.x+it.w/2<=z.x+z.w&&it.y+it.h/2>=z.y&&it.y+it.h/2<=z.y+z.h);
 /* картинки холста: d: — уже в комнате, f: — файл репетитора (видит только он, пока картинку не перенесли в комнату) */
+/* каждую картинку скачиваем один раз и держим в памяти (blob): адрес не меняется, когда обновляется пропуск к файлам,
+   поэтому холст не перекачивает картинки при каждой перерисовке. Не нашлась — больше не спрашиваем */
 const deckURL=s=>{if(!s)return '';const k=DK.urls.get(s);if(typeof k==='string')return k;
-  if(s.startsWith('d:'))return R.pb.files.getURL(R.rec,s.slice(2),{token:FTOK.t});if(s.startsWith('art:'))return ART_BASE+s.slice(4);
-  if(s.startsWith('f:')){if(R.role!=='t')return FTOK.t?`${API}/api/files/files/${s.slice(2)}?token=${FTOK.t}`:'';if(!k){DK.urls.set(s,1);BD.cachedURL(s).then(u=>{if(u&&!String(u).startsWith('f:')){DK.urls.set(s,u);deckSoon()}}).catch(()=>{})}return ''}
+  if(s.startsWith('art:'))return ART_BASE+s.slice(4);
+  if(s.startsWith('d:')||s.startsWith('f:')){if(!k){DK.urls.set(s,1);DK.bq.push(s);deckBlobPump()}return ''}
   return s};
+function deckBlobPump(){while((DK.bn||0)<8&&DK.bq.length){const s=DK.bq.shift();DK.bn=(DK.bn||0)+1;deckBlob(s).finally(()=>{DK.bn--;deckBlobPump()})}}
+async function deckBlob(s){let u='',gone=false;
+  try{if(s.startsWith('f:')&&R.role==='t')u=await BD.cachedURL(s);
+    else{if(!FTOK.t||Date.now()-FTOK.at>60000||FTOK.pb!==R.pb)await roomFileURL('x');
+      const url=s.startsWith('d:')?R.pb.files.getURL(R.rec,s.slice(2),{token:FTOK.t}):`${API}/api/files/files/${s.slice(2)}?token=${FTOK.t}`;
+      const r=await fetch(url);if(r.ok)u=URL.createObjectURL(await r.blob());else gone=r.status===404}}catch(e){}
+  if(u&&u.startsWith('f:'))u='';DK.urls.set(s,u);
+  /* сеть моргнула (не «нет файла») — попробуем ещё раз через 20 секунд */
+  if(!u&&!gone)setTimeout(()=>{if(DK.urls.get(s)===''){DK.urls.delete(s);deckSoon()}},20000);
+  deckSoon()}
 /* проверка: поле ответа и карточка в зоне */
 function deckCheck(it,items){if(it.t==='answer'&&it.ans&&it.text)return rOk({ans:it.ans},it.text)?'ok':'bad';
   if(it.tgt){const z=zoneAt(it,items.filter(x=>x.zone&&x.id!==it.id));if(z)return z.id===it.tgt?'ok':'bad'}return ''}
@@ -9113,10 +9125,8 @@ function deckRemoteDrag(dg){const m=roomMat();if(!dg||!m||m.k!=='deck'||dg.m!==m
    Фреймы стоят на своих местах. Холст двигают, потянув за пустое место или двумя пальцами, приближают щипком, Ctrl+колесом или кнопками.
    В «Веду я» ученик видит ту же часть холста, что репетитор.
    Картинки переносятся в комнату не все сразу, а только те, что репетитор открыл на экране: так большая доска открывается быстро. */
-const DK={v:{},cur:null,urls:new Map(),q:[],qd:new Set(),fail:{},busy:0,full:false};
+const DK={v:{},cur:null,urls:new Map(),bq:[],q:[],qd:new Set(),fail:{},busy:0,full:false};
 const deckView=()=>document.getElementById('rdk');
-/* ученику нужна свежая «подпись» для картинок репетитора: старая живёт пару минут */
-function deckTok(){if(R.role==='t'||(FTOK.t&&Date.now()-FTOK.at<60000&&FTOK.pb===R.pb)||DK.tokB)return;DK.tokB=1;roomFileURL('x').then(deckSoon).catch(()=>{}).finally(()=>{DK.tokB=0})}
 function deckSoon(){clearTimeout(DK.pT);DK.pT=setTimeout(roomDeckPaint,60)}
 function deckPh(f,inView){let bg='';if(inView){const u=f.th?deckURL(f.th):'';const u2=u||deckURL(f.src);if(u2)bg=`background-image:url('${u2}');`}
   return `<div class="rdf-ph" style="background-color:${esc(f.fill||'#fff')};${bg}"><b>${esc(f.text||'')}</b></div>`}
@@ -9126,16 +9136,22 @@ function deckCanvas(pages,m){
   pages.innerHTML=`<div class="rdk" id="rdk"><div class="rdk-w">${fr.map((f,k)=>`<div class="rpg rdeck rdf" data-f="${esc(f.id)}" data-pg="${k}" style="left:${+f.x||0}px;top:${+f.y||0}px;width:${+f.w||1}px;height:${+f.h||1}px"><div class="bd-st" style="width:${+f.w||1}px;height:${+f.h||1}px"></div></div>`).join('')}</div>
     ${(m.at||0)<dayStart(Date.now())?`<div class="rdk-past">Урок ${esc(dayTxt(m.at||0))}${R.role==='t'?' <button class="btn small" id="rdkNow">Продолжить на сегодняшнем уроке</button>':' · можно только посмотреть'}</div>`:''}
     <div class="rdk-bar"><button data-dz="-" title="Отдалить" aria-label="Отдалить">−</button><span id="rdkZ">100%</span><button data-dz="+" title="Приблизить" aria-label="Приблизить">+</button><button data-dz="all" title="Показать весь холст">Весь холст</button><button data-dz="fr" title="Найти фрейм и перейти к нему">Фреймы ▾</button></div></div>`;
-  deckSize();deckBindView();
+  deckSize();deckBindView();deckHeal(m);
   const now=document.getElementById('rdkNow');if(now)now.onclick=()=>{m.at=Date.now();m.vis=true;roomSaveMats();roomUpdate();toast('Разработка перенесена в сегодняшний урок')};
   const c=deckLocked()?deckCamOf():null,saved=DK.v[m.id];
   if(c)deckApplyCam(c);else if(saved)deckSet(saved.x,saved.y,saved.s,R.role==='s');else deckFit([fr.find(f=>f.id===m.f0)||fr[0]])}
+/* картинки, перенесённые в комнату старой версией, могли пропасть из комнаты (две вкладки репетитора затирали друг друга).
+   Репетитор берёт такую картинку обратно из своей разработки — по тому же объекту — и ученик грузит её напрямую */
+function deckHeal(m){if(R.role!=='t'||!m.items)return;const have=new Set(R.rec.docs||[]);let n=0;const src=new Map();
+  for(const b of S.boards||[])for(const it of b.items||[])if(it.t==='image'&&typeof it.src==='string'&&it.src.startsWith('f:')&&!src.has(it.id))src.set(it.id,it);
+  for(const x of m.items){if(typeof x.src!=='string'||!x.src.startsWith('d:')||have.has(x.src.slice(2)))continue;const o=src.get(x.id);if(!o)continue;x.src=o.src;if(o.th)x.th=o.th;n++}
+  if(n){roomSaveMats();deckSoon()}}
 function deckSize(){const vp=deckView();if(!vp)return;const top=vp.getBoundingClientRect().top+scrollY;vp.style.height=Math.max(420,innerHeight-top-14)+'px'}
 function deckSet(x,y,s,quiet){const vp=deckView(),m=roomMat();if(!vp||!m)return;s=Math.max(.02,Math.min(4,s));if(!Number.isFinite(x+y+s))return;
   DK.cur={x,y,s};DK.v[m.id]=DK.cur;const w=vp.firstElementChild;
   w.style.transition=quiet&&R.role==='s'?'transform .12s linear':'none';w.style.transform=`translate(${x}px,${y}px) scale(${s})`;w.style.setProperty('--ik',1/s);
   const z=document.getElementById('rdkZ');if(z)z.textContent=Math.round(s*100)+'%';
-  clearTimeout(DK.lodT);DK.lodT=setTimeout(()=>{deckTok();roomDeckPaint();deckPgNow()},120);
+  clearTimeout(DK.lodT);DK.lodT=setTimeout(()=>{roomDeckPaint();deckPgNow()},120);
   if(!quiet)deckSendCam()}
 function deckFit(list){const vp=deckView();list=list.filter(Boolean);if(!vp||!list.length)return;const W=vp.clientWidth,H=vp.clientHeight;
   let x0=Infinity,y0=Infinity,x1=-Infinity,y1=-Infinity;for(const f of list){x0=Math.min(x0,f.x);y0=Math.min(y0,f.y);x1=Math.max(x1,f.x+f.w);y1=Math.max(y1,f.y+f.h)}
