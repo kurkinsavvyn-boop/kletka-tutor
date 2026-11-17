@@ -600,7 +600,7 @@ img.art.pic{object-fit:contain;display:block}
 .note{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--pen);border-radius:10px;padding:12px 16px;color:var(--ink-2);font-size:14px;margin-bottom:18px}
 
 /* Модалка */
-.veil{position:fixed;inset:0;background:rgba(10,15,30,.45);display:grid;place-items:center;z-index:20;
+.veil{position:fixed;inset:0;background:rgba(10,15,30,.45);display:grid;place-items:center;z-index:85;
   padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
 .modal{background:var(--card);border-radius:16px;width:min(480px,100%);padding:22px;display:flex;flex-direction:column;gap:14px;max-height:100%;overflow:auto}
 .modal h2{font-family:var(--f-disp);font-weight:600;font-size:20px}
@@ -957,7 +957,7 @@ body.shell .top .logo{display:none}
   .nav em{position:absolute;top:2px;left:calc(50% + 6px);margin:0;min-width:16px;height:16px;font-size:10px;padding:0 4px}
 }
 @media print{.sidenav,.top,.toast{display:none!important}body.shell{padding:0}}
-.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:30;background:var(--ink);color:var(--card);font-weight:600;
+.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:95;background:var(--ink);color:var(--card);font-weight:600;
   padding:10px 18px;border-radius:12px;box-shadow:0 8px 24px rgba(20,30,60,.25);transition:opacity .4s;max-width:calc(100% - 32px);text-align:center}
 .toast.out{opacity:0}
 @media (min-width:761px){.toast{bottom:28px}}
@@ -6755,9 +6755,9 @@ let pulseLast=0,pulseT=null;
 /* быстрый канал: во время звонка движения (перетаскивание, указка, камера холста, прокрутка) идут напрямую между компьютерами,
    минуя сервер, — почти без задержки. Без звонка всё идёт через сервер, как раньше */
 const FASTK=['x','y','m','pg','dg','cam','vw','typ','rx'];
-function roomFast(d){const c=C.fdc;if(!c||c.readyState!=='open'||c.bufferedAmount>65536)return false;
+function roomFast(d){const c=C.pc&&C.pc._fast;if(!c||c.readyState!=='open'||c.bufferedAmount>65536)return false;
   try{c.send(JSON.stringify({...d,at:Date.now()}));return true}catch(e){return false}}
-function callFastDc(dc){C.fdc=dc;dc.onmessage=e=>{if(typeof e.data!=='string'||e.data.length>20000)return;let d;try{d=JSON.parse(e.data)}catch(_){return}
+function callFastDc(dc,pc){if(pc)pc._fast=dc;dc.onmessage=e=>{if(typeof e.data!=='string'||e.data.length>20000)return;let d;try{d=JSON.parse(e.data)}catch(_){return}
   if(d&&typeof d==='object')roomOnFast(d)}}
 function roomOnFast(d){if(!R.on)return;const o={};FASTK.forEach(k=>{if(k in d)o[k]=d[k]});R.fastAt=Math.max(R.fastAt||0,+d.at||0);
   R.other={...(R.other||{}),...o};R.otherAt=Date.now();
@@ -7778,8 +7778,8 @@ async function callPc(){
   pc.onconnectionstatechange=()=>callNet();pc.oniceconnectionstatechange=()=>callNet();
   if(C.scrStream)callScreenAttach(pc);
   /* канал «ctl»: по нему ученик шлёт репетитору движения мыши, клики и клавиши, когда репетитор разрешил управление */
-  if(R.role==='t'){callDc(pc.createDataChannel('ctl',{ordered:true}));callFastDc(pc.createDataChannel('fast',{ordered:false,maxRetransmits:0}))}
-  else pc.ondatachannel=e=>e.channel.label==='fast'?callFastDc(e.channel):callDc(e.channel);
+  if(R.role==='t'){callDc(pc.createDataChannel('ctl',{ordered:true}),pc);callFastDc(pc.createDataChannel('fast',{ordered:false,maxRetransmits:0}),pc)}
+  else pc.ondatachannel=e=>e.channel.label==='fast'?callFastDc(e.channel,pc):callDc(e.channel,pc);
   return pc;
 }
 /* полное описание связи сразу со всеми адресами: одно сообщение туда и одно обратно */
@@ -7833,7 +7833,9 @@ async function callStart(again){
   try{sessionStorage.setItem(CALL_KEY,C.n)}catch(e){}
   await callOffer(false);
 }
-async function callOffer(restart){
+/* два переподключения сразу не запускаем: второе ждёт первое, иначе остаются два соединения и каналы путаются */
+function callOffer(restart){const run=()=>callOfferRun(restart);C.offQ=(C.offQ||Promise.resolve()).then(run,run);return C.offQ}
+async function callOfferRun(restart){
   if(C.st==='idle')return;
   if(!C.pc||!restart){if(C.pc)C.pc.close();C.pc=await callPc()}
   const off=await C.pc.createOffer(restart?{iceRestart:true}:{});await C.pc.setLocalDescription(off);await callGather(C.pc);
@@ -7847,7 +7849,8 @@ async function callAccept(auto){
   try{sessionStorage.setItem(CALL_KEY,C.n)}catch(e){}
   await callAnswer(o);
 }
-async function callAnswer(o){
+function callAnswer(o){const run=()=>callAnswerRun(o);C.ansQ=(C.ansQ||Promise.resolve()).then(run,run);return C.ansQ}
+async function callAnswerRun(o){
   if(!C.pc||C.pcN!==o.n||o.fresh){if(C.pc)C.pc.close();C.pc=await callPc();C.pcN=o.n}
   await C.pc.setRemoteDescription({type:'offer',sdp:o.sdp});const ans=await C.pc.createAnswer();await C.pc.setLocalDescription(ans);await callGather(C.pc);
   callSend({n:o.n,t:'answer',r:o.r,oi:o.i,sdp:C.pc.localDescription.sdp});
@@ -7860,6 +7863,9 @@ async function callOnSig(d){
   if(R.role==='s'){callWatch();if(!(d&&d.scr)&&C.scr){C.scr=null;C.scrHide=false}callScreenUI()}
   /* ученик просит позвонить: страницу обновили или связь не вернулась сама */
   if(R.role==='t'&&d&&d.join&&d.jt!==C.lastJoin&&roomLive(R.st)&&!C.declined){C.lastJoin=d.jt;if(C.st==='idle')callWatch();else callOffer(false);return}
+  /* как в Zoom: ученик просит управление, репетитор разрешает одной кнопкой */
+  /* просьба, пришедшая, когда экран не показывали (например, старая после перезагрузки), просто запоминается */
+  if(R.role==='t'&&d&&d.ctlAsk&&d.ctlAsk!==C.ctlAskSeen){C.ctlAskSeen=d.ctlAsk;if(C.scrStream&&!C.ctl)callCtlAsked()}
   if(d&&!!d.ao!==!!C.themAo){C.themAo=!!d.ao;callUI()}
   const s=d&&d.sig;if(!s||!s.n)return;const key=s.i||s.n+':'+s.t+':'+(s.r||0);if(key===C.seen)return;C.seen=key;
   if(s.t==='bye'){if(R.role==='t'&&C.n===s.n&&!s.left)C.declined=true;if(R.role==='s')C.noJoin=true;if(C.n===s.n){callEnd(false,R.role==='t'?'Ученик завершил звонок':'Репетитор завершил звонок')}if(C.offer&&C.offer.n===s.n){C.offer=null;callUI()}return}
@@ -7900,7 +7906,8 @@ function callAdapt(){C.bad=C.q==='bad'?(C.bad||0)+1:0;C.good=C.q==='good'?(C.goo
    Работает, только если репетитор открыл Клетку в программе для компьютера (она умеет двигать мышь) и нажал «Разрешить управление».
    Ученик видит экран репетитора и нажимает прямо на видео, программа повторяет нажатия на компьютере репетитора. */
 const DESK=()=>window.kletkaDesktop&&window.kletkaDesktop.isDesktop?window.kletkaDesktop:null;
-function callDc(dc){C.dc=dc;dc.onmessage=e=>{
+/* каналы хранятся у своего соединения: после переподключения нажатия не уходят в старый, закрытый канал */
+function callDc(dc,pc){if(pc)pc._ctl=dc;dc.onmessage=e=>{
   if(R.role!=='t'||!C.ctl||!DESK()||typeof e.data!=='string'||e.data.length>300)return;
   try{DESK().controlEvent(JSON.parse(e.data))}catch(_){}}}
 function callCtlInfo(){modal(`<h2>Управление экраном</h2>
@@ -7915,18 +7922,28 @@ async function callCtlToggle(){
   if(!r||!r.ok){
     const why=r&&r.why;
     toast(why==='accessibility'?'Разрешите программе «Клетка» управлять компьютером: Системные настройки, Конфиденциальность и безопасность, Универсальный доступ. Потом нажмите ещё раз':why==='no-screen'?'Сначала нажмите «Показать экран» и выберите экран':'В этой версии программы управление недоступно');return}
-  C.ctl=true;roomPulse({ctl:1},true);callUI();callScreenUI()}
-function callCtlStop(tell){if(!C.ctl)return;C.ctl=false;const d=DESK();if(d&&tell)d.controlStop();if(R.on)roomPulse({ctl:0},true);callUI();callScreenUI()}
-if(DESK())DESK().onControlStopped(()=>{C.ctl=false;if(R.on)roomPulse({ctl:0},true);toast('Управление выключено');if(R.on){callUI();callScreenUI()}});
+  C.ctl=true;C.ctlAsk=false;roomPulse({ctl:1},true);callUI();callScreenUI();shSendState()}
+function callCtlAsked(){const nm=(R.info&&R.info.first)||'Ученик';C.ctlAsk=true;shSendState();clearTimeout(C.ctlAskT);C.ctlAskT=setTimeout(()=>{C.ctlAsk=false;shSendState()},60000);
+  if(!DESK()){toast(nm+' просит управление. Оно работает в программе «Клетка» для компьютера');return}
+  if(document.getElementById('ctlAsk'))return;
+  modal(`<div id="ctlAsk"><h2>${esc(nm)} просит управление</h2><p style="margin:0">Ученик сможет нажимать, тащить и печатать на показанном экране. Забрать управление можно в любой момент кнопкой на панели или клавишами ⌘⇧Esc.</p>
+    <div class="modal-actions"><button class="btn quiet" id="cl">Не сейчас</button><button class="btn primary" id="ok">Разрешить</button></div></div>`,()=>{
+    document.getElementById('cl').onclick=()=>{close();C.ctlAsk=false;shSendState()};document.getElementById('ok').onclick=()=>{close();C.ctlAsk=false;if(C.scrStream&&!C.ctl)callCtlToggle()}});
+  try{window.focus()}catch(e){}}
+function callCtlStop(tell){if(!C.ctl)return;C.ctl=false;const d=DESK();if(d&&tell)d.controlStop();if(R.on)roomPulse({ctl:0},true);callUI();callScreenUI();shSendState()}
+if(DESK())DESK().onControlStopped(()=>{C.ctl=false;if(R.on)roomPulse({ctl:0},true);toast('Управление выключено');if(R.on){callUI();callScreenUI();shSendState()}});
 /* у ученика: нажатия на видео уходят репетитору, координаты в долях картинки */
 function callCtlBind(v){if(v._ctl)return;v._ctl=1;v.tabIndex=0;let last={x:.5,y:.5},lm=0;
-  const send=o=>{if(C.dc&&C.dc.readyState==='open'&&R.other&&R.other.ctl)try{C.dc.send(JSON.stringify(o))}catch(_){}};
+  const send=o=>{const dc=C.pc&&C.pc._ctl;if(dc&&dc.readyState==='open'&&R.other&&R.other.ctl)try{dc.send(JSON.stringify(o))}catch(_){}};
   const pos=e=>{const r=v.getBoundingClientRect(),vw=v.videoWidth,vh=v.videoHeight;if(!vw||!vh)return null;
     const k=Math.min(r.width/vw,r.height/vh),w=vw*k,h=vh*k,x=(e.clientX-(r.left+(r.width-w)/2))/w,y=(e.clientY-(r.top+(r.height-h)/2))/h;
     return x<0||x>1||y<0||y>1?null:{x:+x.toFixed(4),y:+y.toFixed(4)}};
   v.addEventListener('pointermove',e=>{const p=pos(e);if(!p||Date.now()-lm<33)return;lm=Date.now();last=p;send({t:'m',...p})});
-  v.addEventListener('pointerdown',e=>{const p=pos(e);if(!p||!(R.other&&R.other.ctl))return;e.preventDefault();v.focus();try{v.setPointerCapture(e.pointerId)}catch(_){}last=p;send({t:'d',b:e.button,...p})});
-  v.addEventListener('pointerup',e=>{const p=pos(e)||last;send({t:'u',b:e.button,...p})});
+  /* двойной щелчок считаем сами: второе нажатие рядом и быстро — c:2, программа сделает настоящий двойной щелчок */
+  let pd={at:0,x:-1,y:-1},cnt=1;
+  v.addEventListener('pointerdown',e=>{const p=pos(e);if(!p||!(R.other&&R.other.ctl))return;e.preventDefault();v.focus();try{v.setPointerCapture(e.pointerId)}catch(_){}last=p;
+    cnt=Date.now()-pd.at<450&&Math.abs(e.clientX-pd.x)<8&&Math.abs(e.clientY-pd.y)<8?2:1;pd={at:cnt===2?0:Date.now(),x:e.clientX,y:e.clientY};send({t:'d',b:e.button,c:cnt,...p})});
+  v.addEventListener('pointerup',e=>{const p=pos(e)||last;send({t:'u',b:e.button,c:cnt,...p})});
   v.addEventListener('wheel',e=>{if(!(R.other&&R.other.ctl))return;const p=pos(e);if(!p)return;e.preventDefault();send({t:'w',dy:Math.sign(e.deltaY)*Math.min(5,Math.ceil(Math.abs(e.deltaY)/40)),...p})},{passive:false});
   v.addEventListener('keydown',e=>{if(!(R.other&&R.other.ctl)||e.metaKey||e.ctrlKey||e.altKey)return;e.preventDefault();send({t:'k',k:e.key})});
   v.addEventListener('contextmenu',e=>e.preventDefault())}
@@ -8011,6 +8028,7 @@ async function shStart(o){
   if(o.snd){if(!au.length){raw.getTracks().forEach(t=>t.stop());toast(DESK()?'Звук компьютера не передаётся на этой версии macOS':'Звук не выбран: в окне браузера включите «Поделиться звуком» и выберите вкладку');return}
     raw.getVideoTracks().forEach(t=>t.stop());vt=null}
   if(o.audio&&!o.snd&&!au.length&&!DESK())toast('Звук не передаётся: его можно передать только со вкладки браузера (галочка «Поделиться звуком»)');
+  if(o.snd&&C.ctl)callCtlStop(true);
   let crop=null;if(vt&&o.region){crop=shCrop(raw,o.video);vt=crop.track}
   if(vt){try{vt.contentHint=o.video?'motion':'detail'}catch(_){}}
   const tracks=[...(vt?[vt]:[]),...au];
@@ -8052,7 +8070,7 @@ function callScreenStop(){const s=C.scrStream;if(!s)return;callCtlStop(true);C.s
   if(DESK())try{DESK().shareStopped()}catch(e){}
   if(SH.pip){try{SH.pip.close()}catch(e){}SH.pip=null}
   roomPulse({scr:null,ann:null},true);callRenego();callUI();callScreenUI()}
-const shState=()=>({paused:SH.paused,ann:SH.ann,ctl:!!C.ctl,audioOnly:SH.snd,kind:SH.kind});
+const shState=()=>({paused:SH.paused,ann:SH.ann,ctl:!!C.ctl,ask:!!C.ctlAsk&&!C.ctl,audioOnly:SH.snd,kind:SH.kind});
 function shSendState(){if(!C.scrStream)return;roomPulse({scr:{sid:C.scrStream.id,p:SH.paused?1:0,snd:SH.snd?1:0}},true);
   if(DESK())try{DESK().shareState(shState())}catch(e){}shBarPaint()}
 function shPause(){if(!C.scrStream)return;SH.paused=!SH.paused;
@@ -8063,14 +8081,14 @@ function shPause(){if(!C.scrStream)return;SH.paused=!SH.paused;
 function shAct(a){if(!C.scrStream&&a!=='app')return;
   if(a==='pause')shPause();else if(a==='swap'){if(DESK())try{window.focus()}catch(e){}shPick(true)}
   else if(a==='ann')shAnnToggle();else if(a==='clr')shAnnClear();else if(a.startsWith('color:')){SH.col=a.slice(6);if(DESK()&&shAnnNative())DESK().shareAnn(true,SH.col);shAnnPaint()}
-  else if(a==='ctl'){if(C.ctl)callCtlStop(true);else callCtlToggle()}else if(a==='stop')callScreenStop();else if(a==='pip')shPip()}
+  else if(a==='ctl'){C.ctlAsk=false;const m=document.getElementById('ctlAsk');if(m)close();if(C.ctl)callCtlStop(true);else callCtlToggle()}else if(a==='stop')callScreenStop();else if(a==='pip')shPip()}
 const SH_COLS=['#E5397A','#2F6BFF','#2C8A57'];
 function shBarHTML(){const st=shState();
-  return `<span class="shb-dot"></span><span class="shb-t">${st.paused?'Показ на паузе':C.ctl?'Ученик управляет':st.audioOnly?'Ученик слышит звук':'Ученик видит экран'}</span>
+  return `<span class="shb-dot"></span><span class="shb-t">${st.ask?'Ученик просит управление →':st.paused?'Показ на паузе':C.ctl?'Ученик управляет':st.audioOnly?'Ученик слышит звук':'Ученик видит экран'}</span>
   ${st.audioOnly?'':`<button data-a="pause" class="${st.paused?'on':''}">${st.paused?'Продолжить':'Пауза'}</button>`}<button data-a="swap">Сменить</button>
   ${st.audioOnly?'':`<button data-a="ann" class="${st.ann?'on':''}">${st.ann?'Готово':'Рисовать'}</button>`}
   ${st.ann?`${SH_COLS.map(c=>`<button class="shb-c${SH.col===c?' on':''}" data-a="color:${c}" style="background:${c}" aria-label="Цвет"></button>`).join('')}<button data-a="clr">Стереть</button>`:''}
-  ${st.audioOnly?'':`<button data-a="ctl" class="${C.ctl?'on':''}">${C.ctl?'Забрать управление':'Управление'}</button>`}
+  ${st.audioOnly?'':`<button data-a="ctl" class="${C.ctl||st.ask?'on':''}">${C.ctl?'Забрать управление':st.ask?'Разрешить управление':'Управление'}</button>`}
   ${!DESK()&&'documentPictureInPicture' in window&&!SH.pip?'<button data-a="pip" title="Панель останется поверх других окон, даже когда вы в игре или другой программе">Поверх окон</button>':''}
   <button data-a="stop" class="shb-stop">Остановить</button>`}
 function shBarBind(root){root.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>shAct(b.dataset.a))}
@@ -8125,10 +8143,13 @@ function callScreenUI(){
   if(C.scrHide){if(el)el.remove();if(!pill){pill=document.createElement('button');pill.id='rmScrShow';pill.className='btn primary rm-scr-show';pill.textContent='Показать экран репетитора';document.body.appendChild(pill);pill.onclick=()=>{C.scrHide=false;callScreenUI()}}return}
   if(pill)pill.remove();
   if(!el){el=document.createElement('div');el.id='rmScr';el.className='rm-scr';
-    el.innerHTML=`<div class="rs-bar"><b>${esc((R.info&&R.info.tutor)||'Репетитор')} показывает экран</b><span class="rs-ctl" id="rsCtl">Управление включено: нажимайте на экран</span><span class="rs-p" id="rsP">Пауза</span><button class="btn small" id="rsHide">К тетради</button></div><div class="rs-w"><video id="rsV" autoplay playsinline></video><canvas id="rsC"></canvas></div>`;
+    el.innerHTML=`<div class="rs-bar"><b>${esc((R.info&&R.info.tutor)||'Репетитор')} показывает экран</b><span class="rs-ctl" id="rsCtl">Управление включено: нажимайте и тащите прямо на экране</span><button class="btn small quiet" id="rsAsk">Попросить управление</button><span class="rs-p" id="rsP">Пауза</span><button class="btn small" id="rsHide">К тетради</button></div><div class="rs-w"><video id="rsV" autoplay playsinline></video><canvas id="rsC"></canvas></div>`;
     document.body.appendChild(el);document.getElementById('rsHide').onclick=()=>{C.scrHide=true;callScreenUI()};
+    document.getElementById('rsAsk').onclick=()=>{R.ctlAskAt=Date.now();roomPulse({ctlAsk:Date.now()},true);toast('Репетитор получил просьбу. Когда он разрешит, экран обведётся зелёным');callScreenUI()};
     addEventListener('resize',()=>{R.annSeen=null;callScreenUI()})}
-  { const cv=document.getElementById('rsV');if(cv){callCtlBind(cv);const on=!!(R.other&&R.other.ctl);el.classList.toggle('ctl',on)}}
+  { const cv=document.getElementById('rsV');if(cv){callCtlBind(cv);const on=!!(R.other&&R.other.ctl);el.classList.toggle('ctl',on);
+    const ask=document.getElementById('rsAsk');if(ask){const wait=Date.now()-(R.ctlAskAt||0)<30000;ask.hidden=on||!!sc.snd;ask.disabled=wait;ask.textContent=wait?'Просьба отправлена':'Попросить управление';
+      if(on)R.ctlAskAt=0;if(wait&&!R.ctlAskT)R.ctlAskT=setTimeout(()=>{R.ctlAskT=null;callScreenUI()},30500)}}}
   const v=document.getElementById('rsV');if(v&&v.srcObject!==C.scr){v.srcObject=C.scr;v.onloadedmetadata=()=>{R.annSeen=null;callScreenUI()};v.play().catch(()=>{v.muted=true;v.play().catch(()=>{})})}
   el.classList.toggle('paused',!!sc.p);if(v){if(sc.p&&!v.paused)v.pause();else if(!sc.p&&v.paused)v.play().catch(()=>{})}
   const an=R.other.ann,ai=an&&an.i||'';if(R.annSeen!==ai+'|'+(v&&v.videoWidth)){R.annSeen=ai+'|'+(v&&v.videoWidth);const c=document.getElementById('rsC');if(c&&v)shStrokes(c,v,an&&an.s)}}
