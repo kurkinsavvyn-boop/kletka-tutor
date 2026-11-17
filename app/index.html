@@ -6232,7 +6232,7 @@ function viewMaterials(){
   if(tab==='boards'){const bl=[...(S.boards||[])].sort((a,b)=>(b.at||0)-(a.at||0));
     const prev=b=>{if(b.cover)return `style="background-image:url('${BD.srcURL(b.cover)}')"`;const f=BD.frames(b.items||[])[0];const im=(f&&f.src)||((b.items||[]).find(x=>x.t==='image')||{}).src;return im?`style="background-image:url('${BD.srcURL(im)}')${f&&!f.src?'':''}"`:f?`style="background:${f.fill||'#fff'}"`:''};
     body=`<div class="lact" style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap"><button class="btn primary" id="bdNew">+ Новая разработка</button><button class="btn" id="bdImp">Импорт доски: PDF или картинки</button><input type="file" id="bdImpF" accept=".pdf,application/pdf,image/*" multiple hidden><button class="btn" id="bdImpM" title="Папка с подготовленной доской: board.json и картинки">Импорт доски: папка</button><input type="file" id="bdImpD" webkitdirectory multiple hidden></div>
-      ${bl.length?[[bl.filter(b=>b.story),'Сюжеты','Отдельный холст на каждый сюжет. На урок берётся копия: сам сюжет остаётся чистым'],[bl.filter(b=>!b.story),bl.some(b=>b.story)?'Большие доски':'','']].filter(g=>g[0].length).map(([g,h,sub])=>`${h?`<h3 class="bsec">${h}${sub?`<small>${sub}</small>`:''}</h3>`:''}<div class="bgrid">${g.map(b=>`<div class="bcard"><button class="bprev" data-bo="${b.id}" ${prev(b)}>${prev(b)?'':'Пустая'}</button>
+      ${bl.length?[[bl.filter(b=>b.story).sort((a,b)=>a.name.localeCompare(b.name,'ru')),'Сюжеты','Отдельный холст на каждый сюжет. На урок берётся копия: сам сюжет остаётся чистым'],[bl.filter(b=>!b.story),bl.some(b=>b.story)?'Большие доски':'','']].filter(g=>g[0].length).map(([g,h,sub])=>`${h?`<h3 class="bsec">${h}${sub?`<small>${sub}</small>`:''}</h3>`:''}<div class="bgrid">${g.map(b=>`<div class="bcard"><button class="bprev" data-bo="${b.id}" ${prev(b)}>${prev(b)?'':'Пустая'}</button>
         <div class="binf"><b>${esc(b.name)}</b><small>${BD.frames(b.items||[]).length} ${plural(BD.frames(b.items||[]).length,['фрейм','фрейма','фреймов'])} · ${ago(b.at||Date.now())}</small>
         <div class="bbtns"><button class="btn small" data-bo="${b.id}">Открыть</button><button class="btn small quiet" data-bc="${b.id}">Копия</button><button class="btn small quiet" data-bd="${b.id}">${V.delB===b.id?'Удалить?':'Удалить'}</button></div></div></div>`).join('')}</div>`).join('')
       :`<div class="empty-first big-empty">${emptyArt('cheburashka-1')}<div><h2>Разработок пока нет</h2><p>Разработка — это ваш холст: фреймы, картинки, текст, стикеры, фигуры. Сделайте один раз и открывайте на уроке в комнате любого ученика.</p></div></div>`}`}
@@ -8467,9 +8467,11 @@ function studentSummary(st,subj){
   const ord=new Map(items.map((x,i)=>[x.id,i]));out.sort((a,b)=>ord.get(a.id)-ord.get(b.id));
   return JSON.parse(JSON.stringify(out))}
 /* обложка: самая большая картинка фрейма (у фреймов из Miro своей картинки нет — были одноцветные квадраты) */
-function frameCover(items,f){let best=null;
-  for(const it of items){if(it.t!=='image')continue;const cx=it.x+it.w/2,cy=it.y+(it.h||it.w)/2;if(cx>=f.x&&cx<=f.x+f.w&&cy>=f.y&&cy<=f.y+f.h&&(!best||it.w*it.h>best.w*best.h))best=it}
-  return best?(best.th||best.src||''):''}
+function frameCover(items,f){let best=null,bg=null;const A=f.w*f.h;
+  /* фон (картинка во весь фрейм или его часть) обложкой не берём: ищем самую крупную картинку меньше четверти фрейма — обычно это герой */
+  for(const it of items){if(it.t!=='image')continue;const cx=it.x+it.w/2,cy=it.y+(it.h||it.w)/2;if(!(cx>=f.x&&cx<=f.x+f.w&&cy>=f.y&&cy<=f.y+f.h))continue;const a=it.w*(it.h||it.w);
+    if(a<A*.25){if(!best||a>best.w*(best.h||best.w))best=it}else if(!bg||a>bg.w*(bg.h||bg.w))bg=it}
+  best=best||bg;return best?(best.th||best.src||''):''}
 function storyCover(items){const f=items.find(x=>x.t==='frame');return f?(f.th||f.src||frameCover(items,f)):''}
 /* сделать холсты сюжетов из большой доски: plan = [{name, frames:[id фреймов]}]. Повторный запуск не плодит копии */
 function storyMake(boardId,plan){const B0=(S.boards||[]).find(b=>b.id===boardId);if(!B0)return 0;let n=0;
