@@ -146,6 +146,13 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
 .actions .btn{flex:1 1 auto}
 .hint{font-size:13px;color:var(--ink-3)}
+.rdk-past{position:absolute;left:12px;top:12px;z-index:5;display:flex;gap:10px;align-items:center;padding:8px 12px;border-radius:10px;background:var(--paper);border:1.5px solid var(--line);font-size:14px;font-weight:600;box-shadow:0 2px 10px rgba(0,0,0,.08)}
+.bsec{font-size:15px;margin:18px 0 10px;display:flex;flex-direction:column;gap:2px}.bsec small{font-weight:400;font-size:13px;color:var(--ink-3);text-transform:none;letter-spacing:0}
+.stp{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;max-height:52vh;overflow:auto;padding:2px}
+.stp-i{display:flex;flex-direction:column;gap:6px;padding:6px;border:1.5px solid var(--line);border-radius:12px;background:var(--paper);cursor:pointer;text-align:left;font:inherit;color:inherit}
+.stp-i:hover{border-color:var(--blue)}.stp-i b{font-size:14px;line-height:1.25;padding:0 4px 4px}
+.stp-th{display:block;aspect-ratio:4/3;border-radius:8px;background:var(--ink-soft) center/contain no-repeat}
+.perm-box{border:1.5px solid var(--line,#ddd);border-radius:12px;padding:14px 16px;background:var(--paper,#fff)}.perm-box p{margin:6px 0 12px;font-size:14px;line-height:1.45}.perm-box .row{display:flex;gap:8px;flex-wrap:wrap}
 .tune{border-top:1px solid var(--line);padding-top:12px;margin-top:4px}
 .tune summary{cursor:pointer;font-weight:600;color:var(--ink-2);font-size:14px}
 .lvl-d{margin:6px 0 0;padding:0;list-style:none;font-size:13px;color:var(--ink-3);display:flex;flex-direction:column;gap:2px}
@@ -1455,9 +1462,9 @@ body.inroom .rm-tools,body.inroom .rm-top{background:var(--card)}
 /* окно видеозвонка: поверх комнаты в правом нижнем углу, на телефоне — сверху справа */
 .vc{position:fixed;z-index:45;left:0;top:0;width:280px;touch-action:none;user-select:none;background:#141A28;color:#fff;border-radius:14px;overflow:hidden;box-shadow:0 12px 40px rgba(10,15,30,.35)}
 .vc .vc-v{cursor:grab}.vc.moving,.vc.moving .vc-v{cursor:grabbing}
-.vc-rs{position:absolute;width:22px;height:22px;z-index:3;touch-action:none}
-.vc-rs.br{right:0;bottom:0;cursor:nwse-resize;background:linear-gradient(135deg,transparent 55%,rgba(255,255,255,.55) 55%,rgba(255,255,255,.55) 62%,transparent 62%,transparent 72%,rgba(255,255,255,.55) 72%,rgba(255,255,255,.55) 79%,transparent 79%)}
-.vc-rs.tl{left:0;top:0;cursor:nwse-resize;background:linear-gradient(135deg,transparent 21%,rgba(255,255,255,.55) 21%,rgba(255,255,255,.55) 28%,transparent 28%,transparent 38%,rgba(255,255,255,.55) 38%,rgba(255,255,255,.55) 45%,transparent 45%)}
+.vc-rs{position:absolute;width:26px;height:26px;z-index:3;touch-action:none}
+.vc-rs.br{right:0;bottom:0;cursor:nwse-resize}.vc-rs.tl{left:0;top:0;cursor:nwse-resize}
+.vc-rs.tr{right:0;top:0;cursor:nesw-resize}.vc-rs.bl{left:0;bottom:0;cursor:nesw-resize}
 .vc-v{position:relative;aspect-ratio:4/3;background:#0B0F19}
 .vc-v #vcR{width:100%;height:100%;object-fit:cover;display:block}
 .vc-v #vcL{position:absolute;right:8px;bottom:8px;width:30%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;border:2px solid rgba(255,255,255,.7);background:#222;transform:scaleX(-1)}
@@ -6223,11 +6230,11 @@ function viewMaterials(){
       ${FILES===null?'<p class="empty">Загружаю…</p>':fs.length?`<div class="flist">${fs.map(f=>`<div class="frow"><button class="fr-main" data-fo="${f.id}"><span class="fk fk-${fileKind(f.name||f.file)}">${fileKind(f.name||f.file)}</span><span class="fr-t"><b>${esc(f.name||f.file)}</b><small>${ago(new Date(f.created.replace(' ','T')).getTime())}</small></span></button>
         ${f.folder?`<span class="chip">${esc(f.folder)}</span>`:''}<button class="ibtn" data-ff="${f.id}" aria-label="В папку">${icon('materials')}</button><button class="ibtn${V.delF===f.id?' on':''}" data-fd="${f.id}" aria-label="Удалить">${V.delF===f.id?'Удалить?':'✕'}</button></div>`).join('')}</div>`:'<p class="empty">Файлов пока нет.</p>'}`}
   if(tab==='boards'){const bl=[...(S.boards||[])].sort((a,b)=>(b.at||0)-(a.at||0));
-    const prev=b=>{const f=BD.frames(b.items||[])[0];const im=(f&&f.src)||((b.items||[]).find(x=>x.t==='image')||{}).src;return im?`style="background-image:url('${BD.srcURL(im)}')${f&&!f.src?'':''}"`:f?`style="background:${f.fill||'#fff'}"`:''};
+    const prev=b=>{if(b.cover)return `style="background-image:url('${BD.srcURL(b.cover)}')"`;const f=BD.frames(b.items||[])[0];const im=(f&&f.src)||((b.items||[]).find(x=>x.t==='image')||{}).src;return im?`style="background-image:url('${BD.srcURL(im)}')${f&&!f.src?'':''}"`:f?`style="background:${f.fill||'#fff'}"`:''};
     body=`<div class="lact" style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap"><button class="btn primary" id="bdNew">+ Новая разработка</button><button class="btn" id="bdImp">Импорт доски: PDF или картинки</button><input type="file" id="bdImpF" accept=".pdf,application/pdf,image/*" multiple hidden><button class="btn" id="bdImpM" title="Папка с подготовленной доской: board.json и картинки">Импорт доски: папка</button><input type="file" id="bdImpD" webkitdirectory multiple hidden></div>
-      ${bl.length?`<div class="bgrid">${bl.map(b=>`<div class="bcard"><button class="bprev" data-bo="${b.id}" ${prev(b)}>${prev(b)?'':'Пустая'}</button>
+      ${bl.length?[[bl.filter(b=>b.story),'Сюжеты','Отдельный холст на каждый сюжет. На урок берётся копия: сам сюжет остаётся чистым'],[bl.filter(b=>!b.story),bl.some(b=>b.story)?'Большие доски':'','']].filter(g=>g[0].length).map(([g,h,sub])=>`${h?`<h3 class="bsec">${h}${sub?`<small>${sub}</small>`:''}</h3>`:''}<div class="bgrid">${g.map(b=>`<div class="bcard"><button class="bprev" data-bo="${b.id}" ${prev(b)}>${prev(b)?'':'Пустая'}</button>
         <div class="binf"><b>${esc(b.name)}</b><small>${BD.frames(b.items||[]).length} ${plural(BD.frames(b.items||[]).length,['фрейм','фрейма','фреймов'])} · ${ago(b.at||Date.now())}</small>
-        <div class="bbtns"><button class="btn small" data-bo="${b.id}">Открыть</button><button class="btn small quiet" data-bc="${b.id}">Копия</button><button class="btn small quiet" data-bd="${b.id}">${V.delB===b.id?'Удалить?':'Удалить'}</button></div></div></div>`).join('')}</div>`
+        <div class="bbtns"><button class="btn small" data-bo="${b.id}">Открыть</button><button class="btn small quiet" data-bc="${b.id}">Копия</button><button class="btn small quiet" data-bd="${b.id}">${V.delB===b.id?'Удалить?':'Удалить'}</button></div></div></div>`).join('')}</div>`).join('')
       :`<div class="empty-first big-empty">${emptyArt('cheburashka-1')}<div><h2>Разработок пока нет</h2><p>Разработка — это ваш холст: фреймы, картинки, текст, стикеры, фигуры. Сделайте один раз и открывайте на уроке в комнате любого ученика.</p></div></div>`}`}
   if(tab==='topics')body=`${mine.length?`<div class="flist">${mine.map(c=>`<div class="frow"><button class="fr-main" data-tp="${c.id}"><span class="fk">${c.grade}</span><span class="fr-t"><b>${esc(c.t)}</b><small>${SUBJ[c.subject]||''} · ${gradeWord(c.grade)} · ${c.L.length} ${plural(c.L.length,['уровень','уровня','уровней'])}</small></span></button></div>`).join('')}</div>`:'<p class="empty">Своих тем пока нет.</p>'}
     <button class="btn" id="newTopic">+ Своя тема</button><p class="hint">Своя тема встаёт в маршрут ученика того класса, для которого её сделали.</p>`;
@@ -6644,7 +6651,7 @@ function roomStart(pb,role,rec,info){
     document.addEventListener('scroll',sc,true);R.unsub.push(()=>document.removeEventListener('scroll',sc,true))}
 }
 function roomStop(){
-  if(!R.on)return;roomForget();
+  if(!R.on)return;if(R.matT&&R.role==='t')roomSaveMatsNow();roomForget();
   Object.values(R.local||{}).forEach(v=>{if(typeof v==='string'&&v.startsWith('blob:'))try{URL.revokeObjectURL(v)}catch(e){}else if(v&&v.doc)try{v.doc.destroy()}catch(e){}});{const d=document.getElementById('rxDock');if(d)d.remove()}if(C.st!=='idle'||C.offer)callEnd(true,null,'left');R.on=false;
   (R.unsub||[]).forEach(u=>{try{u()}catch(e){}});(R.timers||[]).forEach(clearInterval);(R.obs||[]).forEach(o=>o.disconnect());
   clearTimeout(R.stT);clearTimeout(R.ansT);
@@ -6716,8 +6723,10 @@ const roomHere=()=>R.otherAt&&Date.now()-R.otherAt<40000;
 /* на уроке ученик всегда видит то же, что репетитор: сам не листает и не приближает.
    «Отвечает» (st.act не false): вписывает ответы и двигает карточки. «Смотрит»: только смотрит. Ручка выдаётся отдельно */
 const roomFollow=()=>R.role==='s'&&roomLive(R.st);
-const roomCanAct=()=>R.role!=='s'||!roomLive(R.st)||R.st.act!==false;
-function roomNoAct(){if(Date.now()-(R.naT||0)>2500){R.naT=Date.now();toast('Сейчас можно только смотреть. Репетитор скажет, когда отвечать')}}
+/* разработка с прошлого урока у ученика — только посмотреть: все пометки остаются как были на уроке */
+const roomPastDeck=()=>{const m=R.role==='s'&&roomMat();return !!m&&m.k==='deck'&&(m.at||0)<dayStart(Date.now())};
+const roomCanAct=()=>R.role!=='s'||(!roomPastDeck()&&(!roomLive(R.st)||R.st.act!==false));
+function roomNoAct(){if(Date.now()-(R.naT||0)>2500){R.naT=Date.now();toast(roomPastDeck()?'Это прошлый урок: его можно только посмотреть':'Сейчас можно только смотреть. Репетитор скажет, когда отвечать')}}
 /* что видно: номер страницы и доля её высоты у верхнего края, масштаб и сдвиг вбок. Так у ученика тот же кусок листа при любом экране */
 const roomPgs=p=>[...p.children].filter(x=>x.classList.contains('rpg'));
 function roomHxOf(p){for(const el of [p,p.parentElement,p.closest('.rm-pane'),document.getElementById('rmStage')])if(el&&el.scrollWidth>el.clientWidth+1)return el;return null}
@@ -6751,7 +6760,9 @@ function roomSet(patch){
   Object.assign(R.st,patch);R.st.v=(R.st.v||0)+1;
   clearTimeout(R.stT);R.stT=setTimeout(()=>R.pb.collection('rooms').update(R.rec.id,{st:R.st}).catch(()=>toast('Нет связи: ученик увидит изменения, когда связь вернётся')),120);
 }
-function roomSaveMats(){R.pb.collection('rooms').update(R.rec.id,{mats:R.mats}).catch(()=>toast('Нет связи с сервером'))}
+/* список материалов бывает большим (разработки на тысячи объектов): частые правки сохраняем одним запросом */
+function roomSaveMats(){clearTimeout(R.matT);R.matT=setTimeout(roomSaveMatsNow,250)}
+function roomSaveMatsNow(){clearTimeout(R.matT);R.pb.collection('rooms').update(R.rec.id,{mats:R.mats}).catch(e=>{if(e&&e.status===429){clearTimeout(R.matT);R.matT=setTimeout(roomSaveMatsNow,3000)}else toast('Нет связи с сервером')})}
 function roomSaveAns(){clearTimeout(R.ansT);R.ansT=setTimeout(()=>R.pb.collection('rooms').update(R.rec.id,{ans:R.ans}).catch(()=>{}),250)}
 let pulseLast=0,pulseT=null;
 /* быстрый канал: во время звонка движения (перетаскивание, указка, камера холста, прокрутка) идут напрямую между компьютерами,
@@ -7139,7 +7150,7 @@ function roomSetupPage(pg,k){
     R.pb.collection('ink').create(rec).catch(()=>{R.ink=R.ink.filter(x=>x.id!==rec.id);roomInkPaint(pg);toast('Линия не сохранилась: нет связи')})};
   cv.addEventListener('pointerup',end);cv.addEventListener('pointercancel',end);
 }
-const roomCanDraw=()=>R.tool!=='hand'&&(R.role==='t'||(R.st.pen&&roomLive(R.st)));
+const roomCanDraw=()=>R.tool!=='hand'&&(R.role==='t'||(R.st.pen&&roomLive(R.st)&&!roomPastDeck()));
 /* цвета ручки и выделителя; по умолчанию у репетитора красная ручка, у ученика синяя */
 /* новые цвета только в конце списков: номера цветов в уже нарисованных линиях не меняются */
 const INK_PEN=['#D5402F','#2D57C8','#2C8A57','#1F2C55','#E8A317','#7E57C2','#E0559B','#20AFB8','#7A4B2A','#1B1B1F'],
@@ -7437,25 +7448,33 @@ function roomPicker(){
       else if(a==='file')roomFilePick();else if(a==='board'){close();roomAdd({k:'board',bg:'grid',n:1,t:'Доска'})}else if(a==='note')roomNoteEdit()})});
 }
 /* разработка в комнату: копия доски, картинки переезжают в комнату ученика, каждый фрейм — страница */
-function roomDeckPick(){const bl=[...(S.boards||[])].sort((a,b)=>(b.at||0)-(a.at||0));
-  modal(`<h2>Разработка</h2>${bl.length?`<div class="picks">${bl.map(b=>`<button class="pick" data-b="${b.id}"><b>${esc(b.name)}</b><small>${BD.frames(b.items||[]).length} ${plural(BD.frames(b.items||[]).length,['фрейм','фрейма','фреймов'])}</small></button>`).join('')}</div>`
+function roomDeckPick(){const bl=[...(S.boards||[])].sort((a,b)=>(b.at||0)-(a.at||0)),st=bl.filter(b=>b.story).sort((a,b)=>a.name.localeCompare(b.name,'ru')),big=bl.filter(b=>!b.story);
+  const card=b=>`<button class="pick" data-b="${b.id}"><b>${esc(b.name)}</b><small>${BD.frames(b.items||[]).length} ${plural(BD.frames(b.items||[]).length,['фрейм','фрейма','фреймов'])}</small></button>`;
+  modal(`<h2>Разработка</h2>${bl.length?`${st.length?`<input class="inp" id="stq" type="search" placeholder="Найти сюжет: Алладин, Моана…" style="width:100%;margin:0 0 10px">
+      <div class="stp">${st.map(b=>`<button class="stp-i" data-b="${b.id}"><span class="stp-th" data-th="${esc(b.cover||'')}"></span><b>${esc(b.name)}</b></button>`).join('')}</div>`:''}
+    ${big.length?`${st.length?'<h3 class="bsec">Большие доски</h3>':''}<div class="picks">${big.map(card).join('')}</div>`:''}`
     :'<p style="margin:0">Разработок пока нет. Их делают в «Моих материалах» → «Разработки».</p>'}
     <div class="modal-actions"><button class="btn quiet" id="cl">Назад</button></div>`,()=>{
     document.getElementById('cl').onclick=roomPicker;
-    document.querySelectorAll('[data-b]').forEach(x=>x.onclick=()=>{close();roomDeckFramePick(S.boards.find(b=>b.id===x.dataset.b))})});
+    const q=document.getElementById('stq');if(q){q.focus();q.oninput=()=>{const v=q.value.trim().toLowerCase();document.querySelectorAll('.stp-i').forEach(x=>x.hidden=!!v&&!x.textContent.toLowerCase().includes(v))}}
+    deckThumbs('.stp-th');
+    /* сюжет открывается сразу с первого фрейма, большая доска — через выбор фрейма */
+    document.querySelectorAll('[data-b]').forEach(x=>x.onclick=()=>{const b=S.boards.find(y=>y.id===x.dataset.b);close();if(b&&b.story)roomAddDeck(b,(BD.frames(b.items||[])[0]||{}).id);else roomDeckFramePick(b)})});
 }
+/* картинки-обложки грузятся, только когда видны в окне */
+function deckThumbs(sel){const io=new IntersectionObserver(es=>es.forEach(e=>{if(!e.isIntersecting)return;io.unobserve(e.target);const t=e.target.dataset.th;if(!t)return;
+  (t.startsWith('f:')?BD.cachedURL(t):Promise.resolve(t.startsWith('data:')||t.startsWith('http')?t:'')).then(u=>{if(u&&!u.startsWith('f:'))e.target.style.backgroundImage=`url('${u}')`}).catch(()=>{})}));
+  document.querySelectorAll(sel).forEach(x=>io.observe(x));return io}
 /* какой фрейм открыть: на уроке будет весь холст, а на экране сразу этот фрейм */
 function roomDeckFramePick(b){if(!b)return;const fr=BD.frames(b.items||[]);
   if(!fr.length){toast('В разработке нет фреймов: добавьте хотя бы один фрейм');return}
   modal(`<h2>${esc(b.name)}</h2><p class="hint" style="margin:0 0 10px">С какого фрейма начать урок? Откроется весь холст, на экране будет выбранный фрейм. Остальные фреймы тоже можно будет открыть.</p>
     <input class="inp" id="dfq" type="search" placeholder="Найти фрейм по названию" style="width:100%;margin:0 0 10px">
-    <div class="dfp">${fr.map((f,i)=>`<button class="dfp-i" data-f="${esc(f.id)}"><span class="dfp-th" data-th="${esc(f.th||f.src||'')}" style="aspect-ratio:${+f.w||16}/${+f.h||9};background-color:${esc(f.fill||'#fff')}"></span><b>${i+1}. ${esc(f.text||'Фрейм')}</b></button>`).join('')}</div>
+    <div class="dfp">${fr.map((f,i)=>`<button class="dfp-i" data-f="${esc(f.id)}"><span class="dfp-th" data-th="${esc(f.th||f.src||frameCover(b.items||[],f))}" style="aspect-ratio:${+f.w||16}/${+f.h||9};background-color:${esc(f.fill||'#fff')}"></span><b>${i+1}. ${esc(f.text||'Фрейм')}</b></button>`).join('')}</div>
     <div class="modal-actions"><button class="btn quiet" id="cl">Назад</button></div>`,()=>{
     document.getElementById('cl').onclick=roomDeckPick;
     const q=document.getElementById('dfq');q.oninput=()=>{const v=q.value.trim().toLowerCase();document.querySelectorAll('.dfp-i').forEach(x=>x.hidden=!!v&&!x.textContent.toLowerCase().includes(v))};
-    const io=new IntersectionObserver(es=>es.forEach(e=>{if(!e.isIntersecting)return;io.unobserve(e.target);const t=e.target.dataset.th;if(!t)return;
-      (t.startsWith('f:')?BD.cachedURL(t):Promise.resolve(t.startsWith('data:')?t:'')).then(u=>{if(u&&!u.startsWith('f:'))e.target.style.backgroundImage=`url('${u}')`}).catch(()=>{})}));
-    document.querySelectorAll('.dfp-th').forEach(x=>io.observe(x));
+    const io=deckThumbs('.dfp-th');
     document.querySelectorAll('.dfp-i').forEach(x=>x.onclick=()=>{io.disconnect();close();roomAddDeck(b,x.dataset.f)})});
 }
 /* картинки не переносятся заранее: холст сам переносит в комнату то, что репетитор открыл на экране */
@@ -7923,6 +7942,7 @@ async function callCtlToggle(){
   let r;try{r=await d.controlStart()}catch(e){r={ok:false,why:'error'}}
   if(!r||!r.ok){
     const why=r&&r.why;
+    if(why==='accessibility'&&d.permFix){permHelp('access');return}
     toast(why==='accessibility'?'Разрешите программе «Клетка» управлять компьютером: Системные настройки, Конфиденциальность и безопасность, Универсальный доступ. Потом нажмите ещё раз':why==='no-screen'?'Сначала нажмите «Показать экран» и выберите экран':'В этой версии программы управление недоступно');return}
   C.ctl=true;C.ctlAsk=false;roomPulse({ctl:1},true);callUI();callScreenUI();shSendState()}
 function callCtlAsked(){const nm=(R.info&&R.info.first)||'Ученик';C.ctlAsk=true;shSendState();clearTimeout(C.ctlAskT);C.ctlAskT=setTimeout(()=>{C.ctlAsk=false;shSendState()},60000);
@@ -7996,9 +8016,12 @@ function shTile(sel,ico,name,sub,dis){return `<button class="shp-t${dis?' dis':'
 async function shPickBody(){
   const b=document.getElementById('shpB');if(!b)return;const tab=SH.tab;
   if(tab==='scr'){
-    if(DESK()){b.innerHTML='<p class="hint">Ищу экраны и окна…</p>';let list=[];try{list=await DESK().shareSources()}catch(e){}
+    if(DESK()){b.innerHTML='<p class="hint">Ищу экраны и окна…</p>';
+      let ps=null;if(DESK().permState)try{ps=await DESK().permState()}catch(e){}
+      if(ps&&(ps.screen==='denied'||ps.screen==='restricted')){b.innerHTML=permBody('screen');permBind(b,'screen');return}
+      let list=[];try{list=await DESK().shareSources()}catch(e){}
       if(SH.tab!==tab||!document.getElementById('shpB'))return;
-      if(!list.length){b.innerHTML='<p class="hint">Не вижу экранов. Разрешите программе «Клетка» запись экрана: Системные настройки → Конфиденциальность и безопасность → Запись экрана. Потом перезапустите программу.</p>';return}
+      if(!list.length){if(DESK().permFix){b.innerHTML=permBody('screen');permBind(b,'screen')}else b.innerHTML='<p class="hint">Не вижу экранов. Разрешите программе «Клетка» запись экрана: Системные настройки → Конфиденциальность и безопасность → Запись экрана. Потом перезапустите программу.</p>';return}
       b.innerHTML=`<div class="shp-g">${list.map(s=>`<button class="shp-t shp-pv" data-sel='${esc(JSON.stringify({id:s.id,kind:s.kind}))}'><span class="shp-th">${s.thumb?`<img src="${s.thumb}" alt="">`:SH_SVG[s.kind==='screen'?'monitor':'window']}</span><b>${s.icon?`<img class="shp-ic" src="${s.icon}" alt="">`:''}${esc(s.name)}</b></button>`).join('')}</div>`}
     else b.innerHTML=`<div class="shp-g">${shTile({surface:'monitor',kind:'screen'},SH_SVG.monitor,'Весь экран','Всё, что на экране')}${shTile({surface:'window',kind:'window'},SH_SVG.window,'Окно программы','Одна программа: игра, Word, Paint')}${shTile({surface:'browser',kind:'tab'},SH_SVG.browser,'Вкладка браузера','Сайт с игрой или видео')}</div>
       <p class="hint shp-n">Дальше браузер покажет свои окна: выберите там нужное и нажмите «Поделиться». Миниатюры всех окон, как в Zoom, есть в программе «Клетка» для компьютера.</p>`}
@@ -8010,6 +8033,17 @@ async function shPickBody(){
       ${shCanCrop()?'':'<p class="hint shp-n">«Часть экрана» работает в программе «Клетка» для компьютера: кнопка «⋯» вверху → «Скачать программу».</p>'}`}
   b.querySelectorAll('[data-sel]').forEach(t=>{t.onclick=()=>{if(t.classList.contains('dis')){toast('Это есть в программе «Клетка» для компьютера');return}
     SH.sel=JSON.parse(t.dataset.sel);b.querySelectorAll('[data-sel]').forEach(x=>x.classList.toggle('on',x===t))};t.ondblclick=()=>{if(!t.classList.contains('dis')){SH.sel=JSON.parse(t.dataset.sel);shGo()}}})}
+/* разрешения macOS: галочка может стоять, но относиться к старой версии программы. Тогда помогает только «починить»:
+   программа стирает старую запись, перезапускается, и macOS спрашивает заново */
+const PERM_T={screen:['Запись экрана','показывать экран'],access:['Универсальный доступ','давать ученику управление']};
+function permBody(k){const [pane,what]=PERM_T[k];return `<div class="perm-box"><b>macOS не даёт программе ${what}</b>
+  <p>Даже если в настройках «${pane}» у «Клетки» уже стоит галочка, она могла остаться от старой версии программы. Нажмите «Починить»: ${k==='screen'?'программа перезапустится, ':''}macOS спросит разрешение заново. Нажмите «Открыть Системные настройки» и включите «Клетку»${k==='screen'?', затем «Выйти и открыть снова»':''}.</p>
+  <div class="row"><button class="btn primary" data-pf="fix">Починить</button><button class="btn" data-pf="open">Открыть настройки</button></div></div>`}
+function permBind(box,k){box.querySelectorAll('[data-pf]').forEach(b=>b.onclick=async()=>{const d=DESK();if(!d)return;
+  if(b.dataset.pf==='open'){d.permOpen(k);return}
+  if(k==='screen'&&C.st==='live'&&!confirm('Программа перезапустится, звонок прервётся. Ученик останется в комнате, звонок можно будет начать снова. Починить сейчас?'))return;
+  b.disabled=true;await d.permFix(k);if(k==='access'){d.permOpen(k);toast('Включите «Клетку» в «Универсальном доступе» и снова нажмите «Дать управление»')}})}
+function permHelp(k){modal(`<h2>Нужно разрешение</h2>${permBody(k)}<div class="row" style="margin-top:12px"><button class="btn" id="permX">Закрыть</button></div>`,()=>{permBind(mroot,k);document.getElementById('permX').onclick=close})}
 async function shGo(){
   const o=SH.sel;if(!o){toast('Выберите, что показать');return}
   if(o.add){close();roomPicker();return}
@@ -8222,12 +8256,13 @@ function callDrag(el){
   const save=()=>{try{localStorage.setItem(VC_KEY,JSON.stringify(C.pos))}catch(e){}};
   el.addEventListener('pointerdown',e=>{if(e.target.closest('button,.vc-tap'))return;const rs=e.target.dataset.rs;
     if(!rs&&!e.target.closest('.vc-v,.vc-bar'))return;e.preventDefault();el.setPointerCapture(e.pointerId);
-    const p=callPos(),r=el.getBoundingClientRect(),sx=e.clientX,sy=e.clientY,x0=r.left,y0=r.top,w0=r.width;el.classList.add('moving');
+    const p=callPos(),r=el.getBoundingClientRect(),sx=e.clientX,sy=e.clientY,x0=r.left,y0=r.top,w0=r.width,h0=r.height;el.classList.add('moving');
+    /* за любой угол: противоположный угол стоит на месте, окно растёт или сжимается в сторону мыши */
     const mv=ev=>{const dx=ev.clientX-sx,dy=ev.clientY-sy;
-      if(rs==='br'){p.w=Math.max(140,Math.min(innerWidth-16,w0+dx));p.x=x0;p.y=y0}
-      else if(rs==='tl'){p.w=Math.max(140,Math.min(innerWidth-16,w0-dx));p.x=x0+w0-p.w;p.y=y0+(w0-p.w)*.75}
-      else{p.x=x0+dx;p.y=y0+dy}
-      callPlace(el)};
+      if(rs){const L=rs[1]==='l',T=rs[0]==='t',d=Math.abs(dx)>=Math.abs(dy)*1.33?(L?-dx:dx):(T?-dy:dy)/.75;
+        p.w=Math.max(140,Math.min(innerWidth-16,w0+d));p.x=L?x0+w0-p.w:x0;p.y=y0;callPlace(el);
+        if(T){p.y=y0+h0-el.offsetHeight;callPlace(el)}return}
+      p.x=x0+dx;p.y=y0+dy;callPlace(el)};
     const up=()=>{el.classList.remove('moving');el.removeEventListener('pointermove',mv);el.removeEventListener('pointerup',up);el.removeEventListener('pointercancel',up);save()};
     el.addEventListener('pointermove',mv);el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up)});
 }
@@ -8251,7 +8286,7 @@ function callUI(){
   /* видео создаётся один раз на звонок: пересоздание плееров тормозит браузер */
   if(el.dataset.m!=='call'){el.dataset.m='call';el.innerHTML=`<div class="vc-v"><video id="vcR" autoplay playsinline></video><video id="vcL" autoplay playsinline muted></video><div id="vcOv"></div></div>
     <div class="vc-lv"><span title="Ваш микрофон">Вы</span><i><b id="vcLvMe"></b></i><span title="Голос собеседника">${esc(other)}</span><i><b id="vcLvThem"></b></i></div>
-    <div class="vc-bar" id="vcBar"></div><div id="vcMsg"></div><i class="vc-rs tl" data-rs="tl"></i><i class="vc-rs br" data-rs="br"></i>`;callDrag(el)}
+    <div class="vc-bar" id="vcBar"></div><div id="vcMsg"></div><i class="vc-rs tl" data-rs="tl"></i><i class="vc-rs tr" data-rs="tr"></i><i class="vc-rs bl" data-rs="bl"></i><i class="vc-rs br" data-rs="br"></i>`;callDrag(el)}
   const wait=C.st==='calling'?`Звоним: ${esc(other)}…${roomHere()?'':' Ученик пока не в комнате, звонок дождётся его.'}`:C.st==='connecting'?'Соединяем…':C.st==='reconnecting'?'Связь прервалась, восстанавливаем…':'';
   document.getElementById('vcOv').innerHTML=wait?`<div class="vc-wait">${wait}</div>`:C.themAo&&C.st==='live'?`<div class="vc-wait">🔈 ${esc(other)}: только звук</div>`:'';
   document.getElementById('vcBar').innerHTML=`<span class="vc-q" id="vcQ"></span>
@@ -8413,6 +8448,34 @@ function studentSummary(st,subj){
     ${reps.length?`<div class="sum-r"><span class="label">Уроки</span>${reps.map(r=>{const p=r.n?Math.round(r.k/r.n*100):0;return `<button class="sum-rep" data-rp="${r.id}"><span>${dayTxt(r.date)}</span>${resChip(r.k,Math.max(1,r.n))}<small>${r.topics.filter(t=>t.st==='bad'||t.st==='warn').length?'есть слабые темы':'всё усвоено'}</small></button>`}).join('')}</div>`:''}</section>`;
 }
 
+/* ---------- сюжеты: отдельный холст на каждый сюжет большой доски ----------
+   Берём выбранные фреймы со всем, что на них лежит (и рядом, чуть за краем), и ставим их в ряд на новом холсте.
+   Картинки те же файлы, что на большой доске: ничего заново не загружается. Большая доска не меняется. */
+/*STORY*/function storyCut(items,frameIds){
+  const F=items.filter(x=>x.t==='frame'),inside=(a,c)=>a.x>=c.x-1&&a.y>=c.y-1&&a.x+a.w<=c.x+c.w+1&&a.y+(a.h||0)<=c.y+c.h+1;
+  const top=F.filter(f=>!F.some(g=>g!==f&&g.w*g.h>f.w*f.h&&inside(f,g)));
+  /* кому принадлежит объект: самому маленькому верхнему фрейму, в который попадает его середина (с запасом 6% по краям) */
+  const owner=it=>{const cx=it.x+it.w/2,cy=it.y+(it.h||it.w)/2;let best=null,ba=Infinity;
+    for(const f of top){const m=Math.min(f.w,f.h)*.06;if(cx>=f.x-m&&cx<=f.x+f.w+m&&cy>=f.y-m&&cy<=f.y+f.h+m&&f.w*f.h<ba){best=f;ba=f.w*f.h}}return best};
+  const own=new Map();for(const it of items){if(top.includes(it))continue;const o=owner(it);if(o)own.set(it.id,o.id)}
+  const out=[];let cx=0;const GAP=300;
+  for(const id of frameIds){const f=top.find(x=>x.id===id);if(!f)continue;const dx=cx-f.x,dy=-f.y;
+    out.push({...f,x:cx,y:0});
+    for(const it of items)if(own.get(it.id)===id)out.push({...it,x:it.x+dx,y:it.y+dy});
+    cx+=f.w+GAP}
+  /* порядок слоёв как на большой доске */
+  const ord=new Map(items.map((x,i)=>[x.id,i]));out.sort((a,b)=>ord.get(a.id)-ord.get(b.id));
+  return JSON.parse(JSON.stringify(out))}
+/* обложка: самая большая картинка фрейма (у фреймов из Miro своей картинки нет — были одноцветные квадраты) */
+function frameCover(items,f){let best=null;
+  for(const it of items){if(it.t!=='image')continue;const cx=it.x+it.w/2,cy=it.y+(it.h||it.w)/2;if(cx>=f.x&&cx<=f.x+f.w&&cy>=f.y&&cy<=f.y+f.h&&(!best||it.w*it.h>best.w*best.h))best=it}
+  return best?(best.th||best.src||''):''}
+function storyCover(items){const f=items.find(x=>x.t==='frame');return f?(f.th||f.src||frameCover(items,f)):''}
+/* сделать холсты сюжетов из большой доски: plan = [{name, frames:[id фреймов]}]. Повторный запуск не плодит копии */
+function storyMake(boardId,plan){const B0=(S.boards||[]).find(b=>b.id===boardId);if(!B0)return 0;let n=0;
+  for(const p of plan){if(S.boards.some(b=>b.story&&b.src===boardId&&b.name===p.name))continue;const items=storyCut(B0.items||[],p.frames);if(!items.length)continue;
+    S.boards.push({id:'b'+Math.random().toString(36).slice(2,10),name:p.name,at:Date.now(),from:'story',story:true,src:boardId,items,cover:storyCover(items)});n++}
+  if(n)save();return n}
 /* ---------- Разработки: доска как в Miro ----------
    Отдельный блок: всё внутри BD, стили с приставкой bd-. Доска хранится в рабочей среде (S.boards),
    картинки — в «Файлах» аккаунта в скрытой папке __board (без аккаунта — прямо в доске).
@@ -8990,12 +9053,14 @@ const zoneAt=(it,zs)=>zs.find(z=>it.x+it.w/2>=z.x&&it.x+it.w/2<=z.x+z.w&&it.y+it
 /* картинки холста: d: — уже в комнате, f: — файл репетитора (видит только он, пока картинку не перенесли в комнату) */
 const deckURL=s=>{if(!s)return '';const k=DK.urls.get(s);if(typeof k==='string')return k;
   if(s.startsWith('d:'))return R.pb.files.getURL(R.rec,s.slice(2),{token:FTOK.t});if(s.startsWith('art:'))return ART_BASE+s.slice(4);
-  if(s.startsWith('f:')){if(R.role!=='t')return '';if(!k){DK.urls.set(s,1);BD.cachedURL(s).then(u=>{if(u&&!String(u).startsWith('f:')){DK.urls.set(s,u);deckSoon()}}).catch(()=>{})}return ''}
+  if(s.startsWith('f:')){if(R.role!=='t')return FTOK.t?`${API}/api/files/files/${s.slice(2)}?token=${FTOK.t}`:'';if(!k){DK.urls.set(s,1);BD.cachedURL(s).then(u=>{if(u&&!String(u).startsWith('f:')){DK.urls.set(s,u);deckSoon()}}).catch(()=>{})}return ''}
   return s};
 /* проверка: поле ответа и карточка в зоне */
 function deckCheck(it,items){if(it.t==='answer'&&it.ans&&it.text)return rOk({ans:it.ans},it.text)?'ok':'bad';
   if(it.tgt){const z=zoneAt(it,items.filter(x=>x.zone&&x.id!==it.id));if(z)return z.id===it.tgt?'ok':'bad'}return ''}
-function deckInner(m,f,all){const items=all||deckEff(m),show=R.role==='t'||R.st.chk!==false;
+/* мелкая на экране картинка показывается уменьшенной копией (th): при отдалении не качаем сотни оригиналов */
+const deckSm=(it,sc)=>it.t==='image'&&it.th&&sc&&it.w*sc*(devicePixelRatio||1)<=480?{...it,src:it.th}:it;
+function deckInner(m,f,all,sc){const items=(all||deckEff(m)).map(it=>deckSm(it,sc)),show=R.role==='t'||R.st.chk!==false;
   const bg=BD.look({...f,x:0,y:0,src:deckURL(f.src)?f.src:''},deckURL);let h=`<div class="${bg.cls}" style="${bg.style}"></div>`;
   for(const it of items.filter(x=>deckIn(x,f))){const hid=it.hide&&!it.shown;if(hid&&R.role==='s')continue;
     const l=BD.look({...it,x:it.x-f.x,y:it.y-f.y,src:it.src&&deckURL(it.src)?it.src:''},deckURL);let cls=l.cls;
@@ -9005,8 +9070,8 @@ function deckInner(m,f,all){const items=all||deckEff(m),show=R.role==='t'||R.st.
 function roomDeckPaint(){const m=roomMat();if(!m||m.k!=='deck')return;const vp=deckView();if(!vp||!DK.cur)return;vp.classList.toggle('lock',deckLocked());
   const v=DK.cur,W=vp.clientWidth,H=vp.clientHeight,M=400,items=deckEff(m);
   vp.querySelectorAll('.rdf').forEach(pg=>{if(R.deckBusy&&pg.contains(R.deckBusy))return;const f=(m.items||[]).find(x=>x.id===pg.dataset.f);const st=pg.querySelector('.bd-st');if(!f||!st)return;
-    const sx=f.x*v.s+v.x,sy=f.y*v.s+v.y,sw=f.w*v.s,sh=f.h*v.s,inView=sx<W+M&&sy<H+M&&sx+sw>-M&&sy+sh>-M,big=sw>=150;
-    let h;if(inView&&big){h=deckInner(m,f,items);if(R.role==='t')deckNeed(m,f,items)}else h=deckPh(f,inView);
+    const sx=f.x*v.s+v.x,sy=f.y*v.s+v.y,sw=f.w*v.s,sh=f.h*v.s,inView=sx<W+M&&sy<H+M&&sx+sw>-M&&sy+sh>-M,big=sw>=Math.min(320,W*.3);
+    let h;if(inView&&big)h=deckInner(m,f,items,v.s);else h=deckPh(f,inView);
     if(st._h!==h){st.innerHTML=h;st._h=h}
     if(inView&&big&&!pg.querySelector('.r-ink')){roomSetupPage(pg,+pg.dataset.pg);roomInkPaint(pg)}})}
 function deckSave(m,it,patch){const now=Date.now();
@@ -9047,15 +9112,19 @@ function deckRemoteDrag(dg){const m=roomMat();if(!dg||!m||m.k!=='deck'||dg.m!==m
    Картинки переносятся в комнату не все сразу, а только те, что репетитор открыл на экране: так большая доска открывается быстро. */
 const DK={v:{},cur:null,urls:new Map(),q:[],qd:new Set(),fail:{},busy:0,full:false};
 const deckView=()=>document.getElementById('rdk');
+/* ученику нужна свежая «подпись» для картинок репетитора: старая живёт пару минут */
+function deckTok(){if(R.role==='t'||(FTOK.t&&Date.now()-FTOK.at<60000&&FTOK.pb===R.pb)||DK.tokB)return;DK.tokB=1;roomFileURL('x').then(deckSoon).catch(()=>{}).finally(()=>{DK.tokB=0})}
 function deckSoon(){clearTimeout(DK.pT);DK.pT=setTimeout(roomDeckPaint,60)}
-function deckPh(f,inView){let bg='';if(inView){const u=R.role==='t'&&f.th?deckURL(f.th):'';const u2=u||deckURL(f.src);if(u2)bg=`background-image:url('${u2}');`}
+function deckPh(f,inView){let bg='';if(inView){const u=f.th?deckURL(f.th):'';const u2=u||deckURL(f.src);if(u2)bg=`background-image:url('${u2}');`}
   return `<div class="rdf-ph" style="background-color:${esc(f.fill||'#fff')};${bg}"><b>${esc(f.text||'')}</b></div>`}
 function deckCanvas(pages,m){
   pages.classList.add('dk');const fr=BD.frames(m.items||[]);
   if(!fr.length){pages.innerHTML='<p class="empty">В разработке нет фреймов.</p>';return}
   pages.innerHTML=`<div class="rdk" id="rdk"><div class="rdk-w">${fr.map((f,k)=>`<div class="rpg rdeck rdf" data-f="${esc(f.id)}" data-pg="${k}" style="left:${+f.x||0}px;top:${+f.y||0}px;width:${+f.w||1}px;height:${+f.h||1}px"><div class="bd-st" style="width:${+f.w||1}px;height:${+f.h||1}px"></div></div>`).join('')}</div>
+    ${(m.at||0)<dayStart(Date.now())?`<div class="rdk-past">Урок ${esc(dayTxt(m.at||0))}${R.role==='t'?' <button class="btn small" id="rdkNow">Продолжить на сегодняшнем уроке</button>':' · можно только посмотреть'}</div>`:''}
     <div class="rdk-bar"><button data-dz="-" title="Отдалить" aria-label="Отдалить">−</button><span id="rdkZ">100%</span><button data-dz="+" title="Приблизить" aria-label="Приблизить">+</button><button data-dz="all" title="Показать весь холст">Весь холст</button><button data-dz="fr" title="Найти фрейм и перейти к нему">Фреймы ▾</button></div></div>`;
   deckSize();deckBindView();
+  const now=document.getElementById('rdkNow');if(now)now.onclick=()=>{m.at=Date.now();m.vis=true;roomSaveMats();roomUpdate();toast('Разработка перенесена в сегодняшний урок')};
   const c=deckLocked()?deckCamOf():null,saved=DK.v[m.id];
   if(c)deckApplyCam(c);else if(saved)deckSet(saved.x,saved.y,saved.s,R.role==='s');else deckFit([fr.find(f=>f.id===m.f0)||fr[0]])}
 function deckSize(){const vp=deckView();if(!vp)return;const top=vp.getBoundingClientRect().top+scrollY;vp.style.height=Math.max(420,innerHeight-top-14)+'px'}
@@ -9063,7 +9132,7 @@ function deckSet(x,y,s,quiet){const vp=deckView(),m=roomMat();if(!vp||!m)return;
   DK.cur={x,y,s};DK.v[m.id]=DK.cur;const w=vp.firstElementChild;
   w.style.transition=quiet&&R.role==='s'?'transform .12s linear':'none';w.style.transform=`translate(${x}px,${y}px) scale(${s})`;w.style.setProperty('--ik',1/s);
   const z=document.getElementById('rdkZ');if(z)z.textContent=Math.round(s*100)+'%';
-  clearTimeout(DK.lodT);DK.lodT=setTimeout(()=>{roomDeckPaint();deckPgNow()},90);
+  clearTimeout(DK.lodT);DK.lodT=setTimeout(()=>{deckTok();roomDeckPaint();deckPgNow()},120);
   if(!quiet)deckSendCam()}
 function deckFit(list){const vp=deckView();list=list.filter(Boolean);if(!vp||!list.length)return;const W=vp.clientWidth,H=vp.clientHeight;
   let x0=Infinity,y0=Infinity,x1=-Infinity,y1=-Infinity;for(const f of list){x0=Math.min(x0,f.x);y0=Math.min(y0,f.y);x1=Math.max(x1,f.x+f.w);y1=Math.max(y1,f.y+f.h)}
