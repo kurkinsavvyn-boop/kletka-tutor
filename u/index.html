@@ -8108,7 +8108,10 @@ async function shGo(){
   const o=SH.sel;if(!o){toast('Выберите, что показать');return}
   if(o.add){close();roomPicker();return}
   if(o.mat){close();if(C.scrStream)callScreenStop();roomOpenMat(o.mat);const m=R.mats.find(x=>x.id===o.mat);if(m&&m.hid){m.hid=false;roomSaveMats();roomUpdate()}toast('Ученик видит «'+rTitle(m?m.t:'')+'»');return}
-  close();await shStart({...o,audio:SH.audio||!!o.snd,video:SH.video})}
+  close();const run=shStart({...o,audio:SH.audio||!!o.snd,video:SH.video});
+  /* сразу после нажатия: позже браузер окно поверх уже не откроет. Запрос показа к этому моменту уже отправлен */
+  if(!o.snd)shPip();
+  await run;if(!C.scrStream&&SH.pip){try{SH.pip.close()}catch(e){}SH.pip=null}}
 /* выбор в окне Клетки → запрос показа; в программе источник уже выбран, браузер покажет свой список */
 async function shStart(o){
   if(C.st!=='live'){toast('Ученик вышел из звонка. Показ не начат');return}
@@ -8200,17 +8203,27 @@ function shBarHTML(){const st=shState();
   ${st.audioOnly?'':`<button data-a="ann" class="${st.ann?'on':''}">${st.ann?'Готово':'Рисовать'}</button>`}
   ${st.ann?`${SH_COLS.map(c=>`<button class="shb-c${SH.col===c?' on':''}" data-a="color:${c}" style="background:${c}" aria-label="Цвет"></button>`).join('')}<button data-a="clr">Стереть</button>`:''}
   ${st.audioOnly?'':`<button data-a="ctl" class="${C.ctl||st.ask?'on':''}">${C.ctl?'Забрать управление':st.ask?'Разрешить управление':'Управление'}</button>`}
-  ${!DESK()&&'documentPictureInPicture' in window&&!SH.pip?'<button data-a="pip" title="Панель останется поверх других окон, даже когда вы в игре или другой программе">Поверх окон</button>':''}
+  ${('documentPictureInPicture' in window||document.pictureInPictureEnabled)&&!SH.pip?'<button data-a="pip" title="Видео ученика останется поверх других окон, даже когда вы в браузере или другой программе">Ученик поверх окон</button>':''}
   <button data-a="stop" class="shb-stop">Остановить</button>`}
 function shBarBind(root){root.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>shAct(b.dataset.a))}
 function shBarPaint(){const b=document.getElementById('rmShare');if(b){b.innerHTML=shBarHTML();shBarBind(b);b.classList.toggle('ctl',!!C.ctl)}
   if(SH.pip&&SH.pip.document){const r=SH.pip.document.getElementById('shb');if(r){r.innerHTML=shBarHTML();shBarBind(r)}}}
-/* в браузере панель можно вынести в маленькое окно поверх всех программ (Chrome, Edge, Яндекс) */
-async function shPip(){if(!('documentPictureInPicture' in window)||SH.pip)return;
-  try{const w=await documentPictureInPicture.requestWindow({width:620,height:60});SH.pip=w;
-    const st=w.document.createElement('style');st.textContent=SH_BAR_CSS+'body{margin:0;background:#1E2230;font:14px system-ui,sans-serif}#shb{position:static;transform:none;border-radius:0;box-shadow:none;height:60px}';w.document.head.appendChild(st);
-    w.document.body.innerHTML='<div id="shb" class="rm-share"></div>';w.addEventListener('pagehide',()=>{SH.pip=null;shBarPaint()});shBarPaint()}
-  catch(e){toast('Окно поверх не открылось')}}
+/* во время показа репетитор уходит в браузер или другую программу — видео ученика остаётся в маленьком окне поверх всех окон.
+   Окно открывается само при нажатии «Показать» (браузер разрешает такое окно только сразу после нажатия), закрыть и открыть снова можно кнопкой.
+   В браузере в окне ещё и панель показа; в программе своя панель уже висит поверх всех окон */
+function shPip(){if(SH.pip||C.st==='idle')return;
+  if(!('documentPictureInPicture' in window)){const v=document.getElementById('vcR');
+    if(v&&document.pictureInPictureEnabled&&!document.pictureInPictureElement)v.requestPictureInPicture().then(()=>{SH.pip={close:()=>document.exitPictureInPicture().catch(()=>{})};
+      v.addEventListener('leavepictureinpicture',()=>{SH.pip=null;shBarPaint()},{once:true});shBarPaint()}).catch(()=>{});return}
+  const bar=!DESK();SH.pip={close(){}};
+  documentPictureInPicture.requestWindow({width:bar?560:320,height:bar?330:200}).then(w=>{SH.pip=w;
+    const st=w.document.createElement('style');st.textContent=SH_BAR_CSS+`html,body{margin:0;height:100%;background:#1E2230;font:14px system-ui,sans-serif;color:#fff}body{display:flex;flex-direction:column}
+.pv{flex:1;min-height:0;position:relative;background:#0B1020}.pv video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}.pv b{position:absolute;left:8px;bottom:6px;font-size:12px;font-weight:600;background:rgba(0,0,0,.45);padding:2px 8px;border-radius:999px}
+#shb{position:static;transform:none;border-radius:0;box-shadow:none;flex-wrap:wrap;flex:none}`;w.document.head.appendChild(st);
+    w.document.body.innerHTML=`<div class="pv"><video id="pv" autoplay playsinline muted></video><b>${esc(R.info&&(R.info.first||R.info.name)||'Ученик')}</b></div>${bar?'<div id="shb" class="rm-share"></div>':''}`;
+    shPipVid();w.addEventListener('pagehide',()=>{SH.pip=null;shBarPaint()});shBarPaint()})
+  .catch(()=>{SH.pip=null;toast('Окно поверх других окон не открылось. Нажмите «Ученик поверх окон» на панели показа')})}
+function shPipVid(){const d=SH.pip&&SH.pip.document,v=d&&d.getElementById('pv');if(v&&C.rem&&v.srcObject!==C.rem){v.srcObject=C.rem;v.play().catch(()=>{})}}
 const SH_BAR_CSS=`.rm-share{display:flex;align-items:center;gap:4px;background:#1E2230;color:#fff;padding:6px 8px}.rm-share button{border:0;background:transparent;color:#fff;font:inherit;font-size:13px;padding:7px 10px;border-radius:8px;cursor:pointer;white-space:nowrap}.rm-share button:hover{background:rgba(255,255,255,.12)}.rm-share button.on{background:#3E9A5F}.rm-share .shb-stop{background:#D5402F}.rm-share .shb-c{width:22px;height:22px;padding:0;border-radius:50%;border:2px solid transparent}.rm-share .shb-c.on{border-color:#fff}.shb-dot{width:8px;height:8px;border-radius:50%;background:#3E9A5F;margin:0 4px 0 6px;flex-shrink:0}.shb-t{color:#BFE6CB;padding-right:6px;white-space:nowrap}`;
 /* рисовать поверх показа. В программе — прямо на экране (линии попадают в показ сами).
    В браузере и для окна — на большом просмотре своего показа, ученик видит линии поверх видео */
@@ -8323,7 +8336,7 @@ function callBanner(){let b=document.getElementById('vcSnd');if(!C.needTap||C.st
 document.addEventListener('pointerdown',()=>{if(C.needTap)callAudio()},true);document.addEventListener('keydown',()=>{if(C.needTap)callAudio()},true);
 function callVideos(){const r=document.getElementById('vcR'),l=document.getElementById('vcL');
   if(r&&C.rem&&r.srcObject!==C.rem){r.srcObject=C.rem;r.muted=true;r.play().catch(()=>{})}
-  if(l&&C.loc&&l.srcObject!==C.loc)l.srcObject=C.loc;callAudio();callLevels()}
+  if(l&&C.loc&&l.srcObject!==C.loc)l.srcObject=C.loc;shPipVid();callAudio();callLevels()}
 /* полоски громкости: видно, что микрофон работает у вас и что собеседник говорит */
 function callLevels(){if(C.lvT)return;let ac;try{ac=C.ac||(C.ac=new (window.AudioContext||window.webkitAudioContext)())}catch(e){return}
   const mk=st=>{if(!st||!st.getAudioTracks().length)return null;try{const src=ac.createMediaStreamSource(new MediaStream(st.getAudioTracks())),an=ac.createAnalyser();an.fftSize=256;src.connect(an);return an}catch(e){return null}};
@@ -9173,8 +9186,11 @@ function deckInner(m,f,all,sc){const items=(all||deckEff(m)).map(it=>deckSm(it,s
   return h}
 function roomDeckPaint(){const m=roomMat();if(!m||m.k!=='deck')return;const vp=deckView();if(!vp||!DK.cur)return;vp.classList.toggle('lock',deckLocked());
   const v=DK.cur,W=vp.clientWidth,H=vp.clientHeight,M=400,items=deckEff(m);
+  /* мелкие фреймы раньше рисовались пустыми цветными прямоугольниками. Если на экране их немного, рисуем всё содержимое:
+     картинки при этом берутся уменьшенными копиями. Только когда фреймов на экране очень много, мелкие остаются прямоугольниками */
+  const vis=BD.frames(m.items||[]).filter(f=>{const sx=f.x*v.s+v.x,sy=f.y*v.s+v.y;return sx<W&&sy<H&&sx+f.w*v.s>0&&sy+f.h*v.s>0}).length,minW=vis<=30?60:Math.min(320,W*.3);
   vp.querySelectorAll('.rdf').forEach(pg=>{if(R.deckBusy&&pg.contains(R.deckBusy))return;const f=(m.items||[]).find(x=>x.id===pg.dataset.f);const st=pg.querySelector('.bd-st');if(!f||!st)return;
-    const sx=f.x*v.s+v.x,sy=f.y*v.s+v.y,sw=f.w*v.s,sh=f.h*v.s,inView=sx<W+M&&sy<H+M&&sx+sw>-M&&sy+sh>-M,big=sw>=Math.min(320,W*.3);
+    const sx=f.x*v.s+v.x,sy=f.y*v.s+v.y,sw=f.w*v.s,sh=f.h*v.s,inView=sx<W+M&&sy<H+M&&sx+sw>-M&&sy+sh>-M,big=sw>=minW;
     let h;if(inView&&big)h=deckInner(m,f,items,v.s);else h=deckPh(f,inView);
     if(st._h!==h){st.innerHTML=h;st._h=h}
     if(inView&&big&&!pg.querySelector('.r-ink')){roomSetupPage(pg,+pg.dataset.pg);roomInkPaint(pg)}})}
