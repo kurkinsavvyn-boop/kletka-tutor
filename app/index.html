@@ -1294,7 +1294,13 @@ button.mchip:hover{background:rgba(255,255,255,.24)}
 .rm-scr{position:fixed;inset:0;z-index:40;background:#0B1020;display:flex;flex-direction:column}
 .rm-scr .rs-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 16px;color:#fff;font-size:14px}
 .rm-scr .rs-w{flex:1;min-height:0;position:relative}
-.rm-scr video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000}
+.rm-scr .rs-s{position:absolute;inset:0;overflow:auto;display:flex;background:#000;overscroll-behavior:contain}
+.rm-scr video{flex:none;margin:auto;width:100%;height:100%;object-fit:contain;background:#000;display:block}
+.rm-scr.zoomed:not(.ctl) video{cursor:grab}
+.rm-scr.drag video{cursor:grabbing}
+.rm-scr .rs-z{display:flex;align-items:center;gap:6px;margin-left:auto}
+.rm-scr .rs-z b{min-width:46px;text-align:center;font-weight:600}
+.rm-scr .rs-z .btn{min-width:34px}
 .rm-scr canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 .rs-p{display:none;background:#F2B53A;color:#1E2230;border-radius:999px;padding:3px 10px;font-size:13px;font-weight:600}
 .rm-scr.paused .rs-p{display:inline}
@@ -7970,7 +7976,7 @@ function callCtlBind(v){if(v._ctl)return;v._ctl=1;v.tabIndex=0;let last={x:.5,y:
   v.addEventListener('pointerdown',e=>{const p=pos(e);if(!p||!(R.other&&R.other.ctl))return;e.preventDefault();v.focus();try{v.setPointerCapture(e.pointerId)}catch(_){}last=p;
     cnt=Date.now()-pd.at<450&&Math.abs(e.clientX-pd.x)<8&&Math.abs(e.clientY-pd.y)<8?2:1;pd={at:cnt===2?0:Date.now(),x:e.clientX,y:e.clientY};send({t:'d',b:e.button,c:cnt,...p})});
   v.addEventListener('pointerup',e=>{const p=pos(e)||last;send({t:'u',b:e.button,c:cnt,...p})});
-  v.addEventListener('wheel',e=>{if(!(R.other&&R.other.ctl))return;const p=pos(e);if(!p)return;e.preventDefault();send({t:'w',dy:Math.sign(e.deltaY)*Math.min(5,Math.ceil(Math.abs(e.deltaY)/40)),...p})},{passive:false});
+  v.addEventListener('wheel',e=>{if(e.ctrlKey||!(R.other&&R.other.ctl))return;const p=pos(e);if(!p)return;e.preventDefault();send({t:'w',dy:Math.sign(e.deltaY)*Math.min(5,Math.ceil(Math.abs(e.deltaY)/40)),...p})},{passive:false});
   v.addEventListener('keydown',e=>{if(!(R.other&&R.other.ctl)||e.metaKey||e.ctrlKey||e.altKey)return;e.preventDefault();send({t:'k',k:e.key})});
   v.addEventListener('contextmenu',e=>e.preventDefault())}
 /* ---------- показ экрана ----------
@@ -7986,7 +7992,9 @@ function callScreenAttach(pc){const s=C.scrStream;pc=pc||C.pc;if(!pc||!s)return;
   C.scrSenders.forEach(shEnc)}
 /* текст на экране должен оставаться чётким, видео — плавным */
 function shEnc(snd){if(!snd||!snd.track||snd.track.kind!=='video')return;const p=snd.getParameters();p.encodings=p.encodings&&p.encodings.length?p.encodings:[{}];
-  p.encodings[0].maxBitrate=SH.vid?3000000:2000000;p.encodings[0].maxFramerate=SH.vid?30:15;p.degradationPreference=SH.vid?'balanced':'maintain-resolution';snd.setParameters(p).catch(()=>{})}
+  p.encodings[0].maxBitrate=SH.vid?3000000:2500000;p.encodings[0].maxFramerate=SH.vid?30:(SH.kind==='region'?15:10);p.degradationPreference=SH.vid?'balanced':'maintain-resolution';
+  /* при слабой связи место в канале сначала отдаём экрану, а не камере */
+  p.encodings[0].priority='high';p.encodings[0].networkPriority='high';snd.setParameters(p).catch(()=>{})}
 /* ---------- показ экрана как в Zoom ----------
    «Показать экран» открывает окно выбора: «Экраны и окна», «Материалы», «Ещё» (часть экрана, только звук).
    В программе для компьютера окно выбора показывает все экраны и окна с картинками, как в Zoom.
@@ -8108,8 +8116,10 @@ async function shStart(o){
   if(DESK()&&!id&&(o.region||o.snd)){try{const l=await DESK().shareSources();const s=l.find(x=>x.kind==='screen');id=s&&s.id}catch(e){}}
   if(DESK()&&id)try{await DESK().shareChoose({id,audio:!!o.audio,region:!!o.region})}catch(e){}
   /* экран Mac — это 3–6 миллионов точек: кодировать столько 15–30 раз в секунду тяжело и Маку, и сети, отсюда лаги.
-     Ученику хватает 1920×1080: текст читается, а работы в разы меньше */
-  const v={frameRate:{ideal:o.video?30:15,max:o.video?30:15},width:{max:1920},height:{max:1080}};if(!DESK()&&o.surface)v.displaySurface=o.surface;
+     Текст: до 2560×1600, но 10 кадров в секунду — буквы чёткие, а работы столько же, сколько у 1920×1080 при 15 кадрах.
+     Видео: 1920×1080, зато плавно. «Часть экрана» берём крупно: из неё ещё вырезается кусок */
+  const SZ=o.video?{w:1920,h:1080,f:30}:o.region?{w:3840,h:2400,f:15}:{w:2560,h:1600,f:10};
+  const v={frameRate:{ideal:SZ.f,max:SZ.f},width:{max:SZ.w},height:{max:SZ.h}};if(!DESK()&&o.surface)v.displaySurface=o.surface;
   const opt={video:v,audio:o.audio?(DESK()?true:{suppressLocalAudioPlayback:false}):false,selfBrowserSurface:'exclude',surfaceSwitching:'include',systemAudio:'include',monitorTypeSurfaces:'include'};
   let raw;try{raw=await navigator.mediaDevices.getDisplayMedia(opt)}
   catch(e){if(e&&e.name!=='NotAllowedError')toast('Экран не удалось включить');return}
@@ -8120,7 +8130,7 @@ async function shStart(o){
   if(o.audio&&!o.snd&&!au.length&&!DESK())toast('Звук не передаётся: его можно передать только со вкладки браузера (галочка «Поделиться звуком»)');
   if(o.snd&&C.ctl)callCtlStop(true);
   let crop=null;if(vt&&o.region){crop=shCrop(raw,o.video);vt=crop.track}
-  if(vt){try{vt.contentHint=o.video?'motion':'detail'}catch(_){}if(!crop)vt.applyConstraints({width:{max:1920},height:{max:1080},frameRate:{max:o.video?30:15}}).catch(()=>{})}
+  if(vt){try{vt.contentHint=o.video?'motion':'detail'}catch(_){}if(!crop)vt.applyConstraints({width:{max:SZ.w},height:{max:SZ.h},frameRate:{max:SZ.f}}).catch(()=>{})}
   SH.vid=!!o.video;
   const tracks=[...(vt?[vt]:[]),...au];
   const rv=raw.getVideoTracks()[0];if(rv)rv.onended=()=>{if(SH.raw===raw)callScreenStop()};if(!rv&&au[0])au[0].onended=()=>{if(SH.raw===raw)callScreenStop()};
@@ -8149,7 +8159,7 @@ function shCrop(raw,smooth){
   const v=document.createElement('video');v.muted=true;v.playsInline=true;v.srcObject=raw;v.play().catch(()=>{});
   const c=document.createElement('canvas'),x=c.getContext('2d');c.width=1280;c.height=720;let live=true;
   const draw=()=>{if(!live)return;const W=v.videoWidth,H=v.videoHeight;if(W&&H){const r=SH.reg,sw=Math.max(16,r.w*W),sh=Math.max(16,r.h*H);
-      const k=Math.min(1,1920/sw),cw=Math.round(sw*k),ch=Math.round(sh*k);if(c.width!==cw||c.height!==ch){c.width=cw;c.height=ch}
+      const k=Math.min(1,2560/sw,1600/sh),cw=Math.round(sw*k),ch=Math.round(sh*k);if(c.width!==cw||c.height!==ch){c.width=cw;c.height=ch}
       x.drawImage(v,r.x*W,r.y*H,sw,sh,0,0,cw,ch)}
     if(v.requestVideoFrameCallback)v.requestVideoFrameCallback(draw);else setTimeout(draw,1000/(smooth?30:15))};
   if(v.requestVideoFrameCallback)v.requestVideoFrameCallback(draw);else draw();
@@ -8244,16 +8254,37 @@ function callScreenUI(){
   if(C.scrHide){if(el)el.remove();if(!pill){pill=document.createElement('button');pill.id='rmScrShow';pill.className='btn primary rm-scr-show';pill.textContent='Показать экран репетитора';document.body.appendChild(pill);pill.onclick=()=>{C.scrHide=false;callScreenUI()}}return}
   if(pill)pill.remove();
   if(!el){el=document.createElement('div');el.id='rmScr';el.className='rm-scr';
-    el.innerHTML=`<div class="rs-bar"><b>${esc((R.info&&R.info.tutor)||'Репетитор')} показывает экран</b><span class="rs-ctl" id="rsCtl">Управление включено: нажимайте и тащите прямо на экране</span><button class="btn small quiet" id="rsAsk">Попросить управление</button><span class="rs-p" id="rsP">Пауза</span><button class="btn small" id="rsHide">К тетради</button></div><div class="rs-w"><video id="rsV" autoplay playsinline></video><canvas id="rsC"></canvas></div>`;
+    el.innerHTML=`<div class="rs-bar"><b>${esc((R.info&&R.info.tutor)||'Репетитор')} показывает экран</b><span class="rs-ctl" id="rsCtl">Управление включено: нажимайте и тащите прямо на экране</span><button class="btn small quiet" id="rsAsk">Попросить управление</button><span class="rs-p" id="rsP">Пауза</span><span class="rs-z"><button class="btn small" id="rsZo" aria-label="Уменьшить">−</button><b id="rsZv">100%</b><button class="btn small" id="rsZi" aria-label="Увеличить">+</button><button class="btn small" id="rsFs">На весь экран</button></span><button class="btn small" id="rsHide">К тетради</button></div><div class="rs-w"><div class="rs-s" id="rsS"><video id="rsV" autoplay playsinline></video></div><canvas id="rsC"></canvas></div>`;
     document.body.appendChild(el);document.getElementById('rsHide').onclick=()=>{C.scrHide=true;callScreenUI()};
     document.getElementById('rsAsk').onclick=()=>{R.ctlAskAt=Date.now();roomPulse({ctlAsk:Date.now()},true);toast('Репетитор получил просьбу. Когда он разрешит, экран обведётся зелёным');callScreenUI()};
-    addEventListener('resize',()=>{R.annSeen=null;callScreenUI()})}
+    addEventListener('resize',()=>{R.annSeen=null;callScreenUI()});scrZoomBind(el)}
   { const cv=document.getElementById('rsV');if(cv){callCtlBind(cv);const on=!!(R.other&&R.other.ctl);el.classList.toggle('ctl',on);
     const ask=document.getElementById('rsAsk');if(ask){const wait=Date.now()-(R.ctlAskAt||0)<30000;ask.hidden=on||!!sc.snd;ask.disabled=wait;ask.textContent=wait?'Просьба отправлена':'Попросить управление';
       if(on)R.ctlAskAt=0;if(wait&&!R.ctlAskT)R.ctlAskT=setTimeout(()=>{R.ctlAskT=null;callScreenUI()},30500)}}}
   const v=document.getElementById('rsV');if(v&&v.srcObject!==C.scr){v.srcObject=C.scr;v.onloadedmetadata=()=>{R.annSeen=null;callScreenUI()};v.play().catch(()=>{v.muted=true;v.play().catch(()=>{})})}
+  scrZoom(R.scrZ||1);
   el.classList.toggle('paused',!!sc.p);if(v){if(sc.p&&!v.paused)v.pause();else if(!sc.p&&v.paused)v.play().catch(()=>{})}
   const an=R.other.ann,ai=an&&an.i||'';if(R.annSeen!==ai+'|'+(v&&v.videoWidth)){R.annSeen=ai+'|'+(v&&v.videoWidth);const c=document.getElementById('rsC');if(c&&v)shStrokes(c,v,an&&an.s)}}
+/* ученик увеличивает экран репетитора, чтобы читать мелкий текст: кнопки −/+, щипок на тачпаде, двойной щелчок.
+   Увеличенный экран двигается перетаскиванием или прокруткой; при управлении экраном тащить можно только прокруткой */
+function scrZoom(z,cx,cy){const S=document.getElementById('rsS'),v=document.getElementById('rsV'),el=document.getElementById('rmScr');if(!S||!v)return;
+  z=Math.max(1,Math.min(4,Math.round(z*4)/4));const vw=v.videoWidth,vh=v.videoHeight,cw=S.clientWidth,ch=S.clientHeight;
+  const fx=cx==null?.5:(S.scrollLeft+cx)/S.scrollWidth,fy=cy==null?.5:(S.scrollTop+cy)/S.scrollHeight;
+  if(z===1||!vw||!vh){v.style.width=v.style.height=''}else{const k=Math.min(cw/vw,ch/vh);v.style.width=Math.round(vw*k*z)+'px';v.style.height=Math.round(vh*k*z)+'px'}
+  if(z!==R.scrZ){S.scrollLeft=fx*S.scrollWidth-(cx==null?cw/2:cx);S.scrollTop=fy*S.scrollHeight-(cy==null?ch/2:cy);R.scrZ=z;R.annSeen=null;setTimeout(callScreenUI)}
+  const t=document.getElementById('rsZv');if(t)t.textContent=Math.round(z*100)+'%';if(el)el.classList.toggle('zoomed',z>1);
+  const zo=document.getElementById('rsZo'),zi=document.getElementById('rsZi');if(zo)zo.disabled=z<=1;if(zi)zi.disabled=z>=4}
+function scrZoomBind(el){const S=el.querySelector('#rsS'),at=e=>{const r=S.getBoundingClientRect();return[e.clientX-r.left,e.clientY-r.top]};
+  el.querySelector('#rsZi').onclick=()=>scrZoom((R.scrZ||1)+.5);el.querySelector('#rsZo').onclick=()=>scrZoom((R.scrZ||1)-.5);
+  const fs=el.querySelector('#rsFs');if(!document.fullscreenEnabled)fs.hidden=true;
+  fs.onclick=()=>{document.fullscreenElement?document.exitFullscreen().catch(()=>{}):el.requestFullscreen().catch(()=>{})};
+  document.addEventListener('fullscreenchange',()=>{fs.textContent=document.fullscreenElement?'Свернуть':'На весь экран';setTimeout(()=>{R.annSeen=null;callScreenUI()},100)});
+  S.addEventListener('wheel',e=>{if(!e.ctrlKey)return;e.preventDefault();const[x,y]=at(e);scrZoom((R.scrZ||1)*Math.exp(-e.deltaY/100),x,y)},{passive:false});
+  S.addEventListener('dblclick',e=>{if(R.other&&R.other.ctl)return;const[x,y]=at(e);scrZoom((R.scrZ||1)>1?1:2,x,y)});
+  let d=null;S.addEventListener('pointerdown',e=>{if(R.other&&R.other.ctl||(R.scrZ||1)<=1||e.button)return;d={x:e.clientX,y:e.clientY,l:S.scrollLeft,t:S.scrollTop};el.classList.add('drag');try{S.setPointerCapture(e.pointerId)}catch(_){}});
+  S.addEventListener('pointermove',e=>{if(!d)return;S.scrollLeft=d.l-(e.clientX-d.x);S.scrollTop=d.t-(e.clientY-d.y)});
+  const up=()=>{d=null;el.classList.remove('drag')};S.addEventListener('pointerup',up);S.addEventListener('pointercancel',up);
+  let raf=0;S.addEventListener('scroll',()=>{if(raf)return;raf=requestAnimationFrame(()=>{raf=0;R.annSeen=null;callScreenUI()})})}
 /* ---------- завершение ---------- */
 /* left — просто вышел из комнаты: вернётся, звонок поднимется сам; иначе положил трубку */
 function callEnd(send,why,left){
